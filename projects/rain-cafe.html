@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rain Café — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/projects/rain-cafe.html">
+<meta name="description" content="A coffee shop in the rain, mixed live in your browser. Press the button at the bottom right.">
+<meta property="og:title" content="Rain Café — Hari Meyyappan">
+<meta property="og:description" content="A coffee shop in the rain, mixed live in your browser. Press the button at the bottom right.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/projects/rain-cafe.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/style.css?v=20260922g">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script></head>
+<body>
+<header class="masthead"><div class="band"><a href="../index.html"><img src="../img/logo.png" width="248" height="49" alt="networked thought"></a><span class="tagline">Notes on building AI agents, systems, and tools for thought.</span></div></header>
+<div class="page">
+
+<nav class="side">
+  <a class="side-portrait" href="../index.html"><img src="../img/portrait-ink-2.png" width="120" height="155" alt="Illustrated portrait of Hari"></a>
+  <a class="name" href="../index.html">Hari Meyyappan</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../essays/index.html">Essays</a></li>
+    <li><a href="../notes/index.html">Reading+Notes</a></li>
+    <li><a href="../projects/index.html" aria-current="page">Projects</a></li>
+    <li><a href="../recommended/index.html">Recommended</a></li>
+    <li><a href="../now.html">Now</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="../feed.xml">RSS</a></li>
+  </ul>
+</nav>
+
+<main class="essay">
+  <h1>Rain Café</h1>
+  <p class="meta">A coffee shop in the rain, mixed live in your browser. Press the button at the bottom right.</p>
+
+  <dl class="facts">
+    <dt>Status</dt><dd><span class="status status-active">active</span></dd>
+    <dt>Built</dt><dd>September 2026</dd>
+    <dt>Stack</dt><dd>Web Audio API, BBC Sound Effects archive recordings, synthesized fallback</dd>
+    <dt>Source</dt><dd><a href="../js/rain-cafe.js">rain-cafe.js</a></dd>
+  </dl>
+
+  <div class="rc-scene" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" aria-hidden="true"><style> @keyframes rc1-rain{to{transform:translateY(30px)}} .rc1-rain{animation:rc1-rain 4s linear infinite} </style><defs><filter id="rc1-ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter><clipPath id="rc1-pane"><path d="M10 8h100v58H10z"/></clipPath><path id="rc1-rp" d="M24.2 25.4l-1.0 8.8M59.6 13.5l-0.5 8.3M20.2 0.9l-0.8 9.2M85.7 0.1l-0.6 7.2M33.4 28.4l-1.2 9.5M13.5 16.2l-0.9 9.7M32.2 12.7l-1.0 5.1M53.9 14.9l-1.0 6.2M32.4 13.8l-1.2 6.4M93.1 16.7l-1.0 8.2M108.3 25.8l-0.9 5.6M81.7 21.3l-0.8 9.7M92.3 20.1l-0.7 6.5M97.5 25.4l-0.7 7.5M14.4 7.3l-0.8 9.0M28.0 16.5l-0.6 8.5M47.7 13.2l-0.5 7.5M62.1 11.8l-1.2 7.4M15.3 21.1l-0.7 9.9M49.6 5.1l-0.3 7.5"/></defs><g filter="url(#rc1-ink)"><g clip-path="url(#rc1-pane)"><g class="rc1-rain" stroke="#182850" stroke-width="1.3" stroke-linecap="round" fill="none" opacity=".75"><use href="#rc1-rp" y="-30"/><use href="#rc1-rp"/><use href="#rc1-rp" y="30"/><use href="#rc1-rp" y="60"/></g></g><path d="M13 12l-2 5m6-5l-2 5m6-5l-2 5m84-5l-2 5m6-5l-2 5m6-5l-2 5" stroke="#182850" stroke-width="1.2" stroke-linecap="round" fill="none"/><g stroke="#182850" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9 7c30-1 70-1 102 0c0 20 1 40 0 60c-34 1-68 1-102 0c-1-20 0-40 0-60z" stroke-width="2.6"/><path d="M60 8c1 20 0 40 0 58M10 37c33-1 67 1 100 0" stroke-width="2"/></g><path d="M5 66c36-1 74-1 110 0l0 4c-36 1-74 1-110 0z" fill="#182850"/><path d="M3 76c22-2 40 1 58-1m6 1c16-2 32 1 50-1M6 80c14-1 26 1 40 0M78 80c12-1 24 1 36 0" stroke="#182850" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M14 84l-3 6m8-6l-3 6m8-6l-3 6m74-6l-3 6m8-6l-3 6m8-6l-3 6" stroke="#182850" stroke-width="1.4" stroke-linecap="round" fill="none"/><g transform="translate(-18,3) scale(1.2)"><path d="M53 80l-5-30q12-6 24 0l-5 30z" fill="#182850"/><path d="M56 50q4 4 8 0" fill="none" stroke="#f3f4f9" stroke-width="1.6" stroke-linecap="round"/><path d="M57 44l3 4l3-6l3 6l3-4l-1 7h-10z" fill="#182850"/><path d="M60 40l-2 6h4z" fill="#182850"/><path d="M69 53c5 0 9-4 11-9" stroke="#182850" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="M82 36h15l-2 13h-11z" fill="#f3f4f9" stroke="#182850" stroke-width="1.8" stroke-linejoin="round"/><path d="M79 44l10-5m-10 5l11 1m-11-1l8 6" stroke="#182850" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M86 33c-3-3 2-5-1-10m8 10c3-3-2-5 1-10" stroke="#182850" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M36 33c6-3 42-3 48 0c2 1 2 3 0 4c-8 2-40 2-48 0c-2-1-2-3 0-4z" fill="#182850"/><path d="M47 33c-1-12 4-19 13-19c9 0 14 7 13 19z" fill="#182850"/></g><path d="M33 83c14-2 30-2 44 0l1 17H33z" fill="#f3f4f9" stroke="#182850" stroke-width="2.4" stroke-linejoin="round"/><path d="M44 86l-1 12m12-12l0 12m12-12l1 12" stroke="#182850" stroke-width="1.6" stroke-linecap="round" fill="none"/></g></svg></div>
+
+  <p>The first paragraph of <a href="../essays/the-chupacabra.html">The Chupacabra</a> has a man drinking coffee while soft salsa plays and rain thumps against the window. This is that room. The beds are real field recordings from the BBC Sound Effects archive: driving rain on a window, heavy rain outside, a quiet coffee-time chatter and a very busy café with clinking cups. Long loops crossfade so the seam never shows, and thunder and the espresso machine are recordings dropped in at random by the same scheduler that flashes the lightning.</p>
+<p>The recordings load the first time you press play, about eight megabytes. Until they arrive, and if they fail, a fully synthesized version plays instead: noise and oscillators shaped into rain, droplets, a babbling crowd, clinks and a steam wand. The panel says which one you are hearing.</p>
+
+  <h2>What is in the mix</h2>
+  <ul>
+    <li><strong>Rain.</strong> Inside, driving rain on a window with the room's own acoustic. Untick the window and it becomes heavy rain in the open. The rain slider sets the level and opens up the top end as it gets heavier.</li>
+    <li><strong>Thunder and lightning.</strong> Every minute or so a strike is placed at a random distance. The page flashes first, then a recorded thunder roll arrives after the delay the distance implies. Near strikes get the big rolls; far ones a distant rumble over mountains.</li>
+    <li><strong>The crowd.</strong> The café slider crossfades between a quiet room of coffee-time chatter and a packed café, cups and all.</li>
+    <li><strong>The counter.</strong> Every minute or two, one of three takes of an espresso machine being worked.</li>
+  </ul>
+
+  <h2>Credits</h2>
+  <p class="rc-credits">Recordings from the <a href="https://sound-effects.bbcrewind.co.uk/">BBC Sound Effects archive</a>, used under its licence for personal, educational and research use. Catalogue numbers:</p>
+  <ul class="rc-credits">
+    <li>07043376 Driving rain on window, interior acoustic</li>
+    <li>07038337 Heavy rain</li>
+    <li>07011340 Light chatter at coffee-time</li>
+    <li>07052025 Greece: very busy café, with lots of clinks and espresso machine</li>
+    <li>07043391, 07043393, 07043395 Thunder roll, with rain</li>
+    <li>NHU05072099 Distant thunder over mountains</li>
+    <li>07011346 Espresso coffee machine, person preparing coffee</li>
+  </ul>
+
+  <h2>Using it</h2>
+  <p>The speaker button sits at the bottom right of this page and of the story. Click it to start; the mix panel opens with it and shows whether you are hearing the recordings or the synthesized fallback. Right-click the button to show or hide the panel while it plays. The space bar toggles it too. If your system asks for reduced motion, the lightning is sound only.</p>
+
+  <footer>Plain HTML. No tracking. Last updated September 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/rain-cafe.js?v=20260922e"></script>
+<script src="../js/sea.js?v=20260922h" defer></script>
+</body>
+</html>

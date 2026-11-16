@@ -1,0 +1,35 @@
+# Hari Meyyappan
+
+> AI Practice Lead at qBotica (since 2023). Builds AI agents for production: voice agents, document extraction, banking and recruiting agents. Before that, 3 years at Amazon (Alexa Shopping routing, AWS). MS CS, Arizona State; B.Tech, NIT Trichy. Writes notes on building AI agents, personal apps, and tools for thought.
+
+- Home: https://hmeyy.com/
+- Archive of all writing: https://hmeyy.com/archive.html
+- Email: hari.m.subbiah@gmail.com
+- LinkedIn: https://www.linkedin.com/in/harimeyy/
+- GitHub: https://github.com/jagwarrx
+- Feed: https://hmeyy.com/feed.xml
+
+## Essays
+
+- [Your agent will say it sent the email](https://hmeyy.com/essays/agent-said-it-sent-the-email.html): What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.
+- [Artificial Intelligence: Where to dig](https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html): Improve features, create features, create products. The easier problems first.
+- [Coach Wooden](https://hmeyy.com/essays/coach-wooden.html): John Wooden's seven rules for living, and why they still hold.
+- [Aim to Be Directionally Correct](https://hmeyy.com/essays/directionally-correct.html): Precision is expensive. Direction is what compounds.
+- [I built my personal system eighteen times](https://hmeyy.com/essays/eighteen-systems.html): Eighteen attempts in a year at a system to run my life. The median lasted four days. What survived had no schema at all.
+- [How to Win Hackathons](https://hmeyy.com/essays/how-to-win-hackathons.html): A guide to winning hackathons: making marginal gains in ideation, team formation, prototyping and presentation.
+- [Peter Kaufman on Interdisciplinary Thinking](https://hmeyy.com/essays/interdisciplinary-thinking.html): Notes on the talk that made multidisciplinary thinking click.
+- [Lessons In Crypto Markets](https://hmeyy.com/essays/lessons-in-crypto-markets.html): What a year of trading taught me about risk, patience and myself.
+- [Lists of Book Lists](https://hmeyy.com/essays/lists-of-book-lists.html): The reading lists I go back to when choosing what to read next.
+- [Ode to Systems Thinking](https://hmeyy.com/essays/ode-to-systems-thinking.html): Consumers, creators and investors, and what it means to see the whole.
+- [Principles, Experiments & Serendipity](https://hmeyy.com/essays/principles-experiments-serendipity.html): Turning 23. Lessons, professional and personal, and what comes next.
+- [Reason, Resonance & the Future](https://hmeyy.com/essays/reason-resonance-future.html): The future is created, not predicted. On meaning and what to build.
+- [The Chupacabra](https://hmeyy.com/essays/the-chupacabra.html): A short story.
+
+## Projects
+
+- [Condensr rebuild](https://hmeyy.com/projects/condensr.html): A visual thinking canvas, rebuilt in the browser from an open-source desktop tool I liked.
+- [Game Dev](https://hmeyy.com/projects/game-dev.html): A pixel-art game built in Godot. Development log.
+- [Voice agents](https://hmeyy.com/projects/live-voice-agent.html): Agents you talk to that do real work while you're talking: quotes, CRM updates, compliance questions.
+- [Rain Café](https://hmeyy.com/projects/rain-cafe.html): A coffee shop in the rain, mixed live in your browser. Press the button at the bottom right.
+- [Sleep Calculator](https://hmeyy.com/projects/sleep-calculator.html): Pick a wake-up time, get the bedtimes that land on a full sleep cycle.
+- [Personal OS](https://hmeyy.com/projects/task-manager.html): The system I use to run my week, rebuilt more times than I'd like to admit.

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condensr rebuild — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/projects/condensr.html">
+<meta name="description" content="A visual thinking canvas, rebuilt in the browser from an open-source desktop tool I liked.">
+<meta property="og:title" content="Condensr rebuild — Hari Meyyappan">
+<meta property="og:description" content="A visual thinking canvas, rebuilt in the browser from an open-source desktop tool I liked.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/projects/condensr.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/style.css?v=20260922g">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+</head>
+<body>
+<header class="masthead"><div class="band"><a href="../index.html"><img src="../img/logo.png" width="248" height="49" alt="networked thought"></a><span class="tagline">Notes on building AI agents, systems, and tools for thought.</span></div></header>
+<div class="page">
+
+<nav class="side">
+  <a class="side-portrait" href="../index.html"><img src="../img/portrait-ink-2.png" width="120" height="155" alt="Illustrated portrait of Hari"></a>
+  <a class="name" href="../index.html">Hari Meyyappan</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../essays/index.html">Essays</a></li>
+    <li><a href="../notes/index.html">Reading+Notes</a></li>
+    <li><a href="../projects/index.html" aria-current="page">Projects</a></li>
+    <li><a href="../recommended/index.html">Recommended</a></li>
+    <li><a href="../now.html">Now</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="../feed.xml">RSS</a></li>
+  </ul>
+</nav>
+
+<main class="essay">
+  <h1>Condensr rebuild</h1>
+  <p class="meta">A visual thinking canvas, rebuilt in the browser from an open-source desktop tool I liked.</p>
+
+  <dl class="facts">
+    <dt>Status</dt><dd><span class="status status-paused">paused</span></dd>
+    <dt>When</dt><dd>November 2025 to January 2026</dd>
+    <dt>Stack</dt><dd>React, React Flow, Vite. Data in the browser, later as YAML files</dd>
+    <dt>Original</dt><dd>Condensr, a free Java desktop app from the x28hd family of thinking tools</dd>
+  </dl>
+
+  <h2>What it does</h2>
+  <p>A canvas of spaces inside spaces. Each space holds concept and text nodes, boxes and arrows, and reference nodes that point into other spaces, so one idea can live in several maps at once. I added what I wanted from a daily tool: an inbox, a Today, Later and Done task list, a timeline, and a focus mode.</p>
+
+  <h2>Why I rebuilt it</h2>
+  <p>I liked how the original let me think spatially, but it's a desktop Java app and I wanted to change it. The first version was one 4,000-line React file; the second split it into modules and moved the data to plain YAML files I could read and version.</p>
+
+  <h2>Status</h2>
+  <p>Paused since January 2026.</p>
+
+  <footer>Plain HTML. No tracking. Last updated September 2026.</footer>
+</main>
+
+</div>
+<script src="../js/sea.js?v=20260922h" defer></script>
+</body>
+</html>

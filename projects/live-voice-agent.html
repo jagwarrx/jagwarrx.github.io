@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice agents — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/projects/live-voice-agent.html">
+<meta name="description" content="Agents you talk to that do real work while you&#x27;re talking: quotes, CRM updates, compliance questions.">
+<meta property="og:title" content="Voice agents — Hari Meyyappan">
+<meta property="og:description" content="Agents you talk to that do real work while you&#x27;re talking: quotes, CRM updates, compliance questions.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/projects/live-voice-agent.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/style.css?v=20260922g">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+</head>
+<body>
+<header class="masthead"><div class="band"><a href="../index.html"><img src="../img/logo.png" width="248" height="49" alt="networked thought"></a><span class="tagline">Notes on building AI agents, systems, and tools for thought.</span></div></header>
+<div class="page">
+
+<nav class="side">
+  <a class="side-portrait" href="../index.html"><img src="../img/portrait-ink-2.png" width="120" height="155" alt="Illustrated portrait of Hari"></a>
+  <a class="name" href="../index.html">Hari Meyyappan</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../essays/index.html">Essays</a></li>
+    <li><a href="../notes/index.html">Reading+Notes</a></li>
+    <li><a href="../projects/index.html" aria-current="page">Projects</a></li>
+    <li><a href="../recommended/index.html">Recommended</a></li>
+    <li><a href="../now.html">Now</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="../feed.xml">RSS</a></li>
+  </ul>
+</nav>
+<main class="essay">
+  <h1>Voice agents</h1>
+  <p class="meta">Agents you talk to that do real work while you're talking: quotes, CRM updates, compliance questions.</p>
+
+  <dl class="facts">
+    <dt>Status</dt><dd><span class="status status-active">active</span></dd>
+    <dt>Built at</dt><dd>qBotica, for enterprise clients</dd>
+    <dt>Stack</dt><dd>Python, LiveKit Agents, Deepgram speech-to-text, OpenAI models and voices, FastAPI, Next.js, Salesforce</dd>
+    <dt>Since</dt><dd>2025</dd>
+  </dl>
+
+  <h2>Logistics calls</h2>
+  <p>The one that's deployed takes inbound and outbound calls for a logistics company. During the call it creates, looks up and changes quotes, answers the common questions, and routes the caller to the right department when a person is needed.</p>
+
+  <h2>Voice assistants in the browser</h2>
+  <p>A second line of work runs in a web page instead of on the phone, on LiveKit. A salesperson talks to the agent and it adds and updates leads in Salesforce, finds a lead by name, and emails the deck or welcome packet. A compliance version for a purchasing group answers questions about suppliers, contracts and rebates, reads a contract PDF you drop into the call, and draws charts on the screen while it talks. It switches persona depending on who's asking: a finance VP, a supplier manager, a category manager. These were built as client pilots on sample data.</p>
+
+  <h2>What the work actually is</h2>
+  <p>Getting a model to talk is the easy part. Most of the work is making it safe to let it act (more in <a href="../essays/agent-said-it-sent-the-email.html">Your agent will say it sent the email</a>):</p>
+  <ul>
+    <li><strong>Read back before writing.</strong> Before the agent saves a lead or opens a case it reads a short summary back and waits for a yes.</li>
+    <li><strong>Never claim an action that didn't happen.</strong> Models will happily say "I've sent that email" without calling the tool. The prompts forbid it in so many words.</li>
+    <li><strong>Append, don't overwrite.</strong> Notes added by voice are date-stamped and added to the record, never replacing what a person wrote.</li>
+    <li><strong>Keep the conversation moving.</strong> The reply starts generating before the speaker has quite finished, and when a cough or background noise is mistaken for an interruption, the agent picks up where it left off.</li>
+    <li><strong>Say less out loud.</strong> Some things shouldn't be spoken on a call, like pricing tiers or another supplier's data. The agent offers to send those securely instead.</li>
+  </ul>
+
+  <footer>Plain HTML. No tracking. Last updated September 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/sea.js?v=20260922h" defer></script>
+</body>
+</html>

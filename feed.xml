@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hari Meyyappan: Essays</title>
+  <link href="https://hmeyy.com/"/>
+  <link rel="self" href="https://hmeyy.com/feed.xml"/>
+  <id>https://hmeyy.com/</id>
+  <updated>2026-09-22T00:00:00Z</updated>
+  <author><name>Hari Meyyappan</name></author>
+  <entry>
+    <title>Your agent will say it sent the email</title>
+    <link href="https://hmeyy.com/essays/agent-said-it-sent-the-email.html"/>
+    <id>https://hmeyy.com/essays/agent-said-it-sent-the-email.html</id>
+    <updated>2026-09-22T00:00:00Z</updated>
+    <summary>What it takes to let an AI agent act on real systems.</summary>
+  </entry>
+  <entry>
+    <title>I built my personal system eighteen times</title>
+    <link href="https://hmeyy.com/essays/eighteen-systems.html"/>
+    <id>https://hmeyy.com/essays/eighteen-systems.html</id>
+    <updated>2026-09-22T00:00:00Z</updated>
+    <summary>The median lasted four days. What survived had no schema at all.</summary>
+  </entry>
+  <entry>
+    <title>Artificial Intelligence: Where to dig</title>
+    <link href="https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html"/>
+    <id>https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html</id>
+    <updated>2022-05-14T00:00:00Z</updated>
+    <summary>Improve features, create features, create products. The easier problems first.</summary>
+  </entry>
+  <entry>
+    <title>Coach Wooden</title>
+    <link href="https://hmeyy.com/essays/coach-wooden.html"/>
+    <id>https://hmeyy.com/essays/coach-wooden.html</id>
+    <updated>2022-05-11T00:00:00Z</updated>
+    <summary>John Wooden&#x27;s seven rules for living, and why they still hold.</summary>
+  </entry>
+  <entry>
+    <title>Reason, Resonance &amp; the Future</title>
+    <link href="https://hmeyy.com/essays/reason-resonance-future.html"/>
+    <id>https://hmeyy.com/essays/reason-resonance-future.html</id>
+    <updated>2022-05-07T00:00:00Z</updated>
+    <summary>The future is created, not predicted. On meaning and what to build.</summary>
+  </entry>
+  <entry>
+    <title>Peter Kaufman on Interdisciplinary Thinking</title>
+    <link href="https://hmeyy.com/essays/interdisciplinary-thinking.html"/>
+    <id>https://hmeyy.com/essays/interdisciplinary-thinking.html</id>
+    <updated>2021-08-18T00:00:00Z</updated>
+    <summary>Notes on the talk that made multidisciplinary thinking click.</summary>
+  </entry>
+  <entry>
+    <title>Lessons In Crypto Markets</title>
+    <link href="https://hmeyy.com/essays/lessons-in-crypto-markets.html"/>
+    <id>https://hmeyy.com/essays/lessons-in-crypto-markets.html</id>
+    <updated>2021-08-12T00:00:00Z</updated>
+    <summary>What a year of trading taught me about risk, patience and myself.</summary>
+  </entry>
+  <entry>
+    <title>Lists of Book Lists</title>
+    <link href="https://hmeyy.com/essays/lists-of-book-lists.html"/>
+    <id>https://hmeyy.com/essays/lists-of-book-lists.html</id>
+    <updated>2021-02-18T00:00:00Z</updated>
+    <summary>The reading lists I go back to when choosing what to read next.</summary>
+  </entry>
+  <entry>
+    <title>Aim to Be Directionally Correct</title>
+    <link href="https://hmeyy.com/essays/directionally-correct.html"/>
+    <id>https://hmeyy.com/essays/directionally-correct.html</id>
+    <updated>2021-01-18T00:00:00Z</updated>
+    <summary>Precision is expensive. Direction is what compounds.</summary>
+  </entry>
+  <entry>
+    <title>The Chupacabra</title>
+    <link href="https://hmeyy.com/essays/the-chupacabra.html"/>
+    <id>https://hmeyy.com/essays/the-chupacabra.html</id>
+    <updated>2020-09-25T00:00:00Z</updated>
+    <summary>A short story.</summary>
+  </entry>
+  <entry>
+    <title>Ode to Systems Thinking</title>
+    <link href="https://hmeyy.com/essays/ode-to-systems-thinking.html"/>
+    <id>https://hmeyy.com/essays/ode-to-systems-thinking.html</id>
+    <updated>2020-06-06T00:00:00Z</updated>
+    <summary>Consumers, creators and investors, and what it means to see the whole.</summary>
+  </entry>
+  <entry>
+    <title>Principles, Experiments &amp; Serendipity</title>
+    <link href="https://hmeyy.com/essays/principles-experiments-serendipity.html"/>
+    <id>https://hmeyy.com/essays/principles-experiments-serendipity.html</id>
+    <updated>2020-04-21T00:00:00Z</updated>
+    <summary>Turning 23. Lessons, professional and personal, and what comes next.</summary>
+  </entry>
+</feed>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your agent will say it sent the email — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/agent-said-it-sent-the-email.html">
+<meta name="description" content="What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.">
+<meta property="og:title" content="Your agent will say it sent the email — Hari Meyyappan">
+<meta property="og:description" content="What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/agent-said-it-sent-the-email.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/style.css?v=20260922g">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Your agent will say it sent the email", "description": "What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.", "url": "https://hmeyy.com/essays/agent-said-it-sent-the-email.html", "mainEntityOfPage": "https://hmeyy.com/essays/agent-said-it-sent-the-email.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-09-01"}</script>
+</head>
+<body>
+<header class="masthead"><div class="band"><a href="../index.html"><img src="../img/logo.png" width="248" height="49" alt="networked thought"></a><span class="tagline">Notes on building AI agents, systems, and tools for thought.</span></div></header>
+<div class="page">
+
+<nav class="side">
+  <a class="side-portrait" href="../index.html"><img src="../img/portrait-ink-2.png" width="120" height="155" alt="Illustrated portrait of Hari"></a>
+  <a class="name" href="../index.html">Hari Meyyappan</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../essays/index.html" aria-current="page">Essays</a></li>
+    <li><a href="../notes/index.html">Reading+Notes</a></li>
+    <li><a href="../projects/index.html">Projects</a></li>
+    <li><a href="../recommended/index.html">Recommended</a></li>
+    <li><a href="../now.html">Now</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a href="../feed.xml">RSS</a></li>
+  </ul>
+</nav>
+
+<main class="essay">
+  <h1>Your agent will say it sent the email</h1>
+  <p class="meta">September 2026. 676 words.</p>
+
+<p>Getting a model to talk is the easy part now. You can have a voice agent holding a decent conversation in an afternoon. The hard part starts when you let it <em>do</em> things: create the lead, change the contract, send the email. Every rule below is in a prompt or a tool I've built.</p>
+
+<h2>It will say it did the thing</h2>
+<p>The first time an agent tells a user "Done, I've sent that over," check whether it called the tool. Often it didn't. The model has read a million conversations where someone says they sent the email, and saying it is the most likely next sentence. Nothing in the language makes it check.</p>
+<p>So my compliance agent has this line, in capitals: never say you've sent an email without actually calling the tool. And the tool returns a confirmation with the message ID, so there's something concrete to report instead of a vibe.</p>
+
+<h2>It will also say it can't</h2>
+<p>The opposite failure shows up in the same agent. Ask it to send the company deck and it apologises: as an AI, it can't send emails. It has the tool. It has used the tool. But its training says assistants can't send email, and that wins unless you say otherwise. My sales agent's prompt has a whole section that starts: you must use these tools to take action; never say you cannot send emails.</p>
+<p>Put those two rules side by side and the lesson is that the model's picture of what it can do is separate from what it can actually do. You have to keep telling it which is which.</p>
+
+<h2>A stub is a lie it will repeat</h2>
+<p>Early in a build, some tools are stubs: "schedule a demo" logs the request and returns "Demo scheduled." The agent will pass that straight on and tell the customer their demo is booked, when nothing is. If a tool isn't real yet, its return value has to say so, in words the agent will repeat.</p>
+
+<h2>Read back before writing</h2>
+<p>Before the agent saves anything, it reads back one sentence and waits: "Priya at Northwind, two hundred units a month, wants pricing by Friday. Save as new?" One sentence, not a form. On a voice call the read-back is the only screen the user gets. It also catches speech-to-text mistakes before they end up in the CRM. For bigger actions, like opening a dispute or emailing a supplier, the rule is blunter: always ask before creating cases or sending notifications.</p>
+
+<h2>Append, don't overwrite</h2>
+<p>When the agent updates a record, it never replaces the notes field. It adds a date-stamped paragraph to the end. A person's notes are worth more than anything the agent will write, and an agent that overwrites them once loses the sales team's trust for good. It's also the cheapest audit log you'll ever build.</p>
+
+<h2>Some things shouldn't be said out loud</h2>
+<p>On a call there may be other people in the room. My compliance agent knows pricing tiers and rebate percentages, and it won't say them out loud. It offers to send them securely instead. A supplier only ever hears about their own data, whoever is asking. Text-channel rules don't carry over to voice without thinking about who else can hear.</p>
+
+<h2>Voice has its own problems</h2>
+<p>Two settings matter more than the model choice. Start generating the reply before the speaker has quite finished, because people hear a half-second gap as the agent not listening. And when a cough or a door slam registers as an interruption and the agent stops mid-sentence, have it pick up again instead of waiting in silence. Both are a line of configuration in LiveKit, and both matter more than they look.</p>
+
+<h2>The pattern</h2>
+<p>None of these rules is clever. Each one closes the gap between what the model says and what the system did. A demo agent can get by on the model's fluency. An agent people let near their CRM needs every sentence it says about the world to be backed by a tool call that actually happened.</p>
+
+  <footer>Plain HTML. No tracking. Last updated September 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/sea.js?v=20260922h" defer></script>
+</body>
+</html>

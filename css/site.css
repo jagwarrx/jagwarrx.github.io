@@ -1,0 +1,81 @@
+/* site.css: the Nov 2026 home and archive. System fonts (Inter if installed), no web fonts. */
+:root{
+  --ink:#202B33; --ink2:#394B59; --muted:#5C7080; --line:#E1E8ED; --tint:#F5F8FA;
+  --link:#106BA3; --link-hover:#0D5689;
+  --side:#30404D; --side-ink:#CED9E0; --side-label:#8A9BA8;
+  --card:#DCEBF7; --card-line:#C5D7E6; --card-muted:#EBF1F5; --card-muted-line:#D8E1E8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#fff;color:var(--ink);
+  font:16px/26px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+a{color:var(--link)} a:hover{color:var(--link-hover)}
+
+/* layout: sidebar + content */
+.layout{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;
+  background:var(--side);color:var(--side-ink);padding:28px 16px;
+  display:flex;flex-direction:column;gap:24px;font-size:14px;line-height:20px}
+.side a{display:block;padding:8px 10px;border-radius:3px;color:var(--side-ink);text-decoration:none}
+.side a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.side .brand{padding:4px 10px;font-size:15px;font-weight:600;color:#fff}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.side .label{padding:0 10px 6px;font-size:11px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--side-label)}
+.side .toc{display:flex;flex-direction:column;gap:2px}
+.side .contact{margin-top:auto}
+
+.main{padding:56px 48px 64px;min-width:0}
+.col{max-width:720px;display:flex;flex-direction:column;gap:40px}
+.col.center{margin:0 auto}
+section{display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px}
+
+h1{margin:0;font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.01em}
+h2{margin:0;font-size:22px;line-height:30px;font-weight:600}
+.head{display:flex;flex-direction:column;gap:10px}
+.lede{margin:0;font-size:18px;line-height:28px;color:var(--ink2)}
+.back{font-size:14px;line-height:20px}
+
+/* round-bullet list */
+.rb{list-style:none;margin:0;padding:0}
+.rb li{position:relative;padding-left:22px;margin:0 0 6px}
+.rb li::before{content:"";position:absolute;left:6px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.meta{font-size:14px;color:var(--muted)}
+.more{margin:0;font-size:15px}
+
+/* work table */
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px;line-height:22px}
+th,td{text-align:left;padding:10px 12px;border:1px solid var(--line);vertical-align:top}
+thead th{background:var(--tint);padding:8px 12px;font-size:12px;line-height:16px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tbody th{font-weight:600;width:26%}
+td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
+
+/* tool cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.card{position:relative;overflow:hidden;min-height:124px;padding:14px 16px 12px;border-radius:4px;
+  background:var(--card);border:1px solid var(--card-line);display:flex;flex-direction:column;gap:6px}
+.card.muted{background:var(--card-muted);border-color:var(--card-muted-line)}
+.ct{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:15px;font-weight:600;line-height:20px}
+.ct a{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.ct a:hover{text-decoration:underline}
+.ext{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tag{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+.tag.new{color:var(--link)}
+.cd{position:relative;z-index:1;font-size:14px;line-height:20px;padding-right:36px;text-wrap:pretty}
+.cm{position:relative;z-index:1;margin-top:auto;font-size:12px;line-height:16px;color:var(--muted)}
+.glyph{position:absolute;right:-6px;bottom:-6px;width:64px;height:64px;opacity:.16;
+  fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-height:20px;color:var(--muted)}
+
+/* phone */
+@media (max-width:760px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .side .label{flex-basis:100%;padding-bottom:0}
+  .side nav{flex-direction:row;flex-wrap:wrap}
+  .side{position:static;height:auto;gap:12px;padding:16px 12px}
+  .side .toc,.side .contact{flex-direction:row;flex-wrap:wrap}
+  .side .contact{margin-top:0}
+  .main{padding:32px 20px 48px}
+  h1{font-size:32px;line-height:40px}
+}
