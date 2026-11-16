@@ -8,7 +8,7 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:#fff;color:var(--ink);
-  font:16px/26px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+  font:15px/24px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
 a{color:var(--link)} a:hover{color:var(--link-hover)}
 
 /* layout: sidebar + content */
@@ -25,26 +25,26 @@ a{color:var(--link)} a:hover{color:var(--link-hover)}
 .side .contact{margin-top:auto}
 
 .main{padding:56px 48px 64px;min-width:0}
-.col{max-width:720px;display:flex;flex-direction:column;gap:40px}
+.col{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
 .col.center{margin:0 auto}
 section{display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px}
 
-h1{margin:0;font-size:40px;line-height:48px;font-weight:700;letter-spacing:-.01em}
-h2{margin:0;font-size:22px;line-height:30px;font-weight:600}
+h1{margin:0;font-size:30px;line-height:38px;font-weight:700;letter-spacing:-.01em}
+h2{margin:0;font-size:19px;line-height:26px;font-weight:600}
 .head{display:flex;flex-direction:column;gap:10px}
-.lede{margin:0;font-size:18px;line-height:28px;color:var(--ink2)}
+.lede{margin:0;font-size:16px;line-height:25px;color:var(--ink2)}
 .back{font-size:14px;line-height:20px}
 
 /* round-bullet list */
 .rb{list-style:none;margin:0;padding:0}
 .rb li{position:relative;padding-left:22px;margin:0 0 6px}
-.rb li::before{content:"";position:absolute;left:6px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.rb li::before{content:"";position:absolute;left:6px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--muted)}
 .meta{font-size:14px;color:var(--muted)}
 .more{margin:0;font-size:15px}
 
 /* work table */
 .scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:15px;line-height:22px}
+table{width:100%;border-collapse:collapse;font-size:14px;line-height:21px}
 th,td{text-align:left;padding:10px 12px;border:1px solid var(--line);vertical-align:top}
 thead th{background:var(--tint);padding:8px 12px;font-size:12px;line-height:16px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 tbody th{font-weight:600;width:26%}
@@ -63,7 +63,7 @@ td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 .ext{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .tag{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
 .tag.new{color:var(--link)}
-.cd{position:relative;z-index:1;font-size:14px;line-height:20px;padding-right:36px;text-wrap:pretty}
+.cd{position:relative;z-index:1;font-size:13.5px;line-height:19px;padding-right:36px;text-wrap:pretty}
 .cm{position:relative;z-index:1;margin-top:auto;font-size:12px;line-height:16px;color:var(--muted)}
 .glyph{position:absolute;right:-6px;bottom:-6px;width:64px;height:64px;opacity:.16;
   fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
@@ -81,3 +81,32 @@ footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-hei
   .main{padding:32px 20px 48px}
   h1{font-size:32px;line-height:40px}
 }
+
+/* ---- reading pages (essays, notes, projects, about, now) -------- */
+.doc .wrap{max-width:640px;margin:0 auto;padding:40px 20px 64px}
+.topbar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin:0 0 28px;font-size:14px;line-height:20px}
+.topbar nav{display:flex;gap:16px;flex-wrap:wrap}
+.doc main{font-size:16px;line-height:27px}
+.doc main h1{font-size:28px;line-height:36px;margin:0 0 6px}
+.doc main h2{font-size:19px;line-height:26px;margin:32px 0 8px}
+.doc main h3{font-size:18px;line-height:26px;margin:24px 0 6px}
+.doc main p{margin:0 0 16px}
+.doc main .meta{font-size:14px;line-height:20px;color:var(--muted);margin:0 0 24px}
+.doc main img{max-width:100%;height:auto;display:block;margin:16px 0;border-radius:4px}
+.doc main img.cover{float:right;width:96px;margin:0 0 12px 18px}
+.doc main ul,.doc main ol{margin:0 0 16px;padding-left:22px}
+.doc main li{margin-bottom:4px}
+.doc main blockquote{margin:0 0 16px;padding:2px 0 2px 16px;border-left:3px solid var(--line);color:var(--ink2)}
+.doc main pre,.doc main code{font:14px/22px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--tint)}
+.doc main pre{padding:12px 14px;overflow-x:auto;border-radius:4px}
+.doc main .rating{display:inline-block;margin:0 0 16px;padding:2px 8px;background:var(--card);border:1px solid var(--card-line);border-radius:4px;font-size:14px}
+.doc main .sub{display:block;font-size:14px;color:var(--muted)}
+.doc main .status{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:6px}
+.doc main .status-active{color:var(--link)}
+.doc main .facts{display:grid;grid-template-columns:90px 1fr;gap:2px 12px;margin:0 0 20px;padding:10px 14px;background:var(--tint);border:1px solid var(--line);border-radius:4px;font-size:14px;line-height:22px}
+.doc main .facts dt{color:var(--muted);margin:0}
+.doc main .facts dd{margin:0}
+.doc main .list{list-style:none;padding:0}
+.doc main .list li{margin:0 0 12px}
+.doc main .cards .card{min-height:0}
+.doc footer{margin-top:40px}

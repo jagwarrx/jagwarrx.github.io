@@ -1,0 +1,154 @@
+/* extras.css: old-site rules still needed by the Chupacabra essay and Rain Café (from style.css) */
+@font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-400.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Silkscreen"; src: url("../fonts/silkscreen-700.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+:root {
+  --font:            Verdana, Geneva, Arial, sans-serif;
+  --font-pixel:      Verdana, Geneva, Arial, sans-serif;   /* headings: same face as body, bold */
+  --fs-xs:           10px;
+  --fs-sm:           11px;
+  --fs-base:         13px;
+  --fs-lg:           15px;
+  --lh:              1.6;
+
+  --c-navy:          #182850;
+  --c-plum:          #702850;
+  --c-blue:          #3f52c8;
+  --c-sky:           #6898f8;
+  --c-ice:           #c8d8f8;
+
+  --c-bg:            #f3f4f9;
+  --c-surface:       #fff;
+  --c-surface-alt:   #eef1fb;
+  --c-selected:      #dfe7fb;
+
+  --c-text:          #000;
+  --c-text-heading:  var(--c-navy);
+  --c-text-label:    #333;
+  --c-text-secondary:#5a5f78;
+  --c-text-muted:    #8a8fa8;
+
+  --c-link:          var(--c-blue);
+  --c-link-visited:  var(--c-plum);
+
+  --c-border:        var(--c-navy);
+  --c-border-light:  #b9c2e0;
+  --c-border-row:    #d5dbef;
+
+  --shadow:          3px 3px 0 var(--c-navy);
+
+  --c-active:        #15803d;  --c-active-bg:   #bbf7d0;
+  --c-paused:        #a16207;  --c-paused-bg:   #fef08a;
+  --c-archived:      #525252;  --c-archived-bg: #d4d4d4;
+
+  --w-sidebar:       160px;
+  --w-page:          640px;
+}
+/* ---- the chupacabra field (essays/the-chupacabra.html) ---------- */
+
+.chupa-scene {
+  position: relative;
+  height: 150px;
+  margin: 14px 0 4px;
+  overflow: hidden;
+  border-bottom: 2px dotted var(--c-navy);
+  cursor: crosshair;
+  user-select: none;
+}
+.chupa-scene .chupa {
+  position: absolute; left: 0; bottom: 0;
+  width: 0; height: 0;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  pointer-events: none;
+}
+.chupa-scene .frame {
+  position: absolute; left: 0; bottom: 0;
+  height: 104px; width: auto; max-width: none;
+  margin: 0; border: 0; box-shadow: none;
+  transform: translateX(-50%);
+  visibility: hidden;
+}
+.chupa-scene .frame.on { visibility: visible; }
+.chupa-scene .frame-eat { height: 94px; }
+.chupa-scene .sheep {
+  position: absolute; left: 0; bottom: 0;
+  width: 84px; height: 58px;
+  margin-left: -42px;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  pointer-events: none;
+}
+.chupa-scene .sheep svg { display: block; width: 100%; height: 100%; }
+.chupa-scene .sheep svg.drop { animation: sheep-drop .6s cubic-bezier(.3,.9,.4,1.3); }
+@keyframes sheep-drop { from { transform: translateY(-150px); } }
+.chupa-scene .puff {
+  position: absolute; width: 5px; height: 5px;
+  background: var(--c-navy);
+  animation: puff .6s ease-out forwards;
+}
+@keyframes puff { to { transform: translate(var(--dx, 0), var(--dy, -30px)) scale(0); opacity: 0; } }
+.chupa-note { font-size: var(--fs-sm); color: var(--c-text-muted); margin: 0 0 18px; }
+
+/* story beats: paragraph plus a vignette in the right margin */
+.beat { display: flex; gap: 20px; align-items: flex-start; margin: 0 0 1.1em; }
+.beat > p, .beat > blockquote { flex: 1; margin: 0; }
+.vignette { flex: 0 0 126px; width: 126px; height: 105px; margin: 0; }
+.beat.quote { align-items: center; }
+.beat.quote .vignette { flex-basis: 64px; width: 64px; height: 54px; }
+.vignette svg { display: block; width: 100%; height: 100%; overflow: visible; }
+@media (max-width: 640px) {
+  .beat { gap: 8px; }
+  .vignette { flex-basis: 90px; width: 90px; height: 75px; }
+  .beat.quote .vignette { flex-basis: 52px; width: 52px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chupa-scene .puff, .chupa-scene .sheep svg.drop, .vignette * { animation: none !important; }
+}
+
+/* rain café: the floating audio button (js/rain-cafe.js) */
+.rain-cafe { position: fixed; right: 18px; bottom: 18px; z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; font-size: var(--fs-sm); }
+.rain-cafe .rc-btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 2px solid var(--c-navy); background: var(--c-surface); color: var(--c-navy); box-shadow: var(--shadow); font: 700 10px/1 var(--font-pixel); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.rain-cafe .rc-btn:hover { background: var(--c-ice); }
+.rain-cafe .rc-btn:active, .rain-cafe.playing .rc-btn { transform: translate(3px, 3px); box-shadow: none; }
+.rain-cafe.playing .rc-btn { background: var(--c-navy); color: var(--c-bg); }
+.rain-cafe .rc-btn:focus-visible { outline: 2px solid var(--c-plum); outline-offset: 2px; }
+.rain-cafe .rc-w1, .rain-cafe .rc-w2 { opacity: .35; }
+.rain-cafe.playing .rc-w1 { animation: rc-wave 1.1s ease-in-out infinite; }
+.rain-cafe.playing .rc-w2 { animation: rc-wave 1.1s ease-in-out .3s infinite; }
+@keyframes rc-wave { 50% { opacity: 1; } }
+.rain-cafe .rc-panel { width: 210px; padding: 10px 12px; border: 2px solid var(--c-navy); background: var(--c-surface); box-shadow: var(--shadow); }
+.rain-cafe .rc-panel label { display: block; margin: 0 0 8px; }
+.rain-cafe .rc-panel label > span { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.rain-cafe .rc-panel output { color: var(--c-text-muted); }
+.rain-cafe .rc-panel .rc-check { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; }
+.rain-cafe input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; margin: 6px 0; background: var(--c-ice); border: 1px solid var(--c-navy); outline: none; }
+.rain-cafe input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 14px; background: var(--c-navy); border: 0; cursor: pointer; }
+.rain-cafe input[type="range"]::-moz-range-thumb { width: 12px; height: 14px; background: var(--c-navy); border: 0; border-radius: 0; cursor: pointer; }
+.rain-cafe input[type="range"]:focus-visible { outline: 2px solid var(--c-plum); outline-offset: 2px; }
+.rain-cafe input[type="checkbox"] { accent-color: var(--c-navy); margin: 0; }
+html.rc-lightning, html.rc-lightning body { background: #fff; }
+html.rc-lightning .chupa-scene, html.rc-lightning .vignette, html.rc-lightning .rc-scene { filter: invert(1); }
+.rc-scene { width: 252px; height: 210px; margin: 6px 0 18px; }
+.rc-scene svg { display: block; width: 100%; height: 100%; overflow: visible; }
+@media (max-width: 640px) { .rain-cafe { right: 10px; bottom: 10px; } .rain-cafe .rc-btn .rc-label { display: none; } }
+@media (prefers-reduced-motion: reduce) { .rain-cafe .rc-w1, .rain-cafe .rc-w2 { animation: none !important; } }
+
+/* ---- home: compact recent lists --------------------------------- */
+
+.list.compact li { padding: 3px 0; gap: 12px; }
+.list.compact time { padding-top: 1px; }
+.list.compact .sub { display: inline; margin-left: 8px; }
+.list.compact .sub::before { content: "\00b7\00a0"; color: var(--c-text-muted); }
+.list.compact + .more { margin-top: 5px; }
+.more + h2 { margin-top: 20px; }
+
+/* ---- essay body headings: bold sentence case, not tracked caps -- */
+
+.essay h2 { font-size: 14px; letter-spacing: 0; text-transform: none; margin: 24px 0 6px; }
+.essay h3 { font: 700 13px/1.4 var(--font); margin: 18px 0 4px; }
+.rain-cafe .rc-src { display: block; margin-top: 6px; color: var(--c-text-muted); font-size: 10px; }
+.rc-credits { font-size: var(--fs-sm); color: var(--c-text-secondary); }
+.rc-credits li { margin: 0 0 2px; }
+
+/* Background figure (js/sea.js): a fixed canvas behind everything */
+.bg-figure { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
