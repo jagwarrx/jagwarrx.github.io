@@ -50,23 +50,22 @@ thead th{background:var(--tint);padding:8px 12px;font-size:12px;line-height:16px
 tbody th{font-weight:600;width:26%}
 td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 
-/* tool cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
-.card.wide{grid-column:span 2}
-@media (max-width:520px){.card.wide{grid-column:auto}}
-.card{position:relative;overflow:hidden;min-height:0;padding:14px 16px 12px;border-radius:4px;
+/* tool cards: an even 2-column grid, equal heights per row */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{position:relative;overflow:hidden;padding:14px 16px 12px;border-radius:4px;
   background:var(--card);border:1px solid var(--card-line);display:flex;flex-direction:column;gap:6px}
 .card.muted{background:var(--card-muted);border-color:var(--card-muted-line)}
-.ct{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:15px;font-weight:600;line-height:20px}
+.ct{display:flex;align-items:baseline;gap:8px;font-size:15px;font-weight:600;line-height:20px;padding-right:64px}
 .ct a{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
 .ct a:hover{text-decoration:underline}
-.ext{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.tag{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+.ext{width:12px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tag{position:absolute;top:16px;right:16px;font-size:10.5px;line-height:16px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
 .tag.new{color:var(--link)}
-.cd{position:relative;z-index:1;font-size:13.5px;line-height:19px;padding-right:36px;text-wrap:pretty}
-.cm{position:relative;z-index:1;margin-top:auto;font-size:12px;line-height:16px;color:var(--muted)}
-.glyph{position:absolute;right:-6px;bottom:-6px;width:64px;height:64px;opacity:.16;
-  fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.cd{font-size:13.5px;line-height:20px;padding-right:28px;text-wrap:pretty}
+.cm{margin-top:auto;padding-top:2px;font-size:12px;line-height:16px;color:var(--muted)}
+.glyph{position:absolute;right:10px;bottom:10px;width:30px;height:30px;opacity:.22;
+  fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:560px){.cards{grid-template-columns:minmax(0,1fr)}}
 
 footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-height:20px;color:var(--muted)}
 
