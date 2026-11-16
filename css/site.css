@@ -50,41 +50,45 @@ thead th{background:var(--tint);padding:8px 12px;font-size:12px;line-height:16px
 tbody th{font-weight:600;width:26%}
 td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 
-/* tool tiles: neal.fun-style, a bright tile with a drawing, then the words */
-.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 20px}
-.tile{display:flex;flex-direction:column;gap:4px;color:var(--ink);text-decoration:none}
-.art{position:relative;aspect-ratio:16/10;border-radius:14px;background:var(--bg);overflow:hidden;
-  box-shadow:0 2px 0 rgba(0,0,0,.08);transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s;margin-bottom:8px}
-.tile:hover .art{transform:translateY(-4px) rotate(-1.2deg) scale(1.02);box-shadow:0 12px 24px -10px rgba(0,0,0,.35)}
+/* tool tiles: neal.fun-style banners, the name drawn inside, each in its own style */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px;align-items:start}
+.tile{display:flex;flex-direction:column;gap:3px;color:var(--ink);text-decoration:none}
+.art{position:relative;height:96px;border-radius:12px;border:3px solid #1F2933;overflow:hidden;margin-bottom:6px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:transform .2s cubic-bezier(.3,1.5,.5,1),box-shadow .2s}
+.tile:hover .art{transform:translateY(-3px) scale(1.025);box-shadow:0 10px 18px -10px rgba(0,0,0,.45)}
 .art svg{position:absolute;inset:0;width:100%;height:100%}
-.art .w{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
-.art .w.thick{stroke-width:9}
-.art .f{fill:#fff}
-.art .o{fill:none;stroke:#fff;stroke-width:4}
-.art .fillw{fill:rgba(255,255,255,.95);stroke:#fff}
-.art .q{font:700 16px Inter,-apple-system,sans-serif;fill:var(--bg)}
-.pill{position:absolute;top:10px;right:10px;z-index:1;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.92);
-  font-size:10.5px;line-height:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
-.tt{font-size:16px;line-height:22px;font-weight:700}
-.tile:hover .tt{text-decoration:underline}
+.art .name{position:relative;z-index:1}
+.pill{position:absolute;top:6px;right:6px;z-index:2;padding:1px 7px;border-radius:99px;background:#1F2933;
+  font-size:9.5px;line-height:15px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff}
 .td{font-size:13.5px;line-height:20px;color:var(--ink2);text-wrap:pretty}
+.td .tm{font-size:12px;margin-left:4px}
 .tm{font-size:12px;line-height:16px;color:var(--muted)}
-/* hover motion */
-.art g{transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.3,1.5,.5,1)}
-.tile:hover .bob{transform:translateY(-6px)}
-.line{stroke-dasharray:200;stroke-dashoffset:0}
-.tile:hover .line{animation:draw .8s ease-out}
-@keyframes draw{from{stroke-dashoffset:200}}
-.tile:hover .ping{animation:ping .9s ease-out infinite}
-@keyframes ping{50%{opacity:.3}}
-.tile:hover .hop{transform:translate(20px,-20px)}
-.tile:hover .think{transform:scale(1.25) rotate(10deg)}
-.tile:hover .zoom{transform:scale(1.18)}
-.tile:hover .zoom2{transform:scale(1.4)}
-.chop{transform-origin:30% 90%!important}
-.tile:hover .chop{transform:rotate(-14deg)}
-.tile:hover .spark{animation:ping .6s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.art,.art g{transition:none}.tile:hover *{animation:none!important}}
+.tile:hover .td{color:var(--ink)}
+
+.t-trade{background:#0B1220;border-color:#0B1220}
+.t-trade .name{font:700 19px/22px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;color:#4ADE80;text-shadow:0 0 12px rgba(74,222,128,.5)}
+.cursor{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.t-chess{background:#F7F1E3;border-color:#7A5A36}
+.t-chess .name{font:italic 600 24px/28px Georgia,"Times New Roman",serif;color:#3B2A17;display:flex;align-items:center;gap:8px}
+.t-chess .piece{font-style:normal;font-size:30px;display:inline-block;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.tile:hover .piece{transform:translate(6px,-8px) rotate(-12deg)}
+.t-cond{background:#F5F0FF;border-color:#5B21B6}
+.t-cond .name{font:800 24px/28px Inter,-apple-system,sans-serif;letter-spacing:-.02em;color:#5B21B6}
+.art rect,.art g{transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.tile:hover .z1{transform:scale(1.12)}
+.tile:hover .z2{transform:scale(1.08)}
+.tile:hover .z3{transform:scale(1.04)}
+.t-hack{background:#FFFDF5;border-color:#B91C1C}
+.t-hack .name{font:700 22px/24px "Marker Felt","Chalkboard SE","Comic Sans MS",cursive;color:#B91C1C;transform:rotate(-2deg)}
+.chop{transform-origin:20% 100%!important}
+.tile:hover .chop{transform:rotate(-18deg)}
+.tile:hover .bob{transform:translateY(-5px)}
+.line{stroke-dasharray:340}
+.tile:hover .line{animation:draw .9s ease-out}
+@keyframes draw{from{stroke-dashoffset:340}}
+@media (prefers-reduced-motion:reduce){.art,.art *{transition:none!important;animation:none!important}}
 @media (max-width:560px){.tiles{grid-template-columns:minmax(0,1fr)}}
 
 footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-height:20px;color:var(--muted)}
