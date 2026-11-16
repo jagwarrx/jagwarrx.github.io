@@ -54,10 +54,10 @@ td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;align-items:start}
 .tile{position:relative;display:block;color:var(--ink);text-decoration:none;outline:none}
 .tile:hover,.tile:focus-visible{z-index:5}
-/* description: hidden, shown on hover or focus, floats over what's below */
-.info{position:absolute;left:0;right:0;top:calc(100% + 6px);padding:10px 12px;background:#fff;border:1px solid var(--line);
+/* description: hidden, shown on hover or focus, floats above the banner, left-aligned */
+.info{position:absolute;left:0;right:0;bottom:calc(100% + 6px);padding:10px 12px;background:#fff;border:1px solid var(--line);
   border-radius:10px;box-shadow:0 12px 28px -12px rgba(16,22,26,.35);display:flex;flex-direction:column;gap:3px;
-  opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .15s,transform .15s}
+  opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s,transform .15s}
 .tile:hover .info,.tile:focus-visible .info{opacity:1;transform:none}
 .tile:focus-visible .art{outline:2px solid var(--link);outline-offset:2px}
 .art{position:relative;height:96px;border-radius:12px;border:3px solid #1F2933;overflow:hidden;
