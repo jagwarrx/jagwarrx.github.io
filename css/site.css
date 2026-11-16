@@ -42,7 +42,10 @@ h2{margin:0;font-size:19px;line-height:26px;font-weight:600}
 .meta{font-size:14px;color:var(--muted)}
 .more{margin:0;font-size:15px}
 
-/* work table */
+/* work list */
+.rb.work li{margin-bottom:8px}
+.rb.work strong{font-weight:600}
+/* work table (unused on home) */
 .scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:14px;line-height:21px}
 th,td{text-align:left;padding:10px 12px;border:1px solid var(--line);vertical-align:top}
