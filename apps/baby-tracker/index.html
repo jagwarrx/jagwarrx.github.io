@@ -1,520 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0A4C9A">
-<meta name="color-scheme" content="light only">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="format-detection" content="telephone=no">
-<title>Baby tracker</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&display=swap">
-<style>
-:root{color-scheme:light only;--brand:#0A4C9A;--red:#C41E2A;--navy:#0F2038;--link:#0A4C9A;--sheet:#FFFFFF;--ban-bg:#FBE4E6;--ban-fg:#7D1019;--toast-bg:#141B2D;--toast-fg:#FFFFFF;--bg:#EEF0F3;--card:#FFFFFF;--ink:#111827;--mut:#56607A;--line:#C9CED8;--soft:#E3E6EC;--blue:#0A4C9A;--blue-d:#083A78;--tint:#E3EDF9;--or:#C41E2A;--or-t:#FBE4E6;--or-l:#FF6B74;--navy-m:#B9C3DA;--navy-l:#4A5674}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
-button,input,select{font:inherit;color:inherit}
-button,nav a,.sq{cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-button:active,nav a:active,a.sq:active{opacity:.6}
-body{overscroll-behavior-y:contain}
-h1,h2{margin:0;font-family:Archivo,system-ui,sans-serif;font-weight:800;letter-spacing:-.01em}
-.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;padding:calc(20px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:16px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.col{display:flex;flex-direction:column;gap:2px;min-width:0}
-.mut{color:var(--mut);font-size:14px}
-.due{color:var(--or);font-weight:600}
-.card{background:var(--card);border-radius:10px;padding:14px}
-.pill{font-size:13px;font-weight:600;border-radius:6px;padding:5px 10px;background:var(--tint);color:var(--blue-d);white-space:nowrap}
-.pill.warn{background:var(--or-t);color:var(--or)}
-.banner{background:var(--ban-bg);color:var(--ban-fg);border-radius:8px;padding:10px 14px;font-size:14px;line-height:1.4}
-.hero{background:var(--navy);color:#fff;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px}
-.hero .lab{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--navy-m)}
-.hero .sub{font-size:13px;color:var(--navy-m)}
-.hero .big{font:800 40px/1 Archivo,system-ui,sans-serif}
-.hero .over{color:var(--or-l);font-weight:600}
-.bar{height:6px;border-radius:3px;background:#2C3650;overflow:hidden}
-.bar i{display:block;height:100%;border-radius:3px;background:var(--or-l)}
-.hero .btns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
-.hero .btns button{height:56px;border-radius:6px;border:1px solid var(--navy-l);background:transparent;color:#fff;font-size:14px;font-weight:600;padding:0 4px;line-height:1.15}
-.counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.counts b{font:800 20px/1.1 Archivo,system-ui,sans-serif;display:block}
-.list{padding:4px 8px}
-.trk{min-height:68px;display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;column-gap:8px;border-bottom:1px solid var(--soft);padding:6px 0}
-.trk .acts{display:flex;gap:8px}
-.trk .sq{width:52px;height:52px;border-radius:8px}
-.trk a.sq{width:48px}
-.sq.alt{background:var(--tint);color:var(--link)}
-.rowbtn{min-height:56px;border:0;background:transparent;padding:0;text-align:left;display:grid;grid-template-columns:36px 1fr;align-items:center;column-gap:10px;min-width:0}
-.trk:last-child{border-bottom:0}
-.ico{width:36px;height:36px;border-radius:6px;background:var(--tint);display:flex;align-items:center;justify-content:center;color:var(--link)}
-.trk .nm{font-size:15px;font-weight:600}
-.sq{width:44px;height:44px;border:0;border-radius:6px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--mut);text-decoration:none}
-.sq.on{background:var(--or-t);color:var(--or)}
-.sq.go{background:var(--blue);color:#fff}
-.sq.stop{background:#C41E2A;color:#fff}
-.sq.ghost{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px}
-.sq:disabled{opacity:.45}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
-nav div{max-width:480px;margin:0 auto;height:64px;padding:6px 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:500;color:var(--mut);text-decoration:none}
-nav a.cur{color:var(--link);font-weight:600}
-.ev{width:100%;min-height:60px;border:0;background:transparent;padding:4px 0;text-align:left;display:grid;grid-template-columns:72px 36px 1fr;align-items:center;column-gap:10px}
-.ev .ico{background:var(--card);border:1px solid var(--line)}
-.ev .nm{font-size:15px;font-weight:600}
-.sw{width:52px;height:44px;border:0;background:transparent;padding:0;display:flex;align-items:center;flex:none}
-.sw i{width:52px;height:32px;border-radius:8px;background:#7A849B;padding:3px;display:flex;justify-content:flex-start}
-.sw i::after{content:"";width:26px;height:26px;border-radius:5px;background:#fff}
-.sw[aria-checked="true"] i{background:var(--blue);justify-content:flex-end}
-.step{display:flex;align-items:center;gap:10px}
-.step b{min-width:76px;text-align:center;font:800 18px/1 Archivo,system-ui,sans-serif}
-.fld{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--mut)}
-.fld input{height:52px;border:1px solid var(--line);border-radius:8px;padding:0 14px;font-size:16px;font-weight:500;color:var(--ink);background:var(--card);width:100%;min-width:0;-webkit-appearance:none;appearance:none;text-align:left}
-.fld input::-webkit-date-and-time-value{text-align:left}
-.seg{display:grid;gap:8px}
-.seg.c2{grid-template-columns:1fr 1fr}.seg.c3{grid-template-columns:repeat(3,1fr)}
-.seg button{min-height:52px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:15px;font-weight:600;padding:0 6px}
-.seg button[aria-pressed="true"]{border:2px solid var(--blue);background:var(--tint);color:var(--blue-d)}
-.seg.tall button{min-height:64px}
-.prim{height:56px;border:0;border-radius:8px;background:var(--blue);color:#fff;font-size:16px;font-weight:600;width:100%}
-.txt{height:48px;border:0;background:transparent;color:var(--link);font-size:15px;font-weight:600;width:100%}
-.txt.dan{color:var(--or)}
-.scrim{position:fixed;inset:0;background:rgba(20,27,45,.55);display:flex;align-items:flex-end;justify-content:center;z-index:10}
-.sheet{background:var(--sheet);border-radius:14px 28px 0 0;width:100%;max-width:480px;max-height:92vh;max-height:92dvh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:10px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
-.grab{align-self:center;width:40px;height:5px;border-radius:3px;background:#C9D0DD}
-.timer{position:fixed;inset:0;background:var(--navy);color:#fff;z-index:9;overflow:auto}
-.timer .in{max-width:480px;margin:0 auto;min-height:100%;padding:calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:22px}
-.timer .tot{font:800 72px/1 Archivo,system-ui,sans-serif}
-.sides{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.side{height:34vh;min-height:180px;max-height:280px;border:1px solid var(--navy-l);border-radius:10px;background:#1D2740;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
-.side.run{border:2px solid var(--or-l);background:var(--blue)}
-.side b{font:800 34px/1 Archivo,system-ui,sans-serif}
-.side span{font-size:13px;color:var(--navy-m)}
-.side.run span{color:#fff}
-.timer .sq.ghost{background:transparent;border-color:var(--navy-l);color:#fff}
-.timer .prim{background:#fff;color:#141B2D}
-.timer .txt{color:var(--navy-m)}
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--toast-bg);color:var(--toast-fg);display:flex;align-items:center;gap:14px;border-radius:6px;padding:10px 16px;font-size:14px;z-index:20;max-width:90%}
-.toast button{border:0;background:transparent;color:inherit;font-weight:600;text-decoration:underline;min-height:44px;padding:0 6px}
-.app>header{background:var(--brand);color:#fff;margin:calc(-20px - env(safe-area-inset-top)) -16px 0;padding:calc(16px + env(safe-area-inset-top)) 16px 12px;border-bottom:4px solid var(--red)}
-.app>header .mut{color:#D9E6F7}
-.card{border:1.5px solid var(--line)}
-.hero{border-top:4px solid var(--red)}
-.hero .lab{font-weight:800}
-.hero .btns button{text-transform:uppercase;letter-spacing:.03em;font-size:13px;font-weight:800;border-width:2px}
-.prim{text-transform:uppercase;letter-spacing:.05em;font-weight:800}
-.trk .nm,.ev .nm{font-weight:700}
-.trk{border-bottom-width:1.5px}
-.seg button{font-weight:700;border-width:1.5px}
-.fld input{border-width:1.5px}
-.fld{text-transform:uppercase;letter-spacing:.05em;font-size:12px;font-weight:700}
-.fld input{text-transform:none;letter-spacing:0}
-.pill{text-transform:uppercase;letter-spacing:.04em;font-size:12px;font-weight:800}
-nav{border-top:2px solid var(--ink)}
-nav a{text-transform:uppercase;letter-spacing:.04em;font-size:11px;font-weight:700}
-nav a.cur{font-weight:800;box-shadow:inset 0 3px 0 var(--red)}
-nav div{padding-top:0;padding-bottom:0}
-.tcard{padding:14px;display:flex;flex-direction:column;gap:10px}
-.tcard.isdue{border-color:var(--or);border-width:2px}
-.thead{display:flex;align-items:center;gap:10px}
-.thead h2{font-size:20px;flex:1}
-.thead .ico{width:32px;height:32px;flex:none}
-.bell{width:44px;height:44px;margin:-6px -4px -6px -8px;display:flex;align-items:center;justify-content:center;color:var(--mut);flex:none}
-.bell.on{color:var(--or)}
-.tstat{margin:0;font-size:15px;line-height:1.4;color:var(--mut)}
-.tstat b{color:var(--ink)}
-.bgrid{display:grid;gap:8px}.bgrid.c1{grid-template-columns:1fr}.bgrid.c2{grid-template-columns:1fr 1fr}.bgrid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.bb{min-height:58px;border:2px solid var(--blue);border-radius:8px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 8px;line-height:1.15;width:100%}
-.bb.ghost{background:transparent;color:var(--link);border-color:var(--line);min-height:48px;font-size:13px}
-.bb.stop{background:#C41E2A;border-color:#C41E2A}
-.bb.sd{flex-direction:column;gap:3px;min-height:92px;background:var(--card);color:var(--ink);border-color:var(--line)}
-.bb.sd b{font:800 28px/1 Archivo,system-ui,sans-serif}
-.bb.sd small{font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--mut)}
-.bb.sd.run{background:var(--blue);border-color:var(--blue);color:#fff}
-.bb.sd.run small{color:#fff}
-.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;line-height:1.35;margin:0}
-.dl dt{font-weight:800;font-family:ui-monospace,Menlo,monospace;font-size:13px}
-.dl dd{margin:0;color:var(--mut)}
-.pre{overflow:auto;background:var(--bg);border:1.5px solid var(--line);padding:10px;border-radius:6px;font:12px/1.5 ui-monospace,Menlo,monospace;white-space:pre;margin:0}
-.sheet h2{font-size:16px}
-.sheet p{margin:0;font-size:14px;line-height:1.45;color:var(--mut)}
-.hero.feeding{background:var(--red);border-top-color:#fff;animation:pulse 2.6s ease-in-out infinite}
-.hero.feeding .sub{color:#fff}
-.sign{display:flex;align-items:center;gap:10px;font:800 24px/1.1 Archivo,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em}
-@keyframes pulse{0%,100%{background-color:#C41E2A}50%{background-color:#6E0E16}}
-@media (prefers-reduced-motion: reduce){.hero.feeding{animation:none}}
-:focus-visible{outline:3px solid var(--or-l);outline-offset:2px}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baby tracker · Hari Meyyappan</title>
 <link rel="canonical" href="https://hmeyy.com/apps/baby-tracker/">
-<meta name="description" content="A baby tracker for feeds, sleep and diapers, with due-time reminders. Data stays in your browser.">
-<script src="../local-store.js"></script>
+<meta name="description" content="Feeds, sleep and diapers in a tap or two, with a reminder when the next feed is due. Made for the first weeks with our newborn. Data stays in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Baby tracker · Hari Meyyappan">
+<meta property="og:description" content="Feeds, sleep and diapers in a tap or two, with a reminder when the next feed is due. Made for the first weeks with our newborn.">
+<meta property="og:url" content="https://hmeyy.com/apps/baby-tracker/">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../css/site.css">
 </head>
 <body>
-<main class="app" id="view"></main>
-<nav aria-label="Main"><div id="nav"></div></nav>
-<div id="timer"></div>
-<div id="sheet"></div>
-<div id="toast" role="status"></div>
-<input type="file" id="csvFile" accept=".csv,text/csv,text/plain" hidden>
-<script>
-(function(){
-'use strict';
-var MIN=60000, DAY=86400000, OZ=29.5735;
-var IC={
-sleep:'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
-nursing:'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
-bottle:'M9 3h6v3l2 3v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9l2-3V3zM7 13h10',
-diaper:'M4 7h16v4a8 8 0 0 1-16 0V7zM4 11c3 0 5 2 5 5M20 11c-3 0-5 2-5 5',
-pumping:'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',
-medicine:'M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7l-7 7zM7 10l7 7',
-bell:'M6 16V11a6 6 0 0 1 12 0v5l2 2H4l2-2zM10 20a2 2 0 0 0 4 0',
-plus:'M12 5v14M5 12h14', minus:'M5 12h14', play:'M8 5l11 7-11 7V5z', stop:'M7 7h10v10H7z', pause:'M7 5h4v14H7zM13 5h4v14h-4z',
-home:'M4 11l8-7 8 7v9H4v-9z', clock:'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', prefs:'M4 7h10M18 7h2M4 17h2M10 17h10M16 5v4M8 15v4',
-info:'M12 11v6M12 7.5v.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z',left:'M15 6l-6 6 6 6', right:'M9 6l6 6-6 6', down:'M6 9l6 6 6-6', x:'M6 6l12 12M18 6L6 18'
-};
-var NAMES={sleep:'Sleep',nursing:'Nursing',bottle:'Bottle',diaper:'Diaper',pumping:'Pumping',medicine:'Medicine'};
-var DK={pee:'Pee',poo:'Poo',mixed:'Mixed',dry:'Dry'};
-function svg(k,sz,fill){return '<svg aria-hidden="true" width="'+(sz||20)+'" height="'+(sz||20)+'" viewBox="0 0 24 24" fill="'+(fill?'currentColor':'none')+'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+IC[k]+'"></path></svg>';}
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function clone(o){return JSON.parse(JSON.stringify(o||{}));}
-function pad(n){return (n<10?'0':'')+n;}
-function dayKey(ms){var d=new Date(ms);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
-function keyDate(k){var p=k.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
-function shiftKey(k,n){var d=keyDate(k);d.setDate(d.getDate()+n);return dayKey(d.getTime());}
-function fmtTime(ms){return new Date(ms).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}
-function dur(ms){var m=Math.max(0,Math.round(ms/MIN)),h=Math.floor(m/60);return h?h+'h '+pad(m%60)+'m':m+'m';}
-function clock(ms){var s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return (h?h+':'+pad(m):pad(m))+':'+pad(s%60);}
-function toLocal(ms){var d=new Date(ms);return dayKey(ms)+'T'+pad(d.getHours())+':'+pad(d.getMinutes());}
-function fromLocal(v){var t=new Date(v).getTime();return isNaN(t)?null:t;}
-function dayLabel(k){var t=dayKey(Date.now());if(k===t)return 'Today';if(k===shiftKey(t,-1))return 'Yesterday';return keyDate(k).toLocaleDateString([], {weekday:'short',day:'numeric',month:'short'});}
-function when(ms){var k=dayKey(ms),t=dayKey(Date.now());return (k===t?'':dayLabel(k)+' ')+fmtTime(ms);}
-function rid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
-
-function defCfg(){return {name:'',birth:'',units:'ml',lastExport:0,show:{sleep:true,nursing:true,bottle:false,diaper:true,pumping:false,medicine:false},rem:{feed:{on:true,mins:180},diaper:{on:false,mins:150},pumping:{on:false,mins:240},medicine:{on:false,time:'09:00',name:''}}};}
-function mergeCfg(d){var c=defCfg();d=d||{};['name','birth','units'].forEach(function(k){if(typeof d[k]==='string')c[k]=d[k];});
- if(typeof d.lastExport==='number')c.lastExport=d.lastExport;
- var sh=d.show||{};Object.keys(c.show).forEach(function(k){if(typeof sh[k]==='boolean')c.show[k]=sh[k];});
- var r=d.rem||{};Object.keys(c.rem).forEach(function(k){if(r[k]&&typeof r[k]==='object')Object.keys(c.rem[k]).forEach(function(f){if(r[k][f]!=null)c.rem[k][f]=r[k][f];});});return c;}
-
-var S={cfg:defCfg(),days:{},older:{},timers:{},view:'home',tlDay:dayKey(Date.now()),sheet:null,timerOpen:false,sync:'connecting',ro:false};
-var DB=null, chain={}, fetched={}, pending=false;
-var V=document.getElementById('view'),NAV=document.getElementById('nav'),TM=document.getElementById('timer'),SH=document.getElementById('sheet'),TO=document.getElementById('toast');
-
-/* ---------- storage ---------- */
-function toast(msg,undo){toast.undo=undo||null;TO.innerHTML='<div class="toast"><span>'+esc(msg)+'</span>'+(undo?'<button data-act="undo">Undo</button>':'')+'</div>';clearTimeout(toast.t);toast.t=setTimeout(function(){TO.innerHTML='';toast.undo=null;},undo?7000:3200);}
-function queue(path,fn){if(!DB)return;chain[path]=(chain[path]||Promise.resolve()).then(fn).catch(function(e){if(e&&e.code==='invalid_argument')S.ro=true;toast(S.ro?'You have view-only access, so this was not saved':'Could not save. Check your connection');render();});}
-function upsert(path,data,base){queue(path,function(){var r=DB.doc(path);return r.update(data).catch(function(e){if(e&&e.code==='invalid_argument'){var o=clone(base);Object.keys(data).forEach(function(k){o[k]=data[k];});return r.set(o);}throw e;});});}
-function saveCfg(){var c=clone(S.cfg);queue('app/config',function(){return DB.doc('app/config').set(c);});}
-function setTimer(k,val){S.timers[k]=val;var p={};p[k]=val;upsert('app/timers',p,{});}
-function putEvent(key,id,ev){var tgt=S.days[key]||S.older[key];if(!tgt){tgt=S.days[key]={date:key,events:{}};}tgt.events=tgt.events||{};tgt.events[id]=ev;var p={events:{}};p.events[id]=ev;upsert('days/'+key,p,{date:key});}
-function blank(t,s,e){return {t:t,s:s,e:e||null,del:false,L:null,R:null,side:null,ml:null,kind:null,dk:null,con:null,col:null,med:null,note:null};}
-function addEvent(ev){var k=dayKey(ev.s),id=rid();putEvent(k,id,ev);return {key:k,id:id};}
-function dropEvent(key,id){var d=S.days[key]||S.older[key],old=d&&d.events&&d.events[id];if(old){var g=clone(old);g.del=true;putEvent(key,id,g);}}
-
-function dayEvents(key){var d=S.days[key]||S.older[key],out=[];if(d&&d.events)Object.keys(d.events).forEach(function(id){var e=d.events[id];if(e&&!e.del&&typeof e.s==='number')out.push({id:id,key:key,ev:e});});return out.sort(function(a,b){return b.ev.s-a.ev.s;});}
-function recent(){var out=[];Object.keys(S.days).forEach(function(k){out=out.concat(dayEvents(k));});return out.sort(function(a,b){return b.ev.s-a.ev.s;});}
-function lastOf(list,types){for(var i=0;i<list.length;i++)if(types.indexOf(list[i].ev.t)>=0)return list[i].ev;return null;}
-
-/* ---------- formatting ---------- */
-function vol(ml){if(ml==null||ml==='')return '';return S.cfg.units==='oz'?(ml/OZ).toFixed(1)+' oz':Math.round(ml)+' ml';}
-function volIn(ml){if(ml==null)return '';return S.cfg.units==='oz'?String(+(ml/OZ).toFixed(1)):String(Math.round(ml));}
-function volOut(v){var n=parseFloat(v);if(isNaN(n)||n<0)return null;return S.cfg.units==='oz'?n*OZ:n;}
-function sides(ev){var p=[];if(ev.L)p.push('Left '+dur(ev.L));if(ev.R)p.push('Right '+dur(ev.R));return p.join(', ')||dur((ev.e||ev.s)-ev.s);}
-function desc(ev){
- if(ev.t==='nursing')return sides(ev);
- if(ev.t==='bottle')return [vol(ev.ml),ev.kind==='formula'?'formula':ev.kind==='breast'?'breast milk':''].filter(Boolean).join(' ')||'Logged';
- if(ev.t==='diaper')return [DK[ev.dk]||'Diaper',[ev.con,ev.col].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
- if(ev.t==='sleep')return ev.e?dur(ev.e-ev.s)+' · woke '+fmtTime(ev.e):'Started';
- if(ev.t==='pumping')return [vol(ev.ml),ev.e?dur(ev.e-ev.s):''].filter(Boolean).join(' · ')||'Logged';
- if(ev.t==='medicine')return ev.med||'Logged';
- return '';
-}
-function age(){var b=S.cfg.birth;if(!b)return '';var d=Math.floor((keyDate(dayKey(Date.now()))-keyDate(b))/DAY+0.5);if(d<0)return '';
- if(d<14)return d+(d===1?' day old':' days old');
- if(d<84){var w=Math.floor(d/7),r=d%7;return w+' weeks'+(r?', '+r+(r===1?' day':' days'):'');}
- var bd=keyDate(b),n=new Date(),m=(n.getFullYear()-bd.getFullYear())*12+n.getMonth()-bd.getMonth()-(n.getDate()<bd.getDate()?1:0);
- if(m<24)return m+' months';return Math.floor(m/12)+' years';}
-function dueInfo(kind,list,now){
- var r=S.cfg.rem[kind];if(!r||!r.on)return null;
- if(kind==='medicine'){var p=String(r.time||'09:00').split(':'),t=new Date();t.setHours(+p[0]||0,+p[1]||0,0,0);var at=t.getTime(),k=dayKey(now);
-  var done=list.some(function(x){return x.ev.t==='medicine'&&x.key===k;});return {at:at,over:!done&&now>=at,done:done};}
- var last=lastOf(list,kind==='feed'?['nursing','bottle']:[kind]);if(!last)return null;var at2=last.s+r.mins*MIN;return {at:at2,over:now>=at2,last:last};}
-
-/* ---------- views ---------- */
-function bannerHTML(){
- if(S.ro)return '<div class="banner">You have view-only access. Ask the owner for permission to contribute if you need to add logs.</div>';
- if(S.sync==='off')return '<div class="banner">Logs are not being saved. Open this page while signed in to Claude to keep and share them.</div>';
- if(S.sync==='slow')return '<div class="banner">Saved logs can\'t be reached yet. What you see may be out of date.</div>';
- return '';}
-function homeHTML(){
- var now=Date.now(),list=recent(),c=S.cfg,today=dayEvents(dayKey(now)),h='';
- h+='<header class="row"><div class="col"><h1 style="font-size:28px">'+esc(c.name||'Baby')+'</h1><span class="mut" style="font-size:14px">'+esc(age()||'Add a birth date in Settings')+'</span></div>'+(S.sync==='connecting'?'<span class="pill">Connecting</span>':'')+'</header>';
- h+=bannerHTML();
- if(!c.name||!c.birth)h+='<a class="card row" href="#prefs" style="text-decoration:none;color:inherit"><span><b>Set up your baby\'s profile</b><br><span class="mut">Add a name and birth date</span></span>'+svg('right')+'</a>';
- var dk0=Object.keys(S.days).filter(function(k){return dayEvents(k).length;}).sort(),base=c.lastExport||(dk0.length?keyDate(dk0[0]).getTime():now);
- if(list.length&&now-base>7*DAY)h+='<a class="card row" href="#prefs" style="text-decoration:none;color:inherit"><span><b>Back up your logs</b><br><span class="mut">'+(c.lastExport?'Last export '+Math.floor((now-c.lastExport)/DAY)+' days ago':'No export yet')+' · export from Settings</span></span>'+svg('right')+'</a>';
- var lf=lastOf(list,['nursing','bottle']),fd=dueInfo('feed',list,now),nt=S.timers.nursing;
- h+='<section class="hero'+(nt?' feeding':'')+'" aria-label="Feeding">';
- if(nt){h+='<div class="sign">Currently feeding</div><div class="row" style="align-items:baseline"><span class="big" data-clock="total">'+clock((function(q){return q.L+q.R;})(nursTotals(nt,now)))+'</span><span class="sub">Started '+fmtTime(nt.start)+'</span></div><span class="sub" style="font-size:15px">'+(nt.side?(nt.side==='L'?'Left':'Right')+' side running':'Paused · tap a side to continue')+'</span>';}
- else if(!lf){h+='<span class="lab">NEXT FEED</span><div style="font-size:18px;font-weight:600">No feeds logged yet</div>';}
- else{var span=S.cfg.rem.feed.mins*MIN,pct=Math.min(100,Math.max(0,(now-lf.s)/span*100));
-  h+='<div class="row"><span class="lab">SINCE LAST FEED</span><span class="sub">Started '+when(lf.s)+'</span></div>';
-  h+='<div class="big">'+dur(now-lf.s)+'</div>';
-  if(fd)h+='<div class="bar" aria-hidden="true"><i style="width:'+pct.toFixed(0)+'%"></i></div><span class="sub '+(fd.over?'over':'')+'" style="font-size:15px">'+(fd.over?'Next feed was due '+fmtTime(fd.at)+' · '+dur(now-fd.at)+' over':'Next feed '+fmtTime(fd.at)+' · in '+dur(fd.at-now))+'</span>';
-  h+='<span class="sub">'+esc(desc(lf))+(lf.side?' · ended on the '+(lf.side==='L'?'left':'right'):'')+'</span>';}
- h+='</section>';
- var feeds=0,wet=0,dirty=0;list.forEach(function(x){var e=x.ev;if(e.s<now-DAY||e.s>now)return;if(e.t==='nursing'||e.t==='bottle')feeds++;if(e.t==='diaper'){if(e.dk==='pee'||e.dk==='mixed')wet++;if(e.dk==='poo'||e.dk==='mixed')dirty++;}});
- var countsH='<section class="card counts" aria-label="Last 24 hours"><div><b>'+feeds+'</b><span class="mut">Feeds, last 24h</span></div><div><b>'+wet+'</b><span class="mut">Wet, last 24h</span></div><div><b>'+dirty+'</b><span class="mut">Dirty, last 24h</span></div></section>';
-
- var shown=['nursing','diaper','sleep','bottle','pumping','medicine'].filter(function(t){return c.show[t];});
- if(!shown.length)h+='<p class="mut" style="font-size:15px;margin:14px 6px">No trackers are shown. Turn some on in Settings.</p>';
- function big(act,v,label,cls,icon){return '<button class="bb '+(cls||'')+'" data-act="'+act+'" data-v="'+(v||'')+'">'+(icon?svg(icon,18,icon!=='plus'):'')+'<span>'+label+'</span></button>';}
- function sideBtn(k,name,tt){var run=nt.side===k;return '<button class="bb sd '+(run?'run':'')+'" data-act="side" data-v="'+k+'" aria-pressed="'+(run?'true':'false')+'"><span>'+name+'</span><b data-clock="'+k+'">'+clock(tt[k])+'</b><small>'+(run?'Running · tap to pause':'Tap to switch here')+'</small></button>';}
- shown.forEach(function(t){
-  var last=lastOf(list,[t]),rk=t==='sleep'?null:(t==='nursing'||t==='bottle'?'feed':t),d=rk?dueInfo(rk,list,now):null,due=!!(d&&d.over),st='',btn='';
-  if(t==='nursing'){
-   if(nt){var tt=nursTotals(nt,now);due=false;st='<span class="due">Feeding now</span> · started '+fmtTime(nt.start)+(now-nt.start>45*MIN?' · still feeding?':'');
-    btn='<div class="bgrid c2">'+sideBtn('L','Left',tt)+sideBtn('R','Right',tt)+'</div><div class="bgrid c2">'+big('finishNurse','','Finish and save','go')+big('discardNurse','','Discard','ghost')+'</div>';}
-   else{st=last?'Last feed '+dur(now-last.s)+' ago · '+esc(desc(last))+(last.side?' · ended on the '+(last.side==='L'?'left':'right'):''):'No feeds logged yet';
-    btn='<div class="bgrid c2">'+big('side','L','Start left','go','play')+big('side','R','Start right','go','play')+'</div><div class="bgrid c1">'+big('sheet','nursing','Add a past feed','ghost','plus')+'</div>';}
-  }else if(t==='diaper'){
-   st=last?'Last change '+dur(now-last.s)+' ago · '+esc(desc(last)):'No diapers logged yet';
-   btn='<div class="bgrid c3">'+big('quickDiaper','pee','Pee','go')+big('quickDiaper','poo','Poo','go')+big('quickDiaper','mixed','Mixed','go')+'</div><div class="bgrid c1">'+big('sheet','diaper','Dry, details or another time','ghost','plus')+'</div>';
-  }else if(t==='sleep'){var sl=S.timers.sleep;
-   if(sl){st='<span class="due">Asleep</span> since '+fmtTime(sl.start)+' · <b data-clock="sleep">'+clock(now-sl.start)+'</b>';btn='<div class="bgrid c1">'+big('stopSleep','','End sleep','stop','stop')+'</div>';}
-   else{st=last?(last.e?'Awake since '+when(last.e)+' · slept '+dur(last.e-last.s):'Last sleep '+when(last.s)):'No sleep logged yet';btn='<div class="bgrid c2">'+big('startSleep','','Start sleep','go','play')+big('sheet','sleep','Add past sleep','ghost','plus')+'</div>';}
-  }else if(t==='pumping'){var pt=S.timers.pumping;
-   if(pt){st='<span class="due">Pumping</span> since '+fmtTime(pt.start)+' · <b data-clock="pumping">'+clock(now-pt.start)+'</b>';btn='<div class="bgrid c1">'+big('stopPump','','Finish pumping','stop','stop')+'</div>';}
-   else{st=last?'Last session '+dur(now-last.s)+' ago · '+esc(desc(last)):'No pumping logged yet';btn='<div class="bgrid c2">'+big('startPump','','Start pumping','go','play')+big('sheet','pumping','Add past session','ghost','plus')+'</div>';}
-  }else{st=last?'Last '+(dayKey(last.s)===dayKey(now)?dur(now-last.s)+' ago':when(last.s))+' · '+esc(desc(last)):'Nothing logged yet';btn='<div class="bgrid c1">'+big('sheet',t,t==='bottle'?'Log a bottle':'Log medicine','go','plus')+'</div>';}
-  var on=rk&&S.cfg.rem[rk]&&S.cfg.rem[rk].on;
-  h+='<section class="card tcard'+(due?' isdue':'')+'" aria-label="'+NAMES[t]+'"><div class="thead">'+(rk?'<a class="bell '+(on?'on':'')+'" href="#reminders" aria-label="'+NAMES[t]+' reminder '+(on?'on':'off')+'">'+svg('bell',20,on)+'</a>':'')+'<span class="ico" aria-hidden="true">'+svg(t,18)+'</span><h2>'+NAMES[t]+'</h2>'+(due?'<span class="pill warn">Due</span>':'')+'</div><p class="tstat">'+st+'</p>'+btn+'</section>';
- });
- return h+countsH;
-}
-function timelineHTML(){
- var k=S.tlDay,tk=dayKey(Date.now()),ev=dayEvents(k),feeds=0,dia=0,sl=0,h='';
- if(DB&&!S.days[k]&&!fetched[k]){fetched[k]=1;DB.doc('days/'+k).get().then(function(s){if(s.exists){S.older[k]=clone(s.data());render();}}).catch(function(){});}
- ev.forEach(function(x){var e=x.ev;if(e.t==='nursing'||e.t==='bottle')feeds++;if(e.t==='diaper')dia++;if(e.t==='sleep'&&e.e)sl+=e.e-e.s;});
- var dn=S.cfg.birth?Math.floor((keyDate(k)-keyDate(S.cfg.birth))/DAY+0.5):-1;
- h+='<header class="row"><button class="sq ghost" data-act="tl" data-v="-1" aria-label="Previous day">'+svg('left')+'</button><div class="col" style="align-items:center"><h1 style="font-size:22px">'+dayLabel(k)+'</h1><span class="mut">'+keyDate(k).toLocaleDateString([], {weekday:'short',day:'numeric',month:'short'})+(dn>=0?' · day '+dn:'')+'</span></div><button class="sq ghost" data-act="tl" data-v="1" aria-label="Next day" '+(k>=tk?'disabled':'')+'>'+svg('right')+'</button></header>';
- h+=bannerHTML();
- h+='<section class="card counts" aria-label="Totals"><div><b>'+feeds+'</b><span class="mut">Feeds</span></div><div><b>'+dia+'</b><span class="mut">Diapers</span></div><div><b>'+(sl?dur(sl):'0m')+'</b><span class="mut">Sleep</span></div></section>';
- h+='<button class="bb ghost" data-act="choose">'+svg('plus',18)+'<span>Add an entry for this day</span></button>';
- if(!ev.length)return h+'<p class="mut" style="text-align:center;font-size:15px;margin:24px 0">Nothing logged on this day.</p>';
- h+='<section aria-label="Events, newest first">';
- ev.forEach(function(x){h+='<button class="ev" data-act="edit" data-v="'+x.key+'|'+x.id+'" aria-label="Edit '+NAMES[x.ev.t]+' at '+fmtTime(x.ev.s)+'"><span class="mut" style="font-weight:500">'+fmtTime(x.ev.s)+'</span><span class="ico" aria-hidden="true">'+svg(x.ev.t,18)+'</span><span class="col"><span class="nm">'+NAMES[x.ev.t]+'</span><span class="mut">'+esc(desc(x.ev))+(x.ev.note?' · '+esc(x.ev.note):'')+'</span></span></button>';});
- return h+'</section>';
-}
-function sw(k,on,lab,act){return '<button class="sw" role="switch" aria-checked="'+(on?'true':'false')+'" aria-label="'+lab+'" data-act="'+(act||'remToggle')+'" data-v="'+k+'"><i></i></button>';}
-function remindersHTML(){
- var now=Date.now(),list=recent(),R=S.cfg.rem,n=0,h='';Object.keys(R).forEach(function(k){if(R[k].on)n++;});
- h+='<header class="row"><h1 style="font-size:28px">Reminders</h1><span class="pill warn">'+n+' on</span></header>'+bannerHTML();
- h+='<div class="card mut" style="font-size:14px;line-height:1.45">Reminders show as "Due" on Home while this page is open. Lock-screen alerts on iPhone are not available in this version.</div>';
- [['feed','Feed','nursing or bottle resets it','last feed'],['diaper','Diaper','any diaper log resets it','last change'],['pumping','Pumping','a pumping log resets it','last session']].forEach(function(a){
-  var k=a[0],r=R[k],d=dueInfo(k,list,now),st=!r.on?'Off':d?(d.over?'<span class="due">Due now</span>':'Next: '+when(d.at)):'Starts after the first log';
-  h+='<section class="card" aria-label="'+a[1]+' reminder" style="display:flex;flex-direction:column;gap:10px"><div class="row"><div class="col"><span style="font-size:16px;font-weight:600">'+a[1]+'</span><span class="mut">'+st+' · '+a[2]+'</span></div>'+sw(k,r.on,a[1]+' reminder')+'</div>';
-  h+='<div class="row"><span style="font-size:15px">After '+a[3]+'</span><div class="step"><button class="sq ghost" style="border-radius:6px" data-act="remStep" data-v="'+k+'|-15" aria-label="Decrease by 15 minutes">'+svg('minus',18)+'</button><b>'+dur(r.mins*MIN)+'</b><button class="sq ghost" style="border-radius:6px" data-act="remStep" data-v="'+k+'|15" aria-label="Increase by 15 minutes">'+svg('plus',18)+'</button></div></div></section>';
- });
- var m=R.medicine,md=dueInfo('medicine',list,now),ms=!m.on?'Off':md.done?'Given today':md.over?'<span class="due">Due now</span>':'Today at '+fmtTime(md.at);
- h+='<section class="card" aria-label="Medicine reminder" style="display:flex;flex-direction:column;gap:12px"><div class="row"><div class="col"><span style="font-size:16px;font-weight:600">Medicine</span><span class="mut">'+ms+'</span></div>'+sw('medicine',m.on,'Medicine reminder')+'</div>';
- h+='<label class="fld"><span>Name</span><input type="text" data-cfg="rem.medicine.name" value="'+esc(m.name)+'" placeholder="For example, Vitamin D" autocomplete="off"></label><label class="fld"><span>Every day at</span><input type="time" data-cfg="rem.medicine.time" value="'+esc(m.time)+'"></label></section>';
- return h;
-}
-function prefsHTML(){
- var c=S.cfg,h='<header class="row"><h1 style="font-size:28px">Settings</h1></header>'+bannerHTML();
- h+='<section class="card" aria-label="Baby" style="padding:16px;display:flex;flex-direction:column;gap:14px"><div class="row"><h2 style="font-size:18px">Baby</h2>'+(age()?'<span class="pill">'+esc(age())+'</span>':'')+'</div>';
- h+='<label class="fld"><span>Name</span><input type="text" data-cfg="name" value="'+esc(c.name)+'" autocomplete="off" style="font-weight:600"></label>';
- h+='<label class="fld"><span>Birth date</span><input type="date" data-cfg="birth" value="'+esc(c.birth)+'" max="'+dayKey(Date.now())+'" style="font-weight:600"></label><span class="mut">Age on Home and the day count on Timeline come from this.</span></section>';
- h+='<section class="card" aria-label="Home screen" style="padding:16px 16px 8px;display:flex;flex-direction:column"><h2 style="font-size:18px">Home screen</h2><span class="mut" style="margin:4px 0 6px">Choose which trackers appear on Home. Hidden trackers keep their logs.</span>';
- ['sleep','nursing','bottle','diaper','pumping','medicine'].forEach(function(t,i){h+='<div class="row" style="min-height:52px;'+(i?'border-top:1px solid var(--soft)':'')+'"><span style="font-size:15px;font-weight:600">'+NAMES[t]+'</span>'+sw(t,c.show[t],'Show '+NAMES[t]+' on Home','showToggle')+'</div>';});
- h+='</section>';
- h+='<section class="card" aria-label="Units" style="padding:16px;display:flex;flex-direction:column;gap:10px"><h2 style="font-size:18px">Units</h2><div class="seg c2"><button data-act="units" data-v="ml" aria-pressed="'+(c.units==='ml')+'">Millilitres</button><button data-act="units" data-v="oz" aria-pressed="'+(c.units==='oz')+'">Ounces</button></div></section>';
- h+='<section class="card" aria-label="Your data" style="padding:16px;display:flex;flex-direction:column;gap:10px"><h2 style="font-size:18px">Your data</h2><span class="mut" style="font-size:14px;line-height:1.45">Logs are saved in this browser on this phone, and nowhere else. Export them to keep a copy or move them to another device.</span><span class="mut">Last export: '+(c.lastExport?new Date(c.lastExport).toLocaleDateString([], {weekday:'short',day:'numeric',month:'short'}):'never')+'</span><button class="prim" data-act="exportCsv">Export all logs (CSV)</button><div style="display:flex;gap:8px"><button class="bb ghost" style="flex:1;min-height:52px" data-act="importPick">Import logs (CSV)</button><button class="sq ghost" style="width:52px;height:52px;flex:none" data-act="csvInfo" aria-label="CSV format details">'+svg('info',22)+'</button></div></section>';
- return h;
-}
-function navHTML(){return [['home','Home','home'],['timeline','Timeline','clock'],['reminders','Reminders','bell'],['prefs','Settings','prefs']].map(function(a){var cur=S.view===a[0];return '<a href="#'+a[0]+'" class="'+(cur?'cur':'')+'"'+(cur?' aria-current="page"':'')+'>'+svg(a[2],22)+'<span>'+a[1]+'</span></a>';}).join('');}
-function render(force){
- var ae=document.activeElement;if(!force&&ae&&V.contains(ae)&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName)){pending=true;return;}
- pending=false;V.innerHTML=S.view==='timeline'?timelineHTML():S.view==='reminders'?remindersHTML():S.view==='prefs'?prefsHTML():homeHTML();NAV.innerHTML=navHTML();renderTimer();
-}
-
-/* ---------- nursing timer ---------- */
-function nursTotals(nt,now){var L=nt.L||0,R=nt.R||0;if(nt.side==='L')L+=now-nt.since;if(nt.side==='R')R+=now-nt.since;return {L:L,R:R};}
-function lock(){if(document.body)document.body.style.overflow=(S.sheet||S.timerOpen)?'hidden':'';}
-function renderTimer(){lock();
- if(!S.timerOpen){if(TM.innerHTML)TM.innerHTML='';return;}
- var now=Date.now(),nt=S.timers.nursing,t=nt?nursTotals(nt,now):{L:0,R:0},prev=lastOf(recent(),['nursing']),h='';
- function side(k,name){var run=nt&&nt.side===k;return '<button class="side '+(run?'run':'')+'" data-act="side" data-v="'+k+'" aria-pressed="'+(run?'true':'false')+'" aria-label="'+name+' side, '+(run?'running':'paused')+' at '+clock(t[k])+'"><span style="font-size:14px;font-weight:600">'+name+'</span><b>'+clock(t[k])+'</b>'+svg(run?'pause':'play',28,true)+'<span>'+(run?'Running, tap to pause':'Tap to start')+'</span></button>';}
- h+='<div class="timer" role="dialog" aria-label="Nursing timer"><div class="in"><header class="row"><button class="sq ghost" data-act="closeTimer" aria-label="Minimise timer">'+svg('down')+'</button><h1 style="font-size:18px">Nursing</h1><button class="txt" style="width:auto;padding:0 4px" data-act="sheet" data-v="nursing">Enter manually</button></header>';
- h+='<div class="col" style="align-items:center;gap:6px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--navy-m)">TOTAL</span><span class="tot">'+clock(t.L+t.R)+'</span><span style="font-size:14px;color:var(--navy-m)">'+(nt?'Started '+fmtTime(nt.start):prev&&prev.side?'Last feed ended on the '+(prev.side==='L'?'left':'right'):'Tap a side to start')+'</span></div>';
- h+='<div class="sides">'+side('L','Left')+side('R','Right')+'</div><div style="flex:1"></div>';
- h+='<div><button class="prim" data-act="finishNurse" '+(nt?'':'disabled style="opacity:.5"')+'>Finish and save</button>'+(nt?'<button class="txt" data-act="discardNurse">Discard session</button>':'')+'</div></div></div>';
- TM.innerHTML=h;
-}
-
-/* ---------- sheets ---------- */
-function openSheet(t,x){
- var now=Date.now(),f;
- if(x){var e=x.ev;f={side:e.side||'',st:toLocal(e.s).slice(11),s:e.s,e:e.e,Lm:e.L?Math.round(e.L/MIN):'',Rm:e.R?Math.round(e.R/MIN):'',ml:volIn(e.ml),kind:e.kind||'breast',dk:e.dk||'pee',con:e.con||'',col:e.col||'',med:e.med||'',note:e.note||'',mins:e.e?Math.round((e.e-e.s)/MIN):''};}
- else {var lb=lastOf(recent(),['bottle']);f={side:'',st:'',s:now,e:now,Lm:'',Rm:'',ml:lb?volIn(lb.ml):'',kind:lb&&lb.kind||'breast',dk:'pee',con:'',col:'',med:S.cfg.rem.medicine.name||'',note:'',mins:''};
-  if(t==='sleep'){f.s=now-60*MIN;f.e=now;}if(t==='nursing')f.s=null;}
- S.sheet={t:t,id:x?x.id:null,key:x?x.key:null,f:f,confirm:false,clear:null};renderSheet();
-}
-function collect(){if(!S.sheet)return;SH.querySelectorAll('[data-f]').forEach(function(el){var k=el.getAttribute('data-f');S.sheet.f[k]=el.type==='datetime-local'?fromLocal(el.value):el.value;});}
-function seg(k,opts,cls){var f=S.sheet.f;return '<div class="seg '+cls+'">'+opts.map(function(o){return '<button data-act="pick" data-v="'+k+'|'+o[0]+'" aria-pressed="'+(f[k]===o[0])+'">'+o[1]+'</button>';}).join('')+'</div>';}
-function fld(lab,k,type,extra){var v=S.sheet.f[k];if(type==='datetime-local')v=v?toLocal(v):'';return '<label class="fld"><span>'+lab+'</span><input type="'+type+'" data-f="'+k+'" value="'+esc(v)+'" '+(extra||'')+'></label>';}
-function renderSheet(){
- var sh=S.sheet;lock();if(!sh){SH.innerHTML='';return;}
- function wrap(title,inner){return '<div class="scrim" data-act="scrim"><section class="sheet" role="dialog" aria-label="'+title+'"><div class="grab" aria-hidden="true"></div><div class="row"><h1 style="font-size:24px">'+title+'</h1><button class="sq" style="background:var(--bg);color:var(--ink)" data-act="closeSheet" aria-label="Close">'+svg('x')+'</button></div>'+inner+'</section></div>';}
- if(sh.t==='csvInfo'){SH.innerHTML=wrap('CSV format','<p>Use a CSV file with a header row. A file exported from this app imports as it is.</p><h2>Required columns</h2><dl class="dl"><dt>start</dt><dd>Local date and 24-hour time, as 2026-11-14 13:05. A time alone (13:05) also works when the date column is filled.</dd><dt>type</dt><dd>One of: nursing, bottle, diaper, sleep, pumping, medicine.</dd></dl><h2>Optional columns</h2><dl class="dl"><dt>date</dt><dd>2026-11-14. Only needed when start holds a time alone.</dd><dt>end</dt><dd>Same format as start. Used for sleep and pumping.</dd><dt>left_min</dt><dd>Nursing minutes on the left.</dd><dt>right_min</dt><dd>Nursing minutes on the right.</dd><dt>last_side</dt><dd>left or right.</dd><dt>amount_ml</dt><dd>Bottle or pumping amount in millilitres, whatever units the app shows.</dd><dt>milk</dt><dd>breast or formula.</dd><dt>diaper</dt><dd>pee, poo, mixed or dry.</dd><dt>consistency</dt><dd>For example soft, runny or firm.</dd><dt>colour</dt><dd>For example yellow, brown or green.</dd><dt>medicine</dt><dd>Medicine name.</dd><dt>note</dt><dd>Free text, up to 200 characters.</dd></dl><h2>Example</h2><div class="pre">start,type,left_min,right_min,last_side,diaper,end\n2026-11-14 11:00,nursing,8,6,right,,\n2026-11-14 10:50,diaper,,,,pee,\n2026-11-14 11:10,sleep,,,,,2026-11-14 12:40</div><h2>Rules</h2><p>Column order does not matter and extra columns are ignored. A row is skipped if its type or start time cannot be read, or if an entry of the same type already starts in the same minute. Up to 5,000 rows per file. You see a summary and confirm before anything is added.</p>');return;}
- if(sh.t==='csvImport'){var r=sh.res,n=r.evs.length,rng=n?dayLabel(dayKey(r.min))+(dayKey(r.min)===dayKey(r.max)?'':' to '+dayLabel(dayKey(r.max))):'';SH.innerHTML=wrap('Import logs','<p>'+esc(sh.name||'CSV file')+'</p><div class="card counts" style="background:var(--bg)"><div><b>'+n+'</b><span class="mut">New entries</span></div><div><b>'+r.dup+'</b><span class="mut">Already logged</span></div><div><b>'+r.bad+'</b><span class="mut">Unreadable</span></div></div>'+(n?'<p>Covers '+rng+'.'+(r.over?' Only the first 5,000 rows were read.':'')+'</p><button class="prim" data-act="importGo">Import '+n+(n===1?' entry':' entries')+'</button>':'<p>There is nothing new to import from this file.</p>')+'<button class="txt" data-act="closeSheet">Cancel</button>');return;}
- if(sh.t==='choose'){SH.innerHTML='<div class="scrim" data-act="scrim"><section class="sheet" role="dialog" aria-label="Add an entry"><div class="grab" aria-hidden="true"></div><div class="row"><h1 style="font-size:24px">Add an entry</h1><button class="sq" style="background:var(--bg);color:var(--ink)" data-act="closeSheet" aria-label="Close">'+svg('x')+'</button></div><p class="tstat">For '+dayLabel(S.tlDay).toLowerCase()+'. Choose what to log.</p><div class="seg c2 tall">'+['nursing','diaper','sleep','bottle','pumping','medicine'].map(function(k){return '<button data-act="chooseType" data-v="'+k+'">'+NAMES[k]+'</button>';}).join('')+'</div></section></div>';return;}
- var t=sh.t,f=sh.f,u=S.cfg.units,num='inputmode="decimal" min="0" step="any"',b='';
- if(t==='bottle')b=fld('Time','s','datetime-local')+fld('Amount ('+u+')','ml','number',num)+seg('kind',[['breast','Breast milk'],['formula','Formula']],'c2');
- if(t==='diaper'){b=fld('Time','s','datetime-local')+'<div class="fld"><span>Type</span>'+seg('dk',[['pee','Pee'],['poo','Poo'],['mixed','Mixed'],['dry','Dry']],'c2 tall')+'</div>';
-  if(f.dk==='poo'||f.dk==='mixed')b+='<div class="fld"><span>Consistency (optional)</span>'+seg('con',[['soft','Soft'],['runny','Runny'],['firm','Firm']],'c3')+'</div><div class="fld"><span>Colour (optional)</span>'+seg('col',[['yellow','Yellow'],['brown','Brown'],['green','Green']],'c3')+'</div>';}
- if(t==='medicine')b=fld('Time','s','datetime-local')+fld('Medicine','med','text','autocomplete="off"');
- if(t==='pumping')b=fld('Started','s','datetime-local')+fld('Duration (minutes)','mins','number','inputmode="numeric" min="0"')+fld('Amount ('+u+')','ml','number',num);
- if(t==='sleep')b=fld('Fell asleep','s','datetime-local')+fld('Woke up','e','datetime-local');
- if(t==='nursing')b='<div class="seg c2">'+fld('Left (minutes)','Lm','number','inputmode="numeric" min="0" placeholder="0"')+fld('Right (minutes)','Rm','number','inputmode="numeric" min="0" placeholder="0"')+'</div>'+'<div class="fld"><span>Finished on (optional)</span>'+seg('side',[['L','Left'],['R','Right']],'c2')+'</div>'+fld('Start time (optional)','st','time')+'<span class="mut" style="margin-top:-8px">'+(sh.id?'The date stays as '+dayLabel(dayKey(f.s)).toLowerCase()+'.':'Leave it empty and it is worked out as now minus the minutes you entered.')+'</span>';
- b+=fld('Note','note','text','placeholder="Add a note" autocomplete="off"');
- SH.innerHTML='<div class="scrim" data-act="scrim"><section class="sheet" role="dialog" aria-label="'+NAMES[t]+'"><div class="grab" aria-hidden="true"></div><div class="row"><h1 style="font-size:24px">'+NAMES[t]+(t==='nursing'?' · manual entry':'')+'</h1><button class="sq" style="background:var(--bg);border-radius:8px;color:var(--ink)" data-act="closeSheet" aria-label="Close">'+svg('x')+'</button></div>'+b+'<button class="prim" data-act="save">Save</button>'+(sh.id?'<button class="txt dan" data-act="del">'+(sh.confirm?'Tap again to delete':'Delete entry')+'</button>':'')+'</section></div>';
-}
-function saveSheet(){
- collect();var sh=S.sheet,f=sh.f,t=sh.t;if(t==='nursing'){var tot=((parseFloat(f.Lm)||0)+(parseFloat(f.Rm)||0))*MIN;if(tot<=0){toast('Enter minutes for at least one side');return;}
-  if(f.st){var tp=String(f.st).split(':'),bd=new Date(sh.id&&f.s?f.s:(sh.base||Date.now()));bd.setHours(+tp[0]||0,+tp[1]||0,0,0);f.s=bd.getTime();if(!sh.id&&f.s>Date.now()+5*MIN)f.s-=DAY;}
-  else f.s=(sh.base||Date.now())-tot;}
- if(!f.s){toast('Enter a valid time');return;}
- var ev=blank(t,f.s,null);ev.note=String(f.note||'').slice(0,200)||null;
- if(t==='bottle'){ev.ml=volOut(f.ml);ev.kind=f.kind;}
- if(t==='diaper'){ev.dk=f.dk;var p=f.dk==='poo'||f.dk==='mixed';ev.con=p&&f.con||null;ev.col=p&&f.col||null;}
- if(t==='medicine')ev.med=String(f.med||'').slice(0,60)||null;
- if(t==='pumping'){var m=parseFloat(f.mins);ev.e=m>0?f.s+m*MIN:null;ev.ml=volOut(f.ml);}
- if(t==='sleep'){if(!f.e||f.e<=f.s){toast('Wake time must be after the start');return;}ev.e=f.e;}
- if(t==='nursing'){var L=(parseFloat(f.Lm)||0)*MIN,R=(parseFloat(f.Rm)||0)*MIN;if(L+R<=0){toast('Enter minutes for at least one side');return;}ev.L=L;ev.R=R;ev.e=f.s+L+R;ev.side=f.side||(L&&!R?'L':R&&!L?'R':null);}
- var key=dayKey(ev.s),id=sh.id||rid();
- if(sh.id&&sh.key!==key){var old=(S.days[sh.key]||S.older[sh.key]||{events:{}}).events[sh.id];if(old){var gone=clone(old);gone.del=true;putEvent(sh.key,sh.id,gone);}id=rid();}
- var wasNew=!sh.id,ct=sh.clear,tv=ct&&S.timers[ct]?clone(S.timers[ct]):null;
- putEvent(key,id,ev);if(sh.clear)setTimer(sh.clear,null);if(t==='nursing'&&!S.timers.nursing)S.timerOpen=false;
- S.sheet=null;renderSheet();render(true);toast(NAMES[t]+' saved',wasNew?function(){dropEvent(key,id);if(ct&&tv)setTimer(ct,tv);render(true);}:null);
-}
-
-/* ---------- import ---------- */
-function parseCsv(text){var rows=[],row=[],c='',q=false,i=0,ch;text=String(text).replace(/^﻿/,'');
- for(;i<text.length;i++){ch=text[i];
-  if(q){if(ch==='"'){if(text[i+1]==='"'){c+='"';i++;}else q=false;}else c+=ch;}
-  else if(ch==='"')q=true;else if(ch===','){row.push(c);c='';}
-  else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(c);c='';if(row.length>1||row[0]!=='')rows.push(row);row=[];}
-  else c+=ch;}
- row.push(c);if(row.length>1||row[0]!=='')rows.push(row);return rows;}
-function parseWhen(v,dateCol){v=String(v||'').trim();if(!v)return null;var m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})/),t;
- if(m)t=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime();
- else{var tm=v.match(/^(\d{1,2}):(\d{2})/),d=String(dateCol||'').trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(tm&&d)t=new Date(+d[1],+d[2]-1,+d[3],+tm[1],+tm[2]).getTime();}
- return t&&!isNaN(t)?t:null;}
-function readImport(text,existing){
- var rows=parseCsv(text);if(rows.length<2)return {err:'That file has no data rows'};
- var ix={};rows[0].forEach(function(x,i){ix[String(x).trim().toLowerCase()]=i;});
- if(ix.start==null||ix.type==null)return {err:'The file needs "start" and "type" columns'};
- var out=[],bad=0,dup=0,seen={},min=Infinity,max=0;
- function g(r,k){var i=ix[k],v=i==null?'':String(r[i]==null?'':r[i]).trim();return v.charAt(0)==="'"?v.slice(1):v;}
- function num(v){var n=parseFloat(v);return isNaN(n)||n<0?null:n;}
- rows.slice(1,5001).forEach(function(r){var t=g(r,'type').toLowerCase(),s=parseWhen(g(r,'start'),g(r,'date'));
-  if(!NAMES[t]||!s||s>Date.now()+DAY){bad++;return;}
-  var k=t+'|'+Math.floor(s/MIN);if(existing[k]||seen[k]){dup++;return;}seen[k]=1;
-  var ev=blank(t,s,parseWhen(g(r,'end'),g(r,'date')));if(ev.e&&ev.e<=s)ev.e=null;
-  if(t==='nursing'){var L=num(g(r,'left_min')),R=num(g(r,'right_min')),sd=g(r,'last_side').toLowerCase();ev.L=L?L*MIN:null;ev.R=R?R*MIN:null;ev.side=sd==='left'?'L':sd==='right'?'R':null;if(!ev.e&&(ev.L||ev.R))ev.e=s+(ev.L||0)+(ev.R||0);}
-  if(t==='bottle'||t==='pumping')ev.ml=num(g(r,'amount_ml'));
-  if(t==='bottle'){var mk=g(r,'milk').toLowerCase();ev.kind=mk==='formula'?'formula':mk==='breast'?'breast':null;}
-  if(t==='diaper'){var dk=g(r,'diaper').toLowerCase();ev.dk=DK[dk]?dk:null;ev.con=g(r,'consistency').toLowerCase().slice(0,20)||null;ev.col=(g(r,'colour')||g(r,'color')).toLowerCase().slice(0,20)||null;}
-  if(t==='medicine')ev.med=g(r,'medicine').slice(0,60)||null;
-  ev.note=g(r,'note').slice(0,200)||null;out.push(ev);if(s<min)min=s;if(s>max)max=s;});
- return {evs:out,bad:bad,dup:dup,min:min,max:max,over:rows.length-1>5000};}
-function bulkPut(items){var by={};items.forEach(function(it){(by[it.key]=by[it.key]||{})[it.id]=it.ev;var tgt=S.days[it.key]||S.older[it.key];if(!tgt)tgt=S.days[it.key]={date:it.key,events:{}};tgt.events=tgt.events||{};tgt.events[it.id]=it.ev;});
- Object.keys(by).forEach(function(k){upsert('days/'+k,{events:by[k]},{date:k});});}
-function existingKeys(){var p=DB?DB.collection('days').limit(1000).get().then(function(q){var d={};q.docs.forEach(function(x){d[x.id]=x.data();});return d;}).catch(function(){return null;}):Promise.resolve(null);
- return p.then(function(d){var m={};[d||{},S.older,S.days].forEach(function(src){Object.keys(src).forEach(function(k){var ev=(src[k]&&src[k].events)||{};Object.keys(ev).forEach(function(id){var e=ev[id];if(e&&!e.del&&typeof e.s==='number')m[e.t+'|'+Math.floor(e.s/MIN)]=1;});});});return m;});}
-var FILE=document.getElementById('csvFile');
-function onFile(){var f=FILE.files&&FILE.files[0];if(!f)return;if(f.size>3000000){toast('That file is too large to import');return;}
- var fr=new FileReader();fr.onerror=function(){toast('Could not read that file');};
- fr.onload=function(){existingKeys().then(function(m){var r=readImport(fr.result,m);if(r.err){toast(r.err);return;}S.sheet={t:'csvImport',f:{},res:r,name:f.name};renderSheet();});};fr.readAsText(f);}
-
-/* ---------- actions ---------- */
-var ACT={
- sheet:function(v){openSheet(v);},
- edit:function(v){var p=v.split('|'),d=S.days[p[0]]||S.older[p[0]];if(d&&d.events&&d.events[p[1]])openSheet(d.events[p[1]].t,{key:p[0],id:p[1],ev:d.events[p[1]]});},
- closeSheet:function(){S.sheet=null;renderSheet();},
- scrim:function(v,b,e){if(e.target===b){S.sheet=null;renderSheet();}},
- pick:function(v){collect();var p=v.split('|'),f=S.sheet.f;f[p[0]]=(p[0]==='con'||p[0]==='col'||p[0]==='side')&&f[p[0]]===p[1]?'':p[1];renderSheet();},
- save:saveSheet,
- del:function(){var sh=S.sheet;if(!sh.confirm){collect();sh.confirm=true;renderSheet();return;}var old=(S.days[sh.key]||S.older[sh.key]).events[sh.id],g=clone(old);g.del=true;var dk=sh.key,di=sh.id,keep=clone(old);keep.del=false;putEvent(dk,di,g);S.sheet=null;renderSheet();render(true);toast('Entry deleted',function(){putEvent(dk,di,keep);render(true);});},
- startSleep:function(){setTimer('sleep',{start:Date.now()});render(true);toast('Sleep started',function(){setTimer('sleep',null);render(true);});},
- stopSleep:function(){var st=S.timers.sleep;if(!st)return;var now=Date.now();var keep=clone(st),ref=now-st.start>=MIN?addEvent(blank('sleep',st.start,now)):null;setTimer('sleep',null);render(true);toast(ref?'Sleep ended and saved':'Sleep under a minute was not saved',function(){if(ref)dropEvent(ref.key,ref.id);setTimer('sleep',keep);render(true);});},
- startPump:function(){setTimer('pumping',{start:Date.now()});render(true);toast('Pumping started',function(){setTimer('pumping',null);render(true);});},
- stopPump:function(){var pt=S.timers.pumping;if(!pt)return;openSheet('pumping');S.sheet.f.s=pt.start;S.sheet.f.mins=Math.max(1,Math.round((Date.now()-pt.start)/MIN));S.sheet.f.ml='';S.sheet.clear='pumping';renderSheet();},
- openTimer:function(){S.timerOpen=true;renderTimer();},
- closeTimer:function(){S.timerOpen=false;renderTimer();render(true);},
- side:function(k){var now=Date.now(),nt=S.timers.nursing?clone(S.timers.nursing):{start:now,side:null,L:0,R:0,since:now,last:null};
-  if(nt.side){nt[nt.side]=(nt[nt.side]||0)+(now-nt.since);}
-  if(nt.side===k){nt.side=null;}else{nt.side=k;nt.last=k;}nt.since=now;setTimer('nursing',nt);renderTimer();render(true);},
- finishNurse:function(){var nt=S.timers.nursing;if(!nt)return;var now=Date.now(),t=nursTotals(nt,now),keep=clone(nt),ref=null;if(t.L+t.R>=20000){var ev=blank('nursing',nt.start,now);ev.L=t.L;ev.R=t.R;ev.side=nt.last||null;ref=addEvent(ev);}setTimer('nursing',null);S.timerOpen=false;renderTimer();render(true);toast(ref?'Feed saved':'Feed under 20 seconds was not saved',function(){if(ref)dropEvent(ref.key,ref.id);setTimer('nursing',keep);render(true);});},
- discardNurse:function(){var keep=clone(S.timers.nursing);setTimer('nursing',null);S.timerOpen=false;renderTimer();render(true);toast('Session discarded',function(){setTimer('nursing',keep);render(true);});},
- tl:function(v){var k=shiftKey(S.tlDay,+v);if(k>dayKey(Date.now()))return;S.tlDay=k;render(true);},
- remToggle:function(k){S.cfg.rem[k].on=!S.cfg.rem[k].on;saveCfg();render(true);},
- remStep:function(v){var p=v.split('|'),r=S.cfg.rem[p[0]];r.mins=Math.min(720,Math.max(30,r.mins+(+p[1])));saveCfg();render(true);},
- quickDiaper:function(v){var ev=blank('diaper',Date.now());ev.dk=v;var ref=addEvent(ev);render(true);toast(DK[v]+' diaper logged',function(){dropEvent(ref.key,ref.id);render(true);});},
- choose:function(){S.sheet={t:'choose',f:{}};renderSheet();},
- chooseType:function(v){openSheet(v);var tk=dayKey(Date.now());if(S.tlDay!==tk){var b=keyDate(S.tlDay).getTime()+720*MIN,f=S.sheet.f;f.s=b;if(v==='sleep'){f.s=b-60*MIN;f.e=b;}if(v==='nursing'){S.sheet.base=b;f.st='12:00';}renderSheet();}},
- csvInfo:function(){S.sheet={t:'csvInfo',f:{}};renderSheet();},
- importPick:function(){if(S.ro){toast('You have view-only access, so you cannot import');return;}FILE.value='';FILE.click();},
- importGo:function(){var r=S.sheet&&S.sheet.res;if(!r||!r.evs.length)return;var items=r.evs.map(function(ev){return {key:dayKey(ev.s),id:rid(),ev:ev};});bulkPut(items);S.sheet=null;renderSheet();render(true);
-  toast(items.length+(items.length===1?' entry':' entries')+' imported',function(){bulkPut(items.map(function(it){var g=clone(it.ev);g.del=true;return {key:it.key,id:it.id,ev:g};}));render(true);});},
- undo:function(){var u=toast.undo;toast.undo=null;clearTimeout(toast.t);TO.innerHTML='';if(u){u();toast('Undone');}},
- units:function(v){S.cfg.units=v;saveCfg();render(true);},
- showToggle:function(k){S.cfg.show[k]=!S.cfg.show[k];saveCfg();render(true);},
- exportCsv:function(){
-  var all=Promise.resolve(null);
-  if(DB)all=DB.collection('days').limit(1000).get().then(function(q){var d={};q.docs.forEach(function(x){d[x.id]=x.data();});return d;}).catch(function(){return null;});
-  all.then(function(d){
-   d=d||S.days;var rows=[['date','start','end','type','left_min','right_min','last_side','amount_ml','milk','diaper','consistency','colour','medicine','note']],n=0;
-   function iso(ms){return ms?toLocal(ms).replace('T',' '):'';}
-   function mins(ms){return ms?String(Math.round(ms/MIN)):'';}
-   Object.keys(d).sort().forEach(function(k){var ev=(d[k]&&d[k].events)||{};Object.keys(ev).map(function(id){return ev[id];}).filter(function(e){return e&&!e.del&&typeof e.s==='number';}).sort(function(a,b){return a.s-b.s;}).forEach(function(e){n++;
-    rows.push([k,iso(e.s),iso(e.e),e.t,mins(e.L),mins(e.R),e.side==='L'?'left':e.side==='R'?'right':'',e.ml==null?'':String(Math.round(e.ml)),e.kind||'',e.dk||'',e.con||'',e.col||'',e.med||'',e.note||'']);});});
-   if(!n){toast('Nothing to export yet');return;}
-   var csv=rows.map(function(r){return r.map(function(c){c=String(c==null?'':c);if(/^[=+\-@]/.test(c))c="'"+c;return /[",\n\r]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(',');}).join('\r\n');
-   var name='baby-tracker-'+dayKey(Date.now())+'.csv';
-   var use=window.claude&&window.claude.use?window.claude.use('downloads'):Promise.resolve(null);
-   Promise.resolve(use).catch(function(){return null;}).then(function(dl){
-    if(!dl){if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(csv).then(function(){toast('Saving files is not available here, so the data was copied instead');},function(){toast('Export is not available in this view');});else toast('Export is not available in this view');return;}
-    dl.save({filename:name,data:csv}).then(function(){S.cfg.lastExport=Date.now();saveCfg();render(true);toast(n+' entries exported');},function(e){toast(e&&e.code==='declined'?'Export cancelled':'Export did not work. Try again');});
-   });
-  });
- }
-};
-document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-act]');if(!b||b.disabled)return;var a=b.getAttribute('data-act');if(ACT[a])ACT[a](b.getAttribute('data-v'),b,e);});
-document.addEventListener('change',function(e){if(e.target===FILE){onFile();return;}var el=e.target,p=el.getAttribute&&el.getAttribute('data-cfg');if(!p)return;var v=String(el.value||'').slice(0,60),ks=p.split('.'),o=S.cfg;for(var i=0;i<ks.length-1;i++)o=o[ks[i]];if(o[ks[ks.length-1]]===v)return;o[ks[ks.length-1]]=v;saveCfg();});
-document.addEventListener('focusout',function(){setTimeout(function(){if(pending)render();},50);});
-function route(){var h=(location.hash||'').replace('#','');S.view=['home','timeline','reminders','prefs'].indexOf(h)>=0?h:'home';render(true);window.scrollTo(0,0);}
-window.addEventListener('hashchange',route);
-function tick(){var now=Date.now(),nt=S.timers.nursing,t=nt?nursTotals(nt,now):null;V.querySelectorAll('[data-clock]').forEach(function(el){var k=el.getAttribute('data-clock'),v='';if(k==='sleep'){if(S.timers.sleep)v=clock(now-S.timers.sleep.start);}else if(k==='pumping'){if(S.timers.pumping)v=clock(now-S.timers.pumping.start);}else if(t)v=clock(k==='total'?t.L+t.R:t[k]);if(v&&el.textContent!==v)el.textContent=v;});}
-setInterval(function(){if(S.timerOpen)renderTimer();tick();},1000);
-setInterval(function(){if(!S.sheet)render();},20000);
-route();
-
-/* ---------- connect ---------- */
-(function(){
- var use=window.claude&&window.claude.use?window.claude.use('db'):Promise.resolve(null);
- Promise.resolve(use).catch(function(){return null;}).then(function(db){
-  if(!db){S.sync='off';render();return;}
-  DB=db;var slow=setTimeout(function(){if(S.sync==='connecting'){S.sync='slow';render();}},10000);
-  function ok(s){if(s.metadata&&!s.metadata.fromCache){clearTimeout(slow);S.sync='ok';}}
-  function err(){clearTimeout(slow);S.sync='slow';render();}
-  db.doc('app/config').onSnapshot(function(s){if(s.exists)S.cfg=mergeCfg(s.data());ok(s);render();},err);
-  db.doc('app/timers').onSnapshot(function(s){S.timers=s.exists?clone(s.data()):{};ok(s);render();},err);
-  db.collection('days').orderBy('date','desc').limit(14).onSnapshot(function(q){var d={};q.docs.forEach(function(x){d[x.id]=clone(x.data());});S.days=d;ok(q);render();},err);
- });
-})();
-})();
-</script>
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../../index.html#about">About</a>
+<a href="../../index.html#work">Work</a>
+<a class="on" aria-current="page" href="../../index.html#tools">Tools</a>
+<a href="../../index.html#writing">Writing</a>
+<a class="page" href="../../notes/index.html">Notes</a>
+<a href="../../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<main class="main">
+<div class="col app-page">
+<header class="head">
+<h1>Baby tracker</h1>
+<p class="lede">Feeds, sleep and diapers in a tap or two, with a reminder when the next feed is due. Made for the first weeks with our newborn.</p>
+</header>
+<div class="app-wrap">
+<div class="device"><iframe src="app.html" title="Baby tracker" loading="lazy"></iframe></div>
+<div class="app-side">
+<h2>How it works</h2>
+<ul class="rb">
+<li>Start a feed or a sleep with one tap; tap again to stop.</li>
+<li>Home shows when the next feed is due.</li>
+<li>Export everything as a CSV, or import one.</li>
+</ul>
+<p class="meta">Data stays in this browser, on this device. Nothing is sent anywhere.</p>
+<p class="more"><a href="app.html" data-nostack>Open full screen →</a></p>
+<p class="meta">Nov 2026 · HTML · built with Claude</p>
+</div>
+</div>
+<footer>Plain HTML. No tracking.</footer>
+</div>
+</main>
+</div>
+<script src="../../js/stack.js" defer></script>
 </body>
 </html>

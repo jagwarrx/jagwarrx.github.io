@@ -183,3 +183,37 @@ footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-hei
 .embedded .side{display:none} .embedded .layout{display:block}
 @media (max-width:1180px){.layout .doc .wrap.has-toc,.layout>.wrap.has-toc{display:block;max-width:640px}.layout .toc-side{display:none}}
 .layout .toc-side{grid-row:1/span 20;top:40px}
+
+/* app pages: the app runs inside a phone-shaped frame beside a short how-to */
+.app-page{max-width:880px}
+.app-wrap{display:flex;gap:40px;align-items:flex-start}
+.device{flex:none;width:390px;height:780px;padding:12px;border-radius:44px;background:#1F2933;
+  box-shadow:0 30px 60px -30px rgba(16,22,26,.6),inset 0 0 0 2px #394B59}
+.device iframe{display:block;width:100%;height:100%;border:0;border-radius:32px;background:#fff}
+.app-side{display:flex;flex-direction:column;gap:12px;padding-top:8px;min-width:0}
+.app-side p{margin:0}
+@media (max-width:1000px){.app-wrap{flex-direction:column}.device{width:min(390px,100%);height:min(780px,82vh)}}
+@media (max-width:760px){.device{width:100%;padding:0;border-radius:16px;box-shadow:none;border:1px solid var(--line);background:none}.device iframe{border-radius:16px}}
+
+/* sliding panes (js/stack.js): on wide screens a link opens its page as a pane to the right */
+body.stacked .layout{height:100vh;overflow:hidden}
+.stack{display:flex;min-width:0;height:100vh;overflow-x:auto;overflow-y:hidden;background:var(--tint)}
+.pane{--i:0;position:sticky;left:calc(var(--i) * 40px);flex:none;width:680px;height:100vh;background:#fff;
+  border-left:1px solid var(--line);box-shadow:-10px 0 24px -18px rgba(16,22,26,.45)}
+.pane-first{border-left:0;box-shadow:none}
+.pane-scroll{height:100%;overflow-y:auto;transition:opacity .15s}
+.pane .main{padding:40px 44px 56px}
+.pane .wrap{max-width:none;padding:40px 44px 56px}
+.stacked .wrap.has-toc{display:block}
+.stacked .toc-side{display:none}
+.pane-bar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 14px;
+  background:linear-gradient(#fff 70%,rgba(255,255,255,0));font-size:13px}
+.pane-bar a{color:var(--muted);text-decoration:none} .pane-bar a:hover{color:var(--ink)}
+.pane-x{border:0;background:none;font:22px/1 Inter,sans-serif;color:var(--muted);cursor:pointer;padding:0 4px}
+.pane-x:hover{color:var(--ink)}
+.pane-body{padding:0 44px 56px;font-size:16px;line-height:27px}
+.pane-body .col{gap:28px}
+.spine{position:absolute;inset:0 auto 0 0;width:40px;padding:18px 0;writing-mode:vertical-lr;font-size:13px;font-weight:600;
+  color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .15s}
+.pane.covered .spine{opacity:1}
+.pane.covered .pane-scroll{opacity:0;pointer-events:none}
