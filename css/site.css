@@ -140,3 +140,18 @@ footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-hei
 .doc main .list li{margin:0 0 12px}
 .doc main .cards .card{min-height:0}
 .doc footer{margin-top:40px}
+
+/* essays: reading column plus a sticky "On this page" list on the right (js/toc.js) */
+.doc main .meta{display:none}
+.doc .wrap.has-toc{max-width:980px;display:grid;grid-template-columns:minmax(0,660px) 220px;column-gap:56px;justify-content:center}
+.doc .wrap.has-toc>.topbar,.doc .wrap.has-toc>footer{grid-column:1/-1}
+.doc .wrap.has-toc>main{grid-column:1}
+.toc-side{grid-column:2;grid-row:2/span 20;align-self:start;position:sticky;top:32px;max-height:calc(100vh - 64px);overflow-y:auto;
+  padding-left:14px;border-left:1px solid var(--line);font-size:13px;line-height:18px;display:flex;flex-direction:column;gap:2px}
+.toc-label{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.toc-side a{color:var(--muted);text-decoration:none;padding:3px 0}
+.toc-side a.sub{padding-left:12px;font-size:12.5px}
+.toc-side a:hover{color:var(--ink)}
+.toc-side a.on{color:var(--link);font-weight:600}
+.doc main h2,.doc main h3{scroll-margin-top:24px}
+@media (max-width:900px){.doc .wrap.has-toc{display:block;max-width:640px}.toc-side{display:none}}
