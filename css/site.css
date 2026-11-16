@@ -96,6 +96,24 @@ td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 .line{stroke-dasharray:340}
 .tile:hover .line{animation:draw .9s ease-out}
 @keyframes draw{from{stroke-dashoffset:340}}
+/* tool cursors: each banner gets its own pointer (emoji or drawn SVG, normal pointer as fallback) */
+.tile:has(.t-lift),.tile:has(.t-lift) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext x='3' y='26' font-size='26'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E") 4 4, pointer}
+.tile:has(.t-baby),.tile:has(.t-baby) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext x='3' y='26' font-size='26'%3E%F0%9F%8D%BC%3C/text%3E%3C/svg%3E") 4 4, pointer}
+.tile:has(.t-trade),.tile:has(.t-trade) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cg fill='none' stroke='%230B1220' stroke-width='4'%3E%3Ccircle cx='16' cy='16' r='8'/%3E%3Cpath d='M16 1v8M16 23v8M1 16h8M23 16h8'/%3E%3C/g%3E%3Cg fill='none' stroke='%234ADE80' stroke-width='2'%3E%3Ccircle cx='16' cy='16' r='8'/%3E%3Cpath d='M16 1v8M16 23v8M1 16h8M23 16h8'/%3E%3C/g%3E%3Ccircle cx='16' cy='16' r='2' fill='%234ADE80'/%3E%3C/svg%3E") 16 16, crosshair}
+.tile:has(.t-chess),.tile:has(.t-chess) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext x='3' y='26' font-size='28'%3E%E2%99%9E%3C/text%3E%3C/svg%3E") 6 4, pointer}
+.tile:has(.t-cond),.tile:has(.t-cond) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext x='3' y='26' font-size='26'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E") 10 10, pointer}
+.tile:has(.t-hack),.tile:has(.t-hack) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext x='3' y='26' font-size='26'%3E%F0%9F%AA%93%3C/text%3E%3C/svg%3E") 4 4, pointer}
+.t-lift{background:#12131C;border-color:#12131C}
+.t-lift .name{font:700 20px/24px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;color:#FF8A4C;text-shadow:0 0 14px rgba(255,138,76,.55)}
+.t-lift .flame{transform-origin:50% 0!important;animation:flick .18s steps(2) infinite alternate;opacity:.9}
+@keyframes flick{to{transform:scaleY(.7)}}
+.tile:hover .rocket{transform:translateY(-14px)}
+.t-baby{background:#FFF5F2;border-color:#C41E2A}
+.t-baby .name{font:800 24px/28px Inter,-apple-system,sans-serif;letter-spacing:-.02em;color:#C41E2A}
+.tile:hover .moon{transform:rotate(-20deg)}
+.tile:hover .zz{transform:translateY(-6px)}
+.side .toc .page{margin-top:6px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px;border-radius:0 0 3px 3px}
+@media (max-width:760px){.layout{align-content:start}.side .toc .page{margin-top:0;border-top:0;padding-top:8px;border-radius:3px}}
 @media (prefers-reduced-motion:reduce){.art,.art *{transition:none!important;animation:none!important}}
 @media (max-width:560px){.tiles{grid-template-columns:minmax(0,1fr)}}
 /* touch screens have no hover: show the text under each banner */
