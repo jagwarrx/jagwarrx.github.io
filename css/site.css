@@ -50,22 +50,42 @@ thead th{background:var(--tint);padding:8px 12px;font-size:12px;line-height:16px
 tbody th{font-weight:600;width:26%}
 td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 
-/* tool cards: an even 2-column grid, equal heights per row */
-.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{position:relative;overflow:hidden;padding:14px 16px 12px;border-radius:4px;
-  background:var(--card);border:1px solid var(--card-line);display:flex;flex-direction:column;gap:6px}
-.card.muted{background:var(--card-muted);border-color:var(--card-muted-line)}
-.ct{display:flex;align-items:baseline;gap:8px;font-size:15px;font-weight:600;line-height:20px;padding-right:64px}
-.ct a{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
-.ct a:hover{text-decoration:underline}
-.ext{width:12px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.tag{position:absolute;top:16px;right:16px;font-size:10.5px;line-height:16px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
-.tag.new{color:var(--link)}
-.cd{font-size:13.5px;line-height:20px;padding-right:28px;text-wrap:pretty}
-.cm{margin-top:auto;padding-top:2px;font-size:12px;line-height:16px;color:var(--muted)}
-.glyph{position:absolute;right:10px;bottom:10px;width:30px;height:30px;opacity:.22;
-  fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-@media (max-width:560px){.cards{grid-template-columns:minmax(0,1fr)}}
+/* tool tiles: neal.fun-style, a bright tile with a drawing, then the words */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 20px}
+.tile{display:flex;flex-direction:column;gap:4px;color:var(--ink);text-decoration:none}
+.art{position:relative;aspect-ratio:16/10;border-radius:14px;background:var(--bg);overflow:hidden;
+  box-shadow:0 2px 0 rgba(0,0,0,.08);transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s;margin-bottom:8px}
+.tile:hover .art{transform:translateY(-4px) rotate(-1.2deg) scale(1.02);box-shadow:0 12px 24px -10px rgba(0,0,0,.35)}
+.art svg{position:absolute;inset:0;width:100%;height:100%}
+.art .w{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.art .w.thick{stroke-width:9}
+.art .f{fill:#fff}
+.art .o{fill:none;stroke:#fff;stroke-width:4}
+.art .fillw{fill:rgba(255,255,255,.95);stroke:#fff}
+.art .q{font:700 16px Inter,-apple-system,sans-serif;fill:var(--bg)}
+.pill{position:absolute;top:10px;right:10px;z-index:1;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.92);
+  font-size:10.5px;line-height:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.tt{font-size:16px;line-height:22px;font-weight:700}
+.tile:hover .tt{text-decoration:underline}
+.td{font-size:13.5px;line-height:20px;color:var(--ink2);text-wrap:pretty}
+.tm{font-size:12px;line-height:16px;color:var(--muted)}
+/* hover motion */
+.art g{transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.3,1.5,.5,1)}
+.tile:hover .bob{transform:translateY(-6px)}
+.line{stroke-dasharray:200;stroke-dashoffset:0}
+.tile:hover .line{animation:draw .8s ease-out}
+@keyframes draw{from{stroke-dashoffset:200}}
+.tile:hover .ping{animation:ping .9s ease-out infinite}
+@keyframes ping{50%{opacity:.3}}
+.tile:hover .hop{transform:translate(20px,-20px)}
+.tile:hover .think{transform:scale(1.25) rotate(10deg)}
+.tile:hover .zoom{transform:scale(1.18)}
+.tile:hover .zoom2{transform:scale(1.4)}
+.chop{transform-origin:30% 90%!important}
+.tile:hover .chop{transform:rotate(-14deg)}
+.tile:hover .spark{animation:ping .6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.art,.art g{transition:none}.tile:hover *{animation:none!important}}
+@media (max-width:560px){.tiles{grid-template-columns:minmax(0,1fr)}}
 
 footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-height:20px;color:var(--muted)}
 
