@@ -176,3 +176,10 @@ footer{padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-hei
 .toc-side a.on{color:var(--link);font-weight:600}
 .doc main h2,.doc main h3{scroll-margin-top:24px}
 @media (max-width:900px){.doc .wrap.has-toc{display:block;max-width:640px}.toc-side{display:none}}
+
+/* the left sidebar on every page (reading pages too) */
+.side a.on{color:#fff;background:rgba(255,255,255,.12);font-weight:600}
+.layout>.wrap{min-width:0;width:100%}
+.embedded .side{display:none} .embedded .layout{display:block}
+@media (max-width:1180px){.layout .doc .wrap.has-toc,.layout>.wrap.has-toc{display:block;max-width:640px}.layout .toc-side{display:none}}
+.layout .toc-side{grid-row:1/span 20;top:40px}
