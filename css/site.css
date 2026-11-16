@@ -51,8 +51,10 @@ tbody th{font-weight:600;width:26%}
 td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 
 /* tool cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
-.card{position:relative;overflow:hidden;min-height:124px;padding:14px 16px 12px;border-radius:4px;
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
+.card.wide{grid-column:span 2}
+@media (max-width:520px){.card.wide{grid-column:auto}}
+.card{position:relative;overflow:hidden;min-height:0;padding:14px 16px 12px;border-radius:4px;
   background:var(--card);border:1px solid var(--card-line);display:flex;flex-direction:column;gap:6px}
 .card.muted{background:var(--card-muted);border-color:var(--card-muted-line)}
 .ct{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:15px;font-weight:600;line-height:20px}
