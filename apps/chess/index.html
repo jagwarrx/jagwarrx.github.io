@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chess analyzer · Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/apps/chess/">
+<meta name="description" content="Review your Lichess games with a Claude coach on your own key: commit your read first, get questioned, get a whole-game review with three lessons, and keep the principles you learn.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chess analyzer · Hari Meyyappan">
+<meta property="og:description" content="Review your Lichess games with a Claude coach: your read first, then questions, then lessons you keep.">
+<meta property="og:url" content="https://hmeyy.com/apps/chess/">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../tool.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../../index.html#about">About</a>
+<a href="../../index.html#work">Work</a>
+<a class="on" aria-current="page" href="../../index.html#tools">Tools</a>
+<a href="../../index.html#writing">Writing</a>
+<a class="page" href="../../notes/index.html">Notes</a>
+<a href="../../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<main class="main">
+<div class="col app-page chess-page">
+<header class="head">
+<h1>Chess analyzer</h1>
+<p class="lede">Review your own games the way a coach would: say what you see first, then get questioned until you find the better move yourself.</p>
+</header>
+<div class="wide-frame"><iframe src="app.html" title="Chess analyzer"></iframe></div>
+<p class="more"><a href="app.html" data-nostack>Open full screen →</a> <span class="meta">· best on a laptop</span></p>
+<div class="app-side">
+<h2>How to use it</h2>
+<ul class="rb">
+<li><strong>My games</strong> lists your recent Lichess games. Or paste a Lichess link or a PGN, pick your side, Load.</li>
+<li>Step through with the arrow keys; <strong>W</strong> and <strong>E</strong> jump between your mistakes.</li>
+<li><strong>Socratic</strong>: write your read of the position first (plan, candidate, why). The coach then asks one or two questions at a time until you find it, and names the mistake type.</li>
+<li><strong>Coach review</strong>: the whole game in three lessons, credit, homework, a score for each phase, and one takeaway. From the second game on, it checks what you fixed and what keeps coming back.</li>
+<li><strong>6-Factor</strong> and <strong>1200/1700/2200</strong> read a single position; <strong>Extract principle</strong> turns a chat into a rule you keep in <strong>Principles</strong>.</li>
+<li>Turn the engine off (<strong>Engine: ON</strong>, top right) to analyse blind before you look.</li>
+</ul>
+<h2>What it knows, and what it doesn't</h2>
+<ul class="rb">
+<li>Claude can't see the board. Every prompt carries the position, the pieces left loose (attacked as often as defended), detected forks and the Lichess engine line, and Claude is told to use only those.</li>
+<li>Engine data comes from Lichess. If a game has no computer analysis, request it on lichess.org; the app falls back to the Lichess cloud eval where it can.</li>
+<li>Settings: your Claude API key, model, and your rating, which sets what the coach focuses on (one-move blunders under 1200, plans and structure higher up).</li>
+</ul>
+<p class="meta">Your key, saved positions, principles and reviews stay in this browser; Settings exports them as a file. Game data goes to Claude only when you ask. A Socratic turn costs about 1 to 3 cents on Opus 5.5; a coach review about 10 to 20.</p>
+<p class="meta">May–Nov 2026 · HTML · chess.js · Lichess API · Claude API. The best parts of four chess tools I built this year, in one page.</p>
+</div>
+<footer>Plain HTML. No tracking. Your key and your games go only to Anthropic and Lichess.</footer>
+</div>
+</main>
+</div>
+<script src="../../js/stack.js" defer></script>
+</body>
+</html>

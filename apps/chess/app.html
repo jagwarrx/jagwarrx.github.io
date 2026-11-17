@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chess analyzer · Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/apps/chess/app.html">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+<style>
+:root {
+  --font: Verdana, Arial, sans-serif;
+  --fs-xs: 9px;
+  --fs-sm: 10px;
+  --fs-base: 11px;
+  --fs-md: 12px;
+  --fs-lg: 13px;
+  --c-bg: #f5f5f5;
+  --c-surface: #fff;
+  --c-surface-alt: #fafafa;
+  --c-chrome: #e1e1e1;
+  --c-selected: #fffbe6;
+  --c-text: #000;
+  --c-text-secondary: #666;
+  --c-text-muted: #888;
+  --c-text-dim: #bbb;
+  --c-border: #999;
+  --c-border-light: #ccc;
+  --c-border-faint: #f0f0f0;
+  --c-danger: #990000;
+  --c-warn: #a16207;
+  --c-confirm: #15803d;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin:0; padding:0; height:100%; background:var(--c-bg); font-family:var(--font); color-scheme:light; }
+
+.app { height:100%; display:flex; flex-direction:column; background:var(--c-surface); color:var(--c-text); font-size:var(--fs-base); line-height:1.4; border:1px solid var(--c-border); }
+
+.header { background:var(--c-chrome); border-bottom:1px solid var(--c-border); padding:4px 8px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+.header-left { display:flex; align-items:center; gap:8px; }
+.header-title { font-weight:500; color:#551A8B; font-size:var(--fs-md); }
+.header-sep { color:var(--c-text-muted); }
+.header-right { display:flex; align-items:center; gap:6px; }
+
+.body { display:flex; flex:1; min-height:0; overflow:hidden; }
+
+.footer { background:var(--c-chrome); border-top:1px solid var(--c-border); padding:3px 8px; font-size:var(--fs-sm); color:var(--c-text-secondary); display:flex; justify-content:space-between; flex-shrink:0; }
+
+.input-bar { display:flex; gap:4px; align-items:center; }
+.input { font-family:var(--font); font-size:var(--fs-base); height:18px; line-height:16px; padding:0 4px; border:1px solid var(--c-border); background:var(--c-surface); color:var(--c-text); border-radius:0; outline:none; }
+.input:focus { border-color:#333; }
+.input-url { width:240px; }
+select.input { appearance:auto; padding-right:4px; }
+textarea.input { height:auto; min-height:40px; resize:vertical; line-height:1.4; padding:4px; }
+.btn { font-family:var(--font); font-size:var(--fs-base); height:18px; padding:0 6px; background:var(--c-surface); border:1px solid var(--c-border); color:var(--c-text); cursor:pointer; border-radius:0; line-height:16px; white-space:nowrap; }
+.btn:hover { background:var(--c-surface-alt); }
+.btn:disabled { opacity:.4; cursor:default; }
+.btn-sm { font-size:var(--fs-sm); height:16px; line-height:14px; padding:0 4px; }
+.btn-confirm { background:#bbf7d0; border-color:var(--c-confirm); color:#14532d; font-weight:500; }
+.btn-danger { color:var(--c-danger); }
+.btn-danger:hover { background:#fff5f5; }
+.btn-active { background:var(--c-selected); border-color:var(--c-border); font-weight:500; }
+.btn-toggle { font-size:var(--fs-xs); }
+.btn-toggle.on { background:#fef08a; border-color:var(--c-warn); color:#713f12; }
+
+/* Panels */
+.panel { display:flex; flex-direction:column; overflow:hidden; background:var(--c-surface); border-right:1px solid var(--c-border); }
+.panel:last-child { border-right:none; }
+.panel-hdr { display:flex; align-items:center; justify-content:space-between; padding:3px 6px; background:var(--c-surface-alt); border-bottom:1px solid var(--c-border); flex-shrink:0; }
+.panel-hdr-title { font-size:var(--fs-xs); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; color:var(--c-text-secondary); }
+.panel-hdr-btns { display:flex; align-items:center; gap:3px; }
+.panel-body { flex:1; overflow-y:auto; padding:6px; }
+
+.panel-board { width:320px; flex-shrink:0; }
+.panel-moves { width:200px; flex-shrink:0; }
+.panel-ai { flex:1; min-width:280px; }
+
+/* Board */
+#board { width:306px; margin:0 auto; }
+.board-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.eval-bar { height:12px; background:#e5e5e5; overflow:hidden; position:relative; width:306px; border:1px solid var(--c-border-light); }
+.eval-fill { height:100%; background:#333; transition:width .3s; width:50%; }
+.eval-lbl { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:8px; font-weight:700; color:var(--c-text-secondary); }
+.controls { display:flex; gap:2px; justify-content:center; flex-wrap:wrap; }
+.controls .btn { font-size:var(--fs-md); padding:0 8px; }
+.controls .err-nav { color:var(--c-danger); font-weight:700; }
+.highlight-from { box-shadow: inset 0 0 0 3px var(--c-confirm) !important; }
+.highlight-to { box-shadow: inset 0 0 0 3px var(--c-confirm) !important; background: rgba(21,128,61,.15) !important; }
+
+/* Hide engine mode */
+.app.hide-engine .eval-fill { width:50% !important; background:#ccc; }
+.app.hide-engine .eval-lbl { visibility:hidden; }
+.app.hide-engine .mc.blunder,.app.hide-engine .mc.mistake,.app.hide-engine .mc.inaccuracy { color:inherit; }
+.app.hide-engine .engine-info { display:none; }
+.app.hide-engine .badge { display:none; }
+.app.hide-engine .err-summary { display:none; }
+
+/* Moves */
+.game-hdr { font-size:var(--fs-sm); color:var(--c-text-secondary); padding:4px 0; border-bottom:1px solid var(--c-border-faint); margin-bottom:4px; }
+.game-hdr strong { color:var(--c-text); }
+.err-summary { font-size:var(--fs-xs); margin-top:2px; }
+.err-summary .cnt { margin-right:6px; }
+.err-summary .blunder { color:var(--c-danger); }
+.err-summary .mistake { color:#c2410c; }
+.err-summary .inaccuracy { color:var(--c-warn); }
+.ml { display:grid; grid-template-columns:24px 1fr 1fr; gap:0; font-size:var(--fs-sm); font-family:'SF Mono',Consolas,monospace; }
+.mn { color:var(--c-text-dim); text-align:right; padding:2px 4px 2px 0; border-bottom:1px dotted var(--c-border-faint); }
+.mc { padding:2px 4px; cursor:pointer; white-space:nowrap; border-bottom:1px dotted var(--c-border-faint); }
+.mc:hover { background:var(--c-surface-alt); }
+.mc.on { background:var(--c-selected); font-weight:700; }
+.mc.blunder { color:var(--c-danger); }
+.mc.mistake { color:#c2410c; }
+.mc.inaccuracy { color:var(--c-warn); }
+.mc.empty { cursor:default; border-bottom:1px dotted var(--c-border-faint); }
+.mc.instructive { box-shadow:inset 3px 0 0 #0066cc; }
+.mc.instructive::after { content:'·'; color:#0066cc; font-weight:700; margin-left:2px; font-size:10px; }
+.mc.tactic-fork::after { content:'⑂'; color:#0066cc; font-size:8px; margin-left:2px; }
+.mc.tactic-hang::after { content:'!'; color:#cc6600; font-weight:700; font-size:9px; margin-left:1px; }
+
+/* AI Panel */
+.pos-summary { padding:4px 0; }
+.pos-row { display:flex; gap:4px; padding:2px 0; font-size:var(--fs-sm); border-bottom:1px dotted var(--c-border-faint); }
+.pos-lbl { color:var(--c-text-muted); min-width:70px; font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:0.3px; }
+.pos-val { color:var(--c-text); flex:1; }
+
+.engine-info { padding:4px 6px; background:var(--c-surface-alt); border:1px solid var(--c-border-light); margin-bottom:6px; font-size:var(--fs-sm); }
+.engine-info strong { font-weight:600; }
+.engine-info .eval-val { color:var(--c-text-secondary); }
+.engine-info .better { color:var(--c-confirm); }
+.engine-info .why { color:var(--c-danger); }
+
+.badge { display:inline-block; padding:0 4px; font-size:8px; font-weight:700; border:1px solid; }
+.badge.blunder { color:var(--c-danger); border-color:var(--c-danger); }
+.badge.mistake { color:#c2410c; border-color:#c2410c; }
+.badge.inaccuracy { color:var(--c-warn); border-color:var(--c-warn); }
+
+/* Chat */
+.chat-context { position:sticky; top:0; z-index:1; background:var(--c-surface); border-bottom:1px solid var(--c-border); padding:4px 6px; margin:-6px -6px 6px; font-size:var(--fs-sm); }
+.chat-context-move { font-weight:600; font-size:var(--fs-md); font-family:'SF Mono',Consolas,monospace; }
+.chat-context-meta { font-size:var(--fs-xs); color:var(--c-text-muted); margin-top:1px; }
+.chat-context-mode { font-size:8px; text-transform:uppercase; letter-spacing:0.5px; color:var(--c-confirm); font-weight:500; }
+.chat-wrap { display:flex; flex-direction:column; flex:1; min-height:0; }
+.chat-msgs { flex:1; overflow-y:auto; padding:4px 0; display:flex; flex-direction:column; gap:6px; }
+.chat-msg { display:flex; flex-direction:column; gap:1px; }
+.chat-role { font-size:8px; color:var(--c-text-dim); text-transform:uppercase; letter-spacing:0.5px; }
+.chat-text { font-size:var(--fs-base); line-height:1.6; }
+.chat-text p { margin:0 0 4px; }
+.chat-text p:last-child { margin-bottom:0; }
+.chat-text strong { font-weight:600; }
+.chat-text h2 { font-size:var(--fs-md); font-weight:600; margin:8px 0 4px; padding-bottom:2px; border-bottom:1px solid var(--c-border-faint); color:var(--c-text); }
+.chat-text h3 { font-size:var(--fs-base); font-weight:600; margin:6px 0 3px; color:var(--c-text); }
+.chat-text ul { margin:2px 0 4px; padding-left:14px; }
+.chat-text li { margin-bottom:2px; }
+.chat-msg-ai .chat-text { color:var(--c-text); }
+.chat-msg-user .chat-text { color:var(--c-text-secondary); }
+.chat-input-row { display:flex; gap:4px; padding-top:4px; border-top:1px solid var(--c-border-light); }
+.chat-input-row input { flex:1; min-width:0; }
+.chat-streaming { display:inline-block; font-size:var(--fs-xs); color:var(--c-text-muted); animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* Save form */
+.save-form { border:1px solid var(--c-border-light); padding:6px; margin-top:6px; background:var(--c-surface-alt); }
+.save-form label { font-size:var(--fs-xs); color:var(--c-text-muted); text-transform:uppercase; letter-spacing:0.3px; display:block; margin-bottom:2px; margin-top:4px; }
+.save-form label:first-child { margin-top:0; }
+.save-form textarea { width:100%; font-family:var(--font); font-size:var(--fs-sm); border:1px solid var(--c-border-light); padding:3px 4px; resize:vertical; min-height:36px; outline:none; }
+.save-form textarea:focus { border-color:var(--c-border); }
+.save-form .save-btns { display:flex; gap:4px; margin-top:6px; }
+
+/* Lesson box */
+.lesson-box { border:1px solid var(--c-confirm); background:#f0fdf4; padding:6px; margin-top:6px; font-size:var(--fs-sm); }
+.lesson-box strong { font-size:var(--fs-xs); text-transform:uppercase; letter-spacing:0.3px; color:var(--c-confirm); display:block; margin-bottom:2px; }
+
+/* Library */
+.lib-search { width:100%; margin-bottom:6px; }
+.lib-card { padding:6px; border:1px solid var(--c-border-faint); margin-bottom:4px; cursor:pointer; font-size:var(--fs-sm); }
+.lib-card:hover { border-color:var(--c-border-light); background:var(--c-surface-alt); }
+.lib-card-move { font-weight:600; font-family:'SF Mono',Consolas,monospace; }
+.lib-card-meta { font-size:var(--fs-xs); color:var(--c-text-muted); margin-top:2px; }
+.lib-card-lesson { font-size:var(--fs-xs); color:var(--c-text-secondary); margin-top:2px; font-style:italic; }
+.lib-card-actions { display:flex; gap:4px; margin-top:3px; }
+.lib-detail { border:1px solid var(--c-border-light); padding:6px; margin-bottom:6px; background:var(--c-surface-alt); }
+.lib-detail label { font-size:var(--fs-xs); color:var(--c-text-muted); text-transform:uppercase; letter-spacing:0.3px; display:block; margin-top:4px; }
+.lib-detail p { font-size:var(--fs-sm); margin:2px 0 0; }
+
+.principle-text { font-size:var(--fs-sm); font-style:italic; margin-bottom:3px; }
+.principle-tags { display:flex; flex-wrap:wrap; gap:3px; margin-top:3px; }
+.tag-chip { font-size:9px; background:var(--c-surface-alt); border:1px solid var(--c-border-faint); padding:1px 5px; cursor:pointer; }
+.tag-chip:hover { border-color:var(--c-primary); }
+.principle-tags-bar { display:flex; flex-wrap:wrap; gap:3px; margin:6px 0; padding:4px 0; border-bottom:1px solid var(--c-border-faint); }
+.principle-card { border-left:3px solid var(--c-confirm); }
+
+.muted { color:var(--c-text-dim); font-size:var(--fs-sm); text-align:center; padding:16px 4px; }
+.hidden-msg { font-size:var(--fs-sm); color:var(--c-warn); padding:6px; border:1px solid var(--c-warn); background:#fffbeb; margin-bottom:6px; }
+
+@media(max-width:900px){
+  .panel-board{width:auto;min-width:200px;flex:1}
+  .panel-moves{width:140px}
+  .panel-ai{min-width:200px}
+  #board{width:100%!important}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-left">
+      <span class="header-title">Chess Analyzer</span>
+      <span class="header-sep">/</span>
+      <div class="input-bar">
+        <input type="text" class="input input-url" id="inp" placeholder="Lichess link or PGN moves...">
+        <select class="input" id="side"><option value="white">White</option><option value="black">Black</option></select>
+        <button class="btn" onclick="loadGame()">Load</button>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-sm btn-toggle" id="btn-engine" onclick="toggleEngine()">Engine: ON</button>
+      <span id="status-text" style="font-size:9px;color:var(--c-text-muted)"></span>
+    </div>
+  </div>
+  <div class="body">
+    <div class="panel panel-board">
+      <div class="panel-hdr"><span class="panel-hdr-title">Board</span></div>
+      <div class="panel-body">
+        <div class="board-wrap">
+          <div id="board-svg-wrap" style="position:relative;display:inline-block"><div id="board"></div></div>
+          <div class="eval-bar"><div class="eval-fill" id="ebar"></div><span class="eval-lbl" id="elbl">-</span></div>
+          <div class="controls">
+            <button class="btn" onclick="go(0)">&laquo;</button>
+            <button class="btn" onclick="go(cur-1)">&lsaquo;</button>
+            <button class="btn" onclick="go(cur+1)">&rsaquo;</button>
+            <button class="btn" onclick="go(mvs.length-1)">&raquo;</button>
+            <button class="btn" onclick="flipBoard()">&#x21BB;</button>
+            <button class="btn err-nav" onclick="goErr(-1)">&lsaquo;!</button>
+            <button class="btn err-nav" onclick="goErr(1)">!&rsaquo;</button>
+            <button class="btn" id="btn-best" onclick="showBestMove()" disabled style="font-size:9px">Best</button>
+            <button class="btn btn-toggle" id="btn-space" onclick="toggleSpaceViz()" style="font-size:9px">Space</button>
+            <button class="btn" id="btn-save" onclick="showSaveForm()" disabled style="font-size:9px">Save</button>
+          </div>
+        </div>
+        <div id="save-area"></div>
+      </div>
+    </div>
+    <div class="panel panel-moves">
+      <div class="panel-hdr"><span class="panel-hdr-title">Moves</span><span class="panel-hdr-btns" id="move-count"></span></div>
+      <div class="panel-body">
+        <div class="game-hdr" id="ghdr"><span class="muted">Load a game</span></div>
+        <div class="ml" id="mlist"></div>
+      </div>
+    </div>
+    <div class="panel panel-ai">
+      <div class="panel-hdr">
+        <span class="panel-hdr-title" id="ai-panel-title">Analysis</span>
+        <div class="panel-hdr-btns">
+          <button class="btn btn-sm" id="btn-postgame" onclick="showPostGame()" disabled style="font-weight:500">Post-game</button>
+          <button class="btn btn-sm" id="btn-socratic" onclick="startSocratic()" disabled>Socratic</button>
+          <button class="btn btn-sm" id="btn-factor" onclick="startFactorAnalysis()" disabled>6-Factor</button>
+          <button class="btn btn-sm" id="btn-multi" onclick="startMultiRating()" disabled>1200/1700/2200</button>
+          <button class="btn btn-sm" id="btn-narrative" onclick="startNarrative()" disabled>Narrative</button>
+          <button class="btn btn-sm" id="btn-library" onclick="toggleLibrary()">Library</button>
+          <button class="btn btn-sm" id="btn-principles" onclick="togglePrinciples()">Principles</button>
+        </div>
+      </div>
+      <div class="panel-body" id="ap">
+        <div class="muted">Load a game and navigate to a move</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <span id="footer-left">Arrows: navigate | W/E: errors | P: post-game | S: save | L: library | Esc: clear</span>
+    <span id="footer-right"></span>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chess.js@0.12.1/chess.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+<script src="../claude.js"></script>
+<script src="store.js"></script>
+<script>
+let brd, eng=new Chess(), mvs=[], cur=-1, meta={}, errs=[], playerSide='white';
+let chatMsgs=[], chatStreaming=false, chatMode='';
+let hideEngine=false, libraryMode=false, principlesMode=false, savedPositions=[], savedPrinciples=[];
+
+function initBoard(orient){
+  if(brd) brd.destroy();
+  brd=Chessboard('board',{position:'start',pieceTheme:'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',orientation:orient||'white',draggable:false,appearSpeed:150,moveSpeed:150});
+}
+initBoard();
+
+// === LOAD GAME ===
+
+async function loadGame(){
+  const inp=document.getElementById('inp').value.trim();
+  if(!inp)return;
+  playerSide=document.getElementById('side').value;
+  const m=inp.match(/lichess\.org\/([a-zA-Z0-9]{8})/);
+  if(m){await loadLichess(m[1],playerSide)}
+  else{loadText(inp,playerSide)}
+}
+
+async function loadLichess(id,side){
+  try{
+    document.getElementById('ghdr').innerHTML='<span class="muted">Loading...</span>';
+    setStatus('Fetching...');
+    const r=await fetch('https://lichess.org/game/export/'+id+'?evals=1&clocks=1&opening=1',{headers:{Accept:'application/json'}});
+    if(!r.ok)throw new Error('Not found ('+r.status+')');
+    const d=await r.json();
+    meta={w:d.players?.white?.user?.name||'White',b:d.players?.black?.user?.name||'Black',wr:d.players?.white?.rating||'?',br:d.players?.black?.rating||'?',op:d.opening?(d.opening.eco+' '+d.opening.name):'',res:d.winner==='white'?'1-0':d.winner==='black'?'0-1':'1/2',lichessId:id};
+    parse(d.moves.split(' '),d.analysis||[]);
+    render(side);
+    setStatus('');
+  }catch(e){document.getElementById('ghdr').innerHTML='<span style="color:var(--c-danger)">'+e.message+'</span>';setStatus('')}
+}
+
+function loadText(txt,side){
+  let c=txt.replace(/\d+\.\s*/g,' ').replace(/\.\.\./g,' ').replace(/\s+/g,' ').trim();
+  let ms=c.split(' ').filter(m=>m&&!m.match(/^[\d.*/-]+$/));
+  if(['1-0','0-1','1/2-1/2','*'].includes(ms[ms.length-1]))ms.pop();
+  meta={w:'White',b:'Black',wr:'?',br:'?',op:'',res:'',lichessId:null};
+  parse(ms,[]);
+  render(side);
+}
+
+function parse(sans,analysis){
+  mvs=[];errs=[];eng=new Chess();
+  for(let i=0;i<sans.length;i++){
+    let san=sans[i];
+    let res=eng.move(san);
+    if(!res&&san.length>=4){
+      res=eng.move({from:san.slice(0,2),to:san.slice(2,4),promotion:san[4]||undefined});
+    }
+    if(!res){console.warn('bad move:',san);break}
+    const a=analysis[i]||{};
+    // Lichess returns a.eval as a plain integer (centipawns) and a.mate as an integer
+    const evRaw=a.eval;
+    const cp=typeof evRaw==='number'?evRaw:(evRaw!=null&&typeof evRaw==='object'?(evRaw.cp??null):null);
+    const mate=a.mate!==undefined?a.mate:(evRaw!=null&&typeof evRaw==='object'?(evRaw.mate??null):null);
+    const j=a.judgment||null;
+    let jName=null;
+    if(j)jName=j.name.toLowerCase();
+    else if(i>0&&analysis.length>0){
+      const prevA=analysis[i-1]||{};
+      const prevEvRaw=prevA.eval;
+      const prevCp=typeof prevEvRaw==='number'?prevEvRaw:(prevEvRaw!=null&&typeof prevEvRaw==='object'?(prevEvRaw.cp??null):null);
+      if(cp!==null&&prevCp!==null){
+        const swing=i%2===0?(cp-prevCp):-(cp-prevCp);
+        if(swing<=-300)jName='blunder';
+        else if(swing<=-150)jName='mistake';
+        else if(swing<=-75)jName='inaccuracy';
+      }
+    }
+    mvs.push({san:res.san,fen:eng.fen(),cp,mate,j:jName,jc:j?.comment||null,best:a.best||null,line:a.variation||null,c:i%2===0?'w':'b',mn:Math.floor(i/2)+1,from:res.from,to:res.to});
+    if(jName)errs.push(i);
+  }
+}
+
+function render(side){
+  initBoard(side);
+  let hdr='<strong>'+meta.w+'</strong> ('+meta.wr+') vs <strong>'+meta.b+'</strong> ('+meta.br+')';
+  if(meta.op)hdr+=' &middot; '+meta.op;
+  if(meta.res)hdr+=' &middot; '+meta.res;
+  if(errs.length){
+    const bl=mvs.filter(m=>m.j==='blunder').length;
+    const mi=mvs.filter(m=>m.j==='mistake').length;
+    const in_=mvs.filter(m=>m.j==='inaccuracy').length;
+    hdr+='<div class="err-summary">';
+    if(bl)hdr+='<span class="cnt blunder">'+bl+'??</span>';
+    if(mi)hdr+='<span class="cnt mistake">'+mi+'?</span>';
+    if(in_)hdr+='<span class="cnt inaccuracy">'+in_+'?!</span>';
+    hdr+='</div>';
+  }
+  document.getElementById('ghdr').innerHTML=hdr;
+  document.getElementById('move-count').textContent=mvs.length;
+  const el=document.getElementById('mlist');el.innerHTML='';
+  for(let i=0;i<mvs.length;i+=2){
+    const mn=document.createElement('div');mn.className='mn';mn.textContent=mvs[i].mn+'.';el.appendChild(mn);
+    el.appendChild(mcell(mvs[i],i));
+    if(mvs[i+1])el.appendChild(mcell(mvs[i+1],i+1));
+    else{const e=document.createElement('div');e.className='mc empty';el.appendChild(e)}
+  }
+  document.getElementById('btn-socratic').disabled=false;
+  document.getElementById('btn-factor').disabled=false;
+  document.getElementById('btn-multi').disabled=false;
+  document.getElementById('btn-narrative').disabled=false;
+  document.getElementById('btn-postgame').disabled=false;
+  document.getElementById('btn-save').disabled=false;
+  if(libraryMode)toggleLibrary();
+  if(principlesMode)togglePrinciples();
+  _gameAnalysis=[];
+  go(0);
+  analyzeGame();
+}
+
+function mcell(m,idx){
+  const d=document.createElement('div');d.className='mc';
+  d.dataset.idx=idx;
+  if(m.j)d.classList.add(m.j);
+  let t=m.san;
+  if(m.j==='blunder')t+='??';else if(m.j==='mistake')t+='?';else if(m.j==='inaccuracy')t+='?!';
+  d.textContent=t;d.onclick=()=>go(idx);return d;
+}
+
+// === NAVIGATION ===
+
+function go(idx){
+  if(idx<0)idx=0;if(idx>=mvs.length)idx=mvs.length-1;
+  if(mvs.length===0)return;
+  cur=idx;
+  brd.position(mvs[idx].fen,true);
+  document.querySelectorAll('.mc.on').forEach(e=>e.classList.remove('on'));
+  const cells=document.querySelectorAll('.mc:not(.empty)');
+  if(cells[idx])cells[idx].classList.add('on');
+
+  // Eval bar
+  const bar=document.getElementById('ebar'),lbl=document.getElementById('elbl');
+  if(hideEngine||mvs[idx].cp===null&&mvs[idx].mate===null){bar.style.width='50%';lbl.textContent='-'}
+  else{
+    const m=mvs[idx];
+    if(m.mate!==null){lbl.textContent='#'+m.mate;bar.style.width=(m.mate>0?5:95)+'%'}
+    else{const cp=m.cp;lbl.textContent=(cp>=0?'+':'')+(cp/100).toFixed(1);bar.style.width=(50-50*(2/(1+Math.exp(-.004*cp))-1))+'%'}
+  }
+
+  const act=document.querySelector('.mc.on');if(act)act.scrollIntoView({block:'nearest'});
+  document.getElementById('footer-right').textContent='Move '+(idx+1)+'/'+mvs.length;
+  clearHighlights();
+  document.getElementById('btn-best').disabled=hideEngine||!mvs[idx].best;
+  showPositionArrows(idx);
+  if(spaceVizOn)renderSpaceViz(mvs[idx].fen);
+  if(!libraryMode&&chatMsgs.length===0) showPositionInfo(idx);
+}
+
+function showPositionArrows(idx){
+  const arrows=[];
+  const m=mvs[idx];
+  // Played move arrow
+  if(m.from&&m.to){
+    const badMove=m.j==='blunder'||m.j==='mistake';
+    arrows.push({from:m.from,to:m.to,color:badMove?'#cc3300':'#888888',opacity:badMove?'0.7':'0.45'});
+  }
+  // Alternative (what should have been played instead) if it was a mistake
+  if(!hideEngine&&(m.j==='blunder'||m.j==='mistake')&&idx>0&&mvs[idx-1]&&mvs[idx-1].best){
+    const alt=mvs[idx-1].best;
+    if(alt&&alt.length>=4&&(alt.slice(0,4)!==m.from+m.to)){
+      arrows.push({from:alt.slice(0,2),to:alt.slice(2,4),color:'#15803d',opacity:'0.8'});
+    }
+  }
+  // Tactic arrows from pre-computed analysis
+  const analysis=_gameAnalysis[idx];
+  if(analysis&&analysis.tactics.length){
+    for(const t of analysis.tactics){
+      if(t.arrows)arrows.push(...t.arrows);
+    }
+  }
+  drawArrows(arrows);
+}
+
+function goErr(dir){
+  if(errs.length===0)return;
+  if(dir>0){const next=errs.find(i=>i>cur);go(next!==undefined?next:errs[0])}
+  else{const prev=[...errs].reverse().find(i=>i<cur);go(prev!==undefined?prev:errs[errs.length-1])}
+}
+
+function clearHighlights(){document.querySelectorAll('.highlight-from,.highlight-to').forEach(e=>{e.classList.remove('highlight-from','highlight-to')});clearArrows()}
+
+// === ARROW SYSTEM ===
+
+function clearArrows(){const el=document.getElementById('board-arrows');if(el)el.remove()}
+
+function getFlipped(){return brd&&brd.orientation()==='black'}
+
+function squareCenter(sq,sqSize,flipped){
+  const file=sq.charCodeAt(0)-97,rank=parseInt(sq[1])-1;
+  const col=flipped?7-file:file,row=flipped?rank:7-rank;
+  return{x:col*sqSize+sqSize/2,y:row*sqSize+sqSize/2};
+}
+
+function drawArrowShape(svg,from,to,color,sqSize,opacity){
+  const dx=to.x-from.x,dy=to.y-from.y,len=Math.sqrt(dx*dx+dy*dy);
+  if(len<2)return;
+  const ux=dx/len,uy=dy/len,px=-uy,py=ux;
+  const w=sqSize*0.14,hw=sqSize*0.26,hl=sqSize*0.3;
+  const sx=from.x+ux*sqSize*0.12,sy=from.y+uy*sqSize*0.12;
+  const mx=to.x-ux*hl,my=to.y-uy*hl;
+  const pts=[
+    [sx+px*w,sy+py*w],[mx+px*w,my+py*w],[mx+px*hw,my+py*hw],
+    [to.x,to.y],
+    [mx-px*hw,my-py*hw],[mx-px*w,my-py*w],[sx-px*w,sy-py*w]
+  ];
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d','M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L')+'Z');
+  path.setAttribute('fill',color);
+  path.setAttribute('fill-opacity',opacity||'0.78');
+  svg.appendChild(path);
+}
+
+function drawArrows(arrows){
+  clearArrows();
+  if(!arrows||!arrows.length)return;
+  const boardEl=document.getElementById('board');
+  const wrap=document.getElementById('board-svg-wrap');
+  if(!boardEl||!wrap)return;
+  const size=boardEl.offsetWidth;
+  const sqSize=size/8;
+  const flipped=getFlipped();
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.id='board-arrows';
+  svg.setAttribute('width',size);svg.setAttribute('height',size);
+  svg.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:10;';
+  for(const a of arrows){
+    if(!a.from||!a.to||a.from===a.to)continue;
+    const f=squareCenter(a.from,sqSize,flipped),t=squareCenter(a.to,sqSize,flipped);
+    drawArrowShape(svg,f,t,a.color||'#15803d',sqSize,a.opacity);
+  }
+  wrap.appendChild(svg);
+}
+
+function showBestMove(){
+  if(cur<0||!mvs[cur].best||hideEngine)return;
+  const uci=mvs[cur].best;
+  drawArrows([{from:uci.slice(0,2),to:uci.slice(2,4),color:'#15803d'}]);
+}
+
+// === TACTICS DETECTION ===
+
+function pieceValue(t){return{p:1,n:3,b:3,r:5,q:9,k:100}[t]||0}
+
+function swapTurn(fen){const p=fen.split(' ');p[1]=p[1]==='w'?'b':'w';p[3]='-';return p.join(' ')}
+
+function detectTactics(idx){
+  if(idx<0||idx>=mvs.length)return[];
+  const m=mvs[idx];
+  if(!m.from||!m.to)return[];
+  const tactics=[];
+  const movedColor=m.c,oppColor=movedColor==='w'?'b':'w';
+  let chess,swapped;
+  try{chess=new Chess(m.fen);swapped=new Chess(swapTurn(m.fen))}catch(e){return[]}
+
+  // Fork: moved piece attacks 2+ valuable opponent pieces
+  const movesFromTo=swapped.moves({verbose:true}).filter(mv=>mv.from===m.to);
+  const forkTargets=movesFromTo.filter(mv=>{
+    const t=chess.get(mv.to);return t&&t.color===oppColor&&pieceValue(t.type)>=3;
+  }).map(mv=>mv.to);
+  if(forkTargets.length>=2){
+    tactics.push({
+      type:'fork',
+      targets:forkTargets,
+      arrows:forkTargets.map(sq=>({from:m.to,to:sq,color:'#0066cc',opacity:'0.65'})),
+      description:'Fork: '+m.to+' attacks '+forkTargets.join(' & ')
+    });
+  }
+
+  // Hanging: opponent can now win material (the played move blundered a piece)
+  const oppCaptures=chess.moves({verbose:true}).filter(mv=>{
+    if(!mv.flags.includes('c'))return false;
+    const cap=chess.get(mv.to);
+    if(!cap||cap.color!==movedColor)return false;
+    return pieceValue(cap.type)>pieceValue(chess.get(mv.from).type);
+  });
+  if(oppCaptures.length){
+    const best=oppCaptures.sort((a,b)=>(pieceValue(chess.get(b.to).type)-pieceValue(chess.get(b.from).type))-(pieceValue(chess.get(a.to).type)-pieceValue(chess.get(a.from).type)))[0];
+    tactics.push({
+      type:'hanging',
+      square:best.to,
+      arrows:[{from:best.from,to:best.to,color:'#cc3300',opacity:'0.6'}],
+      description:'Hanging: '+best.to+' left undefended'
+    });
+  }
+
+  // Check/mate
+  if(m.san.includes('#'))tactics.push({type:'checkmate',arrows:[],description:'Checkmate!'});
+  else if(m.san.includes('+'))tactics.push({type:'check',arrows:[],description:'Check'});
+
+  return tactics;
+}
+
+// === INSTRUCTIVENESS SCORING ===
+
+let _gameAnalysis=[];
+
+function instructivenessScore(idx,tactics){
+  const m=mvs[idx];let score=0;
+  if(m.j==='blunder')score+=40;
+  else if(m.j==='mistake')score+=25;
+  else if(m.j==='inaccuracy')score+=10;
+  if(idx>0&&mvs[idx-1].cp!==null&&m.cp!==null){
+    const delta=m.c==='w'?(m.cp-mvs[idx-1].cp):-(m.cp-mvs[idx-1].cp);
+    if(delta<-50)score+=Math.min(30,Math.abs(delta)/12);
+  }
+  for(const t of tactics){
+    if(t.type==='fork')score+=30;
+    else if(t.type==='hanging')score+=18;
+    else if(t.type==='checkmate')score+=50;
+    else if(t.type==='check')score+=5;
+  }
+  return Math.min(100,score);
+}
+
+function analyzeGame(){
+  _gameAnalysis=new Array(mvs.length);
+  let idx=0;
+  function next(){
+    if(idx>=mvs.length)return;
+    const tactics=detectTactics(idx);
+    const score=instructivenessScore(idx,tactics);
+    _gameAnalysis[idx]={tactics,score};
+    markMoveCell(idx,tactics,score);
+    idx++;setTimeout(next,0);
+  }
+  setTimeout(next,30);
+}
+
+function markMoveCell(idx,tactics,score){
+  const cell=document.querySelector('.mc[data-idx="'+idx+'"]');
+  if(!cell)return;
+  if(score>=20){
+    cell.classList.add('instructive');
+    const hasFork=tactics.some(t=>t.type==='fork');
+    const hasHang=tactics.some(t=>t.type==='hanging');
+    if(hasFork)cell.classList.add('tactic-fork');
+    else if(hasHang&&!cell.classList.contains('blunder')&&!cell.classList.contains('mistake'))cell.classList.add('tactic-hang');
+  }
+}
+
+// === HIDE ENGINE ===
+
+function toggleEngine(){
+  hideEngine=!hideEngine;
+  const btn=document.getElementById('btn-engine');
+  btn.textContent=hideEngine?'Engine: OFF':'Engine: ON';
+  btn.classList.toggle('on',hideEngine);
+  document.getElementById('app').classList.toggle('hide-engine',hideEngine);
+  if(mvs.length)go(cur);
+}
+
+// === POSITION INFO ===
+
+function showPositionInfo(idx){
+  const m=mvs[idx];
+  const pa=posAnalysis(m.fen);
+  const ap=document.getElementById('ap');
+  let h='';
+
+  h+='<div style="font-size:var(--fs-md);font-weight:600;margin-bottom:4px">'+m.mn+(m.c==='w'?'.':'...')+' '+m.san;
+  if(m.j)h+=' <span class="badge '+m.j+'">'+(m.j==='blunder'?'??':m.j==='mistake'?'?':'?!')+'</span>';
+  h+='</div>';
+
+  if(hideEngine){
+    h+='<div class="hidden-msg">Engine hidden. Analyze the position yourself first.</div>';
+  } else if(m.cp!==null||m.mate!==null||m.j){
+    h+='<div class="engine-info">';
+    if(m.cp!==null||m.mate!==null){
+      const ev=m.mate!==null?'#'+m.mate:(m.cp>=0?'+':'')+(m.cp/100).toFixed(1);
+      h+='<span class="eval-val"><strong>'+ev+'</strong> '+pa.evalText(m)+'</span><br>';
+    }
+    if(m.jc)h+='<span class="why">'+m.jc+'</span><br>';
+    if(m.line)h+='<span class="better">Better: '+m.line+'</span>';
+    h+='</div>';
+  }
+
+  h+='<div class="pos-summary">';
+  h+='<div class="pos-row"><span class="pos-lbl">Material</span><span class="pos-val">'+pa.mat+'</span></div>';
+  h+='<div class="pos-row"><span class="pos-lbl">Develop</span><span class="pos-val">'+pa.dev+'</span></div>';
+  if(pa.king)h+='<div class="pos-row"><span class="pos-lbl">King</span><span class="pos-val">'+pa.king+'</span></div>';
+  h+='<div class="pos-row"><span class="pos-lbl">Pawns</span><span class="pos-val">'+pa.pawns+'</span></div>';
+  h+='<div class="pos-row"><span class="pos-lbl">Activity</span><span class="pos-val">'+pa.act+'</span></div>';
+  h+='<div class="pos-row"><span class="pos-lbl">Space</span><span class="pos-val">'+pa.space+'</span></div>';
+  h+='</div>';
+
+  ap.innerHTML=h;
+  document.getElementById('ai-panel-title').textContent='Analysis';
+}
+
+// === CHAT ===
+
+function showChat(){
+  const ap=document.getElementById('ap');
+  const m=cur>=0&&cur<mvs.length?mvs[cur]:null;
+  const modeLabel={socratic:'Socratic',factor:'6-Factor Analysis',multi:'1200 / 1700 / 2200',lesson:'Lesson Extraction',narrative:'Game Narrative'}[chatMode]||'Analysis';
+
+  let h='';
+  // Sticky context header
+  if(chatMode==='narrative'){
+    h+='<div class="chat-context">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    h+='<span class="chat-context-move">Full Game &middot; '+mvs.length+' moves</span>';
+    h+='<span class="chat-context-mode">'+modeLabel+'</span>';
+    h+='</div>';
+    h+='<div class="chat-context-meta">'+(meta.w||'?')+' vs '+(meta.b||'?');
+    if(meta.op)h+=' &middot; '+meta.op;
+    if(meta.res)h+=' &middot; '+meta.res;
+    h+=' &middot; Playing as '+(playerSide==='white'?'White':'Black');
+    h+='</div></div>';
+  } else if(m){
+    h+='<div class="chat-context">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    h+='<span class="chat-context-move">'+m.mn+(m.c==='w'?'.':'...')+' '+m.san+(m.j?' ('+m.j+')':'')+'</span>';
+    h+='<span class="chat-context-mode">'+modeLabel+'</span>';
+    h+='</div>';
+    h+='<div class="chat-context-meta">'+(meta.w||'?')+' vs '+(meta.b||'?');
+    if(meta.op)h+=' &middot; '+meta.op;
+    h+=' &middot; Playing as '+(playerSide==='white'?'White':'Black');
+    h+='</div></div>';
+  }
+
+  h+='<div class="chat-wrap"><div class="chat-msgs" id="chat-msgs">';
+  for(const msg of chatMsgs){
+    h+='<div class="chat-msg chat-msg-'+msg.role+'"><span class="chat-role">'+(msg.role==='ai'?'coach':'you')+'</span><div class="chat-text">'+formatMsg(msg.content)+'</div></div>';
+  }
+  if(chatStreaming)h+='<div class="chat-streaming">thinking...</div>';
+  h+='</div>';
+  if(!chatStreaming&&chatMsgs.length>0){
+    h+='<div style="display:flex;gap:4px;margin:4px 0"><button class="btn btn-sm" onclick="extractLesson()">Extract Principle</button>';
+    if(chatMode==='lesson')h+='<button class="btn btn-sm btn-confirm" onclick="showPrincipleSaveForm()">Save Principle</button>';
+    h+='</div>';
+    h+='<div class="chat-input-row"><input class="input" style="flex:1;width:auto" type="text" id="chat-in" placeholder="Your answer..." onkeydown="if(event.key===\'Enter\')sendChat()"><button class="btn" onclick="sendChat()">Send</button></div>';
+  }
+  h+='</div>';
+  ap.innerHTML=h;
+  const msgs=document.getElementById('chat-msgs');
+  if(msgs)msgs.scrollTop=msgs.scrollHeight;
+  document.getElementById('ai-panel-title').textContent='Analysis';
+}
+
+function formatMsg(txt){
+  let h=txt;
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  h=h.replace(/^- (.+)$/gm,'<li>$1</li>');
+  h=h.replace(/(<li>.*<\/li>\n?)+/g,function(m){return '<ul>'+m+'</ul>'});
+  h=h.replace(/\n\n/g,'</p><p>');
+  h=h.replace(/\n/g,'<br>');
+  h='<p>'+h+'</p>';
+  h=h.replace(/<p><h([23])>/g,'<h$1>');
+  h=h.replace(/<\/h([23])><\/p>/g,'</h$1>');
+  h=h.replace(/<p><ul>/g,'<ul>');
+  h=h.replace(/<\/ul><\/p>/g,'</ul>');
+  h=h.replace(/<p><\/p>/g,'');
+  return h;
+}
+
+function setStatus(t){document.getElementById('status-text').textContent=t}
+
+// === AI PROMPTS ===
+
+function fenToBoard(fen){
+  const rows=fen.split(' ')[0].split('/');
+  const files='abcdefgh';
+  const names={k:'King',q:'Queen',r:'Rook',b:'Bishop',n:'Knight',p:'Pawn'};
+  const w=[],b=[];
+  for(let r=0;r<8;r++){let f=0;for(const ch of rows[r]){
+    if('12345678'.includes(ch)){f+=parseInt(ch);continue}
+    const sq=files[f]+(8-r);const pc=ch.toLowerCase();const entry=names[pc]+' '+sq;
+    if(ch===ch.toUpperCase())w.push(entry);else b.push(entry);f++;
+  }}
+  return 'White pieces: '+w.join(', ')+'\nBlack pieces: '+b.join(', ');
+}
+
+function getMoveHistory(){
+  if(cur<0||mvs.length===0)return '';
+  const moves=[];
+  for(let i=0;i<=cur;i++){
+    const m=mvs[i];
+    if(m.c==='w')moves.push(m.mn+'. '+m.san);
+    else moves.push(m.mn+'... '+m.san);
+  }
+  return moves.join(' ');
+}
+
+function buildSocraticPrompt(){
+  const m=mvs[cur];const pa=posAnalysis(m.fen);
+  const pColor=playerSide==='white'?'White':'Black';
+  const history=getMoveHistory();
+  let sp=`You are a chess coach. Student plays ${pColor}. Socratic method — questions, not answers.
+
+CURRENT POSITION after ${m.mn}${m.c==='w'?'.':'...'} ${m.san}:
+${fenToBoard(m.fen)}
+
+Game moves so far: ${history||'(starting position)'}`;
+  if(!hideEngine){
+    if(m.cp!==null||m.mate!==null)sp+=`\nEval: ${m.mate!==null?'#'+m.mate:(m.cp/100).toFixed(1)}`;
+    if(m.j)sp+=`, Quality: ${m.j}`;
+    if(m.jc)sp+=`, Why: ${m.jc}`;
+    if(m.line)sp+=`, Better: ${m.line}`;
+  }
+  sp+=`\nFactors: Material=${pa.mat}, Dev=${pa.dev}, Pawns=${pa.pawns}, Activity=${pa.act}, Space=${pa.space}`;
+  if(pa.king)sp+=`, King=${pa.king}`;
+  sp+=`\n\nCRITICAL: Only reference pieces that appear in the board state above. Verify each piece location against the list before making any claim about pins, attacks, or tactics.
+Rules: Frame from ${pColor}'s view. One question per message, 2-4 sentences. After 2-3 exchanges, synthesize. ${hideEngine?'Do NOT reveal any engine evaluation or best move.':'Don\'t reveal engine move until student reasons.'}`;
+  return sp;
+}
+
+function buildFactorPrompt(){
+  const m=mvs[cur];const pColor=playerSide==='white'?'White':'Black';
+  const history=getMoveHistory();
+  let sp=`Chess analyst. Student=${pColor}. Position after ${m.mn}${m.c==='w'?'.':'...'} ${m.san}:
+
+${fenToBoard(m.fen)}
+
+Game moves: ${history||'(starting position)'}`;
+  if(!hideEngine){
+    if(m.cp!==null||m.mate!==null)sp+=`\nEval: ${m.mate!==null?'#'+m.mate:(m.cp/100).toFixed(1)}`;
+    if(m.j)sp+=`, Quality: ${m.j}`;if(m.line)sp+=`, Better: ${m.line}`;
+  }
+  sp+=`\n\nCRITICAL: Only reference pieces that appear in the board state above. Verify each piece location before claiming any tactical or positional relationship.
+Analyze: **1.Material** **2.King Safety** **3.Piece Activity** **4.Pawn Structure** **5.Space** **6.Weak Squares**. End with **Verdict**: who's better, what ${pColor} should do. Be specific.`;
+  return sp;
+}
+
+function buildMultiRatingPrompt(){
+  const m=mvs[cur];const pColor=playerSide==='white'?'White':'Black';
+  const history=getMoveHistory();
+  let sp=`Simulate 3 ratings analyzing position. Student=${pColor}. Position after ${m.mn}${m.c==='w'?'.':'...'} ${m.san}:
+
+${fenToBoard(m.fen)}
+
+Game moves: ${history||'(starting position)'}`;
+  if(!hideEngine){
+    if(m.cp!==null||m.mate!==null)sp+=`\nEval: ${m.mate!==null?'#'+m.mate:(m.cp/100).toFixed(1)}`;
+    if(m.j)sp+=`, Quality: ${m.j}`;if(m.line)sp+=`, Better: ${m.line}`;
+  }
+  sp+=`\n\nCRITICAL: Only reference pieces that appear in the board state above. Verify locations before making claims about tactics.
+**1200**: material+threats only, misses positional. **1700**: sees structure+activity, may misprioritize. **2200**: all 6 factors, finds critical one, prophylaxis.
+For each: inner monologue, what they see/miss, chosen move. End with **Key Lesson**.`;
+  return sp;
+}
+
+// === AI STREAMING ===
+
+function startSocratic(){
+  if(chatStreaming||mvs.length===0)return;
+  chatMsgs=[];chatMode='socratic';highlightBtn('btn-socratic');libraryMode=false;
+  streamAI([{role:'user',content:`I'm playing ${playerSide==='white'?'White':'Black'}. Help me analyze this move.`}],'socratic');
+}
+function startFactorAnalysis(){
+  if(chatStreaming||mvs.length===0)return;
+  chatMsgs=[];chatMode='factor';highlightBtn('btn-factor');libraryMode=false;
+  streamAI([{role:'user',content:`Analyze from ${playerSide==='white'?'White':'Black'}'s perspective.`}],'factor');
+}
+function startMultiRating(){
+  if(chatStreaming||mvs.length===0)return;
+  chatMsgs=[];chatMode='multi';highlightBtn('btn-multi');libraryMode=false;
+  streamAI([{role:'user',content:`Show 1200/1700/2200 analysis as ${playerSide==='white'?'White':'Black'}.`}],'multi');
+}
+function startNarrative(){
+  if(chatStreaming||mvs.length===0)return;
+  chatMsgs=[];chatMode='narrative';highlightBtn('btn-narrative');libraryMode=false;principlesMode=false;
+  streamAI([{role:'user',content:`Write the game narrative from ${playerSide==='white'?'White':'Black'}'s perspective.`}],'narrative');
+}
+
+function buildNarrativePrompt(){
+  const pColor=playerSide==='white'?'White':'Black';
+  // Full annotated move list
+  const lines=[];
+  for(let i=0;i<mvs.length;i+=2){
+    const w=mvs[i],b=mvs[i+1];
+    const ann=m=>m.j==='blunder'?'??':m.j==='mistake'?'?':m.j==='inaccuracy'?'?!':'';
+    let line=w.mn+'. '+w.san+ann(w);
+    if(b)line+=' '+b.san+ann(b);
+    lines.push(line);
+  }
+  let sp=`You are a chess coach narrating a complete game from the student's perspective. Be a storyteller: identify when the student was in control, when it slipped, and what the single pivot moment was.\n\n`;
+  sp+=`${meta.w} (${meta.wr}) vs ${meta.b} (${meta.br})`;
+  if(meta.op)sp+=` | ${meta.op}`;
+  if(meta.res)sp+=` | Result: ${meta.res}`;
+  sp+=`\nStudent plays: ${pColor}\n\nFull game (errors marked where engine data available):\n${lines.join('  ')}\n`;
+  const hasEvals=mvs.some(m=>m.cp!==null||m.mate!==null);
+  if(!hideEngine&&hasEvals){
+    // Error breakdown by phase
+    const phases=[
+      {label:'Opening (moves 1-12)',moves:mvs.filter(m=>m.mn<=12)},
+      {label:'Middlegame (moves 13-30)',moves:mvs.filter(m=>m.mn>12&&m.mn<=30)},
+      {label:'Endgame (moves 31+)',moves:mvs.filter(m=>m.mn>30)}
+    ];
+    const errLines=phases.map(ph=>{
+      const errs=ph.moves.filter(m=>m.j);
+      if(!errs.length)return ph.label+': no errors recorded';
+      return ph.label+': '+errs.map(m=>m.mn+(m.c==='w'?'.':'...')+m.san+(m.j==='blunder'?'??':m.j==='mistake'?'?':'?!')).join(', ');
+    });
+    sp+=`\nEngine error data:\n${errLines.join('\n')}\n`;
+    const swings=[];
+    for(let i=1;i<mvs.length;i++){
+      if(mvs[i].cp!==null&&mvs[i-1].cp!==null){
+        const delta=mvs[i].cp-mvs[i-1].cp;
+        if(Math.abs(delta)>=150)swings.push({mn:mvs[i].mn,c:mvs[i].c,san:mvs[i].san,delta});
+      }
+    }
+    if(swings.length){
+      sp+=`\nKey eval swings (≥1.5 pawns): `+swings.slice(0,10).map(s=>
+        s.mn+(s.c==='w'?'.':'...')+s.san+' ('+(s.delta>0?'+':'')+( s.delta/100).toFixed(1)+')'
+      ).join(', ')+'\n';
+    }
+  } else {
+    sp+=`\nNo engine eval data available for this game. Base the narrative only on what the moves themselves show.\n`;
+  }
+  sp+=`\nACCURACY RULES — violating these makes the narrative useless:
+- Only describe errors if they appear in the engine error data above. If a phase shows "no errors recorded," do not mention errors in that phase.
+- Do not infer or assume the opponent made mistakes without engine evidence.
+- Describe piece trades precisely: count what each side gave up and gained. "Won the bishop pair" means both your own bishops survived — verify this against the move list.
+- Every claim must trace directly to a specific move in the list above.
+
+Write in exactly these four sections:
+
+## Opening
+How ${pColor} handled development, center, and king safety. What did the game look like entering the middlegame?
+
+## Middlegame
+The main struggle. When did the position tip? What was the decisive moment and why?
+
+## Endgame
+What happened after pieces simplified, or state in one sentence that the game ended before reaching an endgame.
+
+## The Arc
+Two sentences: the story of this game as ${pColor}. What was the controlling theme?
+
+Reference specific move numbers. Be direct. ~300-350 words total.`;
+  return sp;
+}
+
+// === POST-GAME ANALYSIS ===
+
+function showPostGame(){
+  if(mvs.length===0)return;
+  chatMsgs=[];chatMode='';libraryMode=false;principlesMode=false;
+  highlightBtn('btn-postgame');
+  const ap=document.getElementById('ap');
+  document.getElementById('ai-panel-title').textContent='Post-Game';
+
+  // Wait for analysis if still running
+  const ready=_gameAnalysis.filter(Boolean).length;
+  if(ready<mvs.length&&ready<3){
+    ap.innerHTML='<div class="muted">Analyzing... ('+ready+'/'+mvs.length+')</div>';
+    setTimeout(showPostGame,400);return;
+  }
+
+  const bl=mvs.filter(m=>m.j==='blunder').length;
+  const mi=mvs.filter(m=>m.j==='mistake').length;
+  const in_=mvs.filter(m=>m.j==='inaccuracy').length;
+
+  // Build instructive moments list
+  const moments=_gameAnalysis.map((a,i)=>({...a,idx:i}))
+    .filter(a=>a&&a.score>=12)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,15);
+
+  let h='<div style="padding:4px 0 8px;border-bottom:1px solid var(--c-border-faint);margin-bottom:6px">';
+  h+='<div style="display:flex;gap:10px;font-size:var(--fs-sm);margin-bottom:3px">';
+  if(bl)h+='<span class="blunder">'+bl+' blunder'+(bl>1?'s':'')+'</span>';
+  if(mi)h+='<span class="mistake">'+mi+' mistake'+(mi>1?'s':'')+'</span>';
+  if(in_)h+='<span class="inaccuracy">'+in_+' inaccuracy'+(in_>1?'s':'')+'</span>';
+  if(!bl&&!mi&&!in_)h+='<span style="color:var(--c-confirm)">Clean game</span>';
+  h+='</div>';
+  h+='<div style="font-size:var(--fs-xs);color:var(--c-text-muted)">'+moments.length+' instructive moment'+(moments.length!==1?'s':'')+' · click to navigate</div>';
+  h+='</div>';
+
+  if(moments.length===0){h+='<div class="muted">No significant moments found</div>';ap.innerHTML=h;return}
+
+  for(const a of moments){
+    const m=mvs[a.idx];
+    const tacticTypes=[...new Set((a.tactics||[]).map(t=>t.type))];
+    const hasTactic=tacticTypes.some(t=>t==='fork'||t==='hanging');
+    h+='<div class="lib-card" onclick="goToMoment('+a.idx+')" style="cursor:pointer">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline">';
+    h+='<span class="lib-card-move">'+m.mn+(m.c==='w'?'.':'...')+' '+m.san;
+    if(m.j)h+=' <span class="badge '+m.j+'">'+(m.j==='blunder'?'??':m.j==='mistake'?'?':'?!')+'</span>';
+    h+='</span>';
+    h+='<span style="font-size:8px;color:var(--c-text-dim)">score '+Math.round(a.score)+'</span>';
+    h+='</div>';
+    if(tacticTypes.length){
+      h+='<div class="lib-card-meta" style="color:#0066cc">';
+      h+=tacticTypes.map(t=>t==='fork'?'Fork detected':t==='hanging'?'Piece left hanging':t==='check'?'Check':t==='checkmate'?'Checkmate!':'').filter(Boolean).join(' · ');
+      h+='</div>';
+    }
+    if(!hideEngine){
+      const evDelta=a.idx>0&&mvs[a.idx-1].cp!==null&&m.cp!==null?
+        (m.c==='w'?(m.cp-mvs[a.idx-1].cp):-(m.cp-mvs[a.idx-1].cp)):null;
+      if(evDelta!==null&&Math.abs(evDelta)>30)h+='<div class="lib-card-meta">eval: '+(evDelta>0?'+':'')+(evDelta/100).toFixed(1)+' pawns</div>';
+      if(m.jc)h+='<div class="lib-card-meta" style="color:var(--c-danger)">'+esc(m.jc)+'</div>';
+      if(m.line&&(m.j==='blunder'||m.j==='mistake'))h+='<div class="lib-card-meta" style="color:var(--c-confirm)">Better: '+esc(m.line)+'</div>';
+    }
+    h+='</div>';
+  }
+  ap.innerHTML=h;
+}
+
+function goToMoment(idx){
+  go(idx);
+  // Re-open post-game after a tick so arrows render first
+  // (position info replaces panel but we stay in post-game mode)
+}
+
+function highlightBtn(id){
+  ['btn-postgame','btn-socratic','btn-factor','btn-multi','btn-narrative','btn-library','btn-principles'].forEach(b=>document.getElementById(b).classList.remove('btn-active'));
+  document.getElementById(id).classList.add('btn-active');
+}
+
+function sendChat(){
+  if(chatStreaming)return;
+  const inp=document.getElementById('chat-in');
+  if(!inp||!inp.value.trim())return;
+  chatMsgs.push({role:'user',content:inp.value.trim()});
+  showChat();
+  streamAI(chatMsgs.map(m=>({role:m.role==='ai'?'assistant':'user',content:m.content})),chatMode);
+}
+
+function streamAI(messages,mode){
+  chatStreaming=true;
+  chatMsgs.push({role:'ai',content:'',streaming:true});
+  showChat();setStatus('Streaming...');
+  const sysPrompt=mode==='factor'?buildFactorPrompt():mode==='multi'?buildMultiRatingPrompt():mode==='lesson'?buildLessonPrompt():mode==='narrative'?buildNarrativePrompt():buildSocraticPrompt();
+  const maxTokens=mode==='narrative'?2048:1024;
+  const xhr=new XMLHttpRequest();
+  xhr.open('POST','/api/chat');
+  xhr.setRequestHeader('Content-Type','application/json');
+  let lastLen=0,aiIdx=chatMsgs.length-1;
+  function process(){
+    const raw=xhr.responseText.substring(lastLen);lastLen=xhr.responseText.length;
+    for(const line of raw.split('\n')){
+      const l=line.trim();if(!l||!l.startsWith('data: '))continue;
+      try{
+        const evt=JSON.parse(l.substring(6));
+        if(evt.type==='token'){chatMsgs[aiIdx].content+=evt.token;updateStream()}
+        else if(evt.type==='done'){chatMsgs[aiIdx].streaming=false;chatStreaming=false;setStatus('');showChat()}
+        else if(evt.type==='error'){chatMsgs[aiIdx].content+=' [Error: '+evt.error+']';chatMsgs[aiIdx].streaming=false;chatStreaming=false;setStatus('');showChat()}
+      }catch(e){}
+    }
+  }
+  xhr.onprogress=process;
+  xhr.onload=function(){process();if(chatStreaming){chatMsgs[aiIdx].streaming=false;chatStreaming=false;setStatus('');showChat()}};
+  xhr.onerror=function(){chatMsgs[aiIdx].content+=' [Network error]';chatMsgs[aiIdx].streaming=false;chatStreaming=false;setStatus('');showChat()};
+  xhr.send(JSON.stringify({systemPrompt:sysPrompt,messages:messages,maxTokens:maxTokens}));
+}
+
+function updateStream(){
+  const el=document.getElementById('chat-msgs');if(!el)return;
+  const last=el.querySelector('.chat-msg:last-of-type .chat-text');
+  if(last){last.innerHTML=formatMsg(chatMsgs[chatMsgs.length-1].content);el.scrollTop=el.scrollHeight}
+  else showChat();
+}
+
+// === LESSON EXTRACTION ===
+
+function buildLessonPrompt(){
+  return `Extract a single high-quality chess principle from the analysis above.
+
+WHAT MAKES A GOOD PRINCIPLE:
+- Identifies the ROOT THINKING ERROR (why the mistake was made), not just the losing move
+- Names the PATTERN, not the piece from this game ("the knight covering a key diagonal" not "the Nf3")
+- Structured as: [when this situation arises] → [run this check]
+- Specific enough to use as a real pre-move checklist item in future games
+
+REJECT these types — they are too generic to be useful:
+- "Calculate forcing lines before moving." / "Protect your king." / "Don't miss tactics."
+- Anything that applies to every chess game, not this specific mistake pattern
+
+EXAMPLES of the quality level required:
+- "Before moving a piece that sits on the only diagonal between the opponent's queen and your king, calculate every queen-to-king forcing line first."
+- "When you spot a free pawn, check whether capturing it clears a defender from a critical square before taking."
+- "After the opponent centralizes their queen, ask what it threatens directly before continuing your own plan."
+
+From the analysis, identify the single deepest mistake pattern and state it as one sentence (max 35 words, present tense).`;
+}
+
+function extractLesson(){
+  if(chatStreaming)return;
+  chatMode='lesson';
+  const allText=chatMsgs.map(m=>m.role+': '+m.content).join('\n');
+  streamAI([{role:'user',content:'Extract the key lesson from this analysis:\n\n'+allText}],'lesson');
+}
+
+function showPrincipleSaveForm(){
+  const lastAi=chatMsgs.filter(m=>m.role==='ai');
+  const text=lastAi.length?lastAi[lastAi.length-1].content.trim():'';
+  const m=cur>=0&&cur<mvs.length?mvs[cur]:null;
+  const gameRef=meta.lichessId?(meta.w||'?')+' vs '+(meta.b||'?')+(meta.op?' / '+meta.op:''):'';
+  const area=document.getElementById('save-area');
+  area.innerHTML=`<div class="save-form">
+    <label>Principle</label>
+    <textarea id="principle-text" rows="3" style="font-size:var(--fs-sm)">${esc(text)}</textarea>
+    <label>Tags (comma-separated)</label>
+    <input class="input" id="principle-tags" placeholder="tactics, pins, endgame...">
+    <div class="save-btns">
+      <button class="btn btn-confirm" onclick="doSavePrinciple()">Save Principle</button>
+      <button class="btn" onclick="document.getElementById('save-area').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function doSavePrinciple(){
+  const text=document.getElementById('principle-text').value.trim();
+  if(!text)return;
+  const tagsRaw=document.getElementById('principle-tags').value.trim();
+  const tags=tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  const m=cur>=0&&cur<mvs.length?mvs[cur]:null;
+  const games=[];
+  if(meta.lichessId){
+    games.push({lichessId:meta.lichessId,white:meta.w,black:meta.b,opening:meta.op,move:m?(m.mn+(m.c==='w'?'.':'...')+' '+m.san):''});
+  }
+  const payload={text,tags,games};
+  try{
+    const r=await fetch('/api/principles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error('Save failed');
+    const saved=await r.json();
+    savedPrinciples.unshift(saved);
+    document.getElementById('save-area').innerHTML='<div style="color:var(--c-confirm);font-size:var(--fs-sm);padding:4px">Principle saved.</div>';
+    setTimeout(()=>document.getElementById('save-area').innerHTML='',2000);
+  }catch(e){document.getElementById('save-area').innerHTML='<div style="color:var(--c-danger);font-size:var(--fs-sm);padding:4px">'+e.message+'</div>'}
+}
+
+// === PRINCIPLES TAB ===
+
+function togglePrinciples(){
+  principlesMode=!principlesMode;
+  libraryMode=false;
+  if(principlesMode){
+    highlightBtn('btn-principles');
+    chatMsgs=[];
+    loadPrinciples();
+  }else{
+    document.getElementById('btn-principles').classList.remove('btn-active');
+    if(mvs.length)showPositionInfo(cur);
+    else document.getElementById('ap').innerHTML='<div class="muted">Load a game and navigate to a move</div>';
+  }
+}
+
+async function loadPrinciples(){
+  try{
+    const r=await fetch('/api/principles');
+    savedPrinciples=await r.json();
+  }catch(e){savedPrinciples=[]}
+  renderPrinciples();
+}
+
+function renderPrinciples(filter){
+  const ap=document.getElementById('ap');
+  document.getElementById('ai-panel-title').textContent='Principles ('+savedPrinciples.length+')';
+  let items=savedPrinciples;
+  if(filter){
+    const q=filter.toLowerCase();
+    items=items.filter(p=>p.text.toLowerCase().includes(q)||(p.tags||[]).some(t=>t.toLowerCase().includes(q)));
+  }
+  let h='<input class="input lib-search" placeholder="Search principles or tags..." oninput="renderPrinciples(this.value)" value="'+(filter||'')+'">';
+  h+='<button class="btn btn-sm" style="margin:4px 0" onclick="showAddPrincipleForm()">+ Add Principle</button>';
+  if(items.length===0){h+='<div class="muted">No principles saved yet</div>';ap.innerHTML=h;return}
+
+  const tagCounts={};
+  for(const p of savedPrinciples)(p.tags||[]).forEach(t=>{tagCounts[t]=(tagCounts[t]||0)+1});
+  if(Object.keys(tagCounts).length){
+    h+='<div class="principle-tags-bar">';
+    for(const[t,c]of Object.entries(tagCounts).sort((a,b)=>b[1]-a[1])){
+      h+='<span class="tag-chip" onclick="renderPrinciples(\''+esc(t)+'\')">'+esc(t)+' ('+c+')</span>';
+    }
+    h+='</div>';
+  }
+
+  for(const p of items){
+    h+='<div class="lib-card principle-card">';
+    h+='<div class="principle-text">'+esc(p.text)+'</div>';
+    if(p.tags&&p.tags.length)h+='<div class="principle-tags">'+p.tags.map(t=>'<span class="tag-chip">'+esc(t)+'</span>').join('')+'</div>';
+    if(p.games&&p.games.length){
+      h+='<div class="lib-card-meta">Games: '+p.games.map(g=>esc(g.white+' vs '+g.black+(g.move?' ('+g.move+')':''))).join('; ')+'</div>';
+    }
+    h+='<div class="lib-card-meta" style="color:var(--c-text-muted)">'+new Date(p.createdAt).toLocaleDateString()+'</div>';
+    h+='<div class="lib-card-actions">';
+    h+='<button class="btn btn-sm" onclick="event.stopPropagation();editPrinciple(\''+p.id+'\')">Edit</button>';
+    h+='<button class="btn btn-sm" onclick="event.stopPropagation();tagGameToPrinciple(\''+p.id+'\')">Tag Game</button>';
+    h+='<button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePrinciple(\''+p.id+'\')">Del</button>';
+    h+='</div></div>';
+  }
+  ap.innerHTML=h;
+}
+
+function showAddPrincipleForm(){
+  const ap=document.getElementById('ap');
+  let h='<div class="save-form" style="margin:8px 0">';
+  h+='<label>Principle</label>';
+  h+='<textarea id="new-principle-text" rows="3" placeholder="One transferable lesson..."></textarea>';
+  h+='<label>Tags (comma-separated)</label>';
+  h+='<input class="input" id="new-principle-tags" placeholder="tactics, pins, endgame...">';
+  h+='<div class="save-btns"><button class="btn btn-confirm" onclick="doAddPrinciple()">Save</button><button class="btn" onclick="renderPrinciples()">Cancel</button></div>';
+  h+='</div>';
+  ap.innerHTML=h;
+}
+
+async function doAddPrinciple(){
+  const text=document.getElementById('new-principle-text').value.trim();
+  if(!text)return;
+  const tagsRaw=document.getElementById('new-principle-tags').value.trim();
+  const tags=tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  const games=[];
+  if(meta.lichessId){
+    const m=cur>=0&&cur<mvs.length?mvs[cur]:null;
+    games.push({lichessId:meta.lichessId,white:meta.w,black:meta.b,opening:meta.op,move:m?(m.mn+(m.c==='w'?'.':'...')+' '+m.san):''});
+  }
+  try{
+    const r=await fetch('/api/principles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,tags,games})});
+    if(!r.ok)throw new Error('Save failed');
+    const saved=await r.json();
+    savedPrinciples.unshift(saved);
+    renderPrinciples();
+  }catch(e){alert(e.message)}
+}
+
+function editPrinciple(id){
+  const p=savedPrinciples.find(x=>x.id===id);
+  if(!p)return;
+  const ap=document.getElementById('ap');
+  let h='<div class="save-form" style="margin:8px 0">';
+  h+='<label>Principle</label>';
+  h+='<textarea id="edit-principle-text" rows="3">'+esc(p.text)+'</textarea>';
+  h+='<label>Tags (comma-separated)</label>';
+  h+='<input class="input" id="edit-principle-tags" value="'+(p.tags||[]).join(', ')+'">';
+  h+='<div class="save-btns"><button class="btn btn-confirm" onclick="doEditPrinciple(\''+id+'\')">Update</button><button class="btn" onclick="renderPrinciples()">Cancel</button></div>';
+  h+='</div>';
+  ap.innerHTML=h;
+}
+
+async function doEditPrinciple(id){
+  const text=document.getElementById('edit-principle-text').value.trim();
+  if(!text)return;
+  const tagsRaw=document.getElementById('edit-principle-tags').value.trim();
+  const tags=tagsRaw?tagsRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  try{
+    const r=await fetch('/api/principles/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,tags})});
+    if(!r.ok)throw new Error('Update failed');
+    const updated=await r.json();
+    const idx=savedPrinciples.findIndex(x=>x.id===id);
+    if(idx>=0)savedPrinciples[idx]=updated;
+    renderPrinciples();
+  }catch(e){alert(e.message)}
+}
+
+async function tagGameToPrinciple(id){
+  if(!meta.lichessId){alert('Load a game first');return}
+  const p=savedPrinciples.find(x=>x.id===id);
+  if(!p)return;
+  const m=cur>=0&&cur<mvs.length?mvs[cur]:null;
+  const gameEntry={lichessId:meta.lichessId,white:meta.w,black:meta.b,opening:meta.op,move:m?(m.mn+(m.c==='w'?'.':'...')+' '+m.san):''};
+  const games=[...(p.games||[])];
+  if(!games.some(g=>g.lichessId===meta.lichessId))games.push(gameEntry);
+  try{
+    const r=await fetch('/api/principles/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({games})});
+    if(!r.ok)throw new Error('Tag failed');
+    const updated=await r.json();
+    const idx=savedPrinciples.findIndex(x=>x.id===id);
+    if(idx>=0)savedPrinciples[idx]=updated;
+    renderPrinciples();
+  }catch(e){alert(e.message)}
+}
+
+async function deletePrinciple(id){
+  await fetch('/api/principles/'+id,{method:'DELETE'});
+  savedPrinciples=savedPrinciples.filter(p=>p.id!==id);
+  renderPrinciples();
+}
+
+// === SAVE POSITION ===
+
+function showSaveForm(){
+  if(cur<0)return;
+  const m=mvs[cur];
+  const area=document.getElementById('save-area');
+  area.innerHTML=`<div class="save-form">
+    <label>Position</label>
+    <div style="font-size:9px;color:var(--c-text-muted);font-family:monospace">${m.mn}${m.c==='w'?'.':'...'} ${m.san} ${m.j?'('+m.j+')':''}</div>
+    <label>Notes</label>
+    <textarea id="save-notes" placeholder="What did you notice? What went wrong?"></textarea>
+    <label>Lesson</label>
+    <textarea id="save-lesson" placeholder="Transferable principle (fill later or use Extract Lesson)"></textarea>
+    <div class="save-btns">
+      <button class="btn btn-confirm" onclick="doSave()">Save Position</button>
+      <button class="btn" onclick="document.getElementById('save-area').innerHTML=''">Cancel</button>
+    </div>
+  </div>`;
+  // Pre-fill lesson if one was extracted
+  const lastAi=chatMsgs.filter(m=>m.role==='ai');
+  if(chatMode==='lesson'&&lastAi.length){
+    document.getElementById('save-lesson').value=lastAi[lastAi.length-1].content.trim();
+  }
+}
+
+async function doSave(){
+  const m=mvs[cur];
+  const notes=document.getElementById('save-notes').value.trim();
+  const lesson=document.getElementById('save-lesson').value.trim();
+  const payload={
+    fen:m.fen,
+    game:{white:meta.w,black:meta.b,whiteRating:meta.wr,blackRating:meta.br,opening:meta.op,result:meta.res,lichessId:meta.lichessId},
+    context:{moveNumber:m.mn,moveSan:m.san,sideToMove:m.c,playerSide:playerSide,eval:m.cp!==null?(m.cp/100):null,mate:m.mate,judgment:m.j,bestMove:m.best,betterLine:m.line},
+    notes:notes,
+    lesson:lesson,
+    tags:[]
+  };
+  try{
+    const r=await fetch('/api/positions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error('Save failed');
+    const saved=await r.json();
+    savedPositions.unshift(saved);
+    document.getElementById('save-area').innerHTML='<div style="color:var(--c-confirm);font-size:var(--fs-sm);padding:4px">Saved.</div>';
+    setTimeout(()=>document.getElementById('save-area').innerHTML='',2000);
+  }catch(e){document.getElementById('save-area').innerHTML='<div style="color:var(--c-danger);font-size:var(--fs-sm);padding:4px">'+e.message+'</div>'}
+}
+
+// === LIBRARY ===
+
+function toggleLibrary(){
+  libraryMode=!libraryMode;
+  principlesMode=false;
+  if(libraryMode){
+    highlightBtn('btn-library');
+    chatMsgs=[];
+    loadLibrary();
+  }else{
+    document.getElementById('btn-library').classList.remove('btn-active');
+    if(mvs.length)showPositionInfo(cur);
+    else document.getElementById('ap').innerHTML='<div class="muted">Load a game and navigate to a move</div>';
+  }
+}
+
+async function loadLibrary(){
+  try{
+    const r=await fetch('/api/positions');
+    savedPositions=await r.json();
+  }catch(e){savedPositions=[]}
+  renderLibrary();
+}
+
+function renderLibrary(filter){
+  const ap=document.getElementById('ap');
+  document.getElementById('ai-panel-title').textContent='Library ('+savedPositions.length+')';
+  let items=savedPositions;
+  if(filter){
+    const q=filter.toLowerCase();
+    items=items.filter(p=>(p.lesson||'').toLowerCase().includes(q)||(p.notes||'').toLowerCase().includes(q)||(p.game?.opening||'').toLowerCase().includes(q)||(p.context?.moveSan||'').toLowerCase().includes(q));
+  }
+  let h='<input class="input lib-search" placeholder="Search lessons, notes, openings..." oninput="renderLibrary(this.value)" value="'+(filter||'')+'">';
+  if(items.length===0){h+='<div class="muted">No saved positions</div>';ap.innerHTML=h;return}
+  for(const p of items){
+    h+='<div class="lib-card" onclick="loadSavedPosition(\''+p.id+'\')">';
+    h+='<span class="lib-card-move">'+p.context.moveNumber+(p.context.sideToMove==='w'?'.':'...')+' '+p.context.moveSan;
+    if(p.context.judgment)h+=' ('+p.context.judgment+')';
+    h+='</span>';
+    h+='<div class="lib-card-meta">'+(p.game.white||'')+' vs '+(p.game.black||'')+' &middot; '+(p.game.opening||'')+' &middot; '+new Date(p.createdAt).toLocaleDateString()+'</div>';
+    if(p.lesson)h+='<div class="lib-card-lesson">'+esc(p.lesson)+'</div>';
+    if(p.notes)h+='<div class="lib-card-meta" style="color:var(--c-text-secondary)">'+esc(p.notes.substring(0,80))+(p.notes.length>80?'...':'')+'</div>';
+    h+='<div class="lib-card-actions"><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePosition(\''+p.id+'\')">Del</button></div>';
+    h+='</div>';
+  }
+  ap.innerHTML=h;
+}
+
+function loadSavedPosition(id){
+  const p=savedPositions.find(x=>x.id===id);
+  if(!p)return;
+  brd.position(p.fen,false);
+  const ap=document.getElementById('ap');
+  let h='<div class="lib-detail">';
+  h+='<div style="font-weight:600;font-size:var(--fs-md)">'+p.context.moveNumber+(p.context.sideToMove==='w'?'.':'...')+' '+p.context.moveSan+'</div>';
+  h+='<label>Game</label><p>'+esc((p.game.white||'?')+' vs '+(p.game.black||'?')+' / '+(p.game.opening||''))+'</p>';
+  if(p.notes){h+='<label>Notes</label><p>'+esc(p.notes)+'</p>'}
+  if(p.lesson){h+='<div class="lesson-box"><strong>Lesson</strong>'+esc(p.lesson)+'</div>'}
+  h+='<div style="margin-top:6px"><button class="btn btn-sm" onclick="renderLibrary()">Back to list</button></div>';
+  h+='</div>';
+  ap.innerHTML=h;
+}
+
+async function deletePosition(id){
+  await fetch('/api/positions/'+id,{method:'DELETE'});
+  savedPositions=savedPositions.filter(p=>p.id!==id);
+  renderLibrary();
+}
+
+function esc(s){return(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// === KEYBOARD ===
+
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowLeft')go(cur-1);
+  else if(e.key==='ArrowRight')go(cur+1);
+  else if(e.key==='Home'){e.preventDefault();go(0)}
+  else if(e.key==='End'){e.preventDefault();go(mvs.length-1)}
+  else if(e.key==='e'||e.key==='E')goErr(1);
+  else if(e.key==='w'||e.key==='W')goErr(-1);
+  else if(e.key==='s'||e.key==='S')showSaveForm();
+  else if(e.key==='l'||e.key==='L')toggleLibrary();
+  else if(e.key==='p'||e.key==='P')showPostGame();
+  else if(e.key==='Escape'){chatMsgs=[];document.getElementById('save-area').innerHTML='';if(libraryMode)toggleLibrary();else if(principlesMode)togglePrinciples();else if(mvs.length)showPositionInfo(cur)}
+});
+
+// === POSITION ANALYSIS ===
+
+function posAnalysis(fen){
+  const parts=fen.split(' ');const bd=parts[0],castl=parts[2];
+  const pcs={w:{p:0,n:0,b:0,r:0,q:0},b:{p:0,n:0,b:0,r:0,q:0}};
+  for(const ch of bd){if('/12345678'.includes(ch))continue;const co=ch===ch.toUpperCase()?'w':'b';const pc=ch.toLowerCase();if(pcs[co][pc]!==undefined)pcs[co][pc]++}
+  const val=p=>p.p+p.n*3+p.b*3+p.r*5+p.q*9;
+  const wm=val(pcs.w),bm=val(pcs.b),d=wm-bm;
+  const detail=c=>{const p=pcs[c],a=[];if(p.q)a.push(p.q+'Q');if(p.r)a.push(p.r+'R');if(p.b)a.push(p.b+'B');if(p.n)a.push(p.n+'N');if(p.p)a.push(p.p+'P');return a.join(' ')};
+  let mat=d===0?'Equal':'';if(d>0)mat='White +'+d;if(d<0)mat='Black +'+(-d);
+  mat+=' ('+detail('w')+' vs '+detail('b')+')';
+
+  const rows=bd.split('/');const pf={w:[],b:[]};
+  for(let r=0;r<8;r++){let f=0;for(const ch of rows[r]){if('12345678'.includes(ch)){f+=parseInt(ch);continue}if(ch==='P')pf.w.push(f);if(ch==='p')pf.b.push(f);f++}}
+  const doubled=fs=>{const c={};fs.forEach(f=>c[f]=(c[f]||0)+1);return Object.values(c).filter(v=>v>1).length};
+  const isolated=fs=>{const u=[...new Set(fs)];return u.filter(f=>!u.includes(f-1)&&!u.includes(f+1)).length};
+  const issues=[];
+  if(doubled(pf.w))issues.push('W doubled');if(doubled(pf.b))issues.push('B doubled');
+  if(isolated(pf.w))issues.push('W isolated');if(isolated(pf.b))issues.push('B isolated');
+  const pawns=issues.length?issues.join(', '):'No weaknesses';
+
+  let wbr=0,bbr=0;
+  let f=0;for(const ch of rows[7]){if('12345678'.includes(ch)){f+=parseInt(ch);continue}if('NBRQ'.includes(ch))wbr++;f++}
+  f=0;for(const ch of rows[0]){if('12345678'.includes(ch)){f+=parseInt(ch);continue}if('nbrq'.includes(ch))bbr++;f++}
+  let dev;
+  if(wbr>2&&bbr<=2)dev='W undeveloped';else if(bbr>2&&wbr<=2)dev='B undeveloped';
+  else if(wbr>2&&bbr>2)dev='Both undeveloped';else dev='Both developed';
+
+  let king=null;
+  const wk=castl.includes('K')||castl.includes('Q');const bk=castl.includes('k')||castl.includes('q');
+  if(wk&&bk)king='Neither castled';else if(wk)king='W not castled';else if(bk)king='B not castled';
+
+  let act;if(wbr>bbr)act='B more active';else if(bbr>wbr)act='W more active';else act='Balanced';
+
+  let ws=0,bs=0;
+  for(let r=0;r<8;r++){let f=0;for(const ch of rows[r]){if('12345678'.includes(ch)){f+=parseInt(ch);continue}if(ch==='P'&&r<=3)ws++;if(ch==='p'&&r>=4)bs++;f++}}
+  let space;if(ws>bs+1)space='W advantage';else if(bs>ws+1)space='B advantage';else space='Equal';
+
+  return{mat,pawns,dev,king,act,space,
+    evalText:m=>{
+      if(m.mate!==null)return'#'+Math.abs(m.mate)+' '+(m.mate>0?'W':'B');
+      if(m.cp!==null){const a=Math.abs(m.cp),who=m.cp>0?'White':'Black';
+        if(a<25)return'Equal';if(a<75)return who+' edge';if(a<150)return who+' clear';if(a<300)return who+' big';return who+' winning';}
+      return'-';
+    }
+  };
+}
+
+// === SPACE VISUALIZER ===
+
+let spaceVizOn=false;
+
+function flipBoard(){
+  brd.flip();
+  setTimeout(()=>{
+    if(spaceVizOn&&mvs.length)renderSpaceViz(mvs[cur].fen);
+    if(mvs.length)showPositionArrows(cur);
+  },60);
+}
+
+function toggleSpaceViz(){
+  spaceVizOn=!spaceVizOn;
+  const btn=document.getElementById('btn-space');
+  btn.classList.toggle('on',spaceVizOn);
+  if(spaceVizOn&&mvs.length)renderSpaceViz(mvs[cur].fen);
+  else clearSpaceViz();
+}
+
+function clearSpaceViz(){const el=document.getElementById('board-space');if(el)el.remove()}
+
+function computeAttacks(fen){
+  // 8x8 grid: attacks[rank][file] = {w:count, b:count}  rank 0=rank1, rank7=rank8
+  const grid=Array.from({length:8},()=>Array.from({length:8},()=>({w:0,b:0})));
+  const rows=fen.split(' ')[0].split('/');
+  const pieces=Array.from({length:8},()=>new Array(8).fill(null));
+
+  // Populate piece map (rows[0]=rank8, rows[7]=rank1)
+  for(let r=0;r<8;r++){
+    let f=0;
+    for(const ch of rows[r]){
+      if('12345678'.includes(ch)){f+=parseInt(ch);continue}
+      pieces[7-r][f]={type:ch.toLowerCase(),color:ch===ch.toUpperCase()?'w':'b'};
+      f++;
+    }
+  }
+
+  function trace(rank,file,dr,df,color){
+    let r=rank+dr,f=file+df;
+    while(r>=0&&r<8&&f>=0&&f<8){
+      grid[r][f][color]++;
+      if(pieces[r][f])break;
+      r+=dr;f+=df;
+    }
+  }
+
+  for(let rank=0;rank<8;rank++){
+    for(let file=0;file<8;file++){
+      const p=pieces[rank][file];if(!p)continue;
+      const c=p.color;
+      switch(p.type){
+        case'p':{
+          const dr=c==='w'?1:-1,nr=rank+dr;
+          if(nr>=0&&nr<8){if(file>0)grid[nr][file-1][c]++;if(file<7)grid[nr][file+1][c]++;}
+          break;
+        }
+        case'n':
+          [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,df])=>{
+            const r=rank+dr,f=file+df;if(r>=0&&r<8&&f>=0&&f<8)grid[r][f][c]++;
+          });break;
+        case'b':[[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,df])=>trace(rank,file,dr,df,c));break;
+        case'r':[[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,df])=>trace(rank,file,dr,df,c));break;
+        case'q':[[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,df])=>trace(rank,file,dr,df,c));break;
+        case'k':
+          [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,df])=>{
+            const r=rank+dr,f=file+df;if(r>=0&&r<8&&f>=0&&f<8)grid[r][f][c]++;
+          });break;
+      }
+    }
+  }
+  return grid;
+}
+
+function renderSpaceViz(fen){
+  clearSpaceViz();
+  if(!spaceVizOn)return;
+  const boardEl=document.getElementById('board');
+  const wrap=document.getElementById('board-svg-wrap');
+  if(!boardEl||!wrap)return;
+  const size=boardEl.offsetWidth;
+  const sqSize=size/8;
+  const flipped=getFlipped();
+  const grid=computeAttacks(fen);
+
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.id='board-space';
+  svg.setAttribute('width',size);svg.setAttribute('height',size);
+  svg.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:5;';
+
+  for(let rank=0;rank<8;rank++){
+    for(let file=0;file<8;file++){
+      const {w,b}=grid[rank][file];
+      if(!w&&!b)continue;
+      const col=flipped?7-file:file;
+      const row=flipped?rank:7-rank;
+      const x=col*sqSize,y=row*sqSize;
+
+      let fill,opacity;
+      if(w>0&&b===0){
+        fill='#4488ff';
+        opacity=Math.min(0.72,0.18+w*0.13);
+      }else if(b>0&&w===0){
+        fill='#ee3333';
+        opacity=Math.min(0.72,0.18+b*0.13);
+      }else if(w>b){
+        fill='#4488ff';
+        opacity=Math.min(0.45,0.08+(w-b)*0.12);
+      }else if(b>w){
+        fill='#ee3333';
+        opacity=Math.min(0.45,0.08+(b-w)*0.12);
+      }else{
+        // Perfectly contested — render split: left half blue, right half red
+        const lRect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+        lRect.setAttribute('x',x);lRect.setAttribute('y',y);
+        lRect.setAttribute('width',sqSize/2);lRect.setAttribute('height',sqSize);
+        lRect.setAttribute('fill','#4488ff');lRect.setAttribute('fill-opacity','0.28');
+        svg.appendChild(lRect);
+        const rRect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rRect.setAttribute('x',x+sqSize/2);rRect.setAttribute('y',y);
+        rRect.setAttribute('width',sqSize/2);rRect.setAttribute('height',sqSize);
+        rRect.setAttribute('fill','#ee3333');rRect.setAttribute('fill-opacity','0.28');
+        svg.appendChild(rRect);
+        continue;
+      }
+
+      const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x',x);rect.setAttribute('y',y);
+      rect.setAttribute('width',sqSize);rect.setAttribute('height',sqSize);
+      rect.setAttribute('fill',fill);rect.setAttribute('fill-opacity',opacity);
+      svg.appendChild(rect);
+    }
+  }
+  wrap.appendChild(svg);
+}
+
+// Load library on start
+fetch('/api/positions').then(r=>r.json()).then(d=>savedPositions=d).catch(()=>{});
+fetch('/api/principles').then(r=>r.json()).then(d=>savedPrinciples=d).catch(()=>{});
+</script>
+<script src="extras.js"></script>
+</body>
+</html>

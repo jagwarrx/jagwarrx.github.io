@@ -75,3 +75,11 @@ textarea:focus,input:focus,select:focus{outline:2px solid rgba(16,107,163,.35);o
 .md code{font:13px/1 ui-monospace,Menlo,monospace;background:var(--tint);padding:2px 4px;border-radius:3px}
 .md blockquote{margin:0 0 10px;padding:2px 0 2px 14px;border-left:3px solid var(--line);color:var(--ink2)}
 .md hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+
+/* chess analyzer: a wide app frame instead of the phone frame */
+.chess-page{max-width:1240px}
+.chess-page .app-side{max-width:760px;padding-top:24px}
+.wide-frame{width:100%;height:min(860px,88vh);min-height:560px;border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  box-shadow:0 20px 50px -30px rgba(16,22,26,.5)}
+.wide-frame iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+.chess-page .more{margin:10px 0 0}
