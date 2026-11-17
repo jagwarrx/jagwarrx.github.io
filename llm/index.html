@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Build an LLM, one part at a time · Hari Meyyappan</title>
 <link rel="canonical" href="https://hmeyy.com/llm/">
-<meta name="description" content="Scroll to assemble GPT-2 from its parts: tokenizer, embeddings, attention, MLP, the stack, sampling, training. What each part does, why, and how, with live numbers.">
+<meta name="description" content="Press ↓ to build GPT-2 in 3D, one part at a time. Every cube is one number; watch each one get computed, and learn the 8 moves the whole model is made of.">
 <meta name="author" content="Hari Meyyappan">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Build an LLM, one part at a time">
-<meta property="og:description" content="Scroll to assemble GPT-2 from its parts. What each part does, why, and how, with live numbers.">
+<meta property="og:description" content="Press ↓ to build GPT-2 in 3D. Every cube is one number; the whole model is 8 moves and a loop.">
 <meta property="og:url" content="https://hmeyy.com/llm/">
 <meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
 <meta name="twitter:card" content="summary">
@@ -17,784 +17,1032 @@
 <style>
 @font-face{font-family:"Silkscreen";src:url(../fonts/silkscreen-400.ttf) format("truetype");font-weight:400;font-display:swap}
 @font-face{font-family:"Silkscreen";src:url(../fonts/silkscreen-700.ttf) format("truetype");font-weight:700;font-display:swap}
-:root{
-  --ink:#1B2430; --ink2:#3A4756; --mute:#6A7785; --line:#D9DEE5;
-  --paper:#FBFAF7; --print:#EAF1FB; --navy:#0E1A2B;
-  --blue:#2F6FDE; --orange:#F08A24; --green:#2BA36B; --red:#D9534F;
-  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --pix:"Silkscreen",var(--mono);
-  --hud:56px;
-}
+:root{--ink:#202B33;--ink2:#394B59;--muted:#5C7080;--line:#E1E8ED;--tint:#FBFAF7;--link:#106BA3;--side:#30404D;--side-ink:#CED9E0;--side-label:#8A9BA8;--frame:#1F2933;
+ --orange:#E16032;--blue:#1C8CA8;--violet:#7058BE;--green:#269D69;--yellow:#CC7A0A;--pink:#E14775;--teal:#1C8CA8;--amber:#D98A0B;
+ --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--pix:"Silkscreen",var(--mono);--hud:52px;--cardw:min(360px,34vw)}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;color:var(--ink);background:var(--paper);
-  font:16px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  transition:background-color .8s ease}
-body[data-zone="print"]{background:var(--print)}
-body[data-zone="navy"]{background:var(--navy)}
-a{color:var(--blue)}
-button{font:inherit;cursor:pointer}
+html,body{margin:0}
+body{color:var(--ink);font:15px/24px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--tint)}
+a{color:var(--link)}
+button{font:inherit;cursor:pointer;color:inherit}
+#stage{position:fixed;inset:0;z-index:0;background:radial-gradient(110% 90% at 62% 42%,#FFFEFB 0%,#FBFAF7 62%,#F3F0E8 100%);touch-action:pan-y}
+#stage canvas{display:block;cursor:grab}
+#stage canvas.dragging{cursor:grabbing}
+#labels{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.tl{position:absolute;left:0;top:0;white-space:nowrap;font-size:12px;line-height:16px;color:var(--ink);transition:opacity .25s;opacity:0;background:rgba(255,255,255,.86);border-radius:4px;padding:1px 5px}
+.tl b{font-weight:600}
+.tl span{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:5px}
+.tl.grp{font-size:12px;font-weight:600;color:var(--ink2);background:none}
+.tl.sub{font-size:12px;font-weight:600;color:var(--ink2);border:1.5px solid var(--ink2);background:#fff}
+.tl.row{font-family:var(--mono);font-size:11px;color:var(--ink2);background:none;padding:0 2px}
+.tl.bar{font-family:var(--mono);font-size:11px;text-align:center;background:none}
+.tl.bar em{display:block;font-style:normal;color:var(--green);font-weight:700}
+.tl.pick{font-family:var(--mono);font-size:14px;font-weight:700;background:#fff;border:2px solid var(--orange);border-radius:8px;padding:2px 9px}
+#calc,#tip{position:fixed;z-index:4;pointer-events:none;font-family:var(--mono);font-size:12px;line-height:17px;background:var(--frame);color:#fff;border-radius:6px;padding:4px 9px;white-space:nowrap;opacity:0;transition:opacity .15s}
+#calc b,#tip b{color:#FFD24C}
+#calc{transform:translate(-50%,0)}
+#tip{transform:translate(14px,-120%)}
 
-/* ---------- HUD ---------- */
-.hud{position:fixed;inset:0 0 auto 0;height:var(--hud);z-index:20;display:flex;align-items:center;gap:16px;
-  padding:0 20px;background:rgba(251,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.hud .home{font-weight:600;color:var(--ink);text-decoration:none;font-size:14px;white-space:nowrap}
-.hud .part{font-family:var(--pix);font-size:12px;letter-spacing:.04em;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hud .part b{color:var(--blue);font-weight:700}
+/* HUD */
+.hud{position:fixed;inset:0 0 auto 0;height:var(--hud);z-index:20;display:flex;align-items:center;gap:18px;padding:0 18px;background:rgba(251,250,247,.94);backdrop-filter:blur(8px);border-bottom:1px solid #ECE7DC;color:var(--ink)}
+.hud .brand{font-weight:600;color:var(--ink);text-decoration:none;font-size:14px;white-space:nowrap}
+.hud .tocb{border:1.5px solid var(--frame);background:#fff;border-radius:8px;padding:3px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+.hud .crumb{display:flex;flex-direction:column;line-height:16px;min-width:0}
+.hud .crumb small{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap}
+.hud .crumb span{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hud .ctr{margin-left:auto;text-align:right;line-height:1.1}
-.hud .ctr .lab{font-family:var(--pix);font-size:10px;color:var(--mute);letter-spacing:.06em}
-.hud .ctr .num{font-family:var(--pix);font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-.hud .bar{position:absolute;left:0;bottom:-1px;height:3px;background:var(--blue);width:0;transition:width .4s ease}
+.hud .ctr small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
+.hud .ctr b{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.hud .bar{position:absolute;left:0;bottom:-2px;height:3px;background:var(--blue);width:0;transition:width .3s}
+body.hero-on .hud .crumb,body.hero-on .hud .ctr{visibility:hidden}
 
-/* ---------- hero ---------- */
-.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:calc(var(--hud) + 24px) 20px 40px}
-.hero h1{font-family:var(--pix);font-weight:700;font-size:clamp(40px,8vw,84px);line-height:1;margin:0 0 18px;letter-spacing:-.01em}
-.hero p{margin:0 auto;max-width:560px;font-size:19px;color:var(--ink2)}
-.hero .kit{margin:34px auto 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:640px}
-.hero .kit span{font-family:var(--mono);font-size:12px;border:1.5px dashed #AEB7C2;border-radius:6px;padding:5px 9px;color:var(--ink2);background:#fff}
-.hero .down{margin-top:44px;font-family:var(--pix);font-size:13px;color:var(--mute);animation:bob 1.6s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(6px)}}
+/* minimap */
+#mini{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:15;display:flex;flex-direction:column;gap:3px;align-items:flex-end}
+#mini button{display:flex;align-items:center;gap:8px;border:0;background:none;padding:1px 0;font-size:11px;line-height:14px;font-weight:600;color:transparent}
+#mini button i{display:block;width:9px;height:9px;border-radius:50%;border:1.5px solid #A7B6C2;background:#fff;transition:all .25s}
+#mini button.done i{background:var(--ink2);border-color:var(--ink2)}
+#mini button.on i{background:var(--link);border-color:var(--link);transform:scale(1.5)}
+#mini button:hover{color:var(--ink2)}
+#mini button.gap{margin-top:8px}
 
-/* ---------- layout ---------- */
-.wrap{display:grid;grid-template-columns:200px minmax(300px,380px) minmax(0,1fr);gap:28px;max-width:1360px;margin:0 auto;padding:0 24px}
-.machine,.zoomcol{position:sticky;top:calc(var(--hud) + 18px);height:calc(100vh - var(--hud) - 36px);align-self:start}
-.zoomcol{display:flex}
-.steps{padding:12vh 0 30vh}
+/* content */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+main{position:relative;z-index:5;pointer-events:none}
+#stage,#labels{transition:opacity .5s}
+body.hero-on #stage,body.hero-on #labels,body.hero-on #mini{opacity:0;pointer-events:none}
+.hero,.toc{position:fixed;inset:var(--hud) 0 0 0;overflow:auto;transition:opacity .45s,transform .45s;pointer-events:auto;z-index:6}
+body:not(.cover-on) .hero,body:not(.toc-on) .toc{opacity:0;transform:translateY(-24px);pointer-events:none}
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 24px 8vh}
+.hero h1{font-size:clamp(40px,6vw,72px);line-height:1.05;font-weight:800;margin:0 0 16px;letter-spacing:-.035em}
+.hero p{margin:0 0 22px;font-size:18px;line-height:28px;color:var(--ink2);max-width:540px}
+.kit{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:620px}
+.kit span{font-family:var(--mono);font-size:12.5px;border:1.5px dashed #B9B2A3;border-radius:6px;padding:4px 10px;color:var(--ink2);background:#fff}
+.start{margin-top:34px;border:0;background:var(--frame);color:#fff;border-radius:10px;padding:9px 20px;font-size:16px;font-weight:600}
+.hero .down{margin-top:12px;font-size:13px;color:var(--muted)}
+.toc{display:flex;justify-content:center;align-items:flex-start;gap:56px;padding:6vh 24px 8vh}
+.toc .intro{max-width:340px;padding-top:40px}
+.toc .intro h2{font-size:26px;line-height:32px;margin:0 0 12px;letter-spacing:-.02em}
+.toc .intro p{font-size:15.5px;line-height:24px;color:var(--ink2);margin:0 0 12px}
+.toc .start{margin-top:10px}
+.mach{display:flex;flex-direction:column;gap:7px;width:290px}
+.mp{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border:1.5px dashed #B9B2A3;border-radius:7px;padding:6px 11px;background:transparent;color:#7D776B;font-size:14.5px;text-align:left;transition:all .25s}
+.mp small{font-family:var(--mono);font-size:11px;color:#A39C8E}
+.mp.seen{border-style:solid;border-color:var(--frame);background:#fff;color:var(--ink)}
+.mp:hover{border-color:var(--blue);color:var(--blue);transform:translateX(4px)}
+.mp.add{align-self:center;width:30px;height:30px;justify-content:center;align-items:center;border-radius:50%;padding:0}
+.mp.io{border:0;justify-content:center;font-family:var(--mono);color:var(--ink2);background:none}
+.blk{border:1.5px solid var(--frame);border-radius:10px;padding:8px 10px 10px;background:#FFFDF8;display:flex;flex-direction:column;gap:7px;
+ box-shadow:5px 5px 0 -1.5px var(--tint),5px 5px 0 0 var(--frame),10px 10px 0 -1.5px var(--tint),10px 10px 0 0 var(--frame)}
+.blk>button.bh{border:0;background:none;padding:0 2px;text-align:left;font-size:12.5px;font-weight:700;color:var(--ink2)}
+.blk>button.bh em{font-style:normal;color:var(--orange)}
+.after{margin-top:18px;font-size:13px;color:var(--muted)}
+.after .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.after .mp{font-size:13px;padding:4px 9px}
+kbd{display:inline-block;font:600 11px/16px var(--mono);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:5px;opacity:.8;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(2px)}}
+.st{height:0}
+.card{pointer-events:auto;position:fixed;left:0;top:0;width:var(--cardw);max-height:calc(100vh - var(--hud) - 24px);overflow:auto;background:#fff;border:3px solid var(--frame);border-radius:12px;
+ box-shadow:0 14px 28px -16px rgba(16,22,26,.45);padding:15px 18px 12px;opacity:0;pointer-events:none;transition:opacity .3s;will-change:transform}
+.st.cur .card{opacity:1;pointer-events:auto}
+.card h2{margin:0 0 8px;font-size:21px;line-height:27px;font-weight:700;letter-spacing:-.01em}
+.card p{margin:0 0 10px;font-size:15px;line-height:23px}
+.card .cap{border-left:3px solid var(--violet);padding:1px 0 1px 11px;min-height:25px;color:var(--ink)}
+.card .cap:empty{display:none}
+.card .cap.fresh{animation:capIn .45s ease}
+@keyframes capIn{from{opacity:0;transform:translateY(5px)}}
+.card .aside{font-size:14.5px;line-height:22px;color:#8A4B12;font-style:italic}
+.card .note{font-size:13px;line-height:19px;color:var(--muted)}
+.card .say{font-size:14px;line-height:21px;margin:12px 0 6px;color:var(--ink2)}
+.k-w{color:var(--violet)}.k-a{color:var(--amber)}.k-p{color:var(--green)}
+.nav{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.nav .dots{display:flex;gap:4px}
+.nav .dots i{width:6px;height:6px;border-radius:50%;background:#D3DCE3}
+.nav .dots i.on{background:var(--violet)}
+.nx{margin-left:auto;border:0;background:var(--frame);color:#fff;border-radius:8px;padding:5px 12px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.nx:disabled{opacity:.4}
+.pv{border:1.5px solid var(--line);background:#fff;border-radius:8px;height:29px;min-width:32px;font-size:13px;color:var(--ink2)}
+.pv:disabled{opacity:.35}
+.cmp{border-collapse:collapse;font-size:13.5px;line-height:19px;margin:2px 0 10px;width:100%}
+.cmp td,.cmp th{padding:3px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.cmp th{font-weight:600}.cmp td:first-child{color:var(--muted);white-space:nowrap}
+.cmp.ex td:last-child{font-family:var(--mono);font-size:12.5px}
+.chips{display:flex;gap:4px;margin:0 0 10px}
+.chips span{font-family:var(--mono);font-size:13px;border:1.5px solid var(--frame);border-radius:6px;padding:1px 7px;background:#FFF6EC}
+.fig{display:block;width:100%;height:auto;margin:0 0 10px}
+.fig text{font:11px Inter,sans-serif;fill:#6B675E}
+.ctxbar{display:flex;gap:1px;margin:2px 0 4px}.ctxbar i{flex:1;height:22px;border-radius:2px;background:#E7E3DA}.ctxbar i.on{background:var(--blue)}
+.mp.here{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,111,222,.18)}
+.heads{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+#lead{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:visible}
+#lead line{stroke:var(--frame);stroke-width:2;stroke-dasharray:5 4;opacity:.75}
+#lead circle{fill:var(--frame)}
+#hint{position:fixed;z-index:7;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .5s;color:#C2410C}
+#hint span{position:absolute;right:88px;top:-76px;white-space:nowrap;font:22px/1.1 "Bradley Hand","Segoe Print","Chalkboard SE","Comic Sans MS",cursive;transform:rotate(-4deg)}
+#hint svg{position:absolute;left:-84px;top:-62px;overflow:visible}
+#hint.r span{right:auto;left:88px;transform:rotate(4deg)}
+#hint.r svg{left:-6px;transform:scaleX(-1)}
+#hint.up svg{top:-8px;transform:scaleY(-1)}
+#hint.up span{top:48px}
+#hint.up.r svg{transform:scale(-1,-1)}
+#hint path{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#ptr{position:fixed;z-index:6;left:0;top:0;width:18px;height:18px;background:#fff;border:3px solid var(--frame);border-right:0;border-top:0;transform:rotate(45deg);opacity:0;transition:opacity .3s;pointer-events:none}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts button,.chipb{border:1.5px solid var(--frame);background:#fff;border-radius:8px;padding:3px 10px;font-family:var(--mono);font-size:13px;white-space:pre}
+.opts button[aria-pressed="true"]{background:var(--frame);color:#fff}
+.btn{border:1.5px solid var(--frame);background:var(--frame);color:#fff;border-radius:8px;padding:4px 12px;font-size:13.5px}
+.ctl{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13.5px}
+.ctl input{flex:1;accent-color:var(--link)}
+.ctl output{font-family:var(--mono);font-weight:700;min-width:36px;text-align:right}
+.mini{font-family:var(--mono);font-size:12px;line-height:18px;color:var(--ink2)}
+.res{margin-top:7px;font-size:13.5px;line-height:20px}
+.slots{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;min-height:28px}
+.slots span{border:1.5px solid var(--green);background:#E8F6EF;border-radius:6px;padding:1px 7px;font-size:12px;animation:pop .3s both}
+.slots span.miss{border-color:var(--orange);background:#FFF1E2}
+.pool{display:flex;flex-wrap:wrap;gap:5px}
+.pool .chipb{font-family:inherit;font-size:12.5px}
+.pool .chipb.bad{animation:shake .35s;border-color:#E14775}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.grid5{display:inline-grid;grid-template-columns:repeat(5,16px);gap:2px}
+.grid5 i{width:16px;height:16px;border-radius:3px;display:block}
+.story{font-family:var(--mono);font-size:14px;line-height:22px;padding:7px 10px;border:1.5px solid var(--frame);border-radius:8px;background:#FFFDF7;min-height:52px}
+.story .n{background:#FFE3C4;border-radius:3px;padding:0 1px}
+.end{position:fixed;inset:var(--hud) 0 0 0;overflow:auto;padding:5vh 24px 8vh;background:rgba(251,250,247,.95);opacity:0;pointer-events:none;transition:opacity .4s;z-index:12}
+body.end-on .end{opacity:1;pointer-events:auto}
+body.end-on .st .card{opacity:0!important;pointer-events:none!important}
+.end .card{position:relative;opacity:1;pointer-events:inherit;transform:none!important;width:min(760px,100%);max-height:none;margin:0 auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin:12px 0}
+.fc{perspective:600px;height:112px;border:0;padding:0;background:none;text-align:left}
+.fc>span{position:relative;display:block;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.fc.flip>span{transform:rotateY(180deg)}
+.fc em,.fc strong{position:absolute;inset:0;backface-visibility:hidden;border:2px solid var(--frame);border-radius:10px;padding:9px 10px;font-style:normal;display:flex;flex-direction:column;justify-content:center}
+.fc em{background:#fff;font-weight:700;font-size:14.5px;line-height:19px}
+.fc em small{font-size:11.5px;font-weight:500;color:var(--muted)}
+.fc strong{background:#F0F8F4;border-color:var(--green);font-weight:500;font-size:12.5px;line-height:17px;transform:rotateY(180deg)}
+.credits{font-size:13px;line-height:20px;color:var(--muted)}
 
-/* ---------- machine (the assembled model) ---------- */
-.mach{display:flex;flex-direction:column;gap:5px;font-size:12px;height:100%;justify-content:center}
-.mp{position:relative;border:1.5px dashed #AEB7C2;border-radius:6px;padding:5px 8px;color:#98A3AF;background:transparent;
-  transition:transform .45s cubic-bezier(.2,.8,.2,1),background .4s,border-color .4s,color .4s,box-shadow .4s;white-space:nowrap}
-.mp small{font-family:var(--mono);font-size:10px;opacity:.8;margin-left:4px}
-.mp.built{border-style:solid;border-color:var(--ink);color:var(--ink);background:#fff}
-.mp.active{transform:translateX(22px);border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 6px 18px rgba(47,111,222,.35)}
-.mp.add{align-self:center;width:28px;text-align:center;padding:2px 0;border-radius:50%}
-.mp.io{font-family:var(--mono);border-style:solid;border-color:transparent;color:var(--ink2);background:transparent;text-align:center}
-.blk{position:relative;border:1.5px dashed #AEB7C2;border-radius:10px;padding:20px 8px 8px;display:flex;flex-direction:column;gap:5px;transition:all .45s}
-.blk .bl{position:absolute;top:3px;left:10px;font-family:var(--pix);font-size:10px;color:#98A3AF}
-.blk.built{border-style:solid;border-color:var(--ink)} .blk.built .bl{color:var(--ink)}
-.blk.active{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,111,222,.15);transform:translateX(10px)}
-.blk.stacked{box-shadow:5px 5px 0 -1.5px var(--paper),5px 5px 0 0 var(--ink),10px 10px 0 -1.5px var(--paper),10px 10px 0 0 var(--ink)}
-.blk .x{font-family:var(--pix);color:var(--orange);font-weight:700;margin-left:4px;opacity:0;transition:opacity .4s}
-.blk.stacked .x{opacity:1}
-.loopline{position:absolute;right:-14px;top:12%;bottom:6%;width:10px;border:2px solid var(--orange);border-left:none;border-radius:0 10px 10px 0;opacity:0;transition:opacity .4s}
-.mach.loop .loopline{opacity:1}
-.mach{position:relative}
-body[data-zone="navy"] .mp:not(.built):not(.io){color:#5E6E82;border-color:#3A4A60}
-body[data-zone="navy"] .mp.io{color:#C9D3E0}
-body[data-zone="navy"] .blk:not(.built){border-color:#3A4A60}
-body[data-zone="navy"] .blk.stacked{box-shadow:5px 5px 0 -1.5px var(--navy),5px 5px 0 0 #C9D3E0,10px 10px 0 -1.5px var(--navy),10px 10px 0 0 #C9D3E0}
-body[data-zone="navy"] .blk.built{border-color:#C9D3E0} body[data-zone="navy"] .blk.built .bl{color:#C9D3E0}
-
-/* ---------- station cards ---------- */
-.step{min-height:92vh;padding-top:4vh}
-.card{background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:20px 22px 18px;box-shadow:4px 4px 0 var(--ink);transition:opacity .4s}
-.step:not(.on) .card{opacity:.45}
-.card .tag{display:flex;align-items:center;gap:8px;font-family:var(--pix);font-size:11px;color:var(--mute);letter-spacing:.05em}
-.card .tag b{background:var(--ink);color:#fff;border-radius:4px;padding:2px 6px;font-weight:700}
-.card h2{margin:8px 0 12px;font-size:26px;line-height:1.15;letter-spacing:-.01em}
-.card dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 12px}
-.card dt{font-family:var(--pix);font-size:11px;color:var(--blue);padding-top:4px;letter-spacing:.04em}
-.card dd{margin:0;font-size:15.5px;line-height:1.5}
-.card .lstm{margin-top:14px;border-left:3px solid var(--orange);background:#FFF6EC;padding:8px 12px;font-size:14.5px;border-radius:0 6px 6px 0}
-.card .lstm b{font-family:var(--pix);font-size:10px;color:var(--orange);display:block;letter-spacing:.05em}
-.fact{margin:18px 0 0 18px;max-width:300px;font-size:14px;color:var(--ink2);background:#FFFBE6;border:1.5px solid #E8D88C;border-radius:10px;padding:10px 12px;transform:rotate(-1deg)}
-.fact b{font-family:var(--pix);font-size:10px;display:block;color:#9A7B00;letter-spacing:.05em}
-.act{margin:0 0 6vh;padding:16px 0}
-.act .k{font-family:var(--pix);font-size:12px;color:var(--orange);letter-spacing:.06em}
-.act h2{margin:6px 0 6px;font-family:var(--pix);font-size:34px;line-height:1.05}
-.act p{margin:0;color:var(--ink2)}
-body[data-zone="navy"] .act h2,body[data-zone="navy"] .act p{color:#E6ECF4}
-body[data-zone="navy"] .fact{background:#1C2A40;border-color:#33465F;color:#C9D3E0} body[data-zone="navy"] .fact b{color:#F6C453}
-
-/* ---------- zoom panel ---------- */
-.zoom{flex:1;background:#fff;border:1.5px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink);padding:18px 20px;overflow:auto;position:relative}
-.zoom .zh{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px dashed var(--line)}
-.zoom .zh b{font-family:var(--pix);font-size:12px;letter-spacing:.05em}
-.zoom .zh span{font-size:13px;color:var(--mute)}
-.zoom .note{font-size:12.5px;color:var(--mute);margin-top:10px}
-.zoom .cap{font-family:var(--pix);font-size:10px;color:var(--mute);letter-spacing:.05em;margin:12px 0 6px}
-.enter>*{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
-.enter>*:nth-child(2){animation-delay:.06s}.enter>*:nth-child(3){animation-delay:.12s}.enter>*:nth-child(4){animation-delay:.18s}.enter>*:nth-child(5){animation-delay:.24s}.enter>*:nth-child(6){animation-delay:.3s}.enter>*:nth-child(n+7){animation-delay:.36s}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}}
-
-/* vectors and grids */
-.vec{display:inline-flex;gap:2px;vertical-align:middle}
-.vec i{display:block;width:var(--c,16px);height:var(--c,16px);border-radius:3px;border:1px solid rgba(27,36,48,.12)}
-.vrow{display:flex;align-items:center;gap:8px;margin:4px 0;font-family:var(--mono);font-size:12.5px}
-.vrow .t{width:58px;text-align:right;white-space:pre;color:var(--ink2)}
-.vrow .op{width:14px;text-align:center;color:var(--mute);font-weight:700}
-.vrow.hl .t{color:var(--blue);font-weight:700}
-.pop>*{animation:rise .45s both}
-.grid{display:inline-grid;gap:3px;font-family:var(--mono);font-size:11.5px}
-.grid .g{width:52px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:5px;border:1px solid rgba(27,36,48,.1);transition:all .25s}
-.grid .h{font-size:11.5px;display:flex;align-items:center;justify-content:center;color:var(--ink2);white-space:pre}
-.grid .h.r{justify-content:flex-end;padding-right:6px}
-.grid .g.mask{background:repeating-linear-gradient(45deg,#F0F2F5,#F0F2F5 4px,#E3E7EC 4px,#E3E7EC 8px)!important;color:#A0A9B4}
-.grid.rows .g{cursor:pointer}
-.grid .g.dim{opacity:.25}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
-.chip{border:1.5px solid var(--ink);border-radius:8px;background:#fff;padding:6px 10px 4px;font-family:var(--mono);font-size:15px;text-align:center;white-space:pre;animation:rise .45s both}
-.chip small{display:block;font-size:11px;color:var(--blue);margin-top:2px}
-.chip.c1{background:#EAF1FB}.chip.c2{background:#FFF1E2}.chip.c3{background:#E8F6EF}.chip.c4{background:#F3ECFB}.chip.c5{background:#FDEBEC}
-.big{font-size:22px;font-family:var(--mono);padding:14px 16px;border:1.5px solid var(--ink);border-radius:10px;background:var(--paper)}
-.cursor{display:inline-block;width:2px;height:1.1em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.box{border:1.5px solid var(--ink);border-radius:10px;padding:10px 14px;background:#fff}
-.box.dash{border-style:dashed;color:var(--mute)}
-.arrow{font-family:var(--mono);color:var(--mute);font-size:18px}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
-.tabs button{border:1.5px solid var(--ink);border-radius:999px;background:#fff;padding:4px 11px;font-size:13px}
-.tabs button[aria-pressed="true"]{background:var(--ink);color:#fff}
-.bars{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:13px}
-.bars .b{display:grid;grid-template-columns:70px 1fr 64px;align-items:center;gap:8px}
-.bars .b .t{text-align:right;white-space:pre}
-.bars .b .track{height:18px;background:#F1F3F6;border-radius:4px;overflow:hidden}
-.bars .b .fill{height:100%;background:var(--blue);border-radius:4px;transition:width .35s ease}
-.bars .b .v{font-variant-numeric:tabular-nums;color:var(--ink2)}
-.bars .b.pick .fill{background:var(--orange)} .bars .b.pick .t{font-weight:700;color:var(--orange)}
-.ctl{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:14px;flex-wrap:wrap}
-.ctl input[type=range]{flex:1;min-width:160px;accent-color:var(--blue)}
-.ctl output{font-family:var(--mono);font-weight:700;min-width:40px}
-.btn{border:1.5px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;padding:6px 14px;font-size:14px;box-shadow:2px 2px 0 var(--orange)}
-.btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--orange)}
-.mini{font-family:var(--mono);font-size:12px;color:var(--ink2)}
-.formula{font-family:var(--mono);font-size:14px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;display:inline-block}
-.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.three .box{font-size:13.5px}
-.three .box h4{margin:0 0 6px;font-family:var(--pix);font-size:10.5px;letter-spacing:.05em;color:var(--blue)}
-.legend{display:flex;gap:14px;align-items:center;font-size:12px;color:var(--mute);margin-top:12px}
-.legend .vec i{--c:12px}
-.kv{display:flex;gap:2px;flex-wrap:wrap;margin-top:6px}
-.kv i{width:18px;height:18px;border-radius:3px;background:#DCE7F8;border:1px solid #B9CDEE}
-.kv i.new{background:var(--orange);border-color:#C96E15;animation:rise .4s both}
-.story{font-family:var(--mono);font-size:17px;line-height:1.7;padding:12px 14px;border:1.5px solid var(--ink);border-radius:10px;background:var(--paper);min-height:84px}
-.story .n{background:#FFE3C4;border-radius:4px;padding:0 2px;animation:rise .35s both}
-svg text{font-family:Inter,-apple-system,sans-serif}
-
-/* ---------- finale ---------- */
-.finale{max-width:880px;margin:0 auto;padding:10vh 24px 18vh;text-align:center}
-.finale h2{font-family:var(--pix);font-size:clamp(30px,5vw,48px);margin:0 0 12px}
-.finale p{color:var(--ink2);max-width:600px;margin:0 auto 10px}
-.finale .credits{margin-top:36px;font-size:14px;color:var(--mute)}
-.finale .credits a{color:var(--ink2)}
-
-/* ---------- responsive ---------- */
-@media (max-width:1180px){
-  .wrap{grid-template-columns:minmax(280px,360px) minmax(0,1fr)}
-  .machine{display:none}
-}
 @media (max-width:820px){
-  .wrap{grid-template-columns:1fr;padding:0 14px}
-  .zoomcol{display:none}
-  .step{min-height:auto;padding:4vh 0 6vh}
-  .step .zoom{margin-top:14px;max-height:none}
-  .steps{padding:4vh 0 10vh}
-  .hud .home{display:none}
-  .hud .ctr .num{font-size:17px}
-  .grid .g{width:40px;height:30px;font-size:10.5px}
-  .three{grid-template-columns:1fr}
-  .fact{margin-left:6px}
+ :root{--cardw:calc(100vw - 20px);--hud:48px}
+ .card{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:46vh;padding:11px 14px 9px;transform:none!important}
+ .card h2{font-size:18px;line-height:23px;margin:0 0 6px}
+ .card p{font-size:14px;line-height:21px;margin-bottom:8px}
+ .card .note{display:none}
+ .hero h1{font-size:40px}
+ .hero p{font-size:16px;line-height:24px}
+ .toc{flex-direction:column;align-items:center;gap:20px;padding:20px 16px 40px}
+ .toc .intro{padding-top:0}
+ .hud .tocb{padding:2px 8px}
+ #mini,.hud .brand{display:none}
+ .hud{gap:10px;padding:0 12px}
+ .hud .ctr b{font-size:17px}
+ .end{padding:16vh 10px}
+ .tl span{display:none}
+ #calc{white-space:normal;max-width:calc(100vw - 20px);font-size:11px;line-height:15px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body data-zone="paper">
+<body>
+<div id="stage"></div>
+<div id="labels"></div>
+<div id="ptr"></div><div id="hint"><span></span><svg width="90" height="70" viewBox="0 0 90 70"><path d="M6 8 C 40 6, 70 22, 80 58" /><path d="M71 52 L80 60 L84 48" /></svg></div><svg id="lead" width="100%" height="100%"><line x1="0" y1="0" x2="0" y2="0"/><circle r="4"/></svg>
+<div id="calc"></div>
+<div id="tip"></div>
 
 <header class="hud">
-  <a class="home" href="../">← hmeyy.com</a>
-  <div class="part" id="hudPart">PART <b>0</b>/21 · THE BOX</div>
-  <div class="ctr"><div class="lab" id="hudLab">PARAMETERS · GPT-2 SMALL</div><div class="num" id="hudNum">0</div></div>
-  <div class="bar" id="hudBar"></div>
+ <a class="brand" href="../">Hari Meyyappan</a>
+ <button class="tocb">Contents</button>
+ <div class="crumb"><small id="hudCh">GPT-2, built</small><span id="hudPart">Build an LLM</span></div>
+ <div class="ctr"><small id="hudLab">Parameters · GPT-2 small</small><b id="hudNum">0</b></div>
+ <div class="bar" id="hudBar"></div>
 </header>
+<nav id="mini" aria-label="Parts"></nav>
 
+<main>
 <section class="hero">
-  <h1>Build an LLM</h1>
-  <p>Scroll to put GPT-2 together, one part at a time. For each part: what it does, why it's there, and how it works, on real numbers.</p>
-  <div class="kit"><span>tokenizer</span><span>embeddings</span><span>LayerNorm</span><span>attention ×12 heads</span><span>residuals</span><span>MLP</span><span>×12 blocks</span><span>softmax</span><span>sampler</span><span>124,439,808 parameters</span></div>
-  <div class="down">SCROLL ↓</div>
+ <h1>Build an LLM</h1>
+ <p>Press ↓ to put GPT-2 together, one part at a time, and watch every number in it get made.</p>
+ <div class="kit"><span>tokenizer</span><span>embeddings</span><span>LayerNorm</span><span>attention ×12 heads</span><span>residuals</span><span>MLP</span><span>×12 blocks</span><span>softmax</span><span>sampler</span><span>124,439,808 parameters</span></div>
+ <button class="start">Start <kbd>↓</kbd></button>
+ <div class="down">↓ or space to go on, ↑ to go back</div>
 </section>
 
-<div class="wrap">
-<aside class="machine" aria-label="The model so far">
-  <div class="mach" id="mach">
-    <div class="mp io" data-p="in">"The cat sat on the"</div>
-    <div class="mp" data-p="tok">Tokenizer</div>
-    <div class="mp" data-p="wte">Token embedding</div>
-    <div class="mp" data-p="wpe">Position embedding</div>
-    <div class="blk" data-p="block"><span class="bl">BLOCK<span class="x" id="blkX">×12</span></span>
-      <div class="mp" data-p="ln1">LayerNorm</div>
-      <div class="mp" data-p="attn">Attention<small id="attnSub"></small></div>
-      <div class="mp add" data-p="res1">+</div>
-      <div class="mp" data-p="ln2">LayerNorm</div>
-      <div class="mp" data-p="mlp">MLP</div>
-      <div class="mp add" data-p="res2">+</div>
-    </div>
-    <div class="mp" data-p="lnf">Final LayerNorm</div>
-    <div class="mp" data-p="unemb">Unembedding</div>
-    <div class="mp" data-p="soft">Softmax</div>
-    <div class="mp" data-p="samp">Sampler</div>
-    <div class="mp io" data-p="out" id="machOut">?</div>
-    <div class="loopline"></div>
+<section class="toc">
+ <div class="intro">
+  <h2>The whole machine</h2>
+  <p>I once trained an LSTM on about 1,000 Thirukkural couplets. It kept reusing words, and it lost the thread after a few lines.</p>
+  <p>This is the machine that fixed that. We'll build it top to bottom. Every cube you'll see is one number, and you can drag the model to look around.</p>
+  <p>Click any part to jump there. Parts you've visited turn solid.</p>
+  <button class="start">Build it <kbd>↓</kbd></button>
+ </div>
+ <div>
+  <div class="mach">
+   <button class="mp io" data-go="0">"The cat sat on the"</button>
+   <button class="mp" data-go="1">Tokenizer <small>1</small></button>
+   <button class="mp" data-go="2">Token embedding <small>2</small></button>
+   <button class="mp" data-go="3">Position embedding <small>3</small></button>
+   <div class="blk"><button class="bh" data-go="11">Block <em>×12</em></button>
+    <button class="mp" data-go="4">LayerNorm <small>4</small></button>
+    <button class="mp" data-go="5" data-to="8">Attention <small>5–8</small></button>
+    <button class="mp add" data-go="9">+</button>
+    <button class="mp" data-go="10">LayerNorm, MLP <small>10</small></button>
+    <button class="mp add" data-go="10">+</button>
+   </div>
+   <button class="mp" data-go="12" style="margin-top:6px">Stack ×12 <small>12</small></button>
+   <button class="mp" data-go="13">Final LayerNorm, unembedding <small>13</small></button>
+   <button class="mp" data-go="14">Softmax <small>14</small></button>
+   <button class="mp" data-go="15">Sampler <small>15</small></button>
+   <button class="mp io" data-go="16">" mat" ↺ and again <small>16</small></button>
   </div>
-</aside>
-
-<main class="steps" id="steps">
-
-<div class="act"><div class="k">ACT 1</div><h2>Build one transformer</h2><p>Parts 0–11. One block, the thing every modern LLM repeats.</p></div>
-
-<section class="step" data-s="0" data-zone="paper">
-<div class="card"><div class="tag"><b>00</b> THE JOB</div><h2>A machine that guesses the next word</h2>
-<dl><dt>WHAT</dt><dd>Give it some text. It returns one guess for what comes next.</dd>
-<dt>WHY</dt><dd>That's the whole job. Every part below exists to make that one guess better.</dd>
-<dt>HOW</dt><dd>Run it again on its own output, and one guess at a time becomes an answer, an essay, or code.</dd></dl></div>
-<div class="fact"><b>THE EXAMPLE</b>We'll push one sentence through every part: <i>"The cat sat on the"</i>. A good model should say <i>" mat"</i>.</div>
+  <div class="after">After the machine:
+   <div class="row"><button class="mp" data-go="17">Training <small>17</small></button><button class="mp" data-go="18">Scale <small>18</small></button><button class="mp" data-go="19">Post-training <small>19</small></button><button class="mp" data-go="20">Context window <small>20</small></button><button class="mp" data-go="21">Rebuild it <small>21</small></button></div></div>
+ </div>
 </section>
 
-<section class="step" data-s="1" data-zone="paper">
-<div class="card"><div class="tag"><b>01</b> PART 1</div><h2>Tokenizer</h2>
-<dl><dt>WHAT</dt><dd>Cuts text into pieces called tokens, and swaps each piece for its number in a fixed list.</dd>
-<dt>WHY</dt><dd>The model can only do maths on numbers. Pieces smaller than words keep the list short (50,257 entries) and still let it spell anything, even a word it has never seen.</dd>
-<dt>HOW</dt><dd>Byte-pair encoding: start from single characters, and keep merging the pair that shows up most often in the training text. Common words end up as one token; rare words become a few.</dd></dl></div>
-<div class="fact"><b>NOTE THE SPACE</b>The space belongs to the token: <i>" cat"</i> with a space is a different token from <i>"cat"</i> without one.</div>
-</section>
+<section class="st" data-s="0"><div class="card" data-sum="Guess the next token. Every part serves that one job.">
+ <h2>One guess at a time</h2>
+ <p>Type “The cat sat on the” and GPT-2 has exactly one job: guess the next <i>token</i>, which is a word or a piece of one. Everything you're about to build exists to make that one guess good.</p>
+ <p class="cap"></p>
+ <p class="say">Before it guesses, you do. The cat sat on the…</p>
+ <div class="opts" id="guess"><button> mat</button><button> floor</button><button> dog</button><button> moon</button></div>
+ <p class="note" id="guessMsg">We'll check your pick against GPT-2 at the sampler.</p>
+</div></section>
 
-<section class="step" data-s="2" data-zone="paper">
-<div class="card"><div class="tag"><b>02</b> PART 2</div><h2>Token embedding</h2>
-<dl><dt>WHAT</dt><dd>A big table with one row per token. Each id picks its row: a list of 768 numbers.</dd>
-<dt>WHY</dt><dd>An id is just a label: 3797 isn't "closer" to dog than 3796. A list of numbers is a position in space, so similar words can sit close together.</dd>
-<dt>HOW</dt><dd>The table starts random. Training slowly moves the rows until words used in similar ways end up near each other.</dd></dl></div>
-<div class="fact"><b>BIGGEST PART</b>This one table is 50,257 × 768 = <b>38.6 million</b> numbers, almost a third of GPT-2 small.</div>
-</section>
+<section class="st" data-s="1"><div class="card" data-sum="Text becomes a list of ids: 464 · 3797 · 3332 · 319 · 262.">
+ <h2>Cutting text into tokens</h2>
+ <p>The model can only do arithmetic, and “cat” isn't a number. So GPT-2 keeps a fixed list of 50,257 pieces of text, each with an id, and your sentence turns into a list of ids.</p>
+ <p class="cap"></p>
+ <p class="say">A rarer word gets cut into several pieces, something like:</p>
+ <div class="chips"><span>␣Thir</span><span>uk</span><span>kural</span></div>
+ <p class="note">The list comes from byte-pair encoding. Start from single bytes and keep merging the most common pair. Common words end up as one token, rare ones as several.</p>
+</div></section>
 
-<section class="step" data-s="3" data-zone="paper">
-<div class="card"><div class="tag"><b>03</b> PART 3</div><h2>Position embedding</h2>
-<dl><dt>WHAT</dt><dd>A second table, one row per position (0, 1, 2 … 1023). Each token's position row is added to its vector.</dd>
-<dt>WHY</dt><dd>Attention, coming up next, looks at all tokens at once and has no sense of order. Without this, "dog bites man" and "man bites dog" look the same.</dd>
-<dt>HOW</dt><dd>Add the two lists number by number. Now each vector says both <i>which word</i> and <i>where</i>.</dd></dl></div>
-<div class="fact"><b>LIMIT</b>1,024 rows means GPT-2 can read at most 1,024 tokens at a time. That's its context window.</div>
-</section>
+<section class="st" data-s="2"><div class="card" data-sum="Each id picks a row of numbers from a big table.">
+ <h2>A row for every token</h2>
+ <p>An id is a name tag. 3797 says nothing about cats, and 3798 isn't nearly a cat. So GPT-2 keeps a table with one row of 768 numbers per token, and the id says which row to copy. Words that behave alike can end up with rows that look alike.</p>
+ <p class="cap"></p>
+ <p class="note">That's 50,257 rows of 768 numbers, or 38.6 million. Almost a third of GPT-2 small sits in this one table.</p>
+</div></section>
 
-<section class="step" data-s="4" data-zone="print">
-<div class="card"><div class="tag"><b>04</b> PART 4 · INSIDE THE BLOCK</div><h2>LayerNorm</h2>
-<dl><dt>WHAT</dt><dd>Re-centres each token's vector to an average of 0, and re-scales it to a spread of 1.</dd>
-<dt>WHY</dt><dd>Numbers passing through dozens of layers drift: some blow up, some shrink to nothing. Normalising keeps every layer working on the same scale, so training stays stable.</dd>
-<dt>HOW</dt><dd>Subtract the mean, divide by the standard deviation, then apply two learned knobs (scale and shift) per number.</dd></dl></div>
-<div class="fact"><b>YOU ARE NOW</b>inside the transformer block. The next six parts are the block.</div>
-</section>
+<section class="st" data-s="3"><div class="card" data-sum="A position row is added, so each row knows where it sits.">
+ <h2>Where each token sits</h2>
+ <p>The next part reads all five tokens at once, with no sense of order. “Dog bites man” and “man bites dog” would look almost the same to it. So each position gets a row of its own, added onto the token's row.</p>
+ <p class="cap"></p>
+ <p class="aside">My LSTM never needed this. It read one word at a time, so order came for free.</p>
+</div></section>
 
-<section class="step" data-s="5" data-zone="print">
-<div class="card"><div class="tag"><b>05</b> PART 5 · ATTENTION, 1 OF 4</div><h2>Query, key, value</h2>
-<dl><dt>WHAT</dt><dd>Each token makes three new vectors by multiplying with three learned matrices.</dd>
-<dt>WHY</dt><dd>A question (what I need), a label (what I am) and a message (what I give). For "it" in "the animal was tired because it…", the query asks for a noun to refer to; "animal"'s key says "noun, living thing". Splitting the roles lets a token be found for one reason and deliver something else.</dd>
-<dt>HOW</dt><dd>Like a search: the query is the search box, keys are the titles, values are the pages. The next part matches queries to keys.</dd></dl></div>
-<div class="fact"><b>CAREFUL</b>"Question, label, message" is an aid. Training decides what the vectors actually hold.</div>
-</section>
+<section class="st" data-s="4"><div class="card" data-sum="Each row is reset to average 0 and spread 1 before every big step.">
+ <h2>Keeping the numbers tame</h2>
+ <p>Rows pass through dozens of steps, and their numbers drift. Some grow huge, some shrink to nothing, and training starts to wobble. So before each big step, every row is shifted and scaled to an average of 0 and a spread of 1. Two learned knobs per number then nudge it to wherever is useful. This is LayerNorm.</p>
+ <p class="cap"></p>
+</div></section>
 
-<section class="step" data-s="6" data-zone="print">
-<div class="card"><div class="tag"><b>06</b> PART 6 · ATTENTION, 2 OF 4</div><h2>Scores, and no peeking</h2>
-<dl><dt>WHAT</dt><dd>Every token's query is compared with every earlier token's key. Each comparison is one number: the score.</dd>
-<dt>WHY</dt><dd>A dot product is big when two vectors point the same way, so a high score means "this one has what I'm looking for". Future tokens are masked out: in training the next word is the answer, so a token must not see it.</dd>
-<dt>HOW</dt><dd>score = q · k ÷ √d. Dividing by √d (here √8) keeps scores from getting too large as vectors get longer.</dd></dl></div>
-</section>
+<section class="st" data-s="5"><div class="card" data-sum="Each token gets a query, a key and a value, made with dot products.">
+ <h2>Asking, and being found</h2>
+ <p>To guess what follows “the”, the last token needs things from earlier. Who sat? On what? So each row goes through three tables of weights and comes out as a <b class="k-w">query</b> (what it's looking for), a <b class="k-w">key</b> (what it can be found by) and a <b class="k-w">value</b> (what it hands over).</p>
+ <p class="cap"></p>
+ <p class="note">Those names are our story. Nothing tells the model what to put where; training decides.</p>
+</div></section>
 
-<section class="step" data-s="7" data-zone="print">
-<div class="card"><div class="tag"><b>07</b> PART 7 · ATTENTION, 3 OF 4</div><h2>Softmax, then mix</h2>
-<dl><dt>WHAT</dt><dd>Each row of scores becomes weights that add up to 1. Each token's output is the weighted mix of the values.</dd>
-<dt>WHY</dt><dd>This is how information moves between tokens. The last <i>"the"</i> can pull in "something was sat on" from <i>sat on</i>, which is what it needs to guess <i>mat</i>.</dd>
-<dt>HOW</dt><dd>softmax turns any numbers into positive weights: eˢ ÷ (sum of all eˢ). Then output = w₁v₁ + w₂v₂ + … Hover a row on the right.</dd></dl>
-<div class="lstm"><b>VS LSTM</b>An LSTM reads one word at a time and squeezes everything so far into one memory vector, so early words fade. Attention looks straight back at every earlier token, however far.</div></div>
-<div class="fact"><b>HONEST NUMBERS</b>These weights come from random, untrained matrices, so the pattern is noise. Training is what turns it into something useful (next part).</div>
-</section>
+<section class="st" data-s="6"><div class="card" data-sum="Query · key for every pair of tokens, with the future blocked.">
+ <h2>Who listens to whom</h2>
+ <p>Now every query meets every key, one dot product per pair. The score is high when the two line up. GPT-2 divides each score by 8 (the square root of its 64-number heads) to keep things calm. The toy divides by 2.</p>
+ <p class="cap"></p>
+ <p class="note">In training the next word is the answer, so no token may look ahead. Blocking the future is called the causal mask.</p>
+</div></section>
 
-<section class="step" data-s="8" data-zone="print">
-<div class="card"><div class="tag"><b>08</b> PART 8 · ATTENTION, 4 OF 4</div><h2>Many heads</h2>
-<dl><dt>WHAT</dt><dd>GPT-2 runs 12 attention heads side by side, each with its own Q, K and V matrices on a 64-number slice.</dd>
-<dt>WHY</dt><dd>One pattern can't track everything. Trained heads specialise: one looks at the previous word, one finds the subject, one copies repeated words.</dd>
-<dt>HOW</dt><dd>12 heads × 64 numbers = 768. Glue the outputs end to end, then one more matrix (the projection) mixes them back into one vector per token.</dd></dl></div>
-<div class="fact"><b>ILLUSTRATED</b>The patterns on the right are the kinds researchers find in trained models, drawn by hand, not read from GPT-2.</div>
-</section>
+<section class="st" data-s="7"><div class="card" data-sum="Scores become shares, and each token takes a blend of the values.">
+ <h2>Taking a share of each</h2>
+ <p>Scores can be any size, so softmax turns each row of them into <b class="k-a">shares</b> that add up to 100%. Each token then builds a new row by blending the value rows by those shares. This is the only place in the model where tokens pass anything to each other.</p>
+ <p class="cap"></p>
+ <p class="aside">My LSTM lost the thread because it squeezed everything it had read into one memory row. Here, ␣the just looks straight back at every word before it.</p>
+ <p class="say">Look at one head at a time:</p>
+ <div class="opts" id="heads"><button aria-pressed="true" data-h="-1">all</button><button data-h="0">head 1</button><button data-h="1">head 2</button><button data-h="2">head 3</button></div>
+</div></section>
 
-<section class="step" data-s="9" data-zone="print">
-<div class="card"><div class="tag"><b>09</b> PART 9</div><h2>Residual connection</h2>
-<dl><dt>WHAT</dt><dd>Add attention's output back onto its input, instead of replacing it.</dd>
-<dt>WHY</dt><dd>Think of a stream running through the whole model. Each part reads the stream and adds a small edit. Nothing gets lost, and in training the error signal has a straight road back to the first layers, so deep models can learn at all.</dd>
-<dt>HOW</dt><dd>x = x + attention(LayerNorm(x)). One plus sign, zero parameters.</dd></dl></div>
-<div class="fact"><b>CHEAPEST PART</b>0 parameters. Probably the reason models can be 96 blocks deep.</div>
-</section>
+<section class="st" data-s="8"><div class="card" data-sum="Several heads look for different things; one more table merges them.">
+ <h2>Several heads at once</h2>
+ <p>One blend can't track everything. The word just before matters, and so does the subject three words back. So attention runs as several heads side by side, each on its own slice of the row. The toy has 3 heads of 4 numbers. GPT-2 has 12 heads of 64.</p>
+ <p class="cap"></p>
+ <p class="say">Trained heads often look like these. I drew them by hand, after patterns people have found in real models:</p>
+ <div class="heads" id="trained"></div>
+</div></section>
 
-<section class="step" data-s="10" data-zone="print">
-<div class="card"><div class="tag"><b>10</b> PART 10</div><h2>MLP</h2>
-<dl><dt>WHAT</dt><dd>Another LayerNorm, then a small two-layer network applied to each token on its own: widen 768 → 3,072, bend, narrow back to 768. Then add to the stream again.</dd>
-<dt>WHY</dt><dd>Attention moves information <i>between</i> tokens. The MLP works on what each token now holds. Much of what the model "knows" (Paris is in France) seems to be stored in these weights.</dd>
-<dt>HOW</dt><dd>The bend is GELU: let positive numbers through, squash negatives toward 0. Without a bend, two layers of multiplying would collapse into one.</dd></dl></div>
-<div class="fact"><b>WHERE THE WEIGHT IS</b>The MLP is two-thirds of each block's parameters: 4.7M of 7.1M.</div>
-</section>
+<section class="st" data-s="9"><div class="card" data-sum="Each part adds to a stream of rows instead of replacing it.">
+ <h2>The stream</h2>
+ <p>If attention overwrote each row, anything it missed would be gone for good, and twelve blocks of that would be miserable to train. So its output is added onto the row it started from. There's nothing new to learn here, and in training the error signal slides back along this same line.</p>
+ <p class="cap"></p>
+</div></section>
 
-<section class="step" data-s="11" data-zone="print">
-<div class="card"><div class="tag"><b>11</b> CHECKPOINT</div><h2>That's one transformer block</h2>
-<dl><dt>WHAT</dt><dd>LayerNorm → attention → add → LayerNorm → MLP → add. Vectors go in, vectors of the same size come out.</dd>
-<dt>WHY</dt><dd>Same size in and out means blocks can be stacked like bricks. That's the trick the whole field runs on.</dd>
-<dt>HOW</dt><dd>7,087,872 parameters per block in GPT-2 small.</dd></dl></div>
-<div class="fact"><b>NOTHING NEW BUT ONE</b>Dot products, dense layers, skip connections, normalising: all older than this block. The only new part is attention (2017, "Attention Is All You Need").</div>
-</section>
+<section class="st" data-s="10"><div class="card" data-sum="Each token is worked on alone: widen, bend, narrow, add to the stream.">
+ <h2>Thinking alone</h2>
+ <p>Attention gathered things into each row but only blended them. The MLP works on each token by itself. It widens the row to four times its size, bends it, narrows it back and adds the result to the stream. In GPT-2 that's 768 numbers out to 3,072 and back.</p>
+ <p class="cap"></p>
+ <svg class="fig" id="geluFig" viewBox="0 0 320 96"></svg>
+ <p class="note">Without the bend, the two tables would collapse into one. About two-thirds of each block's numbers live in this part.</p>
+</div></section>
 
-<div class="act" data-zone="navy"><div class="k">ACT 2</div><h2>Turn it into an LLM</h2><p>Parts 12–21. Stack it, read out a word, pick one, loop, train, scale, tune.</p></div>
+<section class="st" data-s="11"><div class="card" data-sum="One block: LayerNorm, attention, add, LayerNorm, MLP, add.">
+ <h2>That's one block</h2>
+ <p>Everything so far is one transformer block. Tokens talk to each other in attention, then each one thinks alone in the MLP, and both add to the stream. Rows go in and rows of the same size come out, which is what lets you stack them.</p>
+ <p class="cap"></p>
+ <p class="say">Put it back together, top to bottom:</p>
+ <div id="gameBlock"></div>
+ <p class="note">Attention itself dates from 2014. What was new in 2017 was a model built from attention alone, with no reading word by word.</p>
+</div></section>
 
-<section class="step" data-s="12" data-zone="navy">
-<div class="card"><div class="tag"><b>12</b> PART 12</div><h2>Stack it ×12</h2>
-<dl><dt>WHAT</dt><dd>Twelve copies of the block in a row, each with its own weights. The stream flows through all of them.</dd>
-<dt>WHY</dt><dd>Each block can build on the last. Roughly: early blocks handle grammar and nearby words; later blocks handle meaning and what should come next.</dd>
-<dt>HOW</dt><dd>Same block, different numbers. Watch the counter.</dd></dl></div>
-<div class="fact"><b>FOR SCALE</b>GPT-3 stacks 96 blocks, with 12,288 numbers per token instead of 768.</div>
-</section>
+<section class="st" data-s="12"><div class="card" data-sum="Twelve blocks in a row, each with its own numbers.">
+ <h2>Twelve of them</h2>
+ <p>One block gives each token one look around. Working out who “it” is, or who did what to whom, takes more rounds than that. So GPT-2 stacks 12 blocks of the same design, each with its own numbers, and the stream runs through all of them. GPT-3 stacks 96.</p>
+ <p class="cap"></p>
+</div></section>
 
-<section class="step" data-s="13" data-zone="paper">
-<div class="card"><div class="tag"><b>13</b> PART 13</div><h2>Unembedding</h2>
-<dl><dt>WHAT</dt><dd>One last LayerNorm. Then the last token's vector is scored against every row of the token table: 50,257 scores, called logits.</dd>
-<dt>WHY</dt><dd>We only need the last position: it has read the whole sentence, and its job is "what comes after me?"</dd>
-<dt>HOW</dt><dd>GPT-2 reuses the embedding table from part 2, run backwards. A vector that ends up near the row for <i>" mat"</i> gives <i>" mat"</i> a high score.</dd></dl></div>
-<div class="fact"><b>FREE</b>Reusing the table saves 38.6M parameters. Only the final LayerNorm adds any: 1,536.</div>
-</section>
+<section class="st" data-s="13"><div class="card" data-sum="The last row is scored against every token's row in the table.">
+ <h2>Back to words</h2>
+ <p>After 12 blocks, the last row holds the model's best idea of what comes next, written as 768 numbers. To get a word out, GPT-2 normalises it once more and scores it against every row of the token table from the start. That's one score for each of the 50,257 tokens.</p>
+ <p class="cap"></p>
+ <p class="note">In training, every row is scored against its own next token, all at once. When writing, only the last row matters.</p>
+</div></section>
 
-<section class="step" data-s="14" data-zone="paper">
-<div class="card"><div class="tag"><b>14</b> PART 14</div><h2>Softmax</h2>
-<dl><dt>WHAT</dt><dd>Turn the 50,257 scores into probabilities that add up to 100%.</dd>
-<dt>WHY</dt><dd>Scores can be any size and sign. Probabilities can be compared, sampled from, and graded in training.</dd>
-<dt>HOW</dt><dd>The same softmax as inside attention: eˢ for each, divided by the total. It's an ordinary classifier, with 50,257 classes.</dd></dl></div>
-</section>
+<section class="st" data-s="14"><div class="card" data-sum="Softmax turns the scores into odds for every token.">
+ <h2>Scores into odds</h2>
+ <p>A score of 5.2 doesn't tell you how sure the model is. The same softmax you saw in attention turns all 50,257 scores into <b class="k-p">odds</b> that add up to 100%.</p>
+ <p class="cap"></p>
+ <p class="note">The toy is untrained, so its odds would be noise. These bars are made up to look like a trained GPT-2.</p>
+</div></section>
 
-<section class="step" data-s="15" data-zone="paper">
-<div class="card"><div class="tag"><b>15</b> PART 15</div><h2>Sampler</h2>
-<dl><dt>WHAT</dt><dd>Pick one token from the probabilities.</dd>
-<dt>WHY</dt><dd>Always taking the top choice (greedy) gives flat, repetitive text that can loop. A little randomness reads more human.</dd>
-<dt>HOW</dt><dd><b>Temperature</b> divides the scores before softmax: below 1 sharpens toward the top choice, above 1 flattens toward chaos. <b>Top-p</b> keeps only the most likely tokens that add up to p, then picks among them. Try the slider.</dd></dl></div>
-<div class="fact"><b>WHY ANSWERS DIFFER</b>Ask the same question twice and get two answers: that's the sampler, not the model changing its mind.</div>
-</section>
+<section class="st" data-s="15"><div class="card" data-sum="Roll dice weighted by the odds; temperature and top-p shape the dice.">
+ <h2>Rolling the dice</h2>
+ <p>Always taking the top token reads flat, and it tends to loop. My LSTM kept reusing words for much the same reason. So GPT-2 rolls dice weighted by the odds. Temperature divides the scores before softmax, and top-p keeps only the fewest top tokens whose odds reach p.</p>
+ <p class="cap"></p>
+ <div class="ctl"><label for="tSl">Temperature</label><input id="tSl" type="range" min="0.1" max="2" step="0.05" value="1"><output id="tOut">1.00</output></div>
+ <div class="ctl"><label for="pSl">Top-p</label><input id="pSl" type="range" min="0.3" max="1" step="0.05" value="1"><output id="pOut">1.00</output></div>
+ <button class="btn" id="roll">Roll the dice</button> <span class="mini" id="rollMsg"></span>
+ <p class="note" id="guessRes"></p>
+</div></section>
 
-<section class="step" data-s="16" data-zone="paper">
-<div class="card"><div class="tag"><b>16</b> PART 16</div><h2>The loop</h2>
-<dl><dt>WHAT</dt><dd>Stick the chosen token on the end and run the whole machine again. Repeat until a stop token.</dd>
-<dt>WHY</dt><dd>One pass gives one token. This is why chat answers stream out word by word.</dd>
-<dt>HOW</dt><dd>The KV cache keeps every earlier token's keys and values, so each new pass only computes one new row instead of redoing the whole sentence.</dd></dl>
-<div class="lstm"><b>VS LSTM</b>Both generate one token at a time. The difference is training: an LSTM must read a sentence step by step, while a transformer learns from every position of a sentence at once. That's what made huge training runs practical.</div></div>
-</section>
+<section class="st" data-s="16"><div class="card" data-sum="Run, pick, append, and run again.">
+ <h2>Again, and again</h2>
+ <p>One pass gives one token, and a reply needs hundreds. So the picked token is added to the input and the whole stack runs again, until it hits a stop token or a length limit. A cache keeps the old keys and values, so each lap only works out the new token's rows.</p>
+ <p class="cap"></p>
+ <div class="story" id="story">The cat sat on the</div>
+ <p class="aside">My LSTM also wrote one word at a time. The difference is in training: a transformer checks every position of a sentence at once, while an LSTM has to step through. That's what made huge training runs practical.</p>
+</div></section>
 
-<section class="step" data-s="17" data-zone="navy">
-<div class="card"><div class="tag"><b>17</b> PART 17</div><h2>Training</h2>
-<dl><dt>WHAT</dt><dd>Start with all 124 million numbers random. Guess. Measure how wrong. Nudge every knob the helpful way. Repeat, billions of times. That is all of training.</dd>
-<dt>WHY</dt><dd>Nobody writes these numbers by hand, and no labels are needed: the text is its own answer key. Predicting the next token, over enough text, forces the model to pick up grammar, facts and some reasoning on the way.</dd>
-<dt>HOW</dt><dd>Loss = −log(probability given to the true next token). Backpropagation works out which way to nudge each number; the optimiser takes a small step.</dd></dl></div>
-<div class="fact"><b>STARTING POINT</b>A random model spreads its bets evenly: 1 in 50,257. Its loss is ln(50,257) ≈ <b>10.8</b>. That's where every training run starts.</div>
-</section>
+<section class="st" data-s="17"><div class="card" data-sum="Training nudges every number until the real next token is less of a surprise.">
+ <h2>Where the numbers come from</h2>
+ <p>Every number so far was random, which is why the toy picked <b id="toyPick"></b>. Training is brute force. Show it real text, measure how surprised it was by the actual next token, and nudge all 124 million numbers to be a little less surprised. Then repeat, over billions of tokens.</p>
+ <p class="cap"></p>
+ <svg class="fig" id="lossFig" viewBox="0 0 320 130"></svg>
+ <p class="mini">step <b id="trStep">0</b> · loss <b id="trLoss">10.82</b> · the real next token gets <b id="trP">1 in 50,000</b></p>
+ <div class="story" id="trText" style="min-height:44px"></div>
+ <p class="aside">My LSTM saw about 1,000 couplets. GPT-2 saw roughly 9 billion tokens of web pages.</p>
+</div></section>
 
-<section class="step" data-s="18" data-zone="navy">
-<div class="card"><div class="tag"><b>18</b> PART 18</div><h2>Scale</h2>
-<dl><dt>WHAT</dt><dd>Same recipe, much bigger: more parameters, more text, more compute.</dd>
-<dt>WHY</dt><dd>Loss keeps falling smoothly as all three grow together (the scaling laws), and new skills show up along the way.</dd>
-<dt>HOW</dt><dd>GPT-2 → GPT-3 changed almost nothing in the design. Mostly it was 100× more parameters and far more data.</dd></dl>
-<div class="lstm"><b>VS LSTM</b>The big jump from LSTMs to LLMs wasn't one clever trick. It was data and compute, which the transformer could finally use.</div></div>
-<div class="fact"><b>GPT-3</b>175 billion parameters, trained on about 300 billion tokens. The counter just jumped.</div>
-</section>
+<section class="st" data-s="18"><div class="card" data-sum="The same block, far bigger, trained on far more text.">
+ <h2>More of everything</h2>
+ <p>GPT-2 writes passable paragraphs. GPT-3 writes essays and working code. It's the same block, 8 times deeper and 16 times wider, trained on about 30 times more text.</p>
+ <svg class="fig" id="scaleFig" viewBox="0 0 320 120"></svg>
+ <table class="cmp"><tr><td></td><th>GPT-2</th><th>GPT-3</th></tr><tr><td>blocks</td><td>12</td><td>96</td></tr><tr><td>numbers per row</td><td>768</td><td>12,288</td></tr><tr><td>training text</td><td>~9B tokens</td><td>~300B tokens</td></tr></table>
+ <p class="aside">My biggest takeaway, going from LSTMs to LLMs, was data and compute. The transformer is the design that could use both.</p>
+</div></section>
 
-<section class="step" data-s="19" data-zone="paper">
-<div class="card"><div class="tag"><b>19</b> PART 19</div><h2>Post-training</h2>
-<dl><dt>WHAT</dt><dd>Turn the base model into an assistant: first train on example conversations (supervised fine-tuning), then on human preferences (RLHF).</dd>
-<dt>WHY</dt><dd>A base model only continues documents. Ask it a question and it may continue with more questions, because that's what quiz pages look like. A chat is a script the model completes: fine-tuning teaches it to play the assistant's part.</dd>
-<dt>HOW</dt><dd>People rate pairs of answers. A reward model learns their taste, and the LLM is trained to score well with it.</dd></dl></div>
-</section>
+<section class="st" data-s="19"><div class="card" data-sum="A little more training turns the base model into an assistant.">
+ <h2>From autocomplete to assistant</h2>
+ <p>A base model continues documents. Ask it a question and it may well reply with more questions. So it gets trained a little more, first on example chats and then on which of two answers people preferred. That second part is called RLHF.</p>
+ <p class="say">Ask “What is the capital of France?”</p>
+ <table class="cmp ex"><tr><td>base model</td><td>What is the capital of Germany? What is the capital of…</td></tr><tr><td>after example chats</td><td>The capital of France is Paris.</td></tr><tr><td>after preferences</td><td>People picked “Paris.” over a 300-word answer, so short and right wins.</td></tr></table>
+</div></section>
 
-<section class="step" data-s="20" data-zone="paper">
-<div class="card"><div class="tag"><b>20</b> PART 20</div><h2>The context window</h2>
-<dl><dt>WHAT</dt><dd>Everything the model sees is the tokens in the window: your prompt, the chat so far, its own answer. Nothing else.</dd>
-<dt>WHY</dt><dd>It has two memories. The weights are something it read months ago: vague, fixed. The window is a page in front of it: exact, but only what fits. Outside the window, it has never heard of you.</dd>
-<dt>HOW</dt><dd>Attention compares every pair of tokens: twice the input, four times the work. Long windows also spread attention thin: models often miss things in the middle of a long prompt.</dd></dl></div>
-</section>
+<section class="st" data-s="20"><div class="card" data-sum="It sees only what's in the window: your prompt, the chat so far and its own reply.">
+ <h2>All it can see</h2>
+ <p>It has no memory between messages. All it knows about your chat is the text in its window, which holds your prompt and the chat so far, including its own reply as it writes.</p>
+ <p class="say">Slide to compare window sizes. Grey text is outside the window; to the model it doesn't exist.</p>
+ <div class="ctxbar" id="ctxBar"></div>
+ <div class="ctl"><input id="cSl" type="range" min="0" max="5" step="1" value="0"><output id="cOut" style="min-width:120px"></output></div>
+ <p class="mini" id="cInfo"></p>
+ <p class="note">Double the text and attention does about four times the work. Facts buried in the middle of a very long window often get missed.</p>
+</div></section>
 
-<section class="step" data-s="21" data-zone="paper">
-<div class="card"><div class="tag"><b>21</b> DONE</div><h2>You built GPT-2</h2>
-<dl><dt>WHAT</dt><dd>Tokenizer → embeddings → 12 blocks of attention and MLP → unembedding → softmax → sampler, in a loop.</dd>
-<dt>WHY</dt><dd>Every part serves one goal: a better guess at the next token.</dd>
-<dt>HOW</dt><dd>124,439,808 numbers, all learned from text.</dd></dl></div>
-</section>
+<section class="st" data-s="21"><div class="card">
+ <h2>You built GPT-2</h2>
+ <p>That's 124,439,808 numbers doing eight kinds of arithmetic in a loop, and every one of them started out random.</p>
+ <p class="say">One last check. Tap the parts in order, from text in to token out:</p>
+ <div id="gameAll"></div>
+</div></section>
 
+<section class="end"><div class="card">
+ <h2>The whole thing on 20 cards</h2>
+ <p>Say each part's job out loud, then tap the card to check.</p>
+ <div class="cards" id="cards"></div>
+ <h2 style="font-size:18px;margin-top:18px">Where the 124,439,808 numbers are</h2>
+ <table class="cmp"><tr><td>Token embedding</td><td>38,597,376</td></tr><tr><td>Position embedding</td><td>786,432</td></tr><tr><td>12 blocks × 7,087,872</td><td>85,054,464</td></tr><tr><td>Final LayerNorm</td><td>1,536</td></tr><tr><td>Unembedding</td><td>0, it reuses the token table</td></tr><tr><th>Total</th><th>124,439,808</th></tr></table>
+ <p class="note">Inside one block: attention 2,362,368 (queries, keys and values 1,771,776, the merge 590,592), MLP 4,722,432, two LayerNorms 3,072.</p>
+ <h2 style="font-size:18px;margin-top:18px">Eight moves and a loop</h2>
+ <p>Look up a row, add two rows, normalise, take a dot product, softmax, mix by shares, bend, and pick. GPT-2 is those eight, repeated, inside a loop.</p>
+ <p>Today's models add longer windows, mixtures of experts, tools and reasoning steps. Under all of it is the same loop: guess the next token, append it, go again.</p>
+ <p class="credits">Inspired by Brendan Bycroft's <a href="https://bbycroft.net/llm">LLM Visualization</a> and Neal Agarwal's <a href="https://neal.fun/space-elevator/">Space Elevator</a>. Sizes: GPT-2 small (Radford et al., 2019), GPT-3 (Brown et al., 2020); the block is adapted from Vaswani et al. (2017). The 3D model is a real but tiny, untrained transformer (5 tokens × 12 numbers, 3 heads). Anything called made up or drawn by hand is not computed. Made with three.js. <a href="v1.html">First draft</a> · <a href="../">← hmeyy.com</a></p>
+ <button class="pv back">↑ Back</button>
+</div></section>
 </main>
 
-<aside class="zoomcol"><div class="zoom" id="zoom"></div></aside>
-</div>
+<script type="module">
+import * as THREE from './vendor/three.module.min.js';
 
-<section class="finale">
-  <h2>That's the whole machine</h2>
-  <p>Today's models add more: bigger stacks, longer windows, mixtures of experts, tools, reasoning steps. Under all of it is the same loop you just built: guess the next token, append, repeat.</p>
-  <p><button class="btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">Build it again ↑</button></p>
-  <div class="credits">Inspired by Brendan Bycroft's <a href="https://bbycroft.net/llm">LLM Visualization</a> and Neal Agarwal's <a href="https://neal.fun/space-elevator/">Space Elevator</a>. Numbers: GPT-2 small (Radford et al., 2019), GPT-3 (Brown et al., 2020), the block from Vaswani et al. (2017). The zoom panels use a toy model with 8 numbers per token; patterns marked "illustrated" are drawn by hand.<br><br><a href="../">← hmeyy.com</a></div>
-</section>
-
-<script>
-(()=>{
-/* ================= toy model: real maths, 8 numbers per token ================= */
+/* ====================== toy transformer: real maths ====================== */
+const NT=5,C=12,NH=3,HD=4,F=48,VS=16;
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-const R=rng(20261116);
-const randn=()=>{let u=0,v=0;while(!u)u=R();while(!v)v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
-const D=8,H=32;
+const R=rng(1116);const randn=()=>{let u=0,v=0;while(!u)u=R();while(!v)v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
 const mat=(r,c,s)=>Array.from({length:r},()=>Array.from({length:c},()=>randn()*s));
-const mv=(v,M)=>M[0].map((_,j)=>v.reduce((a,x,i)=>a+x*M[i][j],0)); // v (len r) · M (r×c)
-const add=(a,b)=>a.map((x,i)=>x+b[i]);
-const dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
+const mm=(A,W)=>A.map(a=>W[0].map((_,j)=>a.reduce((s,x,i)=>s+x*W[i][j],0)));
+const addM=(A,B)=>A.map((a,i)=>a.map((x,j)=>x+B[i][j]));
 const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
-const std=a=>{const m=mean(a);return Math.sqrt(mean(a.map(x=>(x-m)**2)))};
+const spread=a=>{const m=mean(a);return Math.sqrt(mean(a.map(x=>(x-m)**2)))};
 const ln=a=>{const m=mean(a),s=Math.sqrt(mean(a.map(x=>(x-m)**2))+1e-5);return a.map(x=>(x-m)/s)};
 const gelu=x=>0.5*x*(1+Math.tanh(Math.sqrt(2/Math.PI)*(x+0.044715*x**3)));
-const softmax=a=>{const m=Math.max(...a.filter(Number.isFinite));const e=a.map(x=>Number.isFinite(x)?Math.exp(x-m):0);const s=e.reduce((p,q)=>p+q,0);return e.map(x=>x/s)};
+const softmax=a=>{const f=a.filter(Number.isFinite),m=Math.max(...f);const e=a.map(x=>Number.isFinite(x)?Math.exp(x-m):0);const s=e.reduce((p,q)=>p+q,0);return e.map(x=>x/s)};
+const T_=M=>M[0].map((_,j)=>M.map(r=>r[j]));
+const sd=M=>{const f=M.flat().filter(Number.isFinite);const m=mean(f);return Math.sqrt(mean(f.map(x=>(x-m)**2)))||1};
+const norm=a=>Math.sqrt(a.reduce((s,x)=>s+x*x,0));
+const argmax=a=>a.reduce((b,x,i)=>x>a[b]?i:b,0);
 
-const TOK=[{s:"The",id:464},{s:" cat",id:3797},{s:" sat",id:3332},{s:" on",id:319},{s:" the",id:262}];
+const VOCAB=["!"," the"," on","The"," sat"," cat"," mat"," floor"," bed"," couch"," ground"," sofa"," table"," chair"," and","<|endoftext|>"];
+const VID={" the":262," on":319,"The":464," sat":3332," cat":3797};
+const TOKROW=[3,5,4,2,1];
+const TOKS=TOKROW.map(r=>VOCAB[r]);
 const show=s=>s.replace(/^ /,"␣");
-const N=TOK.length;
-const base=mat(1,D,0.9)[0];
-const E=[base.map(x=>x+randn()*0.25), ...mat(3,D,0.9)];
-E.push(base.map(x=>x+randn()*0.25)); // " the" ≈ "The"
-E.splice(4,0); // keep order: The, cat, sat, on, the
-const EMB=[E[0],E[1],E[2],E[3],E[4]];
-const POS=mat(N,D,0.45);
-const X0=EMB.map((e,i)=>add(e,POS[i]));
-const XL=X0.map(ln);
-const Wq=mat(D,D,1/Math.sqrt(D)*1.6),Wk=mat(D,D,1/Math.sqrt(D)*1.6),Wv=mat(D,D,1/Math.sqrt(D));
-const Q=XL.map(x=>mv(x,Wq)),K=XL.map(x=>mv(x,Wk)),V=XL.map(x=>mv(x,Wv));
-const S=Q.map((q,i)=>K.map((k,j)=>j<=i?dot(q,k)/Math.sqrt(D):-Infinity));
-const A=S.map(softmax);
-const AV=A.map(w=>V[0].map((_,c)=>w.reduce((s,wj,j)=>s+wj*V[j][c],0)));
-const Wo=mat(D,D,1/Math.sqrt(D)*0.8);
-const AO=AV.map(v=>mv(v,Wo));
-const X1=X0.map((x,i)=>add(x,AO[i]));
-const W1=mat(D,H,1/Math.sqrt(D)),W2=mat(H,D,1/Math.sqrt(H)*0.8);
-const ML_in=X1.map(ln), ML_h=ML_in.map(x=>mv(x,W1)), ML_g=ML_h.map(h=>h.map(gelu)), ML_o=ML_g.map(g=>mv(g,W2));
-const X2=X1.map((x,i)=>add(x,ML_o[i]));
-
-/* ================= drawing helpers ================= */
-const f2=x=>(x>=0?" ":"")+x.toFixed(2);
-function col(v,s=1.6){const t=Math.max(-1,Math.min(1,v/s));const L=100-Math.abs(t)*48;return t>=0?`hsl(28 92% ${L}%)`:`hsl(218 78% ${L}%)`}
-function vec(v,o={}){return `<span class="vec" style="--c:${o.c||16}px">${v.map(x=>`<i style="background:${col(x,o.s)}" title="${x.toFixed(3)}"></i>`).join("")}</span>`}
-function vrow(label,v,o={}){return `<div class="vrow ${o.hl?'hl':''}"><span class="t">${label}</span>${o.op?`<span class="op">${o.op}</span>`:''}${vec(v,o)}${o.after||''}</div>`}
-function legend(){return `<div class="legend">${vec([-1.6,-0.8,0,0.8,1.6],{c:12})}<span>blue = negative · white = 0 · orange = positive · hover a cell for its number</span></div>`}
-function head(t,sub){return `<div class="zh"><b>${t}</b><span>${sub||''}</span></div>`}
-const fmt=n=>Math.round(n).toLocaleString("en-US");
-
-/* ================= zoom panels ================= */
-const Z={};
-let timers=[];
-const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
-const every=(fn,ms)=>timers.push(setInterval(fn,ms));
-
-Z[0]=()=>`${head("THE BOX","what we're building")}
-<div class="big">The cat sat on the<span class="cursor"></span></div>
-<div style="text-align:center" class="arrow">↓</div>
-<div class="box dash" style="text-align:center;padding:26px;font-family:var(--pix);font-size:14px">GPT-2 · NOT BUILT YET<br><span class="mini" style="font-family:var(--mono)">0 of 124,439,808 parameters</span></div>
-<div style="text-align:center" class="arrow">↓</div>
-<div class="big" style="text-align:center">?</div>
-<p class="note">Over the next 21 parts, the dashed box on the left fills in and the counter at the top climbs to 124 million.</p>`;
-
-Z[1]=()=>`${head("TOKENIZER","text → pieces → ids")}
-<div class="big">The cat sat on the</div>
-<div class="cap">5 TOKENS (␣ = SPACE)</div>
-<div class="chips">${TOK.map((t,i)=>`<div class="chip c${i+1}" style="animation-delay:${i*.12}s">${show(t.s)}<small>${t.id}</small></div>`).join("")}</div>
-<div class="cap">A RARE WORD SPLITS INTO SEVERAL PIECES (ILLUSTRATED)</div>
-<div class="chips"><div class="chip c4">␣Tir</div><div class="chip c4" style="animation-delay:.1s">uk</div><div class="chip c4" style="animation-delay:.2s">kural</div></div>
-<p class="note">GPT-2's list has 50,257 tokens: 256 single bytes, 50,000 learned merges and one end-of-text marker.</p>`;
-
-Z[2]=()=>{
- const rows=[["0",'"!"',null],["…","",null],["262",'" the"',4],["319",'" on"',3],["464",'"The"',0],["…","",null],["3332",'" sat"',2],["3797",'" cat"',1],["…","",null],["50256","<|endoftext|>",null]];
- const filler=mat(1,D,0.9)[0], filler2=mat(1,D,0.9)[0];
- return `${head("TOKEN EMBEDDING","look up one row per id")}
- <div class="cap">THE TABLE · 50,257 ROWS (8 NUMBERS EACH HERE, 768 IN GPT-2)</div>
- ${rows.map(([id,s,k],n)=>id==="…"?`<div class="vrow"><span class="t">⋮</span></div>`:vrow(id+" ",k==null?(n?filler2:filler):EMB[k],{hl:k!=null,after:`<span class="mini">${s}</span>`})).join("")}
- <div class="cap">OUT: ONE VECTOR PER TOKEN</div>
- <div class="pop">${TOK.map((t,i)=>vrow(show(t.s),EMB[i])).join("")}</div>
- <p class="note">"The" and "␣the" got similar colours: two tokens, nearly one meaning. In a trained table, cat sits near dog and kitten.</p>
- ${legend()}`};
-
-Z[3]=()=>`${head("POSITION EMBEDDING","token + position = input")}
-<div class="pop">${TOK.map((t,i)=>`<div class="vrow"><span class="t">${show(t.s)}</span>${vec(EMB[i],{c:13})}<span class="op">+</span>${vec(POS[i],{c:13})}<span class="op">=</span>${vec(X0[i],{c:13})}<span class="mini">pos ${i}</span></div>`).join("")}</div>
-<div class="cap">WHY ORDER MATTERS</div>
-<div class="flow"><div class="box">dog bites man</div><span class="arrow">≠</span><div class="box">man bites dog</div></div>
-<p class="note">Same three tokens. Only the position vectors tell them apart.</p>${legend()}`;
-
-Z[4]=()=>{const i=1,b=X0[i],a=XL[i];
- const bars=(v,c)=>`<svg viewBox="0 0 300 120" width="100%" style="max-width:360px"><line x1="0" y1="60" x2="300" y2="60" stroke="#C9D0D8"/>${v.map((x,k)=>{const h=Math.max(-55,Math.min(55,x*28));return `<rect x="${8+k*36}" y="${h>0?60-h:60}" width="26" height="${Math.abs(h)}" rx="3" fill="${c}"><title>${x.toFixed(3)}</title></rect>`}).join("")}</svg>`;
- return `${head("LAYERNORM","on ␣cat's vector")}
- <div class="cap">BEFORE · MEAN ${mean(b).toFixed(2)} · SPREAD ${std(b).toFixed(2)}</div>${bars(b,"#9AA7B6")}
- <div class="cap">AFTER · MEAN ${Math.abs(mean(a)).toFixed(2)} · SPREAD ${std(a).toFixed(2)}</div>${bars(a,"#2F6FDE")}
- <div class="formula">x̂ = (x − mean) ÷ spread, then × scale + shift</div>
- <div class="cap">ALL FIVE, NORMALISED</div><div class="pop">${TOK.map((t,k)=>vrow(show(t.s),XL[k])).join("")}</div>`};
-
-Z[5]=()=>{const m=M=>`<div style="display:inline-grid;grid-template-columns:repeat(8,9px);gap:1px">${M.flat().map(x=>`<i style="width:9px;height:9px;background:${col(x,0.8)};display:block"></i>`).join("")}</div>`;
- const block=(name,W,out,q)=>`<div class="box" style="flex:1;min-width:150px"><div class="cap" style="margin-top:0">${name}</div><div class="mini" style="margin-bottom:6px">${q}</div>${m(W)}<div style="margin-top:8px">${out.map((v,i)=>vrow(show(TOK[i].s),v,{c:11})).join("")}</div></div>`;
- return `${head("QUERY · KEY · VALUE","three matrices, three new vectors per token")}
- <div class="cap">IN: THE NORMALISED VECTORS</div>${TOK.map((t,i)=>vrow(show(t.s),XL[i],{c:12})).join("")}
- <div class="cap">× W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub> (8×8 EACH; 768×768 IN GPT-2)</div>
- <div class="flow pop" style="align-items:stretch">${block("QUERY",Wq,Q,"what am I looking for?")}${block("KEY",Wk,K,"what do I have?")}${block("VALUE",Wv,V,"what do I pass on?")}</div>`};
-
-function gridHTML(M,o={}){
- const cols=N+1;let h=`<div class="grid ${o.rows?'rows':''}" style="grid-template-columns:62px repeat(${N},auto)"><div></div>`;
- h+=TOK.map(t=>`<div class="h">${show(t.s)}</div>`).join("");
- M.forEach((row,i)=>{h+=`<div class="h r">${show(TOK[i].s)}</div>`;
-  row.forEach((v,j)=>{const masked=!Number.isFinite(v)||(o.mask&&j>i);
-   const bg=masked?"":(o.prob?`hsl(218 78% ${100-v*55}%)`:col(v,2));
-   h+=`<div class="g ${masked?'mask':''}" data-r="${i}" data-c="${j}" style="background:${bg};${o.anim?`animation:rise .35s ${(i*N+j)*.03}s both`:''};${o.prob&&v>.55?'color:#fff':''}">${masked?'🔒':(o.prob?Math.round(v*100)+'%':v.toFixed(2))}</div>`})});
- return h+"</div>"}
-
-Z[6]=()=>`${head("SCORES","query (row) · key (column) ÷ √8")}
-<div class="cap">EACH ROW: ONE TOKEN ASKING · EACH COLUMN: ONE TOKEN ANSWERING</div>
-${gridHTML(S,{anim:true,mask:true})}
-<div class="formula">score(␣the → ␣sat) = q<sub>the</sub> · k<sub>sat</sub> ÷ √8 = ${S[4][2].toFixed(2)}</div>
-<p class="note">🔒 = the future. "␣cat" may look at "The" and itself, never at "␣sat". In GPT-2 this grid is 1,024 × 1,024, for each of 12 heads, in each of 12 blocks.</p>`;
-
-Z[7]=()=>{setTimeout(()=>bindMix(),0);return `${head("SOFTMAX + MIX","rows become weights, weights mix the values")}
-<div class="cap">WEIGHTS (EACH ROW SUMS TO 100%) · HOVER OR TAP A ROW</div>
-<div id="mixGrid">${gridHTML(A,{prob:true,rows:true,mask:true})}</div>
-<div class="cap" id="mixCap"></div><div id="mixOut"></div>`};
-function bindMix(){
- const g=document.getElementById("mixGrid");if(!g)return;
- const pick=r=>{g.querySelectorAll(".g").forEach(c=>c.classList.toggle("dim",+c.dataset.r!==r));
-  document.getElementById("mixCap").textContent=`OUTPUT FOR ${show(TOK[r].s).toUpperCase()} = Σ weight × value`;
-  document.getElementById("mixOut").innerHTML=`<div class="pop">${TOK.slice(0,r+1).map((t,j)=>vrow(show(t.s),V[j].map(x=>x*A[r][j]),{c:13,after:`<span class="mini">${Math.round(A[r][j]*100)}% × v</span>`})).join("")}</div><div style="border-top:1.5px solid var(--ink);margin:6px 0 0 66px;width:150px"></div>${vrow("= out",AV[r],{c:13,hl:true})}`};
- g.querySelectorAll(".g").forEach(c=>{const r=+c.dataset.r;c.addEventListener("mouseenter",()=>pick(r));c.addEventListener("click",()=>pick(r))});
- pick(4)}
-
-const HEADS=[
- {n:"Previous word",d:"Each token looks one step back. Helps with phrases: 'sat on' → 'on' knows what came before.",
-  M:[[1,0,0,0,0],[.9,.1,0,0,0],[.04,.9,.06,0,0],[.02,.03,.9,.05,0],[.02,.02,.03,.88,.05]]},
- {n:"Back to the start",d:"Parks attention on the first token when nothing else is useful. Common in trained models.",
-  M:[[1,0,0,0,0],[.85,.15,0,0,0],[.8,.1,.1,0,0],[.78,.08,.08,.06,0],[.75,.06,.07,.06,.06]]},
- {n:"Subject finder",d:"'sat' and the last 'the' look at 'cat': who is doing the sitting.",
-  M:[[1,0,0,0,0],[.3,.7,0,0,0],[.1,.82,.08,0,0],[.08,.6,.2,.12,0],[.06,.58,.22,.08,.06]]},
- {n:"Same word",d:"'␣the' finds the earlier 'The'. Helps copy patterns that repeat.",
-  M:[[1,0,0,0,0],[.6,.4,0,0,0],[.5,.25,.25,0,0],[.4,.2,.2,.2,0],[.82,.04,.04,.04,.06]]}];
-Z[8]=()=>{setTimeout(()=>bindHeads(),0);return `${head("12 HEADS","each head learns its own pattern")}
-<div class="tabs" id="headTabs">${HEADS.map((h,i)=>`<button aria-pressed="${i?'false':'true'}" data-h="${i}">${h.n}</button>`).join("")}</div>
-<div id="headGrid"></div><p class="mini" id="headDesc" style="margin:8px 0 0"></p>
-<div class="cap">THEN</div>
-<div class="flow"><div class="box mini">12 heads × 64</div><span class="arrow">→</span><div class="box mini">glue: 768</div><span class="arrow">→</span><div class="box mini">× W<sub>O</sub> (768×768)</div><span class="arrow">→</span><div class="box mini">one vector per token</div></div>
-<p class="note">Illustrated patterns, drawn by hand to show the kinds of heads found in trained models.</p>`};
-function bindHeads(){const t=document.getElementById("headTabs");if(!t)return;
- const set=i=>{t.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.h===i));
-  const M=HEADS[i].M.map((r,a)=>r.map((v,b)=>b>a?-Infinity:v));
-  document.getElementById("headGrid").innerHTML=gridHTML(M,{prob:true,mask:true,anim:true});
-  document.getElementById("headDesc").textContent=HEADS[i].d};
- t.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>set(+b.dataset.h)));set(0);
- let k=0;every(()=>{if(document.querySelector("#headTabs:hover"))return;k=(k+1)%HEADS.length;set(k)},3200)}
-
-Z[9]=()=>`${head("RESIDUAL","the stream, plus an edit")}
-<svg viewBox="0 0 460 150" width="100%" style="max-width:520px">
- <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1B2430"/></marker></defs>
- <line x1="10" y1="40" x2="400" y2="40" stroke="#2F6FDE" stroke-width="6" stroke-linecap="round"/>
- <text x="12" y="25" font-size="12" fill="#2F6FDE" font-weight="700">the stream (x)</text>
- <path d="M90 40 V105 H130" fill="none" stroke="#1B2430" stroke-width="1.8" marker-end="url(#ar)"/>
- <rect x="132" y="88" width="90" height="34" rx="7" fill="#fff" stroke="#1B2430" stroke-width="1.5"/><text x="177" y="110" font-size="12" text-anchor="middle">LayerNorm</text>
- <path d="M222 105 H246" stroke="#1B2430" stroke-width="1.8" marker-end="url(#ar)"/>
- <rect x="248" y="88" width="90" height="34" rx="7" fill="#2F6FDE"/><text x="293" y="110" font-size="12" text-anchor="middle" fill="#fff">Attention</text>
- <path d="M338 105 H360 V58" fill="none" stroke="#1B2430" stroke-width="1.8" marker-end="url(#ar)"/>
- <circle cx="360" cy="40" r="15" fill="#F08A24"/><text x="360" y="46" font-size="18" text-anchor="middle" fill="#fff" font-weight="700">+</text>
- <path d="M400 40 H450" stroke="#2F6FDE" stroke-width="6" marker-end="url(#ar)"/>
-</svg>
-<div class="cap">ON THE LAST TOKEN</div>
-<div class="pop">${vrow("x",X0[4],{c:18})}${vrow("+ edit",AO[4],{c:18})}${vrow("= x",X1[4],{c:18,hl:true})}</div>
-<p class="note">The edit is small next to the stream. Each part nudges; nothing overwrites.</p>`;
-
-Z[10]=()=>{const i=4;
- const curve=`<svg viewBox="0 0 160 100" width="150"><line x1="0" y1="70" x2="160" y2="70" stroke="#C9D0D8"/><line x1="80" y1="0" x2="80" y2="100" stroke="#C9D0D8"/>
- <polyline fill="none" stroke="#F08A24" stroke-width="2.5" points="${Array.from({length:61},(_,k)=>{const x=-3+k*.1;return `${80+x*24},${70-gelu(x)*20}`}).join(" ")}"/><text x="6" y="14" font-size="11" fill="#6A7785">GELU</text></svg>`;
- return `${head("MLP","widen, bend, narrow · one token at a time")}
- <div class="cap">␣THE · IN (8)</div>${vec(ML_in[i])}
- <div class="cap">× W₁ → WIDE (32; 3,072 IN GPT-2)</div>${vec(ML_h[i],{c:11})}
- <div class="flow" style="margin:6px 0">${curve}<span class="mini">negatives squashed toward 0,<br>positives pass through</span></div>
- <div class="cap">AFTER GELU</div>${vec(ML_g[i],{c:11})}
- <div class="cap">× W₂ → NARROW (8), ADDED TO THE STREAM</div>
- <div class="pop">${vrow("x",X1[i])}${vrow("+ mlp",ML_o[i])}${vrow("= x",X2[i],{hl:true})}</div>`};
-
-Z[11]=()=>{const parts=[["LayerNorm","1,536"],["Attention: Q K V","1,771,776"],["Attention: projection","590,592"],["+ residual","0"],["LayerNorm","1,536"],["MLP: widen","2,362,368"],["MLP: narrow","2,360,064"],["+ residual","0"]];
- return `${head("ONE BLOCK","the parts, snapped together")}
- <div style="border:2px solid var(--ink);border-radius:12px;padding:12px;max-width:420px">
- ${parts.map((p,k)=>`<div class="vrow" style="justify-content:space-between;animation:rise .4s ${k*.08}s both;border-bottom:1px dashed var(--line);padding:4px 0;margin:0"><span>${p[0]}</span><span class="mini">${p[1]}</span></div>`).join("")}
- <div class="vrow" style="justify-content:space-between;margin-top:6px;font-weight:700"><span>Block total</span><span>7,087,872</span></div></div>
- <div class="cap">IN AND OUT: SAME SHAPE</div>${TOK.map((t,k)=>`<div class="vrow"><span class="t">${show(t.s)}</span>${vec(X0[k],{c:12})}<span class="op">→</span>${vec(X2[k],{c:12})}</div>`).join("")}
- <p class="note">5 vectors of 8 in, 5 vectors of 8 out. That's why you can stack them.</p>`};
-
-Z[12]=()=>{const lab=["grammar, nearby words","","","","","","","","","","","meaning, what comes next"];
- return `${head("THE STACK","12 blocks, one stream")}
- <div style="display:flex;gap:16px;align-items:stretch">
- <div style="display:flex;flex-direction:column;gap:5px;flex:none">${lab.map((l,k)=>`<div class="box" style="padding:5px 14px;font-family:var(--pix);font-size:11px;background:hsl(218 70% ${94-k*3}%);animation:rise .35s ${k*.07}s both">BLOCK ${k+1}</div>`).join("")}</div>
- <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:13px;color:var(--ink2);padding:6px 0"><span>↑ early: ${lab[0]}</span><span>each block adds 7,087,872 parameters</span><span>↓ late: ${lab[11]}</span></div></div>
- <table style="margin-top:14px;font-size:13px;border-collapse:collapse;width:100%"><tr style="text-align:left;color:var(--mute)"><th></th><th>blocks</th><th>numbers per token</th><th>heads</th></tr>
- <tr><td>GPT-2 small</td><td>12</td><td>768</td><td>12</td></tr><tr><td>GPT-2 XL</td><td>48</td><td>1,600</td><td>25</td></tr><tr><td>GPT-3</td><td>96</td><td>12,288</td><td>96</td></tr></table>`};
-
-const CAND=[[" mat",5.2],[" floor",4.5],[" bed",4.2],[" couch",3.9],[" ground",3.5],[" sofa",3.3],[" edge",3.0],[" table",2.8],[" chair",2.6],[" grass",2.3]];
-const OTHER=2.4; // stands in for the other 50,247 tokens, lumped
-Z[13]=()=>`${head("UNEMBEDDING","last vector · every row of the token table")}
-<div class="flow"><div>${vec(X2[4])}<div class="mini" style="margin-top:4px">␣the, after 12 blocks</div></div><span class="arrow">· table →</span><div class="mini">50,257 scores</div></div>
-<div class="cap">LOGITS, TOP 10 (ILLUSTRATED VALUES)</div>
-<div class="bars">${CAND.map(([t,l],k)=>`<div class="b" style="animation:rise .4s ${k*.05}s both"><span class="t">${show(t)}</span><span class="track"><span class="fill" style="display:block;width:${l/5.6*100}%;background:#9AA7B6"></span></span><span class="v">${l.toFixed(1)}</span></div>`).join("")}<div class="b"><span class="t">…</span><span class="mini">50,247 more</span><span></span></div></div>
-<p class="note">Scores, not probabilities yet: they can be any size, even negative.</p>`;
-
-function probs(T,topP=1){
- const logits=CAND.map(c=>c[1]/T); const lo=OTHER/T;
- const e=logits.map(x=>Math.exp(x)); const eo=Math.exp(lo)*1; const s=e.reduce((a,b)=>a+b,0)+eo;
- let p=e.map(x=>x/s); const po=eo/s;
- if(topP<1){let acc=0;const keep=p.map(x=>{const k=acc<topP;acc+=x;return k});const z=p.reduce((a,x,i)=>a+(keep[i]?x:0),0);p=p.map((x,i)=>keep[i]?x/z:0);return {p,po:0}}
+const q_=s=>`"${show(s)}"`;
+const WTE=mat(VS,C,0.9); WTE[1]=WTE[3].map(x=>x+randn()*0.25);
+const WPE=mat(8,C,0.45);
+const tokE=TOKROW.map(r=>WTE[r]), posE=WPE.slice(0,NT), x0=addM(tokE,posE), xl=x0.map(ln);
+const Wq=mat(C,C,1.5/Math.sqrt(C)),Wk=mat(C,C,1.5/Math.sqrt(C)),Wv=mat(C,C,1/Math.sqrt(C));
+const Q=mm(xl,Wq),K=mm(xl,Wk),V=mm(xl,Wv);
+const S=[],A=[];
+for(let h=0;h<NH;h++){const sl=r=>r.slice(h*HD,h*HD+HD);
+ S[h]=Q.map((q,i)=>K.map((k,j)=>j<=i?sl(q).reduce((s,x,d)=>s+x*sl(k)[d],0)/Math.sqrt(HD):-Infinity));A[h]=S[h].map(softmax)}
+const av=Q.map((_,i)=>Array.from({length:C},(_,c)=>{const h=Math.floor(c/HD);return A[h][i].reduce((s,w,j)=>s+w*V[j][c],0)}));
+const Wo=mat(C,C,1/Math.sqrt(C)),ao=mm(av,Wo),x1=addM(x0,ao),xl2=x1.map(ln);
+const W1=mat(C,F,1/Math.sqrt(C)),hh=mm(xl2,W1),gg=hh.map(r=>r.map(gelu)),W2=mat(F,C,1/Math.sqrt(F)),mo=mm(gg,W2),x2=addM(x1,mo);
+const xf=x2.map(ln),WTEt=T_(WTE),logits=mm(xf,WTEt);
+// facts about the toy, used in the step captions
+const FX={
+ catMean:mean(x0[1]).toFixed(2),catSpread:spread(x0[1]).toFixed(2),
+ s4:argmax(S[0][4].map(x=>Number.isFinite(x)?x:-1e9)),
+ a4:argmax(A[0][4]),
+ resid:Math.round(norm(ao[1])/norm(x0[1])*100),
+ neg:hh.flat().filter(x=>x<0).length,
+ toyTop:argmax(logits[4])};
+FX.s4v=S[0][4][FX.s4].toFixed(2);FX.a4p=Math.round(A[0][4][FX.a4]*100);
+document.getElementById("toyPick").textContent=q_(VOCAB[FX.toyTop]);
+// illustrated "trained" odds for after "the"
+const TRAINED=[0.2,1.0,0.6,0.1,0.3,1.2,5.2,4.5,4.2,3.9,3.5,3.3,2.8,2.6,1.5,0.4];
+const OTHER=2.4;
+const RANK=TRAINED.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
+const NB=8;
+function probs(Tm=1,topP=1){const e=TRAINED.map(l=>Math.exp(l/Tm)),eo=Math.exp(OTHER/Tm),s=e.reduce((a,b)=>a+b,0)+eo;let p=e.map(x=>x/s),po=eo/s;
+ if(topP<1){const ord=p.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]);let acc=0;const keep=new Set();for(const [v,i] of ord){if(acc<topP){keep.add(i);acc+=v}}const z=p.reduce((a,v,i)=>a+(keep.has(i)?v:0),0);p=p.map((v,i)=>keep.has(i)?v/z:0);po=0}
  return {p,po}}
-function barsHTML(P,pick){return `<div class="bars">${CAND.map(([t],k)=>`<div class="b ${pick===k?'pick':''}"><span class="t">${show(t)}</span><span class="track"><span class="fill" style="display:block;width:${P.p[k]*100}%"></span></span><span class="v">${(P.p[k]*100).toFixed(1)}%</span></div>`).join("")}<div class="b"><span class="t">others</span><span class="track"><span class="fill" style="display:block;width:${P.po*100}%;background:#9AA7B6"></span></span><span class="v">${(P.po*100).toFixed(1)}%</span></div></div>`}
-Z[14]=()=>{const P=probs(1);return `${head("SOFTMAX","scores → probabilities")}
-<div class="formula">p = e<sup>score</sup> ÷ Σ e<sup>score</sup></div>
-${barsHTML(P)}
-<p class="note">All 50,257 add up to 100%. "others" lumps together the 50,247 tokens not shown.</p>`};
+const pct=v=>v<0.01&&v>0?"<1%":Math.round(v*100)+"%";
+const n2=v=>(v<0?"−":"")+Math.abs(v).toFixed(2);
 
-Z[15]=()=>{setTimeout(bindSampler,0);return `${head("SAMPLER","pick one")}
-<div class="big" id="sampText">The cat sat on the<span class="n" id="sampTok" style="background:#FFE3C4;border-radius:4px"></span><span class="cursor"></span></div>
-<div class="ctl"><label for="tSl">Temperature</label><input id="tSl" type="range" min="0.1" max="2" step="0.05" value="1"><output id="tOut">1.00</output></div>
-<div class="ctl"><label for="pSl">Top-p</label><input id="pSl" type="range" min="0.3" max="1" step="0.05" value="1"><output id="pOut">1.00</output><button class="btn" id="roll">Pick a token</button></div>
-<div id="sampBars"></div>
-<p class="note">Temperature 0.1 ≈ greedy: always " mat". At 2.0 the long tail wakes up.</p>`};
-function bindSampler(){const t=document.getElementById("tSl");if(!t)return;const p=document.getElementById("pSl");let pick=null;
- const draw=()=>{document.getElementById("tOut").textContent=(+t.value).toFixed(2);document.getElementById("pOut").textContent=(+p.value).toFixed(2);
-  document.getElementById("sampBars").innerHTML=barsHTML(probs(+t.value,+p.value),pick)};
- t.oninput=()=>{pick=null;draw()};p.oninput=()=>{pick=null;draw()};
- document.getElementById("roll").onclick=()=>{const P=probs(+t.value,+p.value);let r=Math.random(),k=0,acc=0;
-  for(;k<CAND.length;k++){acc+=P.p[k];if(r<acc)break}
-  pick=k<CAND.length?k:null;document.getElementById("sampTok").textContent=pick!=null?CAND[pick][0]:" [rare word]";
-  if(pick!=null)document.getElementById("machOut").textContent=`"${CAND[pick][0]}"`;draw()};
- draw()}
+/* ====================== scene ====================== */
+const stageEl=document.getElementById("stage");
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+stageEl.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const BGC=new THREE.Color('#F8F6F0');
+scene.fog=new THREE.Fog(BGC,200,600);
+const FOV=30;
+const camera=new THREE.PerspectiveCamera(FOV,1,0.5,5000);
+scene.add(new THREE.HemisphereLight(0xffffff,0xd8cfc4,1.7));
+const sun=new THREE.DirectionalLight(0xfff8f0,1.25);sun.position.set(-30,50,90);scene.add(sun);
+const CELL=new THREE.BoxGeometry(0.86,0.86,0.42);
+const CELLMAT=new THREE.MeshLambertMaterial({color:0xffffff});
 
-const STORY=[" mat",","," purring"," softly","."," Outside",","," the"," rain"," had"," stopped","."];
-Z[16]=()=>{later(runLoop,300);return `${head("THE LOOP","append, run again")}
-<div class="story" id="story">The cat sat on the</div>
-<div class="cap" id="passCap">PASS 1</div>
-<div class="cap">KV CACHE: KEYS + VALUES KEPT FROM EARLIER TOKENS</div>
-<div class="kv" id="kv">${TOK.map(()=>"<i></i>").join("")}</div>
-<p class="note">Orange = computed this pass. Blue = reused from the cache. Without the cache, every pass would redo every square.</p>`};
-function runLoop(){const st=document.getElementById("story");if(!st)return;let k=0;
- const tick=()=>{if(!document.getElementById("story"))return;
-  if(k>=STORY.length){k=0;st.innerHTML="The cat sat on the";document.getElementById("kv").innerHTML=TOK.map(()=>"<i></i>").join("");}
-  st.insertAdjacentHTML("beforeend",`<span class="n">${STORY[k]}</span>`);
-  document.querySelectorAll("#kv i.new").forEach(i=>i.classList.remove("new"));
-  document.getElementById("kv").insertAdjacentHTML("beforeend",'<i class="new"></i>');
-  document.getElementById("passCap").textContent=`PASS ${k+2}: ${N+k+1} TOKENS IN → "${STORY[k+1]||' …'}" NEXT`;
-  k++};
- every(tick,900)}
+const col=h=>new THREE.Color(h);
+// Monokai Pro, light filter: teal below zero, pink above; weights purple; attention amber; odds green
+const cNeg=col('#1C8CA8'),cPos=col('#E14775'),cZero=col('#F5EFEA'),wLo=col('#ECE7F7'),wHi=col('#4E3C9E'),pLo=col('#FBF3E2'),pHi=col('#D98A0B'),
+ cMask=col('#403E41'),cGhost=col('#E4DDD3'),cDim=col('#F3EEE8'),cId=col('#403E41');
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const back=t=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
 
-const SAMPLES=[[0,"The cat sat on the qz]] fl8 the of the,, Tamb"],[200,"The cat sat on the the the the and the"],[2000,"The cat sat on the man of the city in the"],[20000,"The cat sat on the bed and looked at the door."],[200000,"The cat sat on the mat, purring softly in the sun."]];
-Z[17]=()=>{setTimeout(bindTrain,0);return `${head("TRAINING","guess, measure the miss, nudge, repeat")}
-<svg id="lossSvg" viewBox="0 0 420 170" width="100%" style="max-width:480px"></svg>
-<div class="ctl"><label for="stSl">Training step</label><input id="stSl" type="range" min="0" max="100" value="0"><output id="stOut">0</output></div>
-<div class="cap">WHAT IT WRITES AT THIS STEP (ILLUSTRATED)</div><div class="story" id="trText"></div>
-<div class="formula" id="lossF"></div>`};
-function bindTrain(){const sl=document.getElementById("stSl");if(!sl)return;
- const steps=x=>Math.round(Math.pow(10,x/100*5.3))-1; // 0 … ~200k
- const loss=s=>2.9+7.9*Math.exp(-Math.pow(s/900,.55)); // illustrative curve from 10.8 down
- const X=s=>20+Math.log10(s+1)/5.4*390, Y=l=>150-(l-2.5)/8.5*135;
- let pts=[];for(let x=0;x<=100;x+=2){const s=steps(x);pts.push(`${X(s)},${Y(loss(s))}`)}
- const svg=document.getElementById("lossSvg");
- svg.innerHTML=`<line x1="20" y1="150" x2="410" y2="150" stroke="#C9D0D8"/><line x1="20" y1="10" x2="20" y2="150" stroke="#C9D0D8"/>
- <text x="24" y="20" font-size="11" fill="#6A7785">loss</text><text x="410" y="166" font-size="11" fill="#6A7785" text-anchor="end">training steps (log scale) →</text>
- <line x1="20" x2="410" y1="${Y(10.82)}" y2="${Y(10.82)}" stroke="#D9534F" stroke-dasharray="4 4"/><text x="408" y="${Y(10.82)-4}" font-size="10.5" fill="#D9534F" text-anchor="end">random guessing: 10.8</text>
- <polyline points="${pts.join(" ")}" fill="none" stroke="#2F6FDE" stroke-width="2.5"/><circle id="lossDot" r="6" fill="#F08A24" stroke="#fff" stroke-width="2"/>`;
- const draw=()=>{const s=steps(+sl.value),l=loss(s);document.getElementById("stOut").textContent=fmt(s);
-  const d=document.getElementById("lossDot");d.setAttribute("cx",X(s));d.setAttribute("cy",Y(l));
-  let t=SAMPLES[0][1];for(const [k,v] of SAMPLES)if(s>=k)t=v;document.getElementById("trText").textContent=t;
-  const p=Math.exp(-l);document.getElementById("lossF").innerHTML=`p(" mat") ≈ ${p<.001?p.toExponential(1):p.toFixed(3)} → loss = −log p = <b>${l.toFixed(2)}</b>`};
- sl.oninput=draw;draw();
- let v=0;const auto=setInterval(()=>{if(!document.getElementById("stSl")){clearInterval(auto);return}v+=1;if(v>100){clearInterval(auto);return}sl.value=v;draw()},60);timers.push(auto)}
+const TS={},TL=[];
+const labelsEl=document.getElementById("labels");
+function mkLabel(html,cls){const d=document.createElement("div");d.className="tl "+(cls||"");d.innerHTML=html;labelsEl.appendChild(d);return d}
 
-Z[18]=()=>{const M=[["GPT-1","2018",0.117],["GPT-2 small","2019",0.124],["GPT-2 XL","2019",1.5],["GPT-3","2020",175]];
- const X=v=>40+(Math.log10(v)+1)/3.4*360;
- return `${head("SCALE","parameters, log scale")}
- <svg viewBox="0 0 440 210" width="100%" style="max-width:520px">
- <line x1="30" y1="170" x2="430" y2="170" stroke="#C9D0D8"/>
- ${[0.1,1,10,100].map(v=>`<line x1="${X(v)}" x2="${X(v)}" y1="20" y2="170" stroke="#EEF1F4"/><text x="${X(v)}" y="188" font-size="11" fill="#6A7785" text-anchor="middle">${v<1?'100M':v<10?'1B':v<100?'10B':'100B'}</text>`).join("")}
- ${M.map(([n,y,v],k)=>`<g style="animation:rise .5s ${k*.15}s both"><circle cx="${X(v)}" cy="${150-k*36}" r="${6+Math.log10(v*10)*4}" fill="${k===3?'#F08A24':'#2F6FDE'}" opacity=".85"/><text x="${X(v)+(k===3?-14:14)}" y="${154-k*36}" font-size="12" text-anchor="${k===3?'end':'start'}" fill="#1B2430"><tspan font-weight="700">${n}</tspan> · ${y} · ${v<1?Math.round(v*1000)+'M':v+'B'}</text></g>`).join("")}
- </svg>
- <div class="three" style="margin-top:6px"><div class="box"><h4>PARAMETERS</h4>124M → 175B<br><span class="mini">~1,400×</span></div><div class="box"><h4>DATA</h4>~10B → ~300B tokens<br><span class="mini">GPT-2's WebText ≈ 40 GB of text</span></div><div class="box"><h4>DESIGN</h4>almost the same block<br><span class="mini">mostly wider and deeper</span></div></div>
- <p class="note">Newer models mostly don't publish their sizes, so the chart stops at GPT-3.</p>`};
+function tensor(id,data,kind,cx,top,appear,name,shape,o={}){
+ const rows=data.length,cols=data[0].length,g=o.groups||0,gap=0.55;
+ const width=cols+(g?Math.floor((cols-1)/g)*gap:0);
+ const t={id,data,kind,cx,top,appear,name,rows,cols,g,width,head:o.head,tok:!!o.tok,mmSrc:o.mmSrc,s:o.s||(kind==='p'?1:2*sd(data)),key:"",drop:0,lastState:"hidden",vis:false,focus:false};
+ t.cx_=c=>cx-width/2+c+0.5+(g?Math.floor(c/g)*gap:0);
+ t.cy_=r=>top-r-0.5;
+ const mesh=new THREE.InstancedMesh(CELL,CELLMAT,rows*cols);mesh.frustumCulled=false;mesh.userData.t=t;
+ for(let i=0;i<rows*cols;i++)mesh.setColorAt(i,cGhost);
+ t.mesh=mesh;t.group=new THREE.Group();t.group.add(mesh);
+ t.outline=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(width+0.5,rows+0.5,0.6)),new THREE.LineBasicMaterial({color:0xB5ACA0,transparent:true,opacity:.6}));
+ t.outline.position.set(cx,top-rows/2,0);scene.add(t.outline);
+ scene.add(t.group);
+ t.label=mkLabel(`<b>${name}</b><span>${shape}</span>`);
+ if(o.rowLabels)t.rl=o.rowLabels.map(s=>mkLabel(show(s),"row"));
+ TS[id]=t;TL.push(t);return t}
 
-Z[19]=()=>`${head("POST-TRAINING","base model → assistant")}
-<div class="big" style="font-size:16px">What is the capital of France?</div>
-<div class="three" style="margin-top:10px">
-<div class="box"><h4>BASE MODEL</h4><span class="mini">What is the capital of Germany? What is the capital of Italy? What is the capital of Spain?</span><p class="mini" style="color:var(--mute)">continues the page it thinks it's on</p></div>
-<div class="box"><h4>+ FINE-TUNING (SFT)</h4><span class="mini">The capital of France is Paris.</span><p class="mini" style="color:var(--mute)">trained on example Q&amp;A written by people</p></div>
-<div class="box"><h4>+ PREFERENCES (RLHF)</h4><span class="mini">A: "Paris." 👍<br>B: "Paris, which is also…" (300 words) 👎</span><p class="mini" style="color:var(--mute)">people pick the better answer; the model learns their taste</p></div></div>
-<p class="note">Same 124M-parameter machine. Only the numbers change, and only a little.</p>`;
+// layout, top to bottom (1 unit = 1 cell)
+tensor("ids",TOKROW.map(r=>[VID[VOCAB[r]]]),"id",0,0,1,"token ids","5 × 1",{rowLabels:TOKS.map(s=>`${show(s)}  ${VID[s]}`)});
+tensor("WTE",WTE,"w",-17,-8,2,"token table","16 × 12 shown · real 50,257 × 768",{rowLabels:VOCAB});
+tensor("WPE",WPE,"w",17,-8,3,"position table","8 × 12 shown · real 1,024 × 768",{rowLabels:[0,1,2,3,4,5,6,7].map(String)});
+tensor("tokE",tokE,"a",-8,-29,2,"token rows","5 × 12",{rowLabels:TOKS,tok:1});
+tensor("posE",posE,"a",8,-29,3,"position rows","5 × 12",{rowLabels:["0","1","2","3","4"],tok:1});
+tensor("x0",x0,"a",0,-39,3,"input = token + position","5 × 12 · real 5 × 768",{rowLabels:TOKS,tok:1});
+tensor("xl",xl,"a",0,-49,4,"LayerNorm","5 × 12",{rowLabels:TOKS,tok:1});
+tensor("Wq",Wq,"w",-16,-59,5,"W<sub>Q</sub>","12 × 12",{groups:HD});
+tensor("Wk",Wk,"w",0,-59,5,"W<sub>K</sub>","12 × 12",{groups:HD});
+tensor("Wv",Wv,"w",16,-59,5,"W<sub>V</sub>","12 × 12",{groups:HD});
+tensor("Q",Q,"a",-16,-75,5,"Q · queries","5 × 12 · 3 heads of 4",{groups:HD,rowLabels:TOKS,tok:1,mmSrc:["xl","Wq"]});
+tensor("K",K,"a",0,-75,5,"K · keys","5 × 12",{groups:HD,tok:1,mmSrc:["xl","Wk"]});
+tensor("V",V,"a",16,-75,5,"V · values","5 × 12",{groups:HD,tok:1,mmSrc:["xl","Wv"]});
+for(let h=0;h<NH;h++){tensor("S"+h,S[h],"s",-10+h*10,-85,6,`scores · head ${h+1}`,"5 × 5",{head:h,rowLabels:h===0?TOKS:null,tok:1});
+ tensor("A"+h,A[h],"p",-10+h*10,-95,7,`shares · head ${h+1}`,"5 × 5",{head:h,rowLabels:h===0?TOKS:null,tok:1})}
+tensor("av",av,"a",0,-105,7,"blended values (heads glued)","5 × 12",{groups:HD,rowLabels:TOKS,tok:1});
+tensor("Wo",Wo,"w",20,-103,8,"W<sub>O</sub> mixer","12 × 12");
+tensor("ao",ao,"a",0,-118,8,"attention output","5 × 12",{rowLabels:TOKS,tok:1,mmSrc:["av","Wo"]});
+tensor("x1",x1,"a",0,-128,9,"row + attention","5 × 12",{rowLabels:TOKS,tok:1});
+tensor("xl2",xl2,"a",0,-138,10,"LayerNorm","5 × 12",{rowLabels:TOKS,tok:1});
+tensor("W1",W1,"w",0,-148,10,"W₁ widen","12 × 48 · real 768 × 3,072");
+tensor("h",hh,"a",0,-165,10,"wide","5 × 48",{rowLabels:TOKS,tok:1,mmSrc:["xl2","W1"]});
+tensor("g",gg,"a",0,-175,10,"after the bend (GELU)","5 × 48",{rowLabels:TOKS,tok:1});
+tensor("W2",T_(W2),"w",0,-185,10,"W₂ narrow (on its side)","48 × 12, drawn 12 × 48");
+tensor("m",mo,"a",0,-202,10,"MLP output","5 × 12",{rowLabels:TOKS,tok:1,mmSrc:["g","W2",1]});
+tensor("x2",x2,"a",0,-212,10,"row + MLP · block out","5 × 12",{rowLabels:TOKS,tok:1});
+tensor("xf",xf,"a",0,-252,13,"final LayerNorm","5 × 12",{rowLabels:TOKS,tok:1});
+tensor("WTEt",WTEt,"w",20,-252,13,"token table, on its side","12 × 16 shown");
+tensor("logits",logits,"a",0,-266,13,"scores per token (logits)","5 × 16 shown · real 5 × 50,257",{rowLabels:TOKS,tok:1,mmSrc:["xf","WTEt"]});
 
-Z[20]=()=>{setTimeout(bindCtx,0);return `${head("CONTEXT WINDOW","all it can see")}
-<div id="ctxBar" style="display:flex;flex-wrap:wrap;gap:2px"></div>
-<div class="ctl"><label for="cSl">Window</label><input id="cSl" type="range" min="0" max="5" step="1" value="0"><output id="cOut"></output></div>
-<div class="three"><div class="box"><h4>TOKENS</h4><span id="cT"></span></div><div class="box"><h4>PAIRS TO COMPARE</h4><span id="cP"></span></div><div class="box"><h4>ROUGHLY</h4><span id="cW"></span></div></div>
-<p class="note">Pairs = tokens², per head, per block. Grey = outside the window: to the model, it doesn't exist.</p>`};
-function bindCtx(){const s=document.getElementById("cSl");if(!s)return;
- const W=[[1024,"GPT-2","~2 pages"],[2048,"GPT-3","~4 pages"],[8192,"","~a long essay"],[32768,"","~a short book"],[128000,"","~a novel"],[1000000,"","~several novels"]];
- const draw=()=>{const [n,m,w]=W[+s.value];const cells=120,on=Math.max(6,Math.round(cells*Math.log2(n/512)/Math.log2(1000000/512)));
-  document.getElementById("ctxBar").innerHTML=Array.from({length:cells},(_,k)=>`<i style="display:block;width:10px;height:10px;border-radius:2px;background:${k>=cells-on?'#2F6FDE':'#E3E7EC'}"></i>`).join("");
-  document.getElementById("cOut").textContent=fmt(n)+(m?` · ${m}`:"");document.getElementById("cT").textContent=fmt(n);
-  document.getElementById("cP").textContent=n*n>=1e9?(n*n/1e9).toFixed(1)+" billion":fmt(n*n);document.getElementById("cW").textContent=w};
- s.oninput=draw;draw()}
+const GL=[["Embeddings",-36,-6],["Block 1",-36,-46],["Blocks 2–12",-36,-221],["Output",-36,-250]].map(([t,x,y])=>({el:mkLabel(t,"grp"),p:new THREE.Vector3(x,y,0)}));
+const SUBL=[["LayerNorm",-49],["Attention",-80],["+ add",-128],["LayerNorm",-138],["MLP",-170],["+ add",-212]].map(([t,y])=>({el:mkLabel(t,"sub"),p:new THREE.Vector3(-34,y,0)}));
 
-Z[21]=()=>`${head("THE WHOLE MACHINE","everything you built")}
-<div style="display:flex;flex-direction:column;gap:6px;max-width:440px">
-${[["Tokenizer","text → 5 ids","0"],["Token embedding","ids → vectors","38,597,376"],["Position embedding","+ where","786,432"],["Block ×12","LayerNorm · attention · + · LayerNorm · MLP · +","85,054,464"],["Final LayerNorm","","1,536"],["Unembedding","vector → 50,257 scores","shared"],["Softmax","scores → %","0"],["Sampler","% → one token","0"]].map((r,k)=>`<div class="box" style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;animation:rise .35s ${k*.07}s both;${k===3?'background:#EAF1FB;border-width:2px':''}"><span><b>${r[0]}</b> <span class="mini">${r[1]}</span></span><span class="mini">${r[2]}</span></div>`).join("")}
-<div class="box" style="display:flex;justify-content:space-between;background:var(--ink);color:#fff"><b>Total</b><b style="font-family:var(--pix)">124,439,808</b></div></div>
-<p class="note">↻ then loop: append the token and run it all again.</p>`;
+const blockFrame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(62,174,4)),new THREE.LineBasicMaterial({color:0x403E41,transparent:true,opacity:0}));
+blockFrame.position.set(0,-131,0);scene.add(blockFrame);
+const ghosts=[];for(let k=0;k<11;k++){const g=new THREE.Group();const m=new THREE.Mesh(new THREE.BoxGeometry(56,1.1,3),new THREE.MeshLambertMaterial({color:0xB7ADC9,transparent:true,opacity:.45}));
+ const e=new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),new THREE.LineBasicMaterial({color:0x7058BE,transparent:true,opacity:.5}));g.add(m,e);g.position.set(0,-222-k*2.4,0);g.visible=false;g.userData.drop=0;scene.add(g);ghosts.push(g)}
+// probability bars: top 8 by rank, plus "other"
+const BAR_Y=-290,BAR_H=14;const bars=[];const barGeo=new THREE.BoxGeometry(1.4,1,1.2);barGeo.translate(0,0.5,0);
+for(let k=0;k<=NB;k++){const m=new THREE.Mesh(barGeo,new THREE.MeshLambertMaterial({color:k<NB?0x269D69:0xB5ACA0}));m.position.set(-8+k*2,BAR_Y,0);m.scale.y=0.01;m.visible=false;scene.add(m);
+ bars.push({m,el:mkLabel("","bar"),h:0})}
+const barFloor=new THREE.Mesh(new THREE.BoxGeometry(20,0.3,2.4),new THREE.MeshLambertMaterial({color:0xDDD5CA}));barFloor.position.set(0,BAR_Y-0.15,0);barFloor.visible=false;scene.add(barFloor);
+const pickEl=mkLabel("","pick");
+// scale comparison
+const scaleG=new THREE.Group();scaleG.visible=false;scene.add(scaleG);
+function stack(n,w,x,color){for(let k=0;k<n;k++){const m=new THREE.Mesh(new THREE.BoxGeometry(w,1,3),new THREE.MeshLambertMaterial({color}));m.position.set(x,-20-k*1.5,0);scaleG.add(m)}}
+stack(12,4,70,0x1C8CA8);stack(96,64,128,0xE14775);
+const scaleL=[mkLabel("<b>GPT-2 small</b><span>12 blocks · 768 wide</span>"),mkLabel("<b>GPT-3</b><span>96 blocks · 12,288 wide</span>")];
+const scaleP=[new THREE.Vector3(66,-40,0),new THREE.Vector3(98,-16,0)];
 
-/* ================= station config: machine + counter ================= */
-const ORDER=["tok","wte","wpe","ln1","attn","res1","ln2","mlp","res2","lnf","unemb","soft","samp"];
-const CFG={
- 0:{a:[],b:0,p:0,n:"THE BOX"},1:{a:["tok"],b:1,p:0,n:"TOKENIZER"},2:{a:["wte"],b:2,p:38597376,n:"TOKEN EMBEDDING"},
- 3:{a:["wpe"],b:3,p:39383808,n:"POSITION EMBEDDING"},4:{a:["ln1"],b:4,p:39385344,n:"LAYERNORM"},
- 5:{a:["attn"],b:5,p:41157120,n:"ATTENTION · Q K V",sub:"Q K V"},6:{a:["attn"],b:5,p:41157120,n:"ATTENTION · SCORES",sub:"scores"},
- 7:{a:["attn"],b:5,p:41157120,n:"ATTENTION · MIX",sub:"mix"},8:{a:["attn"],b:5,p:41747712,n:"ATTENTION · HEADS",sub:"×12 heads"},
- 9:{a:["res1"],b:6,p:41747712,n:"RESIDUAL"},10:{a:["ln2","mlp","res2"],b:9,p:46471680,n:"MLP"},
- 11:{a:["block"],b:9,p:46471680,n:"ONE BLOCK"},12:{a:["block"],b:9,p:124438272,n:"STACK ×12",stack:1},
- 13:{a:["lnf","unemb"],b:11,p:124439808,n:"UNEMBEDDING",stack:1},14:{a:["soft"],b:12,p:124439808,n:"SOFTMAX",stack:1},
- 15:{a:["samp"],b:13,p:124439808,n:"SAMPLER",stack:1},16:{a:["in"],b:13,p:124439808,n:"THE LOOP",stack:1,loop:1},
- 17:{a:ORDER,b:13,p:124439808,n:"TRAINING",stack:1},18:{a:["block"],b:13,p:175000000000,n:"SCALE",stack:1,big:1},
- 19:{a:[],b:13,p:175000000000,n:"POST-TRAINING",stack:1,big:1},20:{a:["in"],b:13,p:124439808,n:"CONTEXT WINDOW",stack:1},
- 21:{a:[],b:13,p:124439808,n:"DONE",stack:1}};
+// flow: thin lines for data, tubes for the residual stream and the loop
+const EDGES=[["ids","tokE"],["WTE","tokE"],["WPE","posE"],["tokE","x0"],["posE","x0"],["x0","xl"],["xl","Q"],["xl","K"],["xl","V"],["Wq","Q"],["Wk","K"],["Wv","V"],
+ ["Q","S0"],["Q","S1"],["Q","S2"],["K","S0"],["K","S1"],["K","S2"],["S0","A0"],["S1","A1"],["S2","A2"],["A0","av"],["A1","av"],["A2","av"],["V","av"],
+ ["av","ao"],["Wo","ao"],["ao","x1"],["x1","xl2"],["xl2","h"],["W1","h"],["h","g"],["g","m"],["W2","m"],["m","x2"],["x2","xf"],["xf","logits"],["WTEt","logits"]];
+const SKIPS=[["x0","x1"],["x1","x2"]];
+const edges=[];
+const bottomOf=t=>new THREE.Vector3(t.cx,t.top-t.rows-0.3,0),topOf=t=>new THREE.Vector3(t.cx,t.top+0.3,0);
+const dotGeo=new THREE.SphereGeometry(0.2,10,8),dotMat=new THREE.MeshBasicMaterial({color:0x7058BE}),bigDot=new THREE.SphereGeometry(0.42,12,10),orMat=new THREE.MeshBasicMaterial({color:0xE16032});
+function mkEdge(a,b,skip){const A_=TS[a],B_=TS[b];let curve,obj;
+ if(skip){const p0=new THREE.Vector3(A_.cx-A_.width/2-0.4,A_.top-A_.rows/2,0),p3=new THREE.Vector3(B_.cx-B_.width/2-0.4,B_.top-B_.rows/2,0);
+  curve=new THREE.CubicBezierCurve3(p0,new THREE.Vector3(-31,p0.y,0),new THREE.Vector3(-31,p3.y,0),p3);
+  obj=new THREE.Mesh(new THREE.TubeGeometry(curve,80,0.28,8),new THREE.MeshLambertMaterial({color:0xE16032,transparent:true,opacity:0}))}
+ else{const p0=bottomOf(A_),p3=topOf(B_);const dy=Math.max(2,(p0.y-p3.y)*0.5);curve=new THREE.CubicBezierCurve3(p0,p0.clone().add(new THREE.Vector3(0,-dy,0)),p3.clone().add(new THREE.Vector3(0,dy,0)),p3);
+  obj=new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(40)),new THREE.LineBasicMaterial({color:0xC2B9AD,transparent:true,opacity:0}))}
+ scene.add(obj);
+ const parts=[];for(let k=0;k<(skip?3:1);k++){const p=new THREE.Mesh(skip?bigDot:dotGeo,skip?orMat:dotMat);p.visible=false;scene.add(p);parts.push(p)}
+ edges.push({a,b,skip,curve,obj,parts})}
+EDGES.forEach(([a,b])=>mkEdge(a,b));SKIPS.forEach(([a,b])=>mkEdge(a,b,true));
+const loopCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(2,-300,0),new THREE.Vector3(30,-292,0),new THREE.Vector3(48,-150,0),new THREE.Vector3(30,-4,0),new THREE.Vector3(2,1,0)]);
+const loopTube=new THREE.Mesh(new THREE.TubeGeometry(loopCurve,160,0.5,8),new THREE.MeshLambertMaterial({color:0xE16032,transparent:true,opacity:0}));scene.add(loopTube);
+const loopParts=[];for(let k=0;k<6;k++){const p=new THREE.Mesh(new THREE.SphereGeometry(1.2,14,12),orMat);p.visible=false;scene.add(p);loopParts.push(p)}
+// highlight frames: outline only
+function mkHL(){const e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1)),new THREE.LineBasicMaterial({color:0xCC7A0A}));e.visible=false;scene.add(e);return e}
+const HL=[mkHL(),mkHL(),mkHL()];
+function frame(h,t,r0,r1,c0,c1){const xa=t.cx_(c0)-0.5,xb=t.cx_(c1)+0.5,ya=t.cy_(r0)+0.5,yb=t.cy_(r1)-0.5;
+ h.visible=true;h.position.set((xa+xb)/2,(ya+yb)/2+t.group.position.y,0.55);h.scale.set(xb-xa+0.3,ya-yb+0.3,0.9)}
 
-const $=s=>document.querySelector(s);
-const zoom=$("#zoom"),zoomCol=$(".zoomcol");
-let cur=-1,shown=0,anim=null;
-function counter(to){cancelAnimationFrame(anim);const from=shown,t0=performance.now(),dur=Math.min(1600,400+Math.abs(Math.log10((to+1)/(from+1)))*500);
- const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);shown=from+(to-from)*e;$("#hudNum").textContent=fmt(shown);if(k<1)anim=requestAnimationFrame(step);else shown=to};
- anim=requestAnimationFrame(step)}
-function machine(c){
- document.querySelectorAll(".mp[data-p]").forEach(el=>{const p=el.dataset.p;if(p==="in"||p==="out")return;
-  el.classList.toggle("built",ORDER.indexOf(p)>-1&&ORDER.indexOf(p)<c.b);el.classList.toggle("active",c.a.includes(p))});
- const blk=$(".blk");blk.classList.toggle("built",c.b>=9);blk.classList.toggle("active",c.a.includes("block"));blk.classList.toggle("stacked",!!c.stack);
- $("#blkX").textContent=c.big?"×96":"×12";
- $("#mach").classList.toggle("loop",!!c.loop);
- $("#attnSub").textContent=c.sub?" · "+c.sub:"";
- if(c.b<13)$("#machOut").textContent="?";else if($("#machOut").textContent==="?")$("#machOut").textContent='" mat"'}
-function activate(n,sec){
- if(n===cur)return;cur=n;const c=CFG[n];
- timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];
- document.querySelectorAll(".step").forEach(s=>s.classList.toggle("on",s===sec));
- document.body.dataset.zone=sec.dataset.zone||"paper";
- $("#hudPart").innerHTML=`PART <b>${n}</b>/21 · ${c.n}`;
- $("#hudLab").textContent=c.big?"PARAMETERS · GPT-3":"PARAMETERS · GPT-2 SMALL";
- $("#hudBar").style.width=(n/21*100)+"%";
- counter(c.p);machine(c);
- const mobile=matchMedia("(max-width:820px)").matches;
- if(mobile){sec.appendChild(zoom)}else if(zoom.parentNode!==zoomCol){zoomCol.appendChild(zoom)}
- zoom.innerHTML=`<div class="enter">${Z[n]()}</div>`;zoom.scrollTop=0}
+/* ====================== stations: ops + step captions ====================== */
+// beat: {at: scroll fraction, a: anchor tensor id | "BARS" | "GHOST" | "LOOP" | "BLOCK", t: text}
+const mmOp=(A_,W_,out,o={})=>({t:"mm",A:A_,W:W_,out,...o});
+const ST=[
+ {n:"The job",ch:"The job",p:0,focus:"ALL",beats:[{at:0,a:"ids",t:"Those faint outlines are the parts. They fill in as you build them, top to bottom."}]},
+ {n:"Tokenizer",ch:"1 · Words → numbers",p:0,focus:["ids"],ops:[{t:"rows",out:"ids"}],beats:[
+  {at:0,a:"ids",t:"Your sentence, cut into 5 tokens. Each one gets its id from the list."},
+  {at:.45,a:"ids",t:"The ␣ is a space, and it belongs to the token. ␣cat is 3797; cat without the space is 9246."},
+  {at:.8,a:"ids",t:"Think of these as jersey numbers. The next part gives them something to mean."}]},
+ {n:"Token embedding",ch:"1 · Words → numbers",p:38597376,focus:["ids","WTE","tokE"],ops:[{t:"lookup",src:"WTE",map:TOKROW,out:"tokE",slow:1}],beats:[
+  {at:0,a:"WTE",t:"Each cube is one number. This is the token table, 16 of its 50,257 rows.",hint:{a:"WTE",c:4,r:3,t:"hover any cube",hover:1}},
+  {at:.12,a:"tokE",t:"The is id 464, so it gets row 464. It's copied; nothing is computed.",loop:1,dur:3},
+  {at:.45,a:"tokE",t:"Same for the other four. Pink is above zero, teal below, pale near zero."},
+  {at:.8,a:"WTE",t:"The and ␣the look alike because I set them that way. In GPT-2, training does that."}]},
+ {n:"Position embedding",ch:"1 · Words → numbers",p:39383808,focus:["WPE","tokE","posE","x0"],ops:[{t:"lookup",src:"WPE",map:[0,1,2,3,4],out:"posE"},{t:"add",a:"tokE",b:"posE",out:"x0",slow:1}],beats:[
+  {at:0,a:"WPE",t:"A second table, one row per position. The first token gets row 0."},
+  {at:.36,a:"x0",t:"Now they're added, number by number. The's row goes first.",loop:1,dur:3.5},
+  {at:.85,a:"WPE",t:"GPT-2 has 1,024 of these rows, which is why it can't read past 1,024 tokens."}]},
+ {n:"LayerNorm",ch:"2 · Tokens talk",p:39385344,focus:["x0","xl"],ops:[{t:"rows",src:"x0",out:"xl",slow:1,calc:"subtract the average, divide by the spread"}],beats:[
+  {at:0,a:"x0",t:`␣cat's row averages ${FX.catMean} with a spread of ${FX.catSpread}. The other rows differ.`},
+  {at:.15,a:"xl",t:"Each row gets reset on its own. Watch the colours even out.",loop:1,dur:3.5},
+  {at:.8,a:"xl",t:"The pattern inside each row survives. Only its scale changed."}]},
+ {n:"Query, key, value",ch:"2 · Tokens talk",p:41157120,focus:["xl","Wq","Wk","Wv","Q","K","V"],ops:[mmOp("xl","Wq","Q",{slow:1}),mmOp("xl","Wk","K"),mmOp("xl","Wv","V")],yaw:-.22,beats:[
+  {at:0,a:"Wq",t:"These three grids are weights, numbers the model learns. One each for queries, keys and values."},
+  {at:.12,a:"Q",t:"One cell, slowly. The's row times one column of W_Q: twelve pairs, multiplied, then added up.",loop:1,dur:4.5,hint:{a:"Q",c:.5,r:.5,t:"the whole trick"}},
+  {at:.27,a:"Q",t:"That's a dot product. Every cell here is one, and that's all a matrix multiply is."},
+  {at:.48,a:"K",t:"The same five rows go through W_K, then W_V."},
+  {at:.78,a:"V",t:"Hover any cube to see the sum that made it."}]},
+ {n:"Scores",ch:"2 · Tokens talk",p:41157120,focus:["Q","K","S0","S1","S2"],ops:[0,1,2].map(h=>({t:"score",h,out:"S"+h,slow:h===0})),beats:[
+  {at:0,a:"S0",t:"One grid per head. Each row is a token asking; each column, a token being asked."},
+  {at:.12,a:"S0",t:"First cell: The's query against its own key. Four pairs, added, then divided by 2.",loop:1,dur:3.5},
+  {at:.3,a:"S0",t:"The dark cells are the future. ␣cat can't see ␣sat yet.",hint:{a:"S0",c:4.5,r:.5,t:"no peeking"}},
+  {at:.82,a:"S0",t:`In head 1, ␣the scores ${show(TOKS[FX.s4])} highest (${FX.s4v}). The weights are random, so that's luck.`}]},
+ {n:"Softmax and mix",ch:"2 · Tokens talk",p:41157120,focus:["S0","S1","S2","A0","A1","A2","V","av"],ops:[...[0,1,2].map(h=>({t:"rows",src:"S"+h,out:"A"+h,slow:h===0,calc:"softmax: scores into shares"})),{t:"mix",out:"av",slow:1}],beats:[
+  {at:0,a:"A0",t:"Softmax, one row at a time. A bigger score gets a bigger share."},
+  {at:.25,a:"A0",t:`␣the gives ${FX.a4p}% of its attention to ${show(TOKS[FX.a4])} in head 1.`},
+  {at:.59,a:"av",t:"Now the blend: each value row times its share, added up. Watch The's first number.",loop:1,dur:3.5},
+  {at:.85,a:"av",t:"Five new rows, each a mix of the tokens up to and including itself."}]},
+ {n:"Many heads",ch:"2 · Tokens talk",p:41747712,focus:["av","Wo","ao"],ops:[mmOp("av","Wo","ao")],beats:[
+  {at:0,a:"av",t:"The three heads' outputs, glued side by side. Three times four is twelve."},
+  {at:.3,a:"ao",t:"One more table of weights mixes them into a single row per token."}]},
+ {n:"Residual",ch:"2 · Tokens talk",p:41747712,focus:["x0","ao","x1"],ops:[{t:"add",a:"x0",b:"ao",out:"x1"}],beats:[
+  {at:0,a:"x1",t:"The thick orange line carries the row from before attention, around the side."},
+  {at:.35,a:"x1",t:`Here they meet and add. ␣cat's row moved about ${FX.resid}%; most of it is still the old row.`}]},
+ {n:"MLP",ch:"3 · Tokens think",p:46471680,focus:["x1","xl2","W1","h","g","W2","m","x2"],ops:[{t:"rows",src:"x1",out:"xl2",calc:"LayerNorm"},mmOp("xl2","W1","h"),{t:"rows",src:"h",out:"g",slow:1,calc:"the bend: negatives squashed toward 0"},mmOp("g","W2","m",{trans:1}),{t:"add",a:"x1",b:"m",out:"x2"}],yaw:-.2,beats:[
+  {at:0,a:"xl2",t:"First, the same reset you saw in part 4."},
+  {at:.24,a:"W1",t:"Widen from 12 numbers to 48. More room to work in."},
+  {at:.36,a:"g",t:`The bend, called GELU. ${FX.neg} of the 240 numbers were negative, and they get squashed toward zero.`,loop:1,dur:3.5},
+  {at:.59,a:"W2",t:"Narrow back to 12. I drew this table on its side so the flow keeps running down."},
+  {at:.71,a:"x2",t:"And onto the stream, just like attention's output."}]},
+ {n:"One block",ch:"Checkpoint",p:46471680,focus:"BLOCK",beats:[{at:0,a:"BLOCK",t:"The whole block, labelled. Attention on top, the MLP below, the stream down the side.",hint:{a:"g",c:0,r:0,t:"drag to spin it"}}]},
+ {n:"Stack ×12",ch:"4 · Stack it",p:124438272,focus:["x2","GHOST","xf"],beats:[{at:0,a:"GHOST",t:"Each slab is another block, with 7,087,872 numbers of its own.",dur:5,hint:{el:"hudNum",t:"watch this number"}}]},
+ {n:"Unembedding",ch:"5 · Numbers → a word",p:124439808,focus:["x2","xf","WTEt","logits"],ops:[{t:"rows",src:"x2",out:"xf",calc:"final LayerNorm"},mmOp("xf","WTEt","logits",{slow:1})],beats:[
+  {at:0,a:"WTEt",t:"The token table from part 2, turned on its side. No new numbers."},
+  {at:.36,a:"logits",t:"Each score is the final row dotted with one token's row.",loop:1,dur:3.5},
+  {at:.85,a:"logits",t:`The untrained toy's top pick after ␣the is ${show(VOCAB[FX.toyTop])}. Random, for now.`}]},
+ {n:"Softmax",ch:"5 · Numbers → a word",p:124439808,focus:["logits","BARS"],beats:[
+  {at:0,a:"BARS",t:"Made-up odds for a trained GPT-2. ␣mat comes first.",dur:3},
+  {at:.6,a:"BARS",t:"The grey bar is every other token, all 50,249 of them, together."}]},
+ {n:"Sampler",ch:"5 · Numbers → a word",p:124439808,focus:["BARS"],beats:[
+  {at:0,a:"BARS",t:"Below 1, temperature makes the tall bars taller. Above 1, everything flattens out."},
+  {at:.5,a:"BARS",t:"Roll a few times. At temperature 1, ␣mat wins about one roll in three."}]},
+ {n:"The loop",ch:"5 · Numbers → a word",p:124439808,focus:"ALL",beats:[
+  {at:0,a:"LOOP",t:"The picked token goes back in at the top. One lap, one token."},
+  {at:.5,a:"LOOP",t:"This is why chat replies appear word by word."}]},
+ {n:"Training",ch:"6 · Where the numbers come from",p:124439808,focus:["Wq","Wk","Wv","Wo","W1","W2"],beats:[
+  {at:0,a:"W1",t:"Step 0, loss 10.8. That's what blind guessing among 50,257 tokens scores.",dur:3},
+  {at:.2,a:"W1",t:"The shimmer is every weight being nudged at once. It settles as the loss falls.",dur:4},
+  {at:.5,a:"W1",t:"The sample text is a sketch I wrote of each stage, not real output.",dur:4},
+  {at:.8,a:"W1",t:"GPT-2 small ends near 3. None of the parts changed, only their numbers.",dur:3}]},
+ {n:"Scale",ch:"6 · Where the numbers come from",p:175000000000,focus:"SCALE",big:1,dur:4},
+ {n:"Post-training",ch:"6 · Where the numbers come from",p:124439808,focus:"ALL"},
+ {n:"Context window",ch:"6 · Where the numbers come from",p:124439808,focus:["ids","tokE","posE","x0"]},
+ {n:"Done",ch:"Done",p:124439808,focus:"ALL"}];
+const BLOCK_IDS=new Set(["x0","xl","Wq","Wk","Wv","Q","K","V","S0","S1","S2","A0","A1","A2","av","Wo","ao","x1","xl2","W1","h","g","W2","m","x2"]);
+const MOVES={lookup:["look up","Take row n of a table."],add:["add","Add two rows, number by number."],normalise:["normalise","Shift and scale a row to average 0, spread 1."],
+ dot:["dot product","Multiply two rows pair by pair, add up: one number, big when they agree."],softmax:["softmax","Turn scores into shares that add up to 100%."],
+ mix:["mix","Blend rows by those shares."],bend:["bend","Squash negatives toward 0 (GELU)."],pick:["pick","Roll dice weighted by the shares."]};
 
-const secs=[...document.querySelectorAll(".step")];
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)activate(+e.target.dataset.s,e.target)})},{rootMargin:"-45% 0px -50% 0px"});
-secs.forEach(s=>io.observe(s));
-// acts set the background too
-const aio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.target.dataset.zone)document.body.dataset.zone=e.target.dataset.zone}),{rootMargin:"-45% 0px -50% 0px"});
-document.querySelectorAll(".act").forEach(a=>aio.observe(a));
-// before the first station: show the empty box
-addEventListener("scroll",()=>{if(scrollY<innerHeight*.5&&cur!==-1){cur=-1;$("#hudPart").innerHTML="PART <b>0</b>/21 · THE BOX";counter(0);document.body.dataset.zone="paper";machine(CFG[0])}},{passive:true});
-activate(0,secs[0]);
-addEventListener("resize",()=>{const n=cur;cur=-1;if(n>=0)activate(n,secs[n])});
-})();
+/* ====================== per-frame state ====================== */
+let cur=0,prog=0,headFocus=-1,trainQ=0,clock=0,tempV=1,topPV=1,picked=null,heroMode=true,away=false;
+const tmpM=new THREE.Matrix4(),tmpC=new THREE.Color(),tmpC2=new THREE.Color(),tmpV=new THREE.Vector3();
+function valColor(t,v,out){
+ if(t.kind==="id"){out.copy(cId);return out}
+ if(t.kind==="w"){out.lerpColors(wLo,wHi,Math.pow(clamp((v/t.s+1)/2,0,1),1.1));return out}
+ if(t.kind==="p"){out.lerpColors(pLo,pHi,Math.pow(clamp(v,0,1),0.6));return out}
+ if(!Number.isFinite(v)){out.copy(cMask);return out}
+ const k=clamp(v/t.s,-1,1),m=Math.pow(Math.abs(k),0.7);k>=0?out.lerpColors(cZero,cPos,m):out.lerpColors(cZero,cNeg,m);return out}
+const perCell=op=>op.t==="mm"||op.t==="score"||op.t==="mix";
+const unitsOf=op=>{const t=TS[op.out];return perCell(op)?t.rows*t.cols:t.rows};
+// slow first unit: the worked example gets 40% of this op's scroll
+const warp=(u,units,slow)=>slow&&units>1?(u<0.4?u/0.4:1+(u-0.4)/0.6*(units-1)):u*units;
+
+function paint(t,st){ // st: {state, ri, f, unitRow, op, dim, lift}
+ const shimmer=cur===17&&t.kind==="w";
+ const key=`${st.state}|${st.ri}|${st.f.toFixed(2)}|${st.dim}|${headFocus}|${st.lift||""}|${shimmer?clock.toFixed(2):""}`;if(key===t.key)return;t.key=key;
+ const n=t.rows*t.cols,op=st.op,gy=t.group.position.y;const L=st.liftR;
+ for(let i=0;i<n;i++){const r=Math.floor(i/t.cols),c=i%t.cols;
+  let x=t.cx_(c),y=t.cy_(r),z=0,sc=1,v=t.data[r][c];
+  const unit=st.unitRow?r:i;
+  if(shimmer&&Number.isFinite(v))v+=(1-trainQ)*t.s*1.2*Math.sin(clock*4+i*1.9);
+  if(st.state==="full"||(st.state==="build"&&unit<st.ri))valColor(t,v,tmpC);
+  else if(st.state==="build"&&unit===st.ri){const f=st.f,e=ease(f);
+   if(op.t==="lookup"){const S_=TS[op.src];const sy=S_.cy_(op.map[r])+S_.group.position.y-gy;x=S_.cx_(c)+(x-S_.cx_(c))*e;y=sy+(y-sy)*e;z=Math.sin(Math.PI*e)*4;valColor(t,v,tmpC)}
+   else if(op.t==="add"){const S_=TS[op.a];const sy=S_.cy_(r)+S_.group.position.y-gy;y=sy+(y-sy)*e;z=Math.sin(Math.PI*e)*2;valColor(S_,S_.data[r][c],tmpC);tmpC.lerp(valColor(t,v,tmpC2),e)}
+   else if(op.t==="rows"&&op.src){const S_=TS[op.src];valColor(S_,S_.data[r][c],tmpC);tmpC.lerp(valColor(t,v,tmpC2),e);z=Math.sin(Math.PI*e)*.8}
+   else{sc=0.32+0.68*back(clamp(f*1.4,0,1));tmpC.copy(cGhost).lerp(valColor(t,v,tmpC2),clamp(f*1.6,0,1));z=0.6}}
+  else{tmpC.copy(cGhost);sc=0.3}
+  let d=st.dim?0.78:0;
+  if(headFocus>=0&&!st.dim&&cur>=5&&cur<=8){if(t.head!==undefined&&t.head!==headFocus)d=0.82;if(t.g&&Math.floor(c/t.g)!==headFocus)d=0.82}
+  if(L&&r>=L[0]&&r<=L[1]&&c>=L[2]&&c<=L[3]){z+=0.55;sc*=1.06}
+  if(d)tmpC.lerp(cDim,d);
+  t.mesh.setColorAt(i,tmpC);
+  tmpM.makeScale(sc,sc,sc);tmpM.setPosition(x,y,z);t.mesh.setMatrixAt(i,tmpM)}
+ t.mesh.instanceColor.needsUpdate=true;t.mesh.instanceMatrix.needsUpdate=true}
+
+let calcInfo=null,beatNow=null;
+function update(dt){
+ const s=heroMode?21:cur,st=ST[s],ops=st.ops||[];
+ away=s===18;
+ const wts=ops.map(o=>o.slow?2:1),tot=wts.reduce((a,b)=>a+b,0),qq=clamp((prog-0.12)/0.7,0,1)*tot;
+ let k=0,acc=0;for(;k<ops.length-1&&qq>=acc+wts[k];k++)acc+=wts[k];const u=ops.length?clamp((qq-acc)/wts[k],0,1):0,doneAll=qq>=tot;
+ const focusAll=st.focus==="ALL"||st.focus==="SCALE",focusBlock=st.focus==="BLOCK";
+ calcInfo=null;HL.forEach(h=>h.visible=false);
+ // pass 1: states, the unit in flight, what to lift
+ const plan={},lift={};
+ for(const t of TL){let state;
+  if(t.appear>s)state="hidden";else if(t.appear<s)state="full";
+  else{const oi=ops.findIndex(o=>o.out===t.id);if(oi<0||oi<k||(oi===k&&doneAll))state="full";else state="build"}
+  const p={state,ri:-1,f:0,unitRow:false,op:null};
+  if(state==="build"){const oi=ops.findIndex(o=>o.out===t.id),op=ops[oi];p.op=op;p.unitRow=!perCell(op);
+   if(oi===k){const units=unitsOf(op),w=warp(u,units,op.slow);p.ri=Math.min(units,Math.floor(w));p.f=w-p.ri;if(p.ri<units)highlight(op,p.ri,lift)}
+   else p.ri=0}
+  plan[t.id]=p}
+ // pass 2: paint
+ for(const t of TL){const p=plan[t.id];const visible=p.state!=="hidden";
+  t.drop=Math.max(0,t.drop-dt*1.6);t.group.position.y=(1-back(1-t.drop))*-10;
+  const inFocus=focusAll||(focusBlock?BLOCK_IDS.has(t.id):Array.isArray(st.focus)&&st.focus.includes(t.id));
+  const shown=visible&&!away&&inFocus;
+  if(shown&&!t.shown)t.drop=1;t.shown=shown;
+  t.group.visible=shown;
+  t.outline.visible=!visible&&!away&&!heroMode&&s===0;
+  p.dim=visible&&!inFocus;p.lift=lift[t.id]?lift[t.id].join(","):"";p.liftR=lift[t.id];
+  if(shown)paint(t,p);
+  t.vis=shown;t.focus=inFocus}
+ // edges
+ const activeOuts=new Set(ops.map(o=>o.out));
+ for(const e of edges){const A_=TS[e.a],B_=TS[e.b];const vis=A_.vis&&B_.vis&&(e.skip?s>=9:true);
+  const active=vis&&!heroMode&&(activeOuts.has(e.b)||(e.skip&&(s===9&&e.b==="x1"||s===10&&e.b==="x2")));
+  const want=vis?(active?1:e.skip?0.75:0.45):0;
+  e.obj.material.opacity+=(want-e.obj.material.opacity)*0.15;e.obj.visible=e.obj.material.opacity>0.01;
+  if(!e.skip)e.obj.material.color.set(active?0x7058BE:0xC2B9AD);
+  e.parts.forEach((p,i)=>{p.visible=active;if(active)p.position.copy(e.curve.getPoint(((clock*(e.skip?0.3:0.5))+i/e.parts.length)%1))})}
+ blockFrame.material.opacity+=(((s===11)?0.85:(st.focus==="ALL"&&s>=11?0.2:0))-blockFrame.material.opacity)*0.12;
+ const gN=s<12?0:s===12?Math.ceil(clamp(prog/0.7,0,1)*11):11;
+ ghosts.forEach((g,i)=>{const on=i<gN&&!away&&(s===12||st.focus==="ALL");if(on&&!g.visible)g.userData.drop=1;g.visible=on;g.userData.drop=Math.max(0,g.userData.drop-dt*2.2);g.position.y=-222-i*2.4+(1-back(1-g.userData.drop))*-8});
+ const showBars=s>=14&&!away&&(focusAll||(Array.isArray(st.focus)&&st.focus.includes("BARS")));barFloor.visible=showBars;
+ const P=probs(s===15?tempV:1,s===15?topPV:1);const grow=s===14?clamp(prog/0.5,0,1):1;
+ const vals=RANK.slice(0,NB).map(i=>P.p[i]);vals.push(P.po+RANK.slice(NB).reduce((a,i)=>a+P.p[i],0));const mx=Math.max(...vals);
+ bars.forEach((b,k)=>{b.m.visible=showBars;const want=vals[k]/mx*BAR_H*grow;b.h+=(want-b.h)*0.15;b.m.scale.y=Math.max(0.02,b.h);b.v=vals[k];
+  b.m.material.color.set(picked!=null&&s>=15&&((picked<NB&&k===picked)||(picked>=NB&&k===NB))?0xE16032:(k<NB?0x269D69:0xB5ACA0))});
+ loopTube.material.opacity+=((s===16&&!heroMode?0.9:0)-loopTube.material.opacity)*0.12;loopTube.visible=loopTube.material.opacity>0.01;
+ loopParts.forEach((p,i)=>{p.visible=s===16&&!heroMode;if(p.visible)p.position.copy(loopCurve.getPoint(((clock*0.16)+i/6)%1))});
+ scaleG.visible=away;
+ if(s===17)trainQ=clamp((prog-0.05)/0.8,0,1);
+ // which step caption
+ const B=heroMode?[]:(ST[cur].beats||[]);beatNow=B.length?{...B[beatIdx],i:beatIdx,n:B.length}:null}
+
+const dotTerms=(a,b,n=3)=>a.slice(0,n).map((x,i)=>`${n2(x)}×${n2(b[i])}`).join(" + ");
+function highlight(op,idx,lift){
+ const out=TS[op.out];const add=(id,r0,r1,c0,c1)=>{lift[id]=[r0,r1,c0,c1]};
+ if(op.t==="mm"){const r=Math.floor(idx/out.cols),c=idx%out.cols;const A_=TS[op.A],W_=TS[op.W];
+  frame(HL[0],A_,r,r,0,A_.cols-1);add(op.A,r,r,0,A_.cols-1);
+  if(op.trans){frame(HL[1],W_,c,c,0,W_.cols-1);add(op.W,c,c,0,W_.cols-1)}else{frame(HL[1],W_,0,W_.rows-1,c,c);add(op.W,0,W_.rows-1,c,c)}
+  frame(HL[2],out,r,r,c,c);
+  const a=A_.data[r],w=op.trans?W_.data[c]:W_.data.map(rw=>rw[c]);
+  calcInfo={t:out,txt:`${show(TOKS[r])} row · column ${c+1}: ${dotTerms(a,w)} + … (${a.length} pairs) = <b>${n2(out.data[r][c])}</b>`}}
+ else if(op.t==="score"){const r=Math.floor(idx/5),c=idx%5,h=op.h;
+  frame(HL[0],TS.Q,r,r,h*HD,h*HD+HD-1);frame(HL[1],TS.K,c,c,h*HD,h*HD+HD-1);frame(HL[2],out,r,r,c,c);add("Q",r,r,h*HD,h*HD+HD-1);add("K",c,c,h*HD,h*HD+HD-1);
+  const qa=Q[r].slice(h*HD,h*HD+HD),ka=K[c].slice(h*HD,h*HD+HD);
+  calcInfo={t:out,txt:c>r?`${show(TOKS[r])} can't see ${show(TOKS[c])}: it comes later`:`q·k for ${show(TOKS[r])}→${show(TOKS[c])}: (${dotTerms(qa,ka,2)} + …) ÷ 2 = <b>${n2(out.data[r][c])}</b>`}}
+ else if(op.t==="mix"){const r=Math.floor(idx/C),c=idx%C,h=Math.floor(c/HD);
+  frame(HL[0],TS["A"+h],r,r,0,4);frame(HL[1],TS.V,0,r,c,c);frame(HL[2],out,r,r,c,c);add("A"+h,r,r,0,4);add("V",0,r,c,c);
+  const terms=A[h][r].slice(0,r+1).map((w,j)=>`${Math.round(w*100)}%×${n2(V[j][c])}`).slice(0,3).join(" + ");
+  calcInfo={t:out,txt:`${show(TOKS[r])}: ${terms}${r>2?" + …":""} = <b>${n2(out.data[r][c])}</b>`}}
+ else if(op.t==="lookup"){const r=idx,S_=TS[op.src];frame(HL[0],S_,op.map[r],op.map[r],0,S_.cols-1);add(op.src,op.map[r],op.map[r],0,S_.cols-1);
+  calcInfo={t:out,txt:op.src==="WTE"?`id ${VID[TOKS[r]]} → copy the row for ${show(TOKS[r])}`:`position ${r} → copy row ${r}`}}
+ else if(op.t==="add"){const r=idx;frame(HL[0],TS[op.a],r,r,0,C-1);frame(HL[1],TS[op.b],r,r,0,C-1);add(op.a,r,r,0,C-1);add(op.b,r,r,0,C-1);
+  calcInfo={t:out,txt:`${show(TOKS[r])}: ${n2(TS[op.a].data[r][0])} + ${n2(TS[op.b].data[r][0])} = <b>${n2(out.data[r][0])}</b>, and so on for all 12`}}
+ else if(op.t==="rows"){const r=idx;
+  if(op.src){frame(HL[0],TS[op.src],r,r,0,TS[op.src].cols-1);add(op.src,r,r,0,TS[op.src].cols-1)}
+  calcInfo={t:out,txt:op.out==="ids"?`${show(TOKS[r])} → <b>${VID[TOKS[r]]}</b>`:`${show(TOKS[r])}: ${op.calc}`}}}
+
+/* ====================== camera ====================== */
+const camT=new THREE.Vector3(0,-140,0),wantT=new THREE.Vector3();let camD=420,wantD=420,yaw=-0.3,wantYaw=-0.3,pitch=0.12,dYaw=0,dPitch=0,autoYaw=0;
+const box=new THREE.Box3(),sz=new THREE.Vector3();
+function focusBox(st){box.makeEmpty();
+ const addT=t=>{box.expandByPoint(tmpV.set(t.cx-t.width/2-4,t.top+2,0));box.expandByPoint(tmpV.set(t.cx+t.width/2,t.top-t.rows,0))};
+ if(st.focus==="ALL")box.set(new THREE.Vector3(-36,-300,0),new THREE.Vector3(36,6,0));
+ else if(st.focus==="SCALE")box.set(new THREE.Vector3(60,-166,0),new THREE.Vector3(162,-10,0));
+ else if(st.focus==="BLOCK")box.set(new THREE.Vector3(-40,-218,0),new THREE.Vector3(33,-40,0));
+ else st.focus.forEach(id=>{if(id==="GHOST"){box.expandByPoint(tmpV.set(-28,-220,0));box.expandByPoint(tmpV.set(28,-248,0))}
+  else if(id==="BARS"){box.expandByPoint(tmpV.set(-11,BAR_Y+BAR_H+2,0));box.expandByPoint(tmpV.set(11,BAR_Y-5,0))}else addT(TS[id])});
+ return box}
+let W=1,H=1,usableW=1,usableH=1,mobile=false;
+const tanH=Math.tan(THREE.MathUtils.degToRad(FOV/2));
+function resize(){W=innerWidth;H=innerHeight;mobile=W<=820;renderer.setSize(W,H);camera.aspect=W/H;
+ const cardW=mobile?0:Math.min(360,W*0.34)+44,miniW=mobile?0:50;
+ const shiftX=mobile?0:-(cardW+miniW)/2,shiftY=mobile?H*(heroMode?0.27:0.22):-26;usableW=W-cardW-miniW-30;usableH=mobile?H*(heroMode?0.34:0.4):H-96;
+ camera.setViewOffset(W,H,-shiftX,shiftY,W,H);camera.updateProjectionMatrix();setWant();
+}
+let boxR=0,boxT=0,boxB=0;
+function setWant(){const st=ST[heroMode?21:cur];const b=focusBox(st);b.getCenter(wantT);b.getSize(sz);boxR=b.max.x;boxT=b.max.y;boxB=b.min.y;
+ // leave room on the right for the step caption on desktop
+ const extra=1;
+ const dH=(sz.y/2+2)/tanH*(H/usableH),dW=(sz.x/2+2)*extra/(tanH*camera.aspect)*(W/usableW);wantD=Math.max(dH,dW,24);
+ wantYaw=st.yaw??-0.3}
+let drag=null;
+renderer.domElement.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,yw:dYaw,pt:dPitch,touch:e.pointerType!=="mouse",on:e.pointerType==="mouse"};if(drag.on)renderer.domElement.classList.add("dragging")});
+addEventListener("pointermove",e=>{if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(drag.touch&&!drag.on){if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.5)drag.on=true;else return}
+  dYaw=clamp(drag.yw+dx*0.006,-1.1,1.1);if(!drag.touch)dPitch=clamp(drag.pt+dy*0.004,-0.6,0.7)}
+ else hover(e)});
+addEventListener("pointerup",()=>{drag=null;renderer.domElement.classList.remove("dragging")});
+addEventListener("pointercancel",()=>{drag=null});
+
+/* ====================== hover: inspect any cube ====================== */
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),tipEl=document.getElementById("tip");let hoverAt=0;
+function hover(e){if(e.pointerType!=="mouse"||e.target!==renderer.domElement){tipEl.style.opacity=0;return}
+ const now=performance.now();if(now-hoverAt<40)return;hoverAt=now;
+ mouse.set(e.clientX/W*2-1,-(e.clientY/H)*2+1);ray.setFromCamera(mouse,camera);
+ const hits=ray.intersectObjects(TL.filter(t=>t.vis).map(t=>t.mesh),false);
+ if(!hits.length){tipEl.style.opacity=0;return}
+ const h=hits[0],t=h.object.userData.t,i=h.instanceId,r=Math.floor(i/t.cols),c=i%t.cols,v=t.data[r][c];
+ const who=t.tok?show(TOKS[r]):t.id==="WTE"?show(VOCAB[r]):t.id==="WPE"?`position ${r}`:`row ${r+1}`;
+ let txt=`${t.name.replace(/<[^>]+>/g,"")} · ${who} · #${c+1} = <b>${Number.isFinite(v)?n2(v):"blocked"}</b>`;
+ if(t.mmSrc&&Number.isFinite(v)){const [a,w,tr]=t.mmSrc;const ar=TS[a].data[r],wc=tr?TS[w].data[c]:TS[w].data.map(x=>x[c]);txt+=`<br>= ${dotTerms(ar,wc)} + … (${ar.length} pairs)`}
+ hoveredOnce=true;tipEl.innerHTML=txt;tipEl.style.left=e.clientX+"px";tipEl.style.top=e.clientY+"px";tipEl.style.opacity=1}
+
+/* ====================== labels, caption, calc ====================== */
+function place(el,p,on,extra=""){if(!on){el.style.opacity=0;return}tmpV.copy(p).project(camera);
+ if(tmpV.z>1){el.style.opacity=0;return}const x=(tmpV.x+1)/2*W,y=(1-tmpV.y)/2*H;el.style.opacity=1;el.style.transform=`translate(${x}px,${y}px) ${extra}`}
+const lp=new THREE.Vector3(),ptrEl=document.getElementById("ptr"),calcEl=document.getElementById("calc");let beatKey="",cardX=null,cardY=0,hoveredOnce=false;const hintEl=document.getElementById("hint");const leadEl=document.getElementById("lead"),leadL=leadEl.querySelector("line"),leadC=leadEl.querySelector("circle");
+function anchorPt(){ // world-space point the card points at: right edge of the part being explained
+ const st=ST[cur];let a=beatNow?beatNow.a:(Array.isArray(st.focus)?st.focus.find(id=>TS[id]):null);
+ if(a==="BARS")return [11,BAR_Y+BAR_H*0.6];if(a==="GHOST")return [28,-230];if(a==="LOOP")return [48,-150];if(a==="BLOCK")return [33,-100];
+ if(a&&TS[a]){const t=TS[a];return [t.cx+t.width/2,t.top+t.group.position.y-Math.min(t.rows/2,4)]}
+ return [wantT.x+sz.x/2,wantT.y+sz.y*0.2]}
+function labels(){
+ const st=ST[heroMode?21:cur],overview=st.focus==="ALL"||st.focus==="SCALE";
+ const ppu=H/(2*camD*tanH);const small=ppu<6;
+ for(const t of TL){const showL=t.vis&&t.focus&&!overview&&!small&&cur!==11;const gy=t.group.position.y;
+  place(t.label,lp.set(t.cx-t.width/2,t.top+gy+1.2,0),showL,"translateY(-100%)");
+  if(t.rl){const showR=showL&&ppu>=12&&(t.kind!=="w"||cur===2||cur===3);t.rl.forEach((el,r)=>place(el,lp.set(t.cx-t.width/2-0.6,t.cy_(r)+gy,0),showR,"translate(-100%,-50%)"))}}
+ GL.forEach(g=>place(g.el,g.p,st.focus==="ALL"&&cur!==16,"translate(-100%,-50%)"));
+ SUBL.forEach(g=>place(g.el,g.p,cur===11&&!heroMode,"translate(-100%,-50%)"));
+ scaleL.forEach((el,i)=>place(el,scaleP[i],away&&!heroMode,i?"translateY(-100%)":""));
+ const showBarL=(cur===14||cur===15)&&!heroMode;
+ bars.forEach((b,k)=>{const tok=k<NB?show(VOCAB[RANK[k]]):"other";b.el.innerHTML=`${tok}<em>${pct(b.v||0)}</em>`;place(b.el,lp.set(b.m.position.x,BAR_Y-0.8,0),showBarL&&(!mobile||k===0||k===NB),"translate(-50%,0)")});
+ const pk=picked==null?null:picked<NB?picked:NB;
+ pickEl.textContent=picked==null?"":`"${picked<NB?VOCAB[RANK[picked]]:"(another token)"}"`;
+ place(pickEl,lp.set(pk==null?0:bars[pk].m.position.x,BAR_Y+(pk==null?0:bars[pk].h)+1.2,0),pk!=null&&cur>=15&&!away&&!heroMode,"translate(-50%,-100%)");
+ // calc: under the tensor being computed
+ if(calcInfo&&!small&&!heroMode){const t=calcInfo.t;tmpV.set(t.cx,t.top-t.rows-1.4+t.group.position.y,0).project(camera);
+  calcEl.innerHTML=calcInfo.txt;const w=calcEl.offsetWidth;calcEl.style.left=clamp((tmpV.x+1)/2*W,w/2+8,(mobile||cardX===null?W:cardX)-w/2-14)+"px";calcEl.style.top=((1-tmpV.y)/2*H)+"px";calcEl.style.opacity=1}else calcEl.style.opacity=0;
+ // casual hint arrow, now and then
+ const H_=beatNow&&beatNow.hint;const hintOn=H_&&!heroMode&&!mobile&&!document.body.classList.contains("end-on")&&beatT>0.9&&!(H_.hover&&(mobile||hoveredOnce));
+ if(hintOn){let hx,hy,up=false;
+  if(H_.el){const r=document.getElementById(H_.el).getBoundingClientRect();hx=r.left+6;hy=r.bottom+6;up=true}
+  else{if(H_.a==="BARS")tmpV.set(bars[0].m.position.x-0.3,BAR_Y+bars[0].h+0.4,0);else{const t=TS[H_.a];tmpV.set(t.cx-t.width/2+(H_.c||0),t.top+t.group.position.y-(H_.r||0),0)}
+   tmpV.project(camera);hx=(tmpV.x+1)/2*W;hy=(1-tmpV.y)/2*H}
+  hintEl.firstChild.textContent=H_.t;const tw=hintEl.firstChild.offsetWidth;
+  hintEl.classList.toggle("up",up);hintEl.classList.toggle("r",hx-88-tw<12);hintEl.style.transform=`translate(${hx}px,${hy}px)`;hintEl.style.opacity=1}
+ else hintEl.style.opacity=0;
+ // the step caption, inside the card
+ const bk=heroMode?"":cur+"|"+(beatNow?beatNow.i:-1);if(bk!==beatKey){beatKey=bk;updateNow()}
+ // the card sits beside the part it explains, with a pointer to it
+ const c=cards[cur];
+ if(!mobile&&c&&!heroMode&&!document.body.classList.contains("end-on")){const [ax,ay]=anchorPt();tmpV.set(ax+1.2,ay,0).project(camera);const sx=(tmpV.x+1)/2*W,sy=(1-tmpV.y)/2*H;
+  const cw=c.offsetWidth,ch=c.offsetHeight,top=parseInt(getComputedStyle(c).top)||0;
+  let ex=0;for(const yy of [boxT,boxB,(boxT+boxB)/2]){tmpV.set(boxR+1,yy,0).project(camera);ex=Math.max(ex,(tmpV.x+1)/2*W)}
+  const x=clamp(Math.max(ex,sx)+26,16,W-cw-56),y=clamp(sy-70,64,H-ch-12);
+  if(cardX===null){cardX=x;cardY=y}else{cardX+=(x-cardX)*0.18;cardY+=(y-cardY)*0.18}
+  c.style.transform=`translate(${cardX}px,${cardY}px)`;
+  const py=clamp(sy,cardY+22,cardY+ch-22);ptrEl.style.transform=`translate(${cardX-8}px,${py-9}px) rotate(45deg)`;ptrEl.style.opacity=sx<cardX-4?1:0;
+  const far=cardX-sx>40;leadL.setAttribute("x1",cardX-8);leadL.setAttribute("y1",py);leadL.setAttribute("x2",sx);leadL.setAttribute("y2",sy);leadC.setAttribute("cx",sx);leadC.setAttribute("cy",sy);leadEl.style.opacity=far?1:0}
+ else{ptrEl.style.opacity=0;leadEl.style.opacity=0}}
+
+/* ====================== HUD, minimap, cards ====================== */
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const secs=[...document.querySelectorAll(".st")];
+const cards=secs.map(s=>s.querySelector(".card"));
+const mini=document.getElementById("mini");
+ST.forEach((s,i)=>{const b=document.createElement("button");if([1,4,10,12,13,17].includes(i))b.className="gap";b.innerHTML=`${s.n} <i></i>`;b.title=s.n;b.onclick=()=>go(i);mini.appendChild(b)});
+function go(i){goStation(i)}
+// every card ends with the same small nav: back, step dots, next
+cards.forEach((c,i)=>{const nv=document.createElement("div");nv.className="nav";
+ nv.innerHTML=`<button class="pv" aria-label="Back">↑</button><span class="dots">${(ST[i].beats||[]).length>1?ST[i].beats.map(()=>"<i></i>").join(""):""}</span><button class="nx">Next <kbd>↓</kbd></button>`;c.appendChild(nv)});
+function updateNow(){const c=cards[cur];if(!c)return;const el=c.querySelector(".cap");
+ c.querySelectorAll(".dots i").forEach((d,i)=>d.classList.toggle("on",beatNow&&i<=beatNow.i));
+ if(!el)return;el.textContent=beatNow?beatNow.t:"";el.classList.remove("fresh");void el.offsetWidth;el.classList.add("fresh")}
+let started=false;
+function setStation(n){if(n===cur&&started)return;started=true;cur=n;const st=ST[n];
+ document.getElementById("hudCh").textContent=heroMode?"GPT-2, built":st.ch;
+ document.getElementById("hudPart").textContent=heroMode?"Build an LLM":`${n}. ${st.n}`;
+ document.getElementById("hudLab").textContent=st.big?(mobile?"Params · GPT-3":"Parameters · GPT-3"):(mobile?"Params":"Parameters · GPT-2 small");
+ secs.forEach((x,i)=>x.classList.toggle("cur",i===n&&!heroMode));
+ [...mini.children].forEach((b,i)=>{b.classList.toggle("on",i===n&&!heroMode);b.classList.toggle("done",i<n)});
+ dYaw=0;dPitch=0;cardX=null;setWant();onStation(n)}
+function counterVal(){if(heroMode)return 0;const st=ST[cur],prev=cur>0?ST[cur-1].p:0;if(st.p<=prev)return st.p;return prev+(st.p-prev)*ease(clamp((prog-0.1)/0.7,0,1))}
+let lastN=-1;
+/* ====================== stepping: ↓ moves on, animations run on their own clock ====================== */
+const FLOW=[{n:-1,b:0,cover:true},{n:-1,b:1,toc:true}];ST.forEach((st,n)=>{const nb=Math.max(1,(st.beats||[]).length);for(let b=0;b<nb;b++)FLOW.push({n,b})});FLOW.push({n:21,b:0,end:true});
+let si=0,beatIdx=0,beatT=0;const seen=new Set();let lastSt=-1;
+function markSeen(){document.querySelectorAll(".mach .mp[data-go],.after .mp[data-go]").forEach(b=>{const g=+b.dataset.go,z=+(b.dataset.to||g);b.classList.toggle("seen",[...seen].some(x=>x>=g&&x<=z));b.classList.toggle("here",lastSt>=g&&lastSt<=z)})}
+function beatSpec(n,b){const B=ST[n].beats||[];if(!B.length)return {a:0,z:1,dur:ST[n].dur||1.8,loop:false};
+ const a=B[b].at,z=b+1<B.length?B[b+1].at-0.001:1;return {a,z,dur:B[b].dur||clamp((z-a)*9,1.4,4.5),loop:!!B[b].loop}}
+function goStep(i,instant){si=clamp(i,0,FLOW.length-1);const f=FLOW[si];const hero=f.n<0;
+ if(hero!==heroMode){heroMode=hero;document.body.classList.toggle("hero-on",hero);started=false;resize()}
+ const n=hero?0:f.n;if(n!==cur||!started)setStation(n);
+ beatIdx=f.b;beatT=0;if(instant)beatT=99;document.body.classList.toggle("end-on",!!f.end);document.body.classList.toggle("cover-on",!!f.cover);document.body.classList.toggle("toc-on",!!f.toc);if(!hero){seen.add(n);lastSt=n}markSeen();if(f.toc)document.querySelector(".toc").scrollTop=0;
+ document.getElementById("hudBar").style.width=(si/(FLOW.length-1)*100)+"%";
+ history.replaceState(null,"",f.cover?location.pathname:f.toc?"#contents":f.end?"#cards":`#${n}${f.b?"."+(f.b+1):""}`);
+ navLabels()}
+const next=()=>goStep(si+1),prev=()=>goStep(si-1);
+function goStation(n){goStep(FLOW.findIndex(f=>f.n===n))}
+function stepProg(dt){beatT+=dt;if(heroMode){prog=1;return}
+ const sp=beatSpec(cur,beatIdx);
+ if(sp.loop){const cyc=sp.dur+1.4,t=beatT%cyc;prog=sp.a+(sp.z-sp.a)*clamp(t/sp.dur,0,1)}
+ else prog=sp.a+(sp.z-sp.a)*clamp(beatT/sp.dur,0,1);
+ const v=Math.round(counterVal());if(v!==lastN){lastN=v;document.getElementById("hudNum").textContent=fmt(v)}
+}
+function navLabels(){const f=FLOW[si],nx=FLOW[si+1];
+ document.querySelectorAll(".nx").forEach(b=>{b.innerHTML=!nx?"That's everything":nx.end?`The 20 cards <kbd>↓</kbd>`:nx.n!==f.n?`${ST[nx.n].n} <kbd>↓</kbd>`:`Next <kbd>↓</kbd>`;b.disabled=!nx});
+ document.querySelectorAll(".pv").forEach(b=>b.disabled=si===0)}
+addEventListener("keydown",e=>{const tg=e.target.tagName;if(tg==="INPUT"||tg==="TEXTAREA")return;
+ if(["ArrowDown","ArrowRight","PageDown"," ","j"].includes(e.key)){e.preventDefault();next()}
+ else if(["ArrowUp","ArrowLeft","PageUp","k"].includes(e.key)){e.preventDefault();prev()}
+ else if(e.key==="Home"){e.preventDefault();goStep(0)}});
+// one wheel or trackpad gesture = one step
+let wheelLast=0;addEventListener("wheel",e=>{const sc=e.target.closest&&e.target.closest(".toc");if(sc&&sc.scrollHeight>sc.clientHeight+2){const atEnd=e.deltaY>0?sc.scrollTop+sc.clientHeight>=sc.scrollHeight-2:sc.scrollTop<=0;if(!atEnd)return}
+ if(document.body.classList.contains("end-on")&&e.target.closest&&e.target.closest(".end")){const en=document.querySelector(".end");if(!(e.deltaY<0&&en.scrollTop<=0))return}
+ const card=e.target.closest&&e.target.closest(".card");
+ if(card&&card.scrollHeight>card.clientHeight+2){const atEnd=e.deltaY>0?card.scrollTop+card.clientHeight>=card.scrollHeight-2:card.scrollTop<=0;if(!atEnd)return}
+ e.preventDefault();const now=performance.now(),quiet=now-wheelLast>260;wheelLast=now;if(quiet&&Math.abs(e.deltaY)>3)(e.deltaY>0?next:prev)()},{passive:false});
+// swipe on the scene (phone)
+let ty0=null;stageEl.addEventListener("touchstart",e=>{ty0=e.touches[0].clientY},{passive:true});
+stageEl.addEventListener("touchend",e=>{if(ty0==null)return;const dy=ty0-e.changedTouches[0].clientY;if(Math.abs(dy)>40)(dy>0?next:prev)();ty0=null});
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){goStation(+g.dataset.go);return}
+ if(e.target.closest(".tocb")){goStep(1);return}
+ const b=e.target.closest(".nx,.pv,.start");if(!b)return;b.classList.contains("pv")?prev():next()});
+
+/* ====================== station extras ====================== */
+let storyTimer=null;
+function onStation(n){clearInterval(storyTimer);
+ if(n===16){const el=document.getElementById("story");const words=[" mat",","," purring"," softly","."," Outside",","," the"," rain"," had"," stopped","."];let k=0;el.innerHTML="The cat sat on the";
+  storyTimer=setInterval(()=>{if(k>=words.length){k=0;el.innerHTML="The cat sat on the"}el.insertAdjacentHTML("beforeend",`<span class="n">${words[k++]}</span>`)},800)}
+ if(n===15)guessRes()}
+let guess=null;
+document.querySelectorAll("#guess button").forEach(b=>b.onclick=()=>{guess=b.textContent;document.querySelectorAll("#guess button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+ document.getElementById("guessMsg").textContent=`You picked “${guess.trim()}”. We'll check it at the sampler.`;guessRes()});
+function guessRes(){const el=document.getElementById("guessRes");if(!guess){el.textContent="";return}const P=probs(1);const i=VOCAB.indexOf(guess);
+ const pv=i>=0?P.p[i]:0.0004;el.innerHTML=`You guessed “${guess.trim()}” at the start. These made-up odds give it <b>${pv<0.01?"under 1%":Math.round(pv*100)+"%"}</b>, and “mat” <b>${Math.round(P.p[6]*100)}%</b>.`}
+const tSl=document.getElementById("tSl"),pSl=document.getElementById("pSl");
+const sync=()=>{tempV=+tSl.value;topPV=+pSl.value;document.getElementById("tOut").textContent=tempV.toFixed(2);document.getElementById("pOut").textContent=topPV.toFixed(2)};
+tSl.oninput=pSl.oninput=sync;sync();
+document.getElementById("roll").onclick=()=>{const P=probs(tempV,topPV);let r=Math.random(),acc=0,k=0;for(;k<VS;k++){acc+=P.p[RANK[k]];if(r<acc)break}
+ picked=k;const tok=k<VS?VOCAB[RANK[k]]:null;document.getElementById("rollMsg").textContent=tok?`→ "${tok.trim()}"`:"→ a token not shown (the long tail)"};
+document.querySelectorAll("#heads button").forEach(b=>b.onclick=()=>{headFocus=+b.dataset.h;document.querySelectorAll("#heads button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+const TRH=[["previous word",[[1,0,0,0,0],[.9,.1,0,0,0],[.04,.9,.06,0,0],[.02,.03,.9,.05,0],[.02,.02,.03,.88,.05]]],["the subject (cat)",[[1,0,0,0,0],[.3,.7,0,0,0],[.1,.82,.08,0,0],[.08,.6,.2,.12,0],[.06,.58,.22,.08,.06]]],["the first token",[[1,0,0,0,0],[.85,.15,0,0,0],[.8,.1,.1,0,0],[.78,.08,.08,.06,0],[.75,.06,.07,.06,.06]]]];
+document.getElementById("trained").innerHTML=TRH.map(([n,M])=>`<div><div class="grid5">${M.flat().map((v,i)=>`<i style="background:${(i%5)>Math.floor(i/5)?'#403E41':`hsl(37 90% ${96-v*50}%)`}"></i>`).join("")}</div><div class="mini" style="margin-top:3px">${n}</div></div>`).join("");
+{const pts=[];for(let k=0;k<=60;k++){const x=-3+k*.1;pts.push(`${160+x*40},${70-gelu(x)*20}`)}
+ document.getElementById("geluFig").innerHTML=`<line x1="20" x2="300" y1="70" y2="70" stroke="#DDD8CC"/><line x1="160" x2="160" y1="6" y2="92" stroke="#DDD8CC"/><polyline points="${pts.join(" ")}" fill="none" stroke="#E16032" stroke-width="2.5"/><text x="20" y="88">negatives squashed toward 0</text><text x="300" y="88" text-anchor="end">positives pass through</text>`}
+const LX=st=>24+Math.log10(st+1)/5.4*286,LY=l=>112-(l-2.5)/8.5*100;
+{const pts=[];for(let q=0;q<=1.001;q+=.02){const st=Math.round(Math.pow(10,q*5.3))-1;pts.push(`${LX(st)},${LY(2.9+7.92*Math.exp(-Math.pow(st/900,.55)))}`)}
+ document.getElementById("lossFig").innerHTML=`<line x1="24" x2="312" y1="112" y2="112" stroke="#DDD8CC"/><line x1="24" x2="24" y1="6" y2="112" stroke="#DDD8CC"/><line x1="24" x2="312" y1="${LY(10.82)}" y2="${LY(10.82)}" stroke="#E14775" stroke-dasharray="4 4"/><text x="310" y="${LY(10.82)-5}" text-anchor="end" fill="#E14775">blind guessing, 10.8</text><polyline points="${pts.join(" ")}" fill="none" stroke="#7058BE" stroke-width="2.5"/><text x="312" y="126" text-anchor="end">training steps, log scale →</text><text x="28" y="108">loss</text><circle id="lossDot" r="6" fill="#E16032" stroke="#fff" stroke-width="2"/>`}
+{const M=[["GPT-1 · 2018",0.117],["GPT-2 small · 2019",0.124],["GPT-2 XL · 2019",1.5],["GPT-3 · 2020",175]],X=v=>20+(Math.log10(v)+1)/3.4*270;
+ document.getElementById("scaleFig").innerHTML=`<line x1="14" x2="314" y1="104" y2="104" stroke="#DDD8CC"/>${[[0.1,"100M"],[1,"1B"],[10,"10B"],[100,"100B"]].map(([v,t])=>`<text x="${X(v)}" y="118" text-anchor="middle">${t}</text>`).join("")}${M.map(([n,v],k)=>`<circle cx="${X(v)}" cy="${88-k*24}" r="${5+Math.log10(v*10)*3}" fill="${k===3?"#E16032":"#7058BE"}" opacity=".85"/><text x="${X(v)+(k===3?-16:12)}" y="${92-k*24}" ${k===3?'text-anchor="end"':""}>${n}</text>`).join("")}`}
+const SAMPLES=[[0,"The cat sat on the qz]] fl8 the of the,, Tamb"],[0.25,"The cat sat on the the the the and the"],[0.5,"The cat sat on the man of the city in the"],[0.72,"The cat sat on the bed and looked at the door."],[0.9,"The cat sat on the mat, purring softly in the sun."]];
+function trainCard(){const steps=Math.round(Math.pow(10,trainQ*5.3))-1,loss=2.9+7.92*Math.exp(-Math.pow(steps/900,.55));
+ document.getElementById("trStep").textContent=fmt(steps);document.getElementById("trLoss").textContent=loss.toFixed(2);
+ document.getElementById("trP").textContent="1 in "+fmt(Math.exp(loss));const d=document.getElementById("lossDot");d.setAttribute("cx",LX(steps));d.setAttribute("cy",LY(loss));
+ let t=SAMPLES[0][1];for(const [k,v] of SAMPLES)if(trainQ>=k)t=v;const el=document.getElementById("trText");if(el.textContent!==t)el.textContent=t}
+const CW=[[1024,"GPT-2","2 pages"],[2048,"GPT-3","4 pages"],[8192,"","a long essay"],[32768,"","a short book"],[128000,"","a novel"],[1000000,"","several novels"]];
+const cSl=document.getElementById("cSl");const ctx=()=>{const [n,m,w]=CW[+cSl.value];document.getElementById("cOut").textContent=fmt(n)+" tokens"+(m?` · ${m}`:"");
+ const on=Math.max(4,Math.round(80*Math.log2(n/512)/Math.log2(1000000/512)));document.getElementById("ctxBar").innerHTML=Array.from({length:80},(_,k)=>`<i class="${k>=80-on?"on":""}"></i>`).join("");const pr=n*n/2;document.getElementById("cInfo").innerHTML=`About ${w} · <b>${pr>=1e9?(pr/1e9).toFixed(1)+" billion":fmt(pr)}</b> pairs to compare, per head, per block`};cSl.oninput=ctx;ctx();
+function orderGame(el,parts){let next=0,done=false;const miss=new Set();
+ const pool=[...parts].sort(()=>Math.random()-.5);
+ el.innerHTML=`<div class="slots"></div><div class="pool"></div><div class="res mini"></div>`;
+ const slots=el.querySelector(".slots"),pl=el.querySelector(".pool"),res=el.querySelector(".res");
+ pool.forEach(p=>{const b=document.createElement("button");b.className="chipb";b.textContent=p;pl.appendChild(b);
+  b.onclick=()=>{if(done)return;if(p===parts[next]){const s=document.createElement("span");s.textContent=p;if(miss.has(next))s.className="miss";slots.appendChild(s);b.remove();next++;
+    if(next===parts.length){done=true;const sc=parts.length-miss.size;res.innerHTML=`<b>${sc} of ${parts.length}</b> right first time. ${sc===parts.length?"All in order.":"The orange ones are worth another look."} <button class="btn" style="margin-left:6px">Again</button>`;res.querySelector("button").onclick=()=>orderGame(el,parts)}}
+   else{miss.add(next);b.classList.remove("bad");void b.offsetWidth;b.classList.add("bad")}}})}
+orderGame(document.getElementById("gameBlock"),["LayerNorm","Attention","+ add","LayerNorm","MLP","+ add"]);
+orderGame(document.getElementById("gameAll"),["Tokenizer","Token embedding","+ Position embedding","LayerNorm","Attention","+ add","LayerNorm","MLP","+ add","×12 blocks","Final LayerNorm","Unembedding","Softmax","Sampler"]);
+// flashcards from every GOT IT line, and the 8 moves
+document.getElementById("cards").innerHTML=cards.slice(1,21).map((c,i)=>`<button class="fc"><span><em><small>${i+1} · ${ST[i+1].n}</small>${c.querySelector("h2").textContent}</em><strong>${c.dataset.sum}</strong></span></button>`).join("");
+document.querySelectorAll(".fc").forEach(b=>b.onclick=()=>b.classList.toggle("flip"));
+
+
+/* ====================== render loop ====================== */
+addEventListener("resize",resize);resize();
+{const m=location.hash.match(/^#(\d+)(?:\.(\d+))?/);let i=location.hash==="#cards"?FLOW.length-1:location.hash==="#contents"?1:0;if(m){const n=+m[1],b=(+m[2]||1)-1;i=FLOW.findIndex(f=>f.n===n&&f.b===b);if(i<0)i=FLOW.findIndex(f=>f.n===n);if(i<0)i=0}
+ heroMode=FLOW[i].n<0;document.body.classList.toggle("hero-on",heroMode);started=false;goStep(i)}
+setWant();camT.copy(wantT);camD=wantD;yaw=wantYaw;
+let last=performance.now();
+function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;clock+=dt;
+ stepProg(dt);update(dt);if(cur===17&&!heroMode)trainCard();
+ const kk=1-Math.exp(-dt*3);camT.lerp(wantT,kk);camD+=(wantD-camD)*kk;yaw+=(wantYaw-yaw)*kk;
+ scene.fog.near=camD*0.85;scene.fog.far=camD*2.4;
+ if(heroMode)autoYaw+=dt*0.15;else autoYaw*=0.96;
+ const y=yaw+dYaw+Math.sin(autoYaw)*0.5,p=pitch+dPitch;
+ camera.position.set(camT.x+camD*Math.sin(y)*Math.cos(p),camT.y+camD*Math.sin(p),camT.z+camD*Math.cos(y)*Math.cos(p));camera.lookAt(camT);
+ renderer.render(scene,camera);labels();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+window.__llm={go:goStep,flow:FLOW,get si(){return si},get cur(){return cur},get prog(){return prog},get camD(){return camD},get hero(){return heroMode}};
 </script>
 </body>
 </html>

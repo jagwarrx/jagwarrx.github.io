@@ -83,6 +83,10 @@ td.stack{white-space:nowrap;font-size:13px;color:var(--muted)}
 .t-chess .piece{font-style:normal;font-size:30px;display:inline-block;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
 .tile:hover .piece{transform:translate(6px,-8px) rotate(-12deg)}
 .t-cond{background:#F5F0FF;border-color:#5B21B6}
+.t-llm{background:#FBFAF7;border-color:#403E41}
+.t-llm .name{font:800 24px/28px Inter,-apple-system,sans-serif;letter-spacing:-.03em;color:#403E41}
+.t-llm .cubes{transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.tile:hover .t-llm .cubes{transform:translateY(-3px)}
 .t-cond .name{font:800 24px/28px Inter,-apple-system,sans-serif;letter-spacing:-.02em;color:#5B21B6}
 .art rect,.art g{transform-box:fill-box;transform-origin:center;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
 .tile:hover .z1{transform:scale(1.12)}
