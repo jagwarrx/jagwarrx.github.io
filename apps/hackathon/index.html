@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hackathon idea analyzer · Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/apps/hackathon/">
+<meta name="description" content="Test a hackathon idea before you write code: demo impact, problem significance, technical depth. Concrete tips and questions, plus a Claude review using your own API key.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hackathon idea analyzer · Hari Meyyappan">
+<meta property="og:description" content="Test a hackathon idea before you write code: demo impact, problem significance, technical depth.">
+<meta property="og:url" content="https://hmeyy.com/apps/hackathon/">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../tool.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../../index.html#about">About</a>
+<a href="../../index.html#work">Work</a>
+<a class="on" aria-current="page" href="../../index.html#tools">Tools</a>
+<a href="../../index.html#writing">Writing</a>
+<a class="page" href="../../notes/index.html">Notes</a>
+<a href="../../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<main class="main">
+<div class="col tool-page">
+<header class="head">
+<h1>Hackathon idea analyzer</h1>
+<p class="lede">Spend the first hour sharpening the axe. Test your idea against what judges actually reward, before you write any code.</p>
+<p class="meta">From a dozen hackathons and a lot of top-three finishes. The long version is <a href="../../essays/how-to-win-hackathons.html">How to win hackathons</a>.</p>
+</header>
+
+<section id="analyze">
+<h2>Test your idea</h2>
+<form class="hk-form" id="hk-form" autocomplete="off">
+<div class="field">
+<label for="hk-event">The hackathon <span class="hint">· theme, tracks, sponsors, judging rubric (paste the page)</span></label>
+<textarea id="hk-event" rows="4" placeholder="e.g. 36-hour climate hackathon. Tracks: Best use of Twilio, Best data viz. Rubric: impact 30, technical 30, design 20, pitch 20."></textarea>
+</div>
+<div class="field">
+<label for="hk-idea">Your idea</label>
+<textarea id="hk-idea" rows="4" placeholder="What it does, who it's for, and how you'd build it. Rough is fine."></textarea>
+</div>
+<div class="field">
+<label for="hk-team">Team and time</label>
+<input id="hk-team" type="text" placeholder="e.g. 3 people, 24 hours. Strong in Python and React, no mobile.">
+</div>
+<div class="field">
+<label for="hk-others">Other ideas you're weighing <span class="hint">· optional, one per line; Claude ranks them</span></label>
+<textarea id="hk-others" rows="2"></textarea>
+</div>
+<div class="keybox" id="hk-key"></div>
+<div class="hk-actions">
+<button class="btn" id="hk-go" type="submit">Analyze my idea</button>
+<button class="btn ghost" id="hk-stop" type="button" hidden>Stop</button>
+<button class="kb-link" id="hk-sample" type="button">Fill in an example</button>
+</div>
+<p class="meta">One run costs about 5 to 15 cents on Opus 5.5. Runs are saved in this browser only. <a href="#judges">What judges reward ↓</a></p>
+</form>
+</section>
+
+<section class="hk-out" id="hk-out" aria-live="polite" hidden></section>
+
+<section class="hk-history" id="hk-history" hidden>
+<h2>Your past runs</h2>
+<ul></ul>
+</section>
+
+<section id="judges">
+<h2>What judges reward</h2>
+<p class="meta">Three things decide most results. Claude uses these same tips and questions when it judges your idea.</p>
+<div class="guide" id="guide">
+
+<div class="crit demo">
+<h3>1. Demo impact <span class="w top">Weighs the most</span></h3>
+<p>Does it work live, and does the judge understand it in the first 30 seconds? A polished, narrow demo beats an ambitious broken one almost every time. This usually weighs the most in practice, even when the rubric doesn't say so.</p>
+<h4>Tips</h4>
+<ul>
+<li>Open on the result, not the login screen. The first thing the judge sees is the product doing its job.</li>
+<li>Write the first 30 seconds word for word: who it's for, their pain in one sentence, then the live moment.</li>
+<li>Demo one path that works every time. Rehearse it five times, on the venue wifi, on the demo laptop.</li>
+<li>Seed realistic data. An empty dashboard or lorem ipsum kills the moment.</li>
+<li>Make the change visible: a before and after, a number that moves, a document that appears.</li>
+<li>Have a fallback for every flaky call (cached response, recorded video). Judges forgive a backup; they don't forgive a spinner.</li>
+<li>Freeze features about three quarters of the way through. The rest is polish and rehearsal.</li>
+</ul>
+<h4>Think about</h4>
+<ul>
+<li>What does the judge see in the first 10 seconds?</li>
+<li>Which single moment makes a judge lean forward?</li>
+<li>If the wifi or the API dies mid-demo, what still works?</li>
+<li>What can you cut and still have the demo land?</li>
+</ul>
+</div>
+
+<div class="crit">
+<h3>2. Problem significance <span class="w">Why anyone should care</span></h3>
+<p>Is this a real, specific pain for a clearly named user, and does it fit the hackathon's theme or a sponsor track? Judges reward "I'd use this" or "someone would pay for this" over technical cleverness aimed at nothing.</p>
+<h4>Tips</h4>
+<ul>
+<li>Name the user as a role in a situation ("an ICU nurse at shift handover"), never "people" or "businesses".</li>
+<li>Put a number on the pain: minutes lost, money, errors, how often it happens.</li>
+<li>Talk to one real user before or during the event, and quote them in the pitch.</li>
+<li>Tie the idea to the theme and one sponsor track in a sentence. If you can't, pick a different track or idea.</li>
+<li>Score yourself against the rubric before building. A team that plays the rubric beats a better project that ignores it.</li>
+<li>Impact = how much it changes one person's life × how many people. Fun apps rarely beat real problems for the top spots.</li>
+</ul>
+<h4>Think about</h4>
+<ul>
+<li>Who would use this tomorrow, and what do they use today instead?</li>
+<li>Who would pay for it, or use it every week?</li>
+<li>What does the problem cost if nobody solves it?</li>
+<li>Which prize is this built to win?</li>
+</ul>
+</div>
+
+<div class="crit">
+<h3>3. Technical novelty or depth <span class="w">What sets you apart</span></h3>
+<p>Did you build something non-trivial in the time, or use the sponsor's tech in a way others didn't? This is what separates you from the ten other teams that picked the same idea.</p>
+<h4>Tips</h4>
+<ul>
+<li>Find the one hard part and build it for real. Fake the rest: auth, settings, payments, onboarding.</li>
+<li>Use the sponsor's tech for its unusual feature, not the hello-world call every team makes.</li>
+<li>Assume ten teams have the obvious version of your idea. Write down what yours does that theirs won't.</li>
+<li>Show the work: one architecture slide, and one sentence on the hard thing you solved.</li>
+<li>Choose depth or breadth on purpose. One API used deeply, or many APIs stitched together, both win; drifting between them doesn't.</li>
+<li>Don't train a model in 24 hours unless that is the project. Use a strong model and spend the time on the data and the loop around it.</li>
+</ul>
+<h4>Think about</h4>
+<ul>
+<li>What's the hardest thing this does, and did you build it or just call it?</li>
+<li>What would make the engineer on the panel ask "how did you do that"?</li>
+<li>What's the obvious version another team will build, and how is yours different?</li>
+<li>Which sponsor feature will most teams overlook?</li>
+</ul>
+</div>
+
+</div>
+</section>
+
+
+<footer>Plain HTML. No tracking. Your key and your ideas go only to Anthropic.</footer>
+</div>
+</main>
+</div>
+<script src="../claude.js"></script>
+<script src="hackathon.js"></script>
+<script src="../../js/stack.js" defer></script>
+</body>
+</html>

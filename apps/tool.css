@@ -1,0 +1,77 @@
+/* tool.css: pages for tools that run inside the site (hackathon analyzer, chess analyzer).
+   Loaded after site.css; uses its colour variables. */
+.tool-page{max-width:760px}
+.tool-page [hidden]{display:none!important}
+
+/* buttons, fields */
+.btn{font:inherit;font-size:14px;line-height:20px;font-weight:600;padding:8px 16px;border-radius:4px;border:1px solid #0D5689;
+  background:var(--link);color:#fff;cursor:pointer}
+.btn:hover{background:var(--link-hover)}
+.btn:disabled{background:#A7B6C2;border-color:#A7B6C2;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--ink2);border-color:var(--line)}
+.btn.ghost:hover{background:var(--tint);color:var(--ink)}
+.kb-link{font:inherit;border:0;background:none;padding:0;color:var(--link);cursor:pointer;text-align:left}
+.kb-link:hover{color:var(--link-hover);text-decoration:underline}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.kb-label,.hk-follow label{font-size:14px;line-height:20px;font-weight:600;color:var(--ink)}
+.field .hint{font-weight:400;color:var(--muted)}
+textarea,input[type=text],input[type=password],select{font:inherit;font-size:15px;line-height:22px;color:var(--ink);
+  padding:8px 10px;border:1px solid #CED9E0;border-radius:4px;background:#fff;width:100%}
+select{width:auto;padding:4px 8px;font-size:14px}
+textarea{resize:vertical;min-height:64px}
+textarea:focus,input:focus,select:focus{outline:2px solid rgba(16,107,163,.35);outline-offset:0;border-color:var(--link)}
+
+/* key box */
+.keybox{display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:var(--tint);border:1px solid var(--line);border-radius:6px}
+.kb-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.kb-row input{flex:1;min-width:200px}
+.kb-ok{font-weight:600;color:#0F7B4A}
+.kb-dim{font-size:14px;color:var(--muted)}
+.kb-model{font-size:14px;color:var(--ink2);gap:8px}
+.kb-check{font-size:14px;color:var(--ink2);display:flex;gap:8px;align-items:center}
+.kb-note{margin:0;font-size:13px;line-height:19px;color:var(--muted)}
+.kb-err{margin:0;font-size:14px;color:#C23030}
+
+/* guide cards */
+.guide{display:flex;flex-direction:column;gap:14px}
+.crit{border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.crit h3{margin:0;font-size:16px;line-height:22px;font-weight:600;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.crit .w{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.crit .w.top{color:#A66321}
+.crit p{margin:0;color:var(--ink2)}
+.crit h4{margin:6px 0 0;font-size:12px;line-height:16px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.crit ul{margin:0;padding-left:20px}
+.crit li{margin:0 0 4px}
+.crit.demo{border-left:3px solid #D9822B}
+
+/* form + output */
+.hk-form{display:flex;flex-direction:column;gap:16px}
+.hk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hk-out{display:flex;flex-direction:column;gap:20px;scroll-margin-top:24px}
+.hk-turn{display:flex;flex-direction:column;gap:10px}
+.hk-status{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)}
+.hk-status.err{color:#C23030}
+.hk-status .dot{width:8px;height:8px;border-radius:50%;background:var(--link);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25;transform:scale(.7)}}
+.hk-think{font-size:13px;line-height:19px;color:var(--muted)}
+.hk-think summary{cursor:pointer}
+.hk-think-body{white-space:pre-wrap;padding:8px 12px;margin-top:6px;background:var(--tint);border-radius:4px;max-height:220px;overflow:auto}
+.hk-you{padding:10px 14px;background:var(--tint);border-radius:6px;display:flex;flex-direction:column;gap:2px}
+.hk-follow{display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid var(--line)}
+.hk-history ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hk-history li{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.hk-history .del{color:var(--muted);margin-left:4px}
+
+/* Markdown from Claude */
+.md{font-size:15px;line-height:24px}
+.md h2,.md h3{font-size:19px;line-height:26px;font-weight:600;margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--line)}
+.md>h2:first-child,.md>h3:first-child{margin-top:0;padding-top:0;border-top:0}
+.md h4,.md h5{font-size:16px;line-height:22px;margin:14px 0 6px}
+.md p{margin:0 0 10px}
+.md ul,.md ol{margin:0 0 10px;padding-left:22px}
+.md li{margin:0 0 4px}
+.md li>ul,.md li>ol{margin:4px 0 0}
+.md table{margin:4px 0 12px}
+.md code{font:13px/1 ui-monospace,Menlo,monospace;background:var(--tint);padding:2px 4px;border-radius:3px}
+.md blockquote{margin:0 0 10px;padding:2px 0 2px 14px;border-left:3px solid var(--line);color:var(--ink2)}
+.md hr{border:0;border-top:1px solid var(--line);margin:16px 0}
