@@ -221,3 +221,69 @@ body.stacked .layout{height:100vh;overflow:hidden}
   color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .15s}
 .pane.covered .spine{opacity:1}
 .pane.covered .pane-scroll{opacity:0;pointer-events:none}
+
+/* ---- Plain pass, 18 Nov 2026 (after paulgraham.com) ----------------------------------------
+   Same shell on every page: a narrow column of small links on the left, one narrow text column
+   next to it, left-aligned, empty space to the right. Verdana, small type, titles in small caps,
+   the date under the title. No dark sidebar, no "On this page". The tiles stay as the one loud thing.
+   To undo: delete from this comment to the end (the file before it is _old/site-2026-11-17.css). */
+:root{--ink:#1a1a1a;--ink2:#333;--muted:#6b6b6b;--line:#d9d9d4;--link:#1f3ea6;--link-hover:#0b2380;--title:#7d2a12;--btn:#ecebe6;--btn-ink:#2b2b2b}
+body{font:14px/22px Verdana,Geneva,"DejaVu Sans",sans-serif;color:var(--ink)}
+a{color:var(--link);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+
+/* left links */
+.layout{grid-template-columns:132px minmax(0,1fr)}
+.side{background:none;color:var(--ink);padding:24px 0 24px 14px;gap:10px;font-size:11.5px;line-height:15px;height:auto;max-height:100vh}
+.side .label{display:none}
+.side nav,.side .toc{gap:3px}
+.side a{padding:4px 8px;border-radius:2px;background:var(--btn);color:var(--btn-ink);font-weight:700;text-decoration:none;letter-spacing:.01em}
+.side a:hover{background:#dcdad2;color:#000}
+.side a.on{background:var(--btn-ink);color:#fff}
+.side .brand{background:none;padding:0 8px 10px;font:small-caps 700 13px/17px Verdana,Geneva,sans-serif;letter-spacing:.06em;color:var(--title)}
+.side .brand:hover{background:none;color:var(--title)}
+.side .toc .page{margin-top:0;border-top:0;padding-top:4px;border-radius:2px}
+.side .contact{margin-top:10px}
+
+/* one narrow column, left-aligned */
+.main{padding:28px 28px 64px}
+.col{max-width:560px;margin:0;gap:30px}
+.layout>.wrap,.doc .wrap{max-width:560px;margin:0;padding:28px 28px 64px}
+h1{font:small-caps 400 21px/28px Verdana,Geneva,sans-serif;letter-spacing:.02em;color:var(--title)}
+h2{font-size:14px;line-height:20px;font-weight:700}
+section{gap:8px}
+.head{gap:6px}
+.lede{font-size:14px;line-height:22px;color:var(--ink2)}
+.meta{font-size:12.5px}
+.rb li{padding-left:16px;margin-bottom:5px}
+.rb li::before{left:3px;top:9px;width:5px;height:5px}
+.more{font-size:14px}
+footer{border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+.td{font-size:12.5px;line-height:18px}
+.tm{font-size:11.5px}
+
+/* reading pages: title, date, text; nothing else */
+.doc main{font-size:14px;line-height:22px}
+.doc main h1{font:small-caps 400 21px/28px Verdana,Geneva,sans-serif;letter-spacing:.02em;color:var(--title);margin:0 0 14px}
+.doc main .meta{display:block;font-size:14px;line-height:22px;color:var(--ink);margin:0 0 22px}
+.doc main h2{font-size:14px;line-height:22px;font-weight:700;margin:24px 0 4px}
+.doc main h3{font-size:14px;line-height:22px;font-weight:700;font-style:italic;margin:18px 0 4px}
+.doc main p{margin:0 0 14px}
+.doc main ul,.doc main ol{padding-left:20px;margin:0 0 14px}
+.doc main pre,.doc main code{font-size:12.5px;line-height:19px}
+.doc main blockquote{border-left:2px solid var(--line)}
+.doc main hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+.doc .wrap.has-toc,.layout>.wrap.has-toc{display:block;max-width:560px}
+.toc-side{display:none!important}
+.app-page{max-width:880px}
+.pane{width:620px}
+.pane .wrap,.pane .main,.pane-body{padding-left:32px;padding-right:32px}
+.pane-body{font-size:14px;line-height:22px}
+
+@media (max-width:760px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .side{padding:14px 16px 4px;gap:6px}
+  .side .brand{flex-basis:100%;padding:0 0 4px}
+  .side nav,.side .toc,.side .contact{flex-direction:row;flex-wrap:wrap;gap:4px}
+  .main,.layout>.wrap,.doc .wrap{padding:20px 16px 48px}
+  h1{font-size:21px;line-height:28px}
+}
