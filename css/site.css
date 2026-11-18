@@ -287,3 +287,13 @@ footer{border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
   .main,.layout>.wrap,.doc .wrap{padding:20px 16px 48px}
   h1{font-size:21px;line-height:28px}
 }
+
+/* Plain pass, part 2: a tall portrait strip beside the opening, square bullets, related links after an essay */
+.opening{display:flex;gap:22px;align-items:stretch}
+.strip{flex:none;width:96px;min-height:260px;object-fit:cover;object-position:62% 30%;filter:grayscale(1) contrast(1.1);opacity:.9}
+.opening-text{display:flex;flex-direction:column;gap:30px;min-width:0}
+.rb li::before{border-radius:0;width:4px;height:4px;top:9px;background:#555}
+.doc main ul.related{list-style:none;padding:0;margin:32px 0 0}
+.doc main ul.related li{position:relative;padding-left:14px;margin:0 0 6px}
+.doc main ul.related li::before{content:"";position:absolute;left:1px;top:9px;width:4px;height:4px;background:#555}
+@media (max-width:560px){.strip{width:64px}}
