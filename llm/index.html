@@ -106,6 +106,26 @@ kbd{display:inline-block;font:600 11px/16px var(--mono);border:1px solid current
 .st.cur .card{opacity:1;pointer-events:auto}
 .card h2{margin:0 0 8px;font-size:21px;line-height:27px;font-weight:700;letter-spacing:-.01em}
 .card p{margin:0 0 10px;font-size:15px;line-height:23px}
+.card .lead{font-size:17px;line-height:25px;font-weight:600;color:#2B292D;margin:0 0 12px}
+.steps{list-style:none;padding:0;margin:0 0 12px}
+.steps li{position:relative;padding-left:17px;margin:0 0 8px;font-size:15px;line-height:22px}
+.steps li::before{content:"";position:absolute;left:1px;top:8px;width:7px;height:7px;border-radius:2px;background:#C8BEE3}
+.card .key{font-weight:500;color:#2B292D}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:2px 0 12px}
+.flow span{font-size:12.5px;line-height:18px;padding:3px 8px;border:1px solid #DDD6EC;border-radius:6px;background:#FAF8FD;color:#403E41}
+.flow i{font-style:normal;color:#A79DC4;font-size:12px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:2px 0 12px}
+.trio div{border:1px solid #DDD6EC;border-radius:8px;padding:7px 8px;background:#FAF8FD}
+.trio b{display:block;font-size:14px}.trio span{display:block;font-size:12.5px;line-height:17px;color:#5C5A5E;margin-top:2px}
+details.more{margin:10px 0 2px;border-top:1px dashed #E2DCD2;padding-top:8px}
+details.more summary{cursor:pointer;font-size:13px;font-weight:600;color:#7058BE;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"+ "}details.more[open] summary::before{content:"− "}
+details.more p{font-size:13px;line-height:19px;color:var(--muted);margin:6px 0 0}
+.card .dpm{margin:4px 0 8px;font-size:13px;color:#5C5A5E}.dpm b{color:#403E41}
+.card .know{margin:12px 0 0;padding:8px 11px;border-radius:9px;background:#F4F1FA;font-size:13.5px;line-height:1.5;color:#403E41}
+.know .nw{background:#FCE1E9;border-radius:4px;padding:1px 4px;font-weight:600}
+.cmp.dp{width:auto;margin:6px 0 4px}.cmp.dp td,.cmp.dp th{padding:3px 12px 3px 0;text-align:left}
 .card .cap{border-left:3px solid var(--violet);padding:1px 0 1px 11px;min-height:25px;color:var(--ink)}
 .card .cap:empty{display:none}
 .card .cap.fresh{animation:capIn .45s ease}
@@ -187,6 +207,8 @@ body.end-on .st .card{opacity:0!important;pointer-events:none!important}
  .card h2{font-size:18px;line-height:23px;margin:0 0 6px}
  .card p{font-size:14px;line-height:21px;margin-bottom:8px}
  .card .note{display:none}
+ .card .lead{font-size:15.5px;line-height:22px;margin-bottom:9px}
+ .steps li{font-size:14px;line-height:20px}
  .hero h1{font-size:40px}
  .hero p{font-size:16px;line-height:24px}
  .toc{flex-direction:column;align-items:center;gap:20px;padding:20px 16px 40px}
@@ -261,7 +283,9 @@ body.end-on .st .card{opacity:0!important;pointer-events:none!important}
 
 <section class="st" data-s="0"><div class="card" data-sum="Guess the next token. Every part serves that one job.">
  <h2>One guess at a time</h2>
- <p>Type “The cat sat on the” and GPT-2 has exactly one job: guess the next <i>token</i>, which is a word or a piece of one. Everything you're about to build exists to make that one guess good.</p>
+ <p class="lead">GPT-2 has one job: guess the next <i>token</i>, a word or a piece of one.</p>
+ <p class="say">The route you're about to build:</p>
+ <div class="flow"><span>words</span><i>→</i><span>numbers</span><i>→</i><span>words talk</span><i>→</i><span>each thinks</span><i>→</i><span>×12</span><i>→</i><span>a guess</span></div>
  <p class="cap"></p>
  <p class="say">Before it guesses, you do. The cat sat on the…</p>
  <div class="opts" id="guess"><button> mat</button><button> floor</button><button> dog</button><button> moon</button></div>
@@ -270,138 +294,177 @@ body.end-on .st .card{opacity:0!important;pointer-events:none!important}
 
 <section class="st" data-s="1"><div class="card" data-sum="Text becomes a list of ids: 464 · 3797 · 3332 · 319 · 262.">
  <h2>Cutting text into tokens</h2>
- <p>The model can only do arithmetic, and “cat” isn't a number. So GPT-2 keeps a fixed list of 50,257 pieces of text, each with an id, and your sentence turns into a list of ids.</p>
+ <p class="lead">The model can only do arithmetic, and “cat” isn't a number.</p>
+ <ul class="steps"><li>GPT-2 has a dictionary of 50,257 pieces of text.</li><li>Each piece has a number, its id.</li><li>Your sentence becomes five ids.</li></ul>
  <p class="cap"></p>
- <p class="say">A rarer word gets cut into several pieces, something like:</p>
+ <p class="say">A rarer word gets cut into pieces, something like:</p>
  <div class="chips"><span>␣Thir</span><span>uk</span><span>kural</span></div>
- <p class="note">The list comes from byte-pair encoding. Start from single bytes and keep merging the most common pair. Common words end up as one token, rare ones as several.</p>
+ <details class="more"><summary>More detail</summary><p>The dictionary comes from byte-pair encoding. Start from single bytes and keep merging the most common pair. Common words end up as one token, rare ones as several.</p></details>
 </div></section>
 
 <section class="st" data-s="2"><div class="card" data-sum="Each id picks a row of numbers from a big table.">
  <h2>A row for every token</h2>
- <p>An id is a name tag. 3797 says nothing about cats, and 3798 isn't nearly a cat. So GPT-2 keeps a table with one row of 768 numbers per token, and the id says which row to copy. Words that behave alike can end up with rows that look alike.</p>
+ <p class="lead">An id is a locker number. It says nothing about the word.</p>
+ <ul class="steps"><li>Each id opens a row of 768 numbers: the word's description.</li><li>Think of each number as a slider for some trait.</li><li>Words used the same way get their sliders set alike.</li></ul>
  <p class="cap"></p>
- <p class="note">That's 50,257 rows of 768 numbers, or 38.6 million. Almost a third of GPT-2 small sits in this one table.</p>
+ <p class="say">How alike are two rows? Multiply slider by slider, then add:</p>
+ <table class="cmp dp"><tr><td></td><th>animal</th><th>you sit on it</th></tr><tr><td>␣cat</td><td>0.9</td><td>0.2</td></tr><tr><td>␣dog</td><td>0.8</td><td>0.1</td></tr><tr><td>␣mat</td><td>0</td><td>0.9</td></tr></table>
+ <p class="dpm">␣cat · ␣dog = 0.9×0.8 + 0.2×0.1 = <b>0.74</b> · ␣cat · ␣mat = <b>0.18</b></p>
+ <p class="key">That sum is a <b>dot product</b>, a match score. Almost everything after this is built from it.</p>
+ <p class="know"><b>␣the's row so far:</b> <span class="nw">the word “the”</span></p>
+ <details class="more"><summary>More detail</summary><p>Real sliders have no names; training sets them, and most mix several traits.</p><p>The “so far” line is a story of what a trained model's row comes to hold.</p><p>This table alone is 50,257 × 768 = 38.6 million numbers, almost a third of GPT-2 small.</p></details>
 </div></section>
 
 <section class="st" data-s="3"><div class="card" data-sum="A position row is added, so each row knows where it sits.">
  <h2>Where each token sits</h2>
- <p>The next part reads all five tokens at once, with no sense of order. “Dog bites man” and “man bites dog” would look almost the same to it. So each position gets a row of its own, added onto the token's row.</p>
+ <p class="lead">The next part sees all five words at once, in a heap, with no order.</p>
+ <ul class="steps"><li>“Dog bites man” and “man bites dog” would be the same heap.</li><li>So each seat in the sentence gets its own row.</li><li>It's added onto the word's row, slider by slider.</li></ul>
  <p class="cap"></p>
+ <p class="know"><b>␣the's row so far:</b> the word “the” · <span class="nw">the last of five</span></p>
  <p class="aside">My LSTM never needed this. It read one word at a time, so order came for free.</p>
 </div></section>
 
 <section class="st" data-s="4"><div class="card" data-sum="Each row is reset to average 0 and spread 1 before every big step.">
  <h2>Keeping the numbers tame</h2>
- <p>Rows pass through dozens of steps, and their numbers drift. Some grow huge, some shrink to nothing, and training starts to wobble. So before each big step, every row is shifted and scaled to an average of 0 and a spread of 1. Two learned knobs per number then nudge it to wherever is useful. This is LayerNorm.</p>
+ <p class="lead">Quick housekeeping before the main event.</p>
+ <ul class="steps"><li>Rows pass through many steps, and their numbers drift.</li><li>So before each big step, every row is reset to a standard volume: average 0, spread 1.</li><li>The tune stays. Only the loudness changes. This is <b>LayerNorm</b>.</li></ul>
  <p class="cap"></p>
+ <details class="more"><summary>More detail</summary><p>After the reset, two learned numbers per slider, a gain and a shift, turn parts back up where that helps.</p><p>Without it, some numbers grow huge, others fade to nothing, and training gets shaky.</p><p>GPT-2 does this reset 25 times: twice in each of 12 blocks, and once at the end.</p></details>
 </div></section>
 
 <section class="st" data-s="5"><div class="card" data-sum="Each token gets a query, a key and a value, made with dot products.">
  <h2>Asking, and being found</h2>
- <p>To guess what follows “the”, the last token needs things from earlier. Who sat? On what? So each row goes through three tables of weights and comes out as a <b class="k-w">query</b> (what it's looking for), a <b class="k-w">key</b> (what it can be found by) and a <b class="k-w">value</b> (what it hands over).</p>
+ <p class="lead">Now the main event. ␣the needs to know what came before it.</p>
+ <p class="say">Attention lets every word ask the words before it. Each word gets three cards:</p>
+ <div class="trio"><div><b class="k-w">query</b><span>“what happened just before me?”</span></div><div><b class="k-w">key</b><span>“I'm an action”</span></div><div><b class="k-w">value</b><span>the note it hands over</span></div></div>
+ <ul class="steps"><li>Each card comes from a table of learned <b>weights</b>.</li><li>Every column of that table is a pattern. A dot product scores how well the row fits it.</li></ul>
  <p class="cap"></p>
- <p class="note">Those names are our story. Nothing tells the model what to put where; training decides.</p>
+ <details class="more"><summary>More detail</summary><p>The questions and labels are our story. Nothing tells the model what to put on its cards; training decides.</p></details>
 </div></section>
 
 <section class="st" data-s="6"><div class="card" data-sum="Query · key for every pair of tokens, with the future blocked.">
  <h2>Who listens to whom</h2>
- <p>Now every query meets every key, one dot product per pair. The score is high when the two line up. GPT-2 divides each score by 8 (the square root of its 64-number heads) to keep things calm. The toy divides by 2.</p>
+ <p class="lead">Every question meets every label.</p>
+ <ul class="steps"><li>Score = query · key, a dot product. High when the label answers the question.</li><li>Rows are words asking. Columns are words being asked.</li><li>No peeking ahead: ␣cat can't see ␣sat. Those squares are blacked out.</li></ul>
  <p class="cap"></p>
- <p class="note">In training the next word is the answer, so no token may look ahead. Blocking the future is called the causal mask.</p>
+ <details class="more"><summary>More detail</summary><p>In training the next word is the answer, so no word may look ahead. Blocking the future is called the causal mask.</p><p>Each score is divided by 8, the square root of a GPT-2 head's 64 numbers, so the scores don't get too big for the next step. The toy's heads have 4 numbers, so it divides by 2.</p></details>
 </div></section>
 
 <section class="st" data-s="7"><div class="card" data-sum="Scores become shares, and each token takes a blend of the values.">
  <h2>Taking a share of each</h2>
- <p>Scores can be any size, so softmax turns each row of them into <b class="k-a">shares</b> that add up to 100%. Each token then builds a new row by blending the value rows by those shares. This is the only place in the model where tokens pass anything to each other.</p>
+ <p class="lead">Scores become slices of a pie. Then each word mixes the notes.</p>
+ <ul class="steps"><li><b>Softmax</b> turns each row of scores into <b class="k-a">shares</b> that add up to 100%.</li><li>Bigger score, bigger slice.</li><li>Each word's new note: every earlier word's note, scaled by its slice, added up.</li></ul>
+ <p class="key">This is the only place words pass anything to each other.</p>
  <p class="cap"></p>
- <p class="aside">My LSTM lost the thread because it squeezed everything it had read into one memory row. Here, ␣the just looks straight back at every word before it.</p>
+ <p class="know"><b>␣the's row so far:</b> the word “the” · the last of five · <span class="nw">a cat sat on something just before me</span></p>
+ <p class="aside">My LSTM lost the thread because it squeezed everything into one memory row. Here, ␣the just looks back at every word.</p>
  <p class="say">Look at one head at a time:</p>
  <div class="opts" id="heads"><button aria-pressed="true" data-h="-1">all</button><button data-h="0">head 1</button><button data-h="1">head 2</button><button data-h="2">head 3</button></div>
 </div></section>
 
 <section class="st" data-s="8"><div class="card" data-sum="Several heads look for different things; one more table merges them.">
  <h2>Several heads at once</h2>
- <p>One blend can't track everything. The word just before matters, and so does the subject three words back. So attention runs as several heads side by side, each on its own slice of the row. The toy has 3 heads of 4 numbers. GPT-2 has 12 heads of 64.</p>
+ <p class="lead">One question isn't enough.</p>
+ <ul class="steps"><li>␣the wants the word just before it, and also who's doing the sitting.</li><li>So attention runs several times side by side. Each run is a <b>head</b>.</li><li>One more table of weights merges their notes into one row.</li></ul>
  <p class="cap"></p>
- <p class="say">Trained heads often look like these. I drew them by hand, after patterns people have found in real models:</p>
+ <p class="say">Trained heads often look like these (drawn by hand):</p>
  <div class="heads" id="trained"></div>
+ <details class="more"><summary>More detail</summary><p>Each head works on its own slice of the row. The toy has 3 heads of 4 numbers; GPT-2 has 12 heads of 64.</p><p>The drawings follow patterns people have found in real models.</p></details>
 </div></section>
 
 <section class="st" data-s="9"><div class="card" data-sum="Each part adds to a stream of rows instead of replacing it.">
  <h2>The stream</h2>
- <p>If attention overwrote each row, anything it missed would be gone for good, and twelve blocks of that would be miserable to train. So its output is added onto the row it started from. There's nothing new to learn here, and in training the error signal slides back along this same line.</p>
+ <p class="lead">Attention's note is added on top. Nothing is overwritten.</p>
+ <div class="flow"><span>row</span><i>→</i><span>+ note</span><i>→</i><span>= row with a note</span></div>
+ <ul class="steps"><li>Like pencil notes in the margin of a notebook.</li><li>Each word carries its notebook down the whole model.</li><li>This is the <b>residual stream</b>, the orange line.</li></ul>
  <p class="cap"></p>
+ <details class="more"><summary>More detail</summary><p>It also makes the model trainable. If each part overwrote the row, whatever it missed would be lost, and the “be less wrong” signal would fade on its way back through 12 blocks. Along the stream it travels straight back.</p></details>
 </div></section>
 
 <section class="st" data-s="10"><div class="card" data-sum="Each token is worked on alone: widen, bend, narrow, add to the stream.">
  <h2>Thinking alone</h2>
- <p>Attention gathered things into each row but only blended them. The MLP works on each token by itself. It widens the row to four times its size, bends it, narrows it back and adds the result to the stream. In GPT-2 that's 768 numbers out to 3,072 and back.</p>
+ <p class="lead">Now each word thinks on its own, with what the model memorised. This part is the <b>MLP</b>.</p>
+ <div class="flow"><span>768</span><i>→</i><span>check 3,072 patterns</span><i>→</i><span>keep the matches</span><i>→</i><span>768</span></div>
+ <ul class="steps"><li>Widen: one dot product per learned pattern, 3,072 of them.</li><li>Bend: patterns that don't match are switched off.</li><li>Narrow: each match adds its own note, back down to 768.</li></ul>
  <p class="cap"></p>
+ <p class="know"><b>␣the's row so far:</b> … · a cat sat on something just before me · <span class="nw">so the next word is probably a thing to sit on</span></p>
  <svg class="fig" id="geluFig" viewBox="0 0 320 96"></svg>
- <p class="note">Without the bend, the two tables would collapse into one. About two-thirds of each block's numbers live in this part.</p>
+ <details class="more"><summary>More detail</summary><p>Without the bend, the two tables would collapse into one.</p><p>About two-thirds of each block's numbers live here.</p><p>Researchers have found MLPs often act like this kind of pattern-to-note lookup. It's a useful picture, not the whole story.</p></details>
 </div></section>
 
 <section class="st" data-s="11"><div class="card" data-sum="One block: LayerNorm, attention, add, LayerNorm, MLP, add.">
  <h2>That's one block</h2>
- <p>Everything so far is one transformer block. Tokens talk to each other in attention, then each one thinks alone in the MLP, and both add to the stream. Rows go in and rows of the same size come out, which is what lets you stack them.</p>
+ <p class="lead">Everything so far is one transformer block.</p>
+ <ul class="steps"><li>Words talk in attention.</li><li>Each word thinks alone in the MLP.</li><li>Both write onto the stream.</li><li>Rows in, same-size rows out, so blocks stack like bricks.</li></ul>
  <p class="cap"></p>
  <p class="say">Put it back together, top to bottom:</p>
  <div id="gameBlock"></div>
- <p class="note">Attention itself dates from 2014. What was new in 2017 was a model built from attention alone, with no reading word by word.</p>
+ <details class="more"><summary>More detail</summary><p>Attention itself dates from 2014. What was new in 2017 was a model built from attention alone, with no reading word by word.</p></details>
 </div></section>
 
 <section class="st" data-s="12"><div class="card" data-sum="Twelve blocks in a row, each with its own numbers.">
  <h2>Twelve of them</h2>
- <p>One block gives each token one look around. Working out who “it” is, or who did what to whom, takes more rounds than that. So GPT-2 stacks 12 blocks of the same design, each with its own numbers, and the stream runs through all of them. GPT-3 stacks 96.</p>
+ <p class="lead">One block is one round of “talk, then think”.</p>
+ <ul class="steps"><li>One round can catch that a cat sat.</li><li>Finer things, like what “it” points to, take more rounds.</li><li>GPT-2 runs 12 rounds, each with its own numbers. GPT-3 runs 96.</li></ul>
  <p class="cap"></p>
+ <p class="know"><b>␣the's row so far:</b> … · a thing to sit on comes next · <span class="nw">soft, flat things a cat sits on: mat, floor, bed</span></p>
+ <details class="more"><summary>More detail</summary><p>Roughly, early blocks handle nearby words and grammar, and later ones handle meaning. Real models are messier than that.</p></details>
 </div></section>
 
 <section class="st" data-s="13"><div class="card" data-sum="The last row is scored against every token's row in the table.">
  <h2>Back to words</h2>
- <p>After 12 blocks, the last row holds the model's best idea of what comes next, written as 768 numbers. To get a word out, GPT-2 normalises it once more and scores it against every row of the token table from the start. That's one score for each of the 50,257 tokens.</p>
+ <p class="lead">␣the's row now describes the next word. Time to turn it into one.</p>
+ <ul class="steps"><li>Compare it with every word's row in the token table: one dot product each.</li><li>The best match scores highest.</li><li>That's 50,257 scores, one per token, called logits.</li></ul>
  <p class="cap"></p>
- <p class="note">In training, every row is scored against its own next token, all at once. When writing, only the last row matters.</p>
+ <details class="more"><summary>More detail</summary><p>First the row gets one last volume reset.</p><p>In training, every row is scored against its own next word, all at once. When writing, only the last row matters.</p></details>
 </div></section>
 
 <section class="st" data-s="14"><div class="card" data-sum="Softmax turns the scores into odds for every token.">
  <h2>Scores into odds</h2>
- <p>A score of 5.2 doesn't tell you how sure the model is. The same softmax you saw in attention turns all 50,257 scores into <b class="k-p">odds</b> that add up to 100%.</p>
+ <p class="lead">A score of 5.2 doesn't say how sure the model is.</p>
+ <ul class="steps"><li>The softmax pie comes back, now with 50,257 slices.</li><li>Each slice is the <b class="k-p">odds</b> of one next token.</li></ul>
  <p class="cap"></p>
- <p class="note">The toy is untrained, so its odds would be noise. These bars are made up to look like a trained GPT-2.</p>
+ <details class="more"><summary>More detail</summary><p>The toy is untrained, so its odds would be noise. These bars are made up to look like a trained GPT-2.</p></details>
 </div></section>
 
 <section class="st" data-s="15"><div class="card" data-sum="Roll dice weighted by the odds; temperature and top-p shape the dice.">
  <h2>Rolling the dice</h2>
- <p>Always taking the top token reads flat, and it tends to loop. My LSTM kept reusing words for much the same reason. So GPT-2 rolls dice weighted by the odds. Temperature divides the scores before softmax, and top-p keeps only the fewest top tokens whose odds reach p.</p>
+ <p class="lead">Always taking the biggest slice reads flat, and it repeats itself.</p>
+ <ul class="steps"><li>So GPT-2 spins a wheel with those slices.</li><li><b>Temperature</b>: low makes big slices bigger, high evens them out.</li><li><b>Top-p</b>: drop the tiny slices, keep the top ones that cover p of the pie.</li></ul>
  <p class="cap"></p>
  <div class="ctl"><label for="tSl">Temperature</label><input id="tSl" type="range" min="0.1" max="2" step="0.05" value="1"><output id="tOut">1.00</output></div>
  <div class="ctl"><label for="pSl">Top-p</label><input id="pSl" type="range" min="0.3" max="1" step="0.05" value="1"><output id="pOut">1.00</output></div>
  <button class="btn" id="roll">Roll the dice</button> <span class="mini" id="rollMsg"></span>
  <p class="note" id="guessRes"></p>
+ <p class="aside">My LSTM kept reusing words for much the same reason.</p>
+ <details class="more"><summary>More detail</summary><p>Temperature divides every score before softmax: below 1 that stretches the gaps, above 1 it shrinks them.</p></details>
 </div></section>
 
 <section class="st" data-s="16"><div class="card" data-sum="Run, pick, append, and run again.">
  <h2>Again, and again</h2>
- <p>One pass gives one token, and a reply needs hundreds. So the picked token is added to the input and the whole stack runs again, until it hits a stop token or a length limit. A cache keeps the old keys and values, so each lap only works out the new token's rows.</p>
+ <p class="lead">One run gives one token. A reply needs hundreds.</p>
+ <ul class="steps"><li>The picked token goes on the end of the input.</li><li>The whole thing runs again, until a stop token or a length limit.</li><li>That's why chat replies appear word by word.</li></ul>
  <p class="cap"></p>
  <div class="story" id="story">The cat sat on the</div>
- <p class="aside">My LSTM also wrote one word at a time. The difference is in training: a transformer checks every position of a sentence at once, while an LSTM has to step through. That's what made huge training runs practical.</p>
+ <details class="more"><summary>More detail</summary><p>The earlier words' keys and values don't change, so they're kept in a cache. Each lap only works out rows for the newest token.</p><p>My LSTM also wrote one word at a time. The difference is training: a transformer checks every position of a sentence at once, while an LSTM has to step through. That's what made huge training runs practical.</p></details>
 </div></section>
 
 <section class="st" data-s="17"><div class="card" data-sum="Training nudges every number until the real next token is less of a surprise.">
  <h2>Where the numbers come from</h2>
- <p>Every number so far was random, which is why the toy picked <b id="toyPick"></b>. Training is brute force. Show it real text, measure how surprised it was by the actual next token, and nudge all 124 million numbers to be a little less surprised. Then repeat, over billions of tokens.</p>
+ <p class="lead">Every number so far was random. That's why the toy picked <b id="toyPick"></b>.</p>
+ <ul class="steps"><li>Training is a giant game of hotter–colder.</li><li>Show real text, hide the next word, measure the surprise. That's the <b>loss</b>.</li><li>Nudge all 124 million numbers toward less surprise. Repeat over billions of tokens.</li></ul>
  <p class="cap"></p>
  <svg class="fig" id="lossFig" viewBox="0 0 320 130"></svg>
  <p class="mini">step <b id="trStep">0</b> · loss <b id="trLoss">10.82</b> · the real next token gets <b id="trP">1 in 50,000</b></p>
  <div class="story" id="trText" style="min-height:44px"></div>
  <p class="aside">My LSTM saw about 1,000 couplets. GPT-2 saw roughly 9 billion tokens of web pages.</p>
+ <details class="more"><summary>More detail</summary><p>Working out the right direction for every number at once is called backpropagation: the model's arithmetic run backwards, from the loss to each weight.</p></details>
 </div></section>
 
 <section class="st" data-s="18"><div class="card" data-sum="The same block, far bigger, trained on far more text.">
  <h2>More of everything</h2>
- <p>GPT-2 writes passable paragraphs. GPT-3 writes essays and working code. It's the same block, 8 times deeper and 16 times wider, trained on about 30 times more text.</p>
+ <p class="lead">GPT-3 is the same block, with more of everything.</p>
+ <ul class="steps"><li>GPT-2 writes passable paragraphs.</li><li>GPT-3 writes essays and working code.</li></ul>
  <svg class="fig" id="scaleFig" viewBox="0 0 320 120"></svg>
  <table class="cmp"><tr><td></td><th>GPT-2</th><th>GPT-3</th></tr><tr><td>blocks</td><td>12</td><td>96</td></tr><tr><td>numbers per row</td><td>768</td><td>12,288</td></tr><tr><td>training text</td><td>~9B tokens</td><td>~300B tokens</td></tr></table>
  <p class="aside">My biggest takeaway, going from LSTMs to LLMs, was data and compute. The transformer is the design that could use both.</p>
@@ -409,24 +472,26 @@ body.end-on .st .card{opacity:0!important;pointer-events:none!important}
 
 <section class="st" data-s="19"><div class="card" data-sum="A little more training turns the base model into an assistant.">
  <h2>From autocomplete to assistant</h2>
- <p>A base model continues documents. Ask it a question and it may well reply with more questions. So it gets trained a little more, first on example chats and then on which of two answers people preferred. That second part is called RLHF.</p>
+ <p class="lead">A base model continues documents. It doesn't answer you.</p>
+ <ul class="steps"><li>Ask it a question and it may reply with more questions.</li><li>So it's trained a little more: first on example chats,</li><li>then on which of two answers people liked better. That's RLHF.</li></ul>
  <p class="say">Ask “What is the capital of France?”</p>
  <table class="cmp ex"><tr><td>base model</td><td>What is the capital of Germany? What is the capital of…</td></tr><tr><td>after example chats</td><td>The capital of France is Paris.</td></tr><tr><td>after preferences</td><td>People picked “Paris.” over a 300-word answer, so short and right wins.</td></tr></table>
 </div></section>
 
 <section class="st" data-s="20"><div class="card" data-sum="It sees only what's in the window: your prompt, the chat so far and its own reply.">
  <h2>All it can see</h2>
- <p>It has no memory between messages. All it knows about your chat is the text in its window, which holds your prompt and the chat so far, including its own reply as it writes.</p>
- <p class="say">Slide to compare window sizes. Grey text is outside the window; to the model it doesn't exist.</p>
+ <p class="lead">It has no memory between messages.</p>
+ <ul class="steps"><li>All it sees is the text in its window: your prompt, the chat so far, its own reply.</li><li>Think of a desk that holds so many pages. Whatever falls off is gone.</li></ul>
+ <p class="say">Slide to compare window sizes. Grey text is outside the window.</p>
  <div class="ctxbar" id="ctxBar"></div>
  <div class="ctl"><input id="cSl" type="range" min="0" max="5" step="1" value="0"><output id="cOut" style="min-width:120px"></output></div>
  <p class="mini" id="cInfo"></p>
- <p class="note">Double the text and attention does about four times the work. Facts buried in the middle of a very long window often get missed.</p>
+ <details class="more"><summary>More detail</summary><p>Double the text and attention does about four times the work.</p><p>Facts buried in the middle of a very long window often get missed.</p></details>
 </div></section>
 
 <section class="st" data-s="21"><div class="card">
  <h2>You built GPT-2</h2>
- <p>That's 124,439,808 numbers doing eight kinds of arithmetic in a loop, and every one of them started out random.</p>
+ <p>That's 124,439,808 numbers doing eight kinds of arithmetic in a loop, and every one of them started out random. Underneath it all is one move used over and over: the dot product, a match score.</p>
  <p class="say">One last check. Tap the parts in order, from text in to token out:</p>
  <div id="gameAll"></div>
 </div></section>
@@ -649,18 +714,18 @@ const ST=[
   {at:.15,a:"xl",t:"Each row gets reset on its own. Watch the colours even out.",loop:1,dur:3.5},
   {at:.8,a:"xl",t:"The pattern inside each row survives. Only its scale changed."}]},
  {n:"Query, key, value",ch:"2 · Tokens talk",p:41157120,focus:["xl","Wq","Wk","Wv","Q","K","V"],ops:[mmOp("xl","Wq","Q",{slow:1}),mmOp("xl","Wk","K"),mmOp("xl","Wv","V")],yaw:-.22,beats:[
-  {at:0,a:"Wq",t:"These three grids are weights, numbers the model learns. One each for queries, keys and values."},
+  {at:0,a:"Wq",t:"Three tables of weights, one each for queries, keys and values. Each column is one learned pattern."},
   {at:.12,a:"Q",t:"One cell, slowly. The's row times one column of W_Q: twelve pairs, multiplied, then added up.",loop:1,dur:4.5,hint:{a:"Q",c:.5,r:.5,t:"the whole trick"}},
-  {at:.27,a:"Q",t:"That's a dot product. Every cell here is one, and that's all a matrix multiply is."},
+  {at:.27,a:"Q",t:"The dot product from part 2: how well The's row fits that column. Every cell is one, and a matrix multiply is just lots of them."},
   {at:.48,a:"K",t:"The same five rows go through W_K, then W_V."},
   {at:.78,a:"V",t:"Hover any cube to see the sum that made it."}]},
  {n:"Scores",ch:"2 · Tokens talk",p:41157120,focus:["Q","K","S0","S1","S2"],ops:[0,1,2].map(h=>({t:"score",h,out:"S"+h,slow:h===0})),beats:[
   {at:0,a:"S0",t:"One grid per head. Each row is a token asking; each column, a token being asked."},
   {at:.12,a:"S0",t:"First cell: The's query against its own key. Four pairs, added, then divided by 2.",loop:1,dur:3.5},
   {at:.3,a:"S0",t:"The dark cells are the future. ␣cat can't see ␣sat yet.",hint:{a:"S0",c:4.5,r:.5,t:"no peeking"}},
-  {at:.82,a:"S0",t:`In head 1, ␣the scores ${show(TOKS[FX.s4])} highest (${FX.s4v}). The weights are random, so that's luck.`}]},
+  {at:.82,a:"S0",t:`In head 1, ␣the's question fits “${show(TOKS[FX.s4])}” best (${FX.s4v}). The weights are random, so that's luck.`}]},
  {n:"Softmax and mix",ch:"2 · Tokens talk",p:41157120,focus:["S0","S1","S2","A0","A1","A2","V","av"],ops:[...[0,1,2].map(h=>({t:"rows",src:"S"+h,out:"A"+h,slow:h===0,calc:"softmax: scores into shares"})),{t:"mix",out:"av",slow:1}],beats:[
-  {at:0,a:"A0",t:"Softmax, one row at a time. A bigger score gets a bigger share."},
+  {at:0,a:"A0",t:"Softmax, one row at a time. A bigger score gets a bigger slice."},
   {at:.25,a:"A0",t:`␣the gives ${FX.a4p}% of its attention to ${show(TOKS[FX.a4])} in head 1.`},
   {at:.59,a:"av",t:"Now the blend: each value row times its share, added up. Watch The's first number.",loop:1,dur:3.5},
   {at:.85,a:"av",t:"Five new rows, each a mix of the tokens up to and including itself."}]},
@@ -680,7 +745,7 @@ const ST=[
  {n:"Stack ×12",ch:"4 · Stack it",p:124438272,focus:["x2","GHOST","xf"],beats:[{at:0,a:"GHOST",t:"Each slab is another block, with 7,087,872 numbers of its own.",dur:5,hint:{el:"hudNum",t:"watch this number"}}]},
  {n:"Unembedding",ch:"5 · Numbers → a word",p:124439808,focus:["x2","xf","WTEt","logits"],ops:[{t:"rows",src:"x2",out:"xf",calc:"final LayerNorm"},mmOp("xf","WTEt","logits",{slow:1})],beats:[
   {at:0,a:"WTEt",t:"The token table from part 2, turned on its side. No new numbers."},
-  {at:.36,a:"logits",t:"Each score is the final row dotted with one token's row.",loop:1,dur:3.5},
+  {at:.36,a:"logits",t:"Each score is a dot product: ␣the's final row against one token's row.",loop:1,dur:3.5},
   {at:.85,a:"logits",t:`The untrained toy's top pick after ␣the is ${show(VOCAB[FX.toyTop])}. Random, for now.`}]},
  {n:"Softmax",ch:"5 · Numbers → a word",p:124439808,focus:["logits","BARS"],beats:[
   {at:0,a:"BARS",t:"Made-up odds for a trained GPT-2. ␣mat comes first.",dur:3},
