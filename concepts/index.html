@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concepts · Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/concepts/">
+<meta name="description" content="Concepts I keep coming back to: what each one is, where it comes from, and where it fits.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Concepts · Hari Meyyappan">
+<meta property="og:description" content="Concepts I keep coming back to: what each one is, where it comes from, and where it fits.">
+<meta property="og:url" content="https://hmeyy.com/concepts/">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../img/logo.png">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a href="../index.html#writing">Writing</a>
+<a class="page" href="../notes/index.html">Notes</a>
+<a class="on" href="../concepts/index.html" aria-current="page">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<main class="main">
+<div class="col">
+<header class="head">
+<h1>Concepts</h1>
+<p class="lede">Ideas I keep coming back to. Each one: what it is, where it comes from, and where it fits.</p>
+</header>
+
+<section id="list-processing">
+<h2>List processing</h2>
+<ul class="rb">
+<li>Use one structure, the list, for both data and code. A program is a list, so a program can read, build and change other programs.</li>
+<li>It's where Lisp gets its name: LISt Processing.</li>
+<li>Where it fits: an agent's plan written as structured tool calls is data that a program runs. The agent writes code as data, the way Lisp does.</li>
+<li class="src">John McCarthy, "Recursive Functions of Symbolic Expressions and Their Computation by Machine" (1960) · Paul Graham, <a href="https://paulgraham.com/rootsoflisp.html">"The Roots of Lisp"</a> (2001)</li>
+</ul>
+</section>
+
+<section id="top-down">
+<h2>Top-down design</h2>
+<ul class="rb">
+<li>Start from the whole, split it into parts, then split those, until each part is small enough to build.</li>
+<li>Good when the goal is clear and stable.</li>
+<li>The risk: you design the parts before you know which ones are hard.</li>
+<li class="src">Niklaus Wirth, "Program Development by Stepwise Refinement" (1971)</li>
+</ul>
+</section>
+
+<section id="bottom-up">
+<h2>Bottom-up design</h2>
+<ul class="rb">
+<li>Build small, general pieces first, then make bigger things out of them.</li>
+<li>Good when you learn what the problem is by building it.</li>
+<li>The risk: nice pieces that never add up to the thing.</li>
+<li>Use it together with top-down: split the program down toward the language, and build the language up toward the program. The program gets smaller and the pieces can be used again.</li>
+<li class="src">Paul Graham, <a href="https://paulgraham.com/progbot.html">"Programming Bottom-Up"</a> (1993)</li>
+</ul>
+</section>
+
+<footer>Plain HTML. No tracking.</footer>
+</div>
+</main>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>
