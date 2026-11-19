@@ -98,13 +98,13 @@ select.btn{padding-right:6px}
 /* ---------- chart ---------- */
 .scroller{flex:1;min-height:0;overflow:auto;background:var(--bg);overscroll-behavior:contain}
 .sheet{width:max-content;min-width:100%}
-.heads{position:sticky;top:0;z-index:5;display:flex;background:var(--surface);border-bottom:1px solid var(--line-strong)}
-.corner{position:sticky;left:0;z-index:6;flex:none;background:var(--surface);border-right:1px solid var(--line-strong);
+.heads{position:sticky;top:0;z-index:7;display:flex;background:var(--surface);border-bottom:1px solid var(--line-strong)}
+.corner{position:sticky;left:0;z-index:8;flex:none;background:var(--surface);border-right:1px solid var(--line-strong);
   font-family:var(--label);font-size:11px;color:var(--muted);display:flex;align-items:flex-end;padding:0 0 4px 6px;letter-spacing:.02em}
 .head{flex:none;padding:6px 6px 5px;border-right:1px solid var(--line);font-family:var(--display);font-weight:600;font-size:13px;line-height:1.15;
   border-top:3px solid var(--c);display:flex;align-items:flex-end}
 .body{display:flex;position:relative}
-.axis{position:sticky;left:0;z-index:4;flex:none;background:var(--surface);border-right:1px solid var(--line-strong)}
+.axis{position:sticky;left:0;z-index:6;flex:none;background:var(--surface);border-right:1px solid var(--line-strong)}
 .tick{position:absolute;right:5px;transform:translateY(-50%);font-family:var(--label);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .tick.major{color:var(--ink);font-weight:600}
 .plot{position:relative;flex:none}
@@ -129,6 +129,8 @@ select.btn{padding-right:6px}
 .ev:hover i,.ev.sel i{background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .ico{display:inline-block;flex:none;width:16px;height:16px;line-height:0;transition:transform .15s}
 .ico svg{width:100%;height:100%;overflow:visible}
+.ico img{width:100%;height:100%;display:block;pointer-events:none}
+.ev.ov .ico img{width:78%;height:78%;margin:11%}
 .ev .ico{margin-top:-2px}
 .ev:hover .ico{transform:scale(1.35)}
 .ev.sel .ico{transform:scale(1.35);filter:drop-shadow(0 0 1.5px var(--accent)) drop-shadow(0 0 1.5px var(--accent))}
@@ -162,6 +164,32 @@ select.btn{padding-right:6px}
 .rhead{position:absolute;left:0;right:0;padding:5px 8px;border-left:3px solid var(--c);border-bottom:1px solid var(--line);
   font-family:var(--display);font-weight:600;font-size:13px;line-height:1.15;overflow:hidden}
 .rhead.evhead{border-left-color:var(--line-strong);color:var(--muted)}
+/* sections: folding rows */
+.fold{display:inline-flex;align-items:flex-start;gap:3px;max-width:100%;padding:0;margin:0 0 0 -4px;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer;border-radius:3px}
+.fold:hover{background:color-mix(in srgb,var(--c,var(--muted)) 14%,transparent)}
+.fold svg{flex:none;width:12px;height:12px;margin-top:1px;color:var(--muted);transition:transform .15s}
+.fold[aria-expanded="true"] svg{transform:rotate(90deg)}
+.rhead.sub{font-weight:500;font-size:12.5px;border-left-color:color-mix(in srgb,var(--c) 50%,var(--surface));background:color-mix(in srgb,var(--c) 4%,var(--surface))}
+.rhead.grp{border-bottom-style:dashed}
+.head.sub{font-weight:500;font-size:12px;border-top-color:color-mix(in srgb,var(--c) 50%,var(--surface))}
+.rowoff{position:absolute;z-index:0;pointer-events:none;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--muted) 13%,transparent) 0 3px,transparent 3px 8px)}
+.ev.ov .ico{border-radius:50%;background:color-mix(in srgb,var(--lc) 18%,var(--surface));box-shadow:0 0 0 1px color-mix(in srgb,var(--lc) 55%,transparent)}
+.life{position:absolute;z-index:1;height:2px;border-radius:1px;background:var(--lc);opacity:.4;pointer-events:none}
+.life.v{height:auto;width:2px}
+.layers{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.layers::-webkit-scrollbar{display:none}
+.layers>*{flex:none}
+.layerlab{font-size:12.5px;color:var(--muted);margin-right:2px}
+.chip.layer .ico{width:15px;height:15px}
+.chip.layer[aria-pressed="false"]{opacity:.62}
+.chip.layer[aria-pressed="true"]{background:color-mix(in srgb,var(--lc) 16%,var(--surface));border-color:var(--lc)}
+.links{position:absolute;left:0;top:0;pointer-events:none;z-index:3;overflow:visible}
+.links path{fill:none;stroke-width:1.7;stroke-linecap:round;opacity:.8}
+.links path.head{stroke:none;opacity:.9}
+.lnk{position:absolute;z-index:4;width:22px;height:22px;margin:-11px 0 0 -11px;padding:0;border-radius:50%;border:1.5px solid var(--lc);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.lnk .ico{width:14px;height:14px}
+.lnk:hover,.lnk.sel{box-shadow:0 0 0 2px var(--accent)}
+.srcl{display:inline-block;margin:7px 0 0 14px;font-size:12.5px;color:var(--muted)}
 .sheet.horiz .bar{align-items:center;justify-content:flex-start}
 .sheet.horiz .bar span{writing-mode:horizontal-tb;top:auto;left:calc(var(--headw,136px) + 4px);line-height:1}
 .sheet.horiz .ev span{white-space:nowrap}
@@ -289,6 +317,7 @@ select.btn{padding-right:6px}
       <option value="1800">1800 CE</option>
     </select>
   </div>
+  <div class="layers" id="layerRow" role="group" aria-label="Overlays and sections"></div>
   <div class="legend" aria-hidden="true">
     <span><i class="key"></i>state, firm dates</span>
     <span><i class="key fade"></i>faded end: date uncertain or gradual</span>
@@ -343,6 +372,9 @@ select.btn{padding-right:6px}
       <li><b>One region can be regrouped.</b> Select a single region and a Group by row appears. It re-sorts the same bars into columns by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
       <li><b>Regions are linked.</b> Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed columns.</li>
       <li><b>Two orientations.</b> Horizontal runs time left to right with one row per region. Vertical runs time down the page with regions side by side.</li>
+      <li><b>Regions unfold into parts.</b> Tap a region's heading, or Unfold regions, to split it into sub-regions, and some of those split again. Each part only has a row for the years it has history; hatching marks the years before or after. Folded, everything sits in the one row.</li>
+      <li><b>Overlays.</b> Ten layers add people, religion and belief, society, law and rights, arts and culture, technology and ideas, infrastructure and buildings, trade and business, disasters and disease, food, farming and subsistence, and migration and population. They follow the zoom like events: the most important first, more detail as you zoom in, most of it in recent centuries. A line after a person shows their lifetime. Each item was checked against a source, usually its Wikipedia article.</li>
+      <li><b>Links between regions.</b> Switch on Links between regions to draw arrows for things that crossed from one region to another: faiths, crops, inventions, people, trade, conquests. An arrow shows when both of its regions are selected. A slanted arrow left in one year and arrived in a later one.</li>
       <li><b>A map of borders.</b> The map at the bottom left shows the territories of the selected regions in the year on the red slider. The slider moves in big steps where little happened and in single years where events crowd together. Drag the strip under it to zoom the slider into a range of years. Opening an event or bar moves the map to its year. Drag the map to pan, scroll or pinch to zoom, or use Zoom to area. Borders come from historical-basemaps, about 50 snapshots from 3000 BCE to 2010, with the borders of today from Natural Earth; the map shows the nearest snapshot at or before the year.</li>
       <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
       <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
@@ -358,6 +390,7 @@ select.btn{padding-right:6px}
   </div>
 </div>
 
+<script src="hier.js"></script>
 <script>
 "use strict";
 const NOW = 2026, START = -3300;
@@ -773,6 +806,16 @@ const WAR = new Set([
  "Alexander's conquests","Arab conquests","Mongol conquests","World wars"
 ]);
 const ICON = {
+ flame:'<path d="M8 1.6c.6 2.2 3.6 3.8 3.6 7.2A3.6 3.6 0 0 1 8 12.4a3.6 3.6 0 0 1-3.6-3.6c0-1.6.8-2.6 1.6-3.4.1 1.2.6 2 1.4 2.4C7 6 7.2 3.6 8 1.6z" fill="#f59e0b" stroke="#c2410c" stroke-width=".6" stroke-linejoin="round"/><path d="M8 7.4c.4 1 1.6 1.6 1.6 3a1.6 1.6 0 0 1-3.2 0c0-.8.4-1.2.8-1.6.2.6.5.8.8.9z" fill="#fde68a"/><path d="M4.2 14.4h7.6" stroke="#a0522d" stroke-width="1.6" stroke-linecap="round"/>',
+ gavel:'<rect x="2.2" y="3.4" width="7" height="3.6" rx=".8" transform="rotate(-40 5.7 5.2)" fill="#5b6bb5"/><path d="M7.6 7.4l5.6 5.4" stroke="#8a5a2b" stroke-width="1.9" stroke-linecap="round"/><path d="M1.6 14.6h7" stroke="#3f4a8a" stroke-width="1.8" stroke-linecap="round"/>',
+ storm:'<path d="M4.3 9.6a3 3 0 0 1-.4-6 4 4 0 0 1 7.6.8 2.6 2.6 0 0 1 .5 5.2z" fill="#9aa6b4"/><path d="M8.8 8.2L6.6 11.6h2l-1.4 3.4 3.6-4.6H8.7l1.4-2.2z" fill="#f2b705" stroke="#c98a00" stroke-width=".5" stroke-linejoin="round"/>',
+ wheat:'<path d="M8 15V5.5" stroke="#a0782c" stroke-width="1.2" stroke-linecap="round"/><g fill="#e8b84a" stroke="#b98a2a" stroke-width=".5"><ellipse cx="8" cy="3.2" rx="1.2" ry="2"/><ellipse cx="6.1" cy="6.2" rx="1.1" ry="1.9" transform="rotate(-35 6.1 6.2)"/><ellipse cx="9.9" cy="6.2" rx="1.1" ry="1.9" transform="rotate(35 9.9 6.2)"/><ellipse cx="6.1" cy="9.3" rx="1.1" ry="1.9" transform="rotate(-35 6.1 9.3)"/><ellipse cx="9.9" cy="9.3" rx="1.1" ry="1.9" transform="rotate(35 9.9 9.3)"/></g>',
+ steps:'<g fill="#3d8fb0"><ellipse cx="5" cy="10.6" rx="1.8" ry="2.7" transform="rotate(-12 5 10.6)"/><circle cx="3.6" cy="7" r=".65"/><circle cx="4.8" cy="6.6" r=".65"/><circle cx="6" cy="6.8" r=".6"/></g><g fill="#5fb3d4"><ellipse cx="11" cy="5.8" rx="1.8" ry="2.7" transform="rotate(12 11 5.8)"/><circle cx="9.9" cy="2.3" r=".6"/><circle cx="11.1" cy="2" r=".65"/><circle cx="12.4" cy="2.3" r=".65"/></g>',
+ person:'<circle cx="8" cy="5.3" r="3" fill="#f2c9a0"/><path d="M5 5.2a3 3 0 0 1 6 0c-.7-.8-1.8-1.3-3-1.3s-2.3.5-3 1.3z" fill="#5a3b2a"/><path d="M2.6 14.6c0-3.1 2.4-5.2 5.4-5.2s5.4 2.1 5.4 5.2z" fill="#8e5bd6"/>',
+ palette:'<path d="M8 1.8C4.2 1.8 1.5 4.5 1.5 7.8c0 3.2 2.6 5.8 5.6 5.8 1.2 0 1.6-.7 1.3-1.5-.4-1 .1-1.9 1.2-1.9h1.6c2 0 3.3-1.4 3.3-3.3 0-2.8-2.9-5.1-6.5-5.1z" fill="#f3d9b1" stroke="#b98a52" stroke-width=".8"/><circle cx="5" cy="6.1" r="1.2" fill="#e0569b"/><circle cx="8" cy="4.3" r="1.2" fill="#3b82f6"/><circle cx="11.2" cy="5.7" r="1.2" fill="#f2b705"/><circle cx="4.7" cy="9.4" r="1.2" fill="#22a06b"/>',
+ bulb:'<path d="M8 1.5a4.5 4.5 0 0 0-2.6 8.2c.5.4.8.9.8 1.5v.6h3.6v-.6c0-.6.3-1.1.8-1.5A4.5 4.5 0 0 0 8 1.5z" fill="#ffd54a" stroke="#d9a300" stroke-width=".8"/><rect x="6.1" y="12" width="3.8" height="1.4" rx=".5" fill="#8a96a3"/><rect x="6.6" y="13.6" width="2.8" height="1.1" rx=".5" fill="#6b7785"/><path d="M7 7.2l1 1.3 1-1.3M8 8.5v2.6" stroke="#c77d00" stroke-width=".9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+ bridge:'<path d="M.8 7.2h14.4" stroke="#5d7f99" stroke-width="1.7" stroke-linecap="round"/><path d="M1.6 13.6V10a6.4 4.2 0 0 1 12.8 0v3.6" fill="none" stroke="#7e9db5" stroke-width="1.7"/><path d="M4.4 7.2v3M8 7.2v1.8M11.6 7.2v3" stroke="#7e9db5" stroke-width="1.1"/><path d="M.5 14.4h15" stroke="#4aa3d8" stroke-width="1.3" stroke-linecap="round"/>',
+ scales:'<path d="M8 2.6v10.6" stroke="#8a6a3a" stroke-width="1.3"/><path d="M2.8 4.6h10.4" stroke="#8a6a3a" stroke-width="1.3" stroke-linecap="round"/><path d="M2.8 4.6L1.1 9M2.8 4.6L4.5 9M13.2 4.6L11.5 9M13.2 4.6L14.9 9" stroke="#b08a50" stroke-width=".7"/><path d="M.9 9a1.9 1.4 0 0 0 3.8 0zM11.3 9a1.9 1.4 0 0 0 3.8 0z" fill="#1f9d6b"/><path d="M5 14h6" stroke="#8a6a3a" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="2.5" r="1.1" fill="#d99a1e"/>',
  war:'<path d="M2.5 2.5l8 8M13.5 2.5l-8 8" stroke="#5b6675" stroke-width="3.2" stroke-linecap="round"/><path d="M2.5 2.5l8 8M13.5 2.5l-8 8" stroke="#e4e9ef" stroke-width="1.5" stroke-linecap="round"/><path d="M8.6 12.8l4.2-4.2M3.2 8.6l4.2 4.2" stroke="#d99a1e" stroke-width="2" stroke-linecap="round"/><path d="M11 11l2.8 2.8M5 11l-2.8 2.8" stroke="#8a5a2b" stroke-width="2.2" stroke-linecap="round"/>',
  pyramid:'<path d="M8 2.5L14.5 13.5h-13z" fill="#e8b860"/><path d="M8 2.5l2 11h4.5z" fill="#c98f3a"/><path d="M1 13.6h14" stroke="#b07a30" stroke-width="1.2" stroke-linecap="round"/>',
  city:'<rect x="1.5" y="7" width="4.5" height="7" fill="#d98c5f"/><rect x="5.5" y="3.5" width="5" height="10.5" fill="#eeac7f"/><rect x="10" y="8" width="4.5" height="6" fill="#c9764b"/><path d="M5.5 3.5v-1.2h1.2v1.2M7.4 3.5v-1.2h1.2v1.2M9.3 3.5v-1.2h1.2v1.2" fill="#eeac7f" stroke="#eeac7f" stroke-width=".6"/><rect x="7.3" y="5.5" width="1.4" height="1.8" rx=".7" fill="#6b3b22"/><path d="M7 14v-2.4a1 1 0 0 1 2 0V14z" fill="#6b3b22"/><path d="M1 14.2h14" stroke="#9c5a35" stroke-width="1" stroke-linecap="round"/>',
@@ -821,7 +864,7 @@ const KIND = {
  "4.2 kiloyear drought":"sun","Silk Road opens":"camel","Plague of Justinian":"germ","Indian Ocean trade at full reach":"ship","Black Death":"germ",
  "Zheng He's voyages":"ship","Columbian Exchange":"ship","Atlantic slave trade":"chain","Industrialisation begins":"factory","Decolonisation":"flag"
 };
-const KINDNAME = {war:"War or battle",pyramid:"Monument",city:"City",dome:"Monument",stupa:"Temple",ship:"Voyage",camel:"Overland route",wheel:"Invention",
+const KINDNAME = {flame:"Religion and belief",gavel:"Society, law and rights",storm:"Disaster or disease",wheat:"Food, farming and subsistence",steps:"Migration",person:"Person",palette:"Arts and culture",bulb:"Technology or idea",bridge:"Infrastructure and buildings",scales:"Trade and business",war:"War or battle",pyramid:"Monument",city:"City",dome:"Monument",stupa:"Temple",ship:"Voyage",camel:"Overland route",wheel:"Invention",
  scroll:"Law or treaty",dove:"Peace",book:"Writing and print",star:"Science",lamp:"Faith and ideas",crown:"Rulers",dagger:"Assassination",flag:"Revolution or new state",
  coin:"Wealth and trade",chain:"Slavery and abolition",volcano:"Natural disaster",rocket:"Space",medal:"Games",ballot:"Election",germ:"Plague",sun:"Climate",factory:"Industry"};
 /* Importance. Level 1: turned world or regional history. Level 3: detail. Everything else is level 2.
@@ -859,7 +902,15 @@ function eventIcon(p){
   const ic=icon(p.kind); ic.style.width=ic.style.height=sz+"px"; ic.style.marginTop=(6-sz/2)+"px"; return ic;
 }
 function kindOf(name){ return WAR.has(name) ? "war" : (KIND[name]||null); }
-function icon(kind){ const sp=el("span","ico"); sp.innerHTML=`<svg viewBox="0 0 16 16" aria-hidden="true">${ICON[kind]}</svg>`; return sp; }
+/* Android (Noto) emoji for icons; u-pyramid, u-stupa, u-wheel are drawn in the same style (Noto has no pyramid, stupa or spoked wheel). */
+const EMOJI = {flame:"1f6d0",gavel:"2696",storm:"1f32a",wheat:"1f33e",steps:"1f463",person:"1f9d1",palette:"1f3a8",bulb:"1f4a1",
+ bridge:"1f3d7",scales:"1f4b0",war:"2694",pyramid:"-pyramid",city:"1f3d9",dome:"1f54c",stupa:"-stupa",ship:"26f5",camel:"1f42b",wheel:"-wheel",
+ scroll:"1f4dc",dove:"1f54a",book:"1f4d6",star:"1f52d",lamp:"1fa94",crown:"1f451",dagger:"1f5e1",flag:"1f6a9",coin:"1fa99",
+ chain:"26d3",volcano:"1f30b",rocket:"1f680",medal:"1f3c5",ballot:"1f5f3",germ:"1f9a0",sun:"1f321",factory:"1f3ed"};
+function icon(kind){ const sp=el("span","ico"); const c=EMOJI[kind];
+  if(c){ const im=document.createElement("img"); im.src="emoji/u"+c+".svg"; im.alt=""; im.decoding="async"; im.draggable=false; sp.appendChild(im); }
+  else sp.innerHTML=`<svg viewBox="0 0 16 16" aria-hidden="true">${ICON[kind]}</svg>`;
+  return sp; }
 /* Wikipedia article titles where they differ from the bar name */
 const WIKI = {
  "Caral–Supe":"Caral–Supe civilization","Olmec centres":"Olmecs","Maya city-states":"Maya civilization","Chavín":"Chavín culture",
@@ -1039,7 +1090,10 @@ const TAGS = {
 /* ---------- state ---------- */
 let savedOrient=null; try{ savedOrient=localStorage.getItem("wh8-layout"); }catch(e){}
 const qOrient=new URLSearchParams(location.search).get("layout");
-const state = {active:new Set(REG.map(r=>r.id)), stretch:false, zoom:2, links:true, events:true, lens:"geo", sel:null,
+let savedOpen=[], savedLayers=[], savedLinks=false;
+try{ savedLinks=localStorage.getItem("wh8-links")==="on"; }catch(e){}
+try{ savedOpen=JSON.parse(localStorage.getItem("wh8-open")||"[]"); savedLayers=JSON.parse(localStorage.getItem("wh8-layers")||"[]"); }catch(e){}
+const state = {xlinks:savedLinks, open:new Set(savedOpen.filter(id=>NODES.has(id))), layers:new Set(savedLayers.filter(id=>LAYER[id])), active:new Set(REG.map(r=>r.id)), stretch:false, zoom:2, links:true, events:true, lens:"geo", sel:null,
   horiz:(qOrient||savedOrient)!=="vertical"};
 const ZOOMS = [0.5,0.7,1,1.4,2,3];
 const AXIS_W = 62, PAD_T = 16, PAD_B = 30;
@@ -1060,6 +1114,43 @@ for (const r of REG){
   for (const it of items) it.tags=(TAGS[it.name]||TAGS[it.name+"@"+r.id]).split(" ");
   r.points=POINTS[r.id].map(a=>({pt:true,y:a[0],name:a[1],w:a[2],note:a[3],approx:!!a[4],reg:r.id,kind:kindOf(a[1]),level:levelOf(a[1])})).sort((x,y)=>x.y-y.y);
 }
+
+/* ---------- sections and overlays ----------
+   Each region has a tree of sections (hier.js). Folded, a region is one row; unfolded, a row per section,
+   plus a header row for whatever spans them. Overlays are dated items in five layers, drawn like events. */
+const LAYERS = [
+  {id:"people", name:"People", icon:"person", c:"#8e5bd6"},
+  {id:"religion", name:"Religion & belief", icon:"flame", c:"#a0522d"},
+  {id:"society", name:"Society, law & rights", icon:"gavel", c:"#4054b2"},
+  {id:"arts", name:"Arts & culture", icon:"palette", c:"#d6478f"},
+  {id:"ideas", name:"Tech & ideas", icon:"bulb", c:"#d99a00"},
+  {id:"infra", name:"Infrastructure & buildings", icon:"bridge", c:"#4f7ea3"},
+  {id:"trade", name:"Trade & business", icon:"scales", c:"#1f9d6b"},
+  {id:"disaster", name:"Disasters & disease", icon:"storm", c:"#b42318"},
+  {id:"food", name:"Food, farming & subsistence", icon:"wheat", c:"#7f9a12"},
+  {id:"migration", name:"Migration & population", icon:"steps", c:"#2b8db3"}];
+const LAYER = Object.fromEntries(LAYERS.map(l=>[l.id,l]));
+const NODES = new Map();
+for (const r of REG){
+  const H = (typeof HIER!=="undefined" && HIER[r.id]) || {tree:[],bars:{},events:{}};
+  const root = {id:r.id, name:r.name, s:START, e:NOW, kids:[], parent:null, reg:r.id, depth:0};
+  NODES.set(r.id, root); r.node = root;
+  const add = (n,parent)=>{ const o={id:n.id, name:n.name, s:n.s, e:n.e, kids:[], parent, reg:r.id, depth:parent.depth+1}; NODES.set(o.id,o); parent.kids.push(o); (n.kids||[]).forEach(k=>add(k,o)); };
+  (H.tree||[]).forEach(n=>add(n,root));
+  for (const it of r.items) it.sec = NODES.has(H.bars[it.name]) ? H.bars[it.name] : r.id;
+  for (const q of r.points) q.sec = NODES.has(H.events[q.name]) ? H.events[q.name] : r.id;
+  r.over = [];
+}
+for (const [layer,y,e,name,node,level,approx,w,note,src] of (typeof OVER!=="undefined" ? OVER : [])){
+  const n = NODES.get(node); if (!n || !LAYER[layer]) continue;
+  REG.find(r=>r.id===n.reg).over.push({pt:true, ov:true, layer, y, e:e||null, name, sec:node, level, approx:!!approx, w, note, src, reg:n.reg, kind:LAYER[layer].icon});
+}
+for (const r of REG) r.over.sort((a,b)=>a.y-b.y);
+const LINKKIND = Object.assign({war:{name:"War or conquest", icon:"war", c:"#6b7280"}}, LAYER);
+const XLINKS = (typeof LINKS!=="undefined" ? LINKS : []).filter(a=>NODES.has(a[4]) && NODES.has(a[5]) && LINKKIND[a[0]])
+  .map(([kind,y,y2,name,from,to,level,approx,w,note,src])=>({pt:true, lk:true, kind, y, y2:y2||null, name, from, to, level, approx:!!approx, w, note, src,
+    reg:NODES.get(from).reg}));
+function placeName(id){ const n=NODES.get(id); if (!n) return ""; return n.depth ? `${n.name}, ${REG.find(r=>r.id===n.reg).name}` : n.name; }
 
 /* ---------- scale ---------- */
 function segs(){
@@ -1102,17 +1193,118 @@ function pack(items){
   return ends.length;
 }
 function soloLens(){ return state.active.size===1 && state.lens!=="geo" ? LENS[state.lens] : null; }
+/* events and switched-on overlays at the zoom's importance level, in time order */
+function visiblePoints(r){
+  const lv=shownLevel();
+  const ev = state.events ? r.points.filter(p=>p.level<=lv) : [];
+  const ov = state.layers.size ? r.over.filter(p=>state.layers.has(p.layer) && p.level<=lv) : [];
+  return ov.length ? ev.concat(ov).sort((a,b)=>a.y-b.y) : ev;
+}
+/* the rows a region shows, top to bottom */
+function regionLanes(r){
+  const out=[];
+  const visit=n=>{
+    if (state.open.has(n.id) && n.kids.length){ out.push({key:n.id+"#grp", n, grp:true}); n.kids.forEach(visit); }
+    else out.push({key:n.id, n, grp:false});
+  };
+  visit(r.node); return out;
+}
+/* which row a thing at section `id` lands in: its own section if shown, else the nearest folded section above it */
+function laneKey(id){
+  const chain=[]; for (let n=NODES.get(id); n; n=n.parent) chain.unshift(n);
+  let i=0;
+  while (state.open.has(chain[i].id) && chain[i].kids.length){ if (!chain[i+1]) return chain[i].id+"#grp"; i++; }
+  return chain[i].id;
+}
+function anyFoldable(){ return REG.some(r=>state.active.has(r.id) && r.node.kids.length); }
 function buildCols(){
   const regs = REG.filter(r=>state.active.has(r.id)), lens = soloLens();
-  if (!lens) return regs.map(r=>({name:r.name,color:r.id,items:r.items,lanes:pack(r.items),points:state.events?r.points.filter(p=>p.level<=shownLevel()):[],ev:state.events,regs:[r.id]}));
+  if (!lens){
+    const cols=[], strip = state.events || state.layers.size>0;
+    for (const r of regs){
+      const lanes=regionLanes(r), by=new Map(lanes.map(l=>[l.key,{items:[],points:[]}]));
+      for (const it of r.items) by.get(laneKey(it.sec)).items.push(it);
+      for (const q of visiblePoints(r)) by.get(laneKey(q.sec)).points.push(q);
+      for (const l of lanes){
+        const g=by.get(l.key), n=l.n;
+        cols.push({key:l.key, name:n.name, color:r.id, items:g.items, lanes:pack(g.items), points:g.points,
+          ev: n.depth===0 && !l.grp ? strip : g.points.length>0, regs:[r.id], node:n, grp:l.grp, depth:n.depth,
+          s:n.s, e:n.e, fold: n.kids.length ? l.grp : null});
+      }
+    }
+    return cols;
+  }
   const r=regs[0], idx=LENSKEYS.indexOf(state.lens), cols=[]; let i=0;
   for (const [code,label] of Object.entries(lens.cats)){
     const items=r.items.filter(it=>it.tags[idx]===code);
     if (items.length) cols.push({name:label,color:PAL[i++%PAL.length],items,lanes:pack(items),points:[],ev:false,regs:[r.id]});
   }
-  if (state.events) cols.push({name:"Events",color:null,items:[],lanes:0,points:r.points.filter(p=>p.level<=shownLevel()),ev:true,regs:[r.id]});
+  if (state.events || state.layers.size) cols.push({name:state.layers.size?"Events and overlays":"Events",color:null,items:[],lanes:0,points:visiblePoints(r),ev:true,regs:[r.id]});
   return cols;
 }
+
+const CHEV='<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.2 2.5L7.8 6 4.2 9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function toggleNode(id){
+  const y=topYear();
+  if (state.open.has(id)){ for (const k of [...state.open]){ let n=NODES.get(k); while (n && n.id!==id) n=n.parent; if (n) state.open.delete(k); } }
+  else state.open.add(id);
+  saveOpen(); drawLayers(); render(y);
+}
+function saveOpen(){ try{ localStorage.setItem("wh8-open",JSON.stringify([...state.open])); }catch(e){} }
+/* the heading of a row or column: a fold button when the section has parts */
+function headLabel(h,c){
+  if (c.fold==null){ h.append(document.createTextNode(c.name)); return; }
+  const b=el("button","fold"); b.type="button"; b.setAttribute("aria-expanded",c.fold);
+  b.innerHTML=CHEV; b.append(el("span",null,c.name));
+  b.title = c.fold ? `Fold ${c.name} into one row` : `Unfold ${c.name} into its parts`;
+  b.addEventListener("click",()=>toggleNode(c.node.id)); h.append(b);
+}
+/* how many lines a row's events need: label lines up to max, plus one line of bare icons if some labels do not fit.
+   Returns [lines, index of the bare-icon line or -1]. */
+function labelLines(points,max){
+  if (!points.length || !max) return [0,-1];
+  const ends=new Array(max).fill(-1e9); let used=1, over=false;
+  for (const q of points){ const x=Y(q.y), i=ends.findIndex(e=>x-5>=e); if (i>=0){ ends[i]=x-5+16+q.name.length*6.1+10; used=Math.max(used,i+1); } else over=true; }
+  return over ? [used+1, used] : [used, -1];
+}
+/* links between regions: an arrow from one row to another at the year something crossed */
+function drawLinks(plot,cols,horiz,w,h){
+  if (!state.xlinks || soloLens() || !XLINKS.length) return;
+  const at=new Map(); for (const c of cols) if (c.key) at.set(c.key,c);
+  const NS="http://www.w3.org/2000/svg", svg=document.createElementNS(NS,"svg");
+  svg.setAttribute("class","links"); svg.setAttribute("width",w); svg.setAttribute("height",h);
+  const lv=shownLevel();
+  for (const L of XLINKS){
+    if (L.level>lv) continue;
+    const a=at.get(laneKey(L.from)), b=at.get(laneKey(L.to)); if (!a || !b || a===b) continue;
+    const t0=Y(L.y), t1=Y(L.y2||L.y), col=LINKKIND[L.kind].c;
+    let P;
+    if (horiz){
+      const y0=a.y+Math.min(a.h/2,18), y1=b.y+Math.min(b.h/2,18), k=Math.min(70,Math.abs(y1-y0)*.3)+8;
+      P=[[t0,y0],[t0+k,y0+(y1-y0)*.25],[t1+k,y1-(y1-y0)*.25],[t1,y1]];
+    } else {
+      const x0=a.x+Math.min(a.w/2,40), x1=b.x+Math.min(b.w/2,40), k=Math.min(70,Math.abs(x1-x0)*.3)+8;
+      P=[[x0,t0],[x0+(x1-x0)*.25,t0+k],[x1-(x1-x0)*.25,t1+k],[x1,t1]];
+    }
+    const path=document.createElementNS(NS,"path");
+    path.setAttribute("d",`M${P[0]} C${P[1]} ${P[2]} ${P[3]}`); path.setAttribute("stroke",col);
+    svg.append(path);
+    /* arrowhead along the last segment */
+    const [ex,ey]=P[3], ang=Math.atan2(ey-P[2][1], ex-P[2][0]), s=7;
+    const hd=document.createElementNS(NS,"path"); hd.setAttribute("class","head"); hd.setAttribute("fill",col);
+    hd.setAttribute("d",`M${ex},${ey} L${ex-s*Math.cos(ang-.45)},${ey-s*Math.sin(ang-.45)} L${ex-s*Math.cos(ang+.45)},${ey-s*Math.sin(ang+.45)}Z`);
+    svg.append(hd);
+    /* a button at the middle of the curve */
+    const mx=(P[0][0]+3*P[1][0]+3*P[2][0]+P[3][0])/8, my=(P[0][1]+3*P[1][1]+3*P[2][1]+P[3][1])/8;
+    const btn=el("button","lnk"+(state.sel===L?" sel":"")); btn.type="button"; btn.style.cssText=`left:${mx}px;top:${my}px;--lc:${col}`;
+    btn.append(icon(LINKKIND[L.kind].icon)); btn.title=L.name;
+    btn.setAttribute("aria-label",`${L.name}, from ${placeName(L.from)} to ${placeName(L.to)}, ${L.approx?"about ":""}${fmt(L.y)}`);
+    btn.addEventListener("click",()=>select(L)); hoverLoad(btn,L);
+    L.node=btn; plot.append(btn);
+  }
+  plot.append(svg);
+}
+function markOverlay(b,p){ if (p.ov){ b.classList.add("ov"); b.style.setProperty("--lc",LAYER[p.layer].c); } }
 
 function render(keepYear){
   sheet.classList.toggle("horiz",state.horiz);
@@ -1160,10 +1352,13 @@ function renderV(keepYear){
     c.lw = c.lanes ? (c.w-8-e)/c.lanes : 0;
     c.x = x; c.ex = x+4+c.lanes*c.lw+4;
     c.cvar = c.color ? `var(--c-${c.color})` : "var(--muted)";
-    const h = el("div","head"+(c.color?"":" evhead"),c.name); h.style.width=c.w+"px"; h.style.setProperty("--c",c.color?c.cvar:"var(--line-strong)");
+    const h = el("div","head"+(c.color?"":" evhead")+(c.depth?" sub":"")); headLabel(h,c); h.style.width=c.w+"px"; h.style.setProperty("--c",c.color?c.cvar:"var(--line-strong)");
+    if (c.depth) h.style.paddingLeft=(6+c.depth*6)+"px";
     if (lens) h.style.fontSize="12px";
     heads.append(h);
     const bg = el("div","colbg"); bg.style.left=x+"px"; bg.style.width=c.w+"px"; plot.append(bg);
+    if (c.s>START){ const o=el("div","rowoff"); o.style.cssText=`left:${x}px;width:${c.w}px;top:0;height:${Y(c.s)}px`; plot.append(o); }
+    if (c.e<NOW){ const o=el("div","rowoff"); o.style.cssText=`left:${x}px;width:${c.w}px;top:${Y(c.e)}px;height:${H-Y(c.e)}px`; plot.append(o); }
     x+=c.w;
   }
   plot.style.width=x+"px";
@@ -1202,7 +1397,8 @@ function renderV(keepYear){
     const tw=evW-26, cpl=Math.max(6,Math.floor(tw/5.9));
     for (const p of c.points){
       const y=Y(p.y);
-      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(eventIcon(p)); if (p.level===1 && shownLevel()>1) b.classList.add("l1"); hoverLoad(b,p);
+      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(eventIcon(p)); if (p.level===1 && shownLevel()>1) b.classList.add("l1"); hoverLoad(b,p); markOverlay(b,p);
+      if (p.ov && p.e && p.e>p.y){ const l=el("div","life v"); l.style.cssText=`left:${c.ex+6}px;top:${y}px;height:${Y(Math.min(p.e,NOW))-y}px;--lc:${LAYER[p.layer].c}`; plot.append(l); }
       let dx=0;
       if (evLabels){
         if (y-7>=lastBottom){ const sp=el("span",null,p.name); sp.style.width=tw+"px"; b.append(sp); lastBottom=y-7+Math.ceil(p.name.length/cpl)*13+3; }
@@ -1235,6 +1431,7 @@ function renderV(keepYear){
     }
   }
 
+  drawLinks(plot,cols,false,x,H);
   body.append(axis,plot); sheet.append(heads,body);
   restore(keepYear);
 }
@@ -1256,6 +1453,8 @@ function renderH(keepYear){
   const availH = scroller.clientHeight - AXIS_H - cols.length*9 - 2;
   let lines = 0;
   if (nEv) lines = Math.max(0, Math.min(4, Math.floor(((availH - totalLanes*20)/nEv - 8)/19)));
+  if (cols.some(c=>c.depth||c.grp) || state.layers.size) lines = Math.max(lines, 3);
+  for (const c of cols) [c.lines, c.ovl] = c.ev ? labelLines(c.points, lines) : [0,-1];
   const evH = nEv ? (lines ? 10 + lines*19 : 30) : 0;
   const laneH = Math.max(18, Math.min(40, Math.floor((availH - nEv*evH)/Math.max(1,totalLanes))));
   const fs = laneH>=30 ? 14 : laneH>=24 ? 13 : 12;
@@ -1273,16 +1472,19 @@ function renderH(keepYear){
   /* rows */
   let y=0;
   for (const c of cols){
-    const e = c.ev ? evH : 0;
-    c.h = c.lanes ? c.lanes*laneH+8+e : Math.max(e+8, 30);
+    const e = c.ev ? (c.lines ? 10 + c.lines*19 : 30) : 0;
+    c.h = c.lanes ? c.lanes*laneH+8+e : Math.max(e+8, c.grp ? 26 : 30);
     c.lh = c.lanes ? (c.h-8-e)/c.lanes : 0;
     c.y = y; c.ey = y+4+c.lanes*c.lh+2;
     c.cvar = c.color ? `var(--c-${c.color})` : "var(--muted)";
-    const h = el("div","rhead"+(c.color?"":" evhead"),c.name);
+    const h = el("div","rhead"+(c.color?"":" evhead")+(c.depth?" sub":"")+(c.grp?" grp":"")); headLabel(h,c);
     h.style.cssText=`top:${y}px;height:${c.h}px;--c:${c.color?c.cvar:"var(--line-strong)"}`;
+    if (c.depth) h.style.paddingLeft=(8+c.depth*12)+"px";
     if (narrow || lens) h.style.fontSize="12px";
     rail.append(h);
     const bg = el("div","rowbg"); bg.style.top=y+"px"; bg.style.height=c.h+"px"; plot.append(bg);
+    if (c.s>START){ const o=el("div","rowoff"); o.style.cssText=`top:${y}px;height:${c.h}px;left:0;width:${Y(c.s)}px`; plot.append(o); }
+    if (c.e<NOW){ const o=el("div","rowoff"); o.style.cssText=`top:${y}px;height:${c.h}px;left:${Y(c.e)}px;width:${W-Y(c.e)}px`; plot.append(o); }
     y+=c.h;
   }
   const H = y;
@@ -1318,23 +1520,24 @@ function renderH(keepYear){
   /* dated events: a strip under each row's bars; labels stagger down into free lines */
   for (const c of cols){
     if (!c.ev) continue;
-    const ends = new Array(Math.max(1,lines)).fill(-1e9);
+    const ends = new Array(Math.max(1, c.ovl>=0 ? c.ovl : c.lines)).fill(-1e9);
     let lastX=-99, flip=false;
     for (const p of c.points){
       const x=Y(p.y);
-      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(eventIcon(p)); if (p.level===1 && shownLevel()>1) b.classList.add("l1"); hoverLoad(b,p);
+      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(eventIcon(p)); if (p.level===1 && shownLevel()>1) b.classList.add("l1"); hoverLoad(b,p); markOverlay(b,p);
       let line=0;
-      if (lines){
+      if (c.lines){
         const tw = 16 + p.name.length*6.1 + 10;
         let i = ends.findIndex(e=>x-5>=e);
         if (i>=0){ const sp=el("span",null,p.name); b.append(sp); ends[i]=x-5+tw; line=i; }
-        else line = ends.indexOf(Math.min(...ends));
+        else line = c.ovl>=0 ? c.ovl : ends.indexOf(Math.min(...ends));
         b.style.top=(c.ey+4+line*19)+"px";
       } else {
         if (x-lastX<13){ flip=!flip; } else flip=false;
         b.style.top=(c.ey+4+(flip?11:0))+"px";
       }
       const top=parseFloat(b.style.top);
+      if (p.ov && p.e && p.e>p.y){ const l=el("div","life"); l.style.cssText=`left:${x}px;top:${top+5}px;width:${Y(Math.min(p.e,NOW))-x}px;--lc:${LAYER[p.layer].c}`; plot.append(l); }
       const rule=el("div","evrule v"); rule.style.cssText=`left:${x}px;top:${c.y}px;height:${top+6-c.y}px`; plot.append(rule);
       b.style.left=(x-(p.kind?iconSize(p)/2:5))+"px";
       b.setAttribute("aria-label",`${p.name}${p.kind?", "+KINDNAME[p.kind].toLowerCase():""}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
@@ -1363,6 +1566,7 @@ function renderH(keepYear){
     }
   }
 
+  drawLinks(plot,cols,true,W,H);
   body.append(rail,plot); sheet.append(heads,body);
   restore(keepYear);
 }
@@ -1387,10 +1591,31 @@ function select(obj){
     if (kindOf(obj.n)){ const w=el("span","wartag"); w.append(icon(kindOf(obj.n)),KINDNAME[kindOf(obj.n)]); meta.append(w); }
     meta.append(el("span",null,"Across: "+REG.filter(r=>obj.r.includes(r.id)).map(r=>r.name).join(", ")));
     left.append(meta, el("p",null,obj.t), wikiLink(BANDWIKI[obj.n]||obj.n));
+  } else if (obj.lk){                            /* link between regions */
+    left.append(el("h2",null,obj.name));
+    const c = obj.approx ? "c. " : "";
+    const d=el("span"); d.innerHTML=`<b>${obj.y2 ? c+fmt(obj.y)+" to "+fmt(obj.y2) : c+fmt(obj.y)}</b>`; meta.append(d);
+    meta.append(el("span",null,`From ${placeName(obj.from)} to ${placeName(obj.to)}`));
+    const K=LINKKIND[obj.kind], w=el("span","wartag"); w.append(icon(K.icon),K.name); meta.append(w);
+    meta.append(el("span",null,["","Major","Notable","Detail"][obj.level]));
+    left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
+    left.append(wikiLink(obj.w));
+    if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","srcl","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; left.append(a); }
+  } else if (obj.ov){                            /* overlay item */
+    left.append(el("h2",null,obj.name));
+    const c = obj.approx ? "c. " : "";
+    const when = obj.layer==="people" ? `${c}${fmt(obj.y)} to ${obj.e ? fmt(obj.e) : "living"}` : obj.e ? `${c}${fmt(obj.y)} to ${fmt(obj.e)}` : c+fmt(obj.y);
+    const d=el("span"); d.innerHTML=`<b>${when}</b>`; meta.append(d);
+    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(placeName(obj.sec))); meta.append(tag);
+    const w=el("span","wartag"); w.append(icon(obj.kind),LAYER[obj.layer].name); meta.append(w);
+    meta.append(el("span",null,["","Major","Notable","Detail"][obj.level]));
+    left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
+    left.append(wikiLink(obj.w));
+    if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","srcl","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; left.append(a); }
   } else if (obj.pt){                            /* dated event */
     left.append(el("h2",null,obj.name));
     const d=el("span"); d.innerHTML=`<b>${obj.approx?"c. ":""}${fmt(obj.y)}</b>`; meta.append(d);
-    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(REG.find(r=>r.id===obj.reg).name)); meta.append(tag);
+    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(placeName(obj.sec||obj.reg))); meta.append(tag);
     if (obj.kind){ const w=el("span","wartag"); w.append(icon(obj.kind),KINDNAME[obj.kind]); meta.append(w); }
     meta.append(el("span",null,["","Major event","Notable event","Detail"][obj.level]));
     left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
@@ -1402,7 +1627,7 @@ function select(obj){
     const e = obj.e>=NOW ? "present" : (f.includes("e")?"c. ":"")+fmt(obj.e);
     d.innerHTML=`<b>${s} to ${e}</b>`; meta.append(d);
     if (!f.includes("p")) meta.append(el("span",null,"about "+(Math.round((obj.e-obj.s)/10)*10).toLocaleString()+" years"));
-    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(REG.find(r=>r.id===obj.reg).name)); meta.append(tag);
+    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(placeName(obj.sec||obj.reg))); meta.append(tag);
     left.append(meta, el("p",null,obj.note));
     const w=[];
     if (f.includes("c")) w.push("Shown dashed: a culture, period or movement, not a state.");
@@ -1420,6 +1645,36 @@ function select(obj){
 }
 
 /* ---------- controls ---------- */
+const layerRow=$("layerRow");
+function drawLayers(){
+  layerRow.textContent="";
+  layerRow.append(el("span","layerlab","Overlays"));
+  for (const L of LAYERS){
+    const b=el("button","chip layer"); b.type="button"; b.style.setProperty("--lc",L.c);
+    b.setAttribute("aria-pressed",state.layers.has(L.id)); b.append(icon(L.icon), document.createTextNode(L.name));
+    b.addEventListener("click",()=>{ const y=topYear(); state.layers.has(L.id)?state.layers.delete(L.id):state.layers.add(L.id);
+      try{ localStorage.setItem("wh8-layers",JSON.stringify([...state.layers])); }catch(e){}
+      if (state.sel && state.sel.ov && !state.layers.has(state.sel.layer)) select(null);
+      drawLayers(); render(y); });
+    layerRow.append(b);
+  }
+  if (XLINKS.length){
+    const k=el("button","btn","Links between regions"); k.type="button"; k.setAttribute("aria-pressed",state.xlinks);
+    k.title="Arrows for things that crossed from one region to another: ideas, crops, people, trade, conquests";
+    k.hidden=!!soloLens();
+    k.addEventListener("click",()=>{ const y=topYear(); state.xlinks=!state.xlinks; try{ localStorage.setItem("wh8-links",state.xlinks?"on":"off"); }catch(e){}
+      if (!state.xlinks && state.sel && state.sel.lk) select(null); drawLayers(); render(y); });
+    layerRow.append(k);
+  }
+  const open = REG.some(r=>state.active.has(r.id) && state.open.has(r.id));
+  const f=el("button","btn",open?"Fold all regions":"Unfold regions"); f.type="button";
+  f.title = open ? "Show each region as one row again" : "Split each region shown into its parts. Tap a row heading to fold or unfold one.";
+  f.hidden = !!soloLens() || !anyFoldable();
+  f.addEventListener("click",()=>{ const y=topYear();
+    if (open) state.open.clear(); else REG.forEach(r=>{ if (state.active.has(r.id) && r.node.kids.length) state.open.add(r.id); });
+    saveOpen(); drawLayers(); render(y); });
+  layerRow.append(f);
+}
 const chips=$("chips");
 function drawChips(){
   chips.textContent="";
@@ -1453,7 +1708,7 @@ function drawLens(){
   $("lensNote").textContent = state.lens==="geo" ? "Regroup this region's bars into columns by another dimension." : LENS[state.lens].note+" One label per bar, a judgement call.";
 }
 function topYear(){ return yearAt((state.horiz?scroller.scrollLeft:scroller.scrollTop)+PAD_T); }
-function refresh(){ const y=topYear(); drawChips(); drawLens(); render(y); }
+function refresh(){ const y=topYear(); drawChips(); drawLens(); drawLayers(); render(y); }
 $("scaleEven").addEventListener("click",()=>setScale(false));
 $("scaleStretch").addEventListener("click",()=>setScale(true));
 function setScale(v){ const y=topYear(); state.stretch=v; $("scaleEven").setAttribute("aria-pressed",!v); $("scaleStretch").setAttribute("aria-pressed",v); render(y); }
@@ -1487,7 +1742,7 @@ let rt; window.addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout((
 { const L=$("legendIcons"), g=el("span","icos"); ["pyramid","ship","book","crown","lamp"].forEach(k=>g.append(icon(k))); L.append(g," dated event, the icon shows its kind");
   const W=el("span"); W.style.cssText="display:inline-flex;align-items:center;gap:5px"; W.append(icon("war"),"war, battle or conquest"); L.after(W);
   L.style.cssText="display:inline-flex;align-items:center;gap:5px"; }
-drawOrient(); drawChips(); drawLens(); showHint(); render(0);
+drawOrient(); drawChips(); drawLens(); drawLayers(); showHint(); render(0);
 </script>
 <script src="map.js"></script>
 </body>
