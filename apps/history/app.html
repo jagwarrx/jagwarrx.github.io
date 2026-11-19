@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>World History in Eight Regions</title>
+<link rel="canonical" href="https://hmeyy.com/apps/history/app.html">
+<style>
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-500-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-600-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-600-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-600-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-condensed-500-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-condensed-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-condensed-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-condensed-600-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-condensed-600-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-condensed-600-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-semi-condensed-600-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-semi-condensed-600-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-semi-condensed-600-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-semi-condensed-700-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-semi-condensed-700-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-semi-condensed-700-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+/* Layout idea: one-screen atlas sheet. Fixed control strip on top, a two-way
+   scrolling chart (time runs down, regions run across) with sticky axis and
+   region heads, and a detail strip at the bottom. */
+:root{
+  --bg:#e7ecf1; --surface:#f8fafc; --ink:#15202c; --muted:#566575;
+  --line:#ccd5de; --line-strong:#9aa9b8; --accent:#c8410b;
+  --c-am:#12897b; --c-af:#b97a08; --c-eu:#4a5fd0; --c-me:#bf4a34;
+  --c-ca:#7a6a52; --c-sa:#a83d88; --c-ea:#1583b8; --c-se:#3b9148;
+  --display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --label:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e141b; --surface:#172029; --ink:#e7eef5; --muted:#93a2b2;
+    --line:#293542; --line-strong:#465668; --accent:#ff8b4d;
+    --c-am:#35bfae; --c-af:#e3a52f; --c-eu:#8494f2; --c-me:#ec7a63;
+    --c-ca:#b39f84; --c-sa:#dc75bd; --c-ea:#4db4e6; --c-se:#69c276;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e141b; --surface:#172029; --ink:#e7eef5; --muted:#93a2b2;
+  --line:#293542; --line-strong:#465668; --accent:#ff8b4d;
+  --c-am:#35bfae; --c-af:#e3a52f; --c-eu:#8494f2; --c-me:#ec7a63;
+  --c-ca:#b39f84; --c-sa:#dc75bd; --c-ea:#4db4e6; --c-se:#69c276;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;
+  display:flex;flex-direction:column;overflow:hidden}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- top strip ---------- */
+.top{flex:none;background:var(--surface);border-bottom:1px solid var(--line);padding:10px 16px 8px;display:flex;flex-direction:column;gap:8px}
+.titleRow{display:flex;align-items:baseline;gap:12px;justify-content:space-between}
+h1{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1;margin:0;text-wrap:balance;letter-spacing:.01em}
+.sub{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+.btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:5px 10px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--line-strong);border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;white-space:nowrap}
+.chip i{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.chip[aria-pressed="false"]{opacity:.5}
+.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 14%,var(--surface))}
+.tools{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.tools::-webkit-scrollbar{display:none}
+.tools>*{flex:none}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:5px 9px;font-size:13px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-strong)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+select.btn{padding-right:6px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.key{width:22px;height:11px;border-radius:2px;display:inline-block;border:1px solid var(--muted);background:color-mix(in srgb,var(--muted) 30%,var(--surface))}
+.key.fade{-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
+.key.cult{border-style:dashed;background:color-mix(in srgb,var(--muted) 10%,var(--surface))}
+.key.link{border:0;border-top:2px solid var(--accent);border-radius:0;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 28%,transparent) 0 4px,transparent 4px 8px)}
+
+/* ---------- chart ---------- */
+.scroller{flex:1;min-height:0;overflow:auto;background:var(--bg);overscroll-behavior:contain}
+.sheet{width:max-content;min-width:100%}
+.heads{position:sticky;top:0;z-index:5;display:flex;background:var(--surface);border-bottom:1px solid var(--line-strong)}
+.corner{position:sticky;left:0;z-index:6;flex:none;background:var(--surface);border-right:1px solid var(--line-strong);
+  font-family:var(--label);font-size:11px;color:var(--muted);display:flex;align-items:flex-end;padding:0 0 4px 6px;letter-spacing:.02em}
+.head{flex:none;padding:6px 6px 5px;border-right:1px solid var(--line);font-family:var(--display);font-weight:600;font-size:13px;line-height:1.15;
+  border-top:3px solid var(--c);display:flex;align-items:flex-end}
+.body{display:flex;position:relative}
+.axis{position:sticky;left:0;z-index:4;flex:none;background:var(--surface);border-right:1px solid var(--line-strong)}
+.tick{position:absolute;right:5px;transform:translateY(-50%);font-family:var(--label);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tick.major{color:var(--ink);font-weight:600}
+.plot{position:relative;flex:none}
+.grid{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--line);opacity:.6}
+.grid.major{border-top-color:var(--line-strong);opacity:.9}
+.colbg{position:absolute;top:0;bottom:0;border-right:1px solid var(--line)}
+.bar{position:absolute;margin:0;padding:0;border:1px solid color-mix(in srgb,var(--c) 75%,var(--surface));border-radius:3px;
+  background:color-mix(in srgb,var(--c) 30%,var(--surface));cursor:pointer;display:flex;align-items:flex-start;justify-content:center;z-index:1}
+.bar.cult{border-style:dashed;background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.bar:hover{background:color-mix(in srgb,var(--c) 44%,var(--surface))}
+.bar.sel{outline:2px solid var(--accent);outline-offset:1px;z-index:2;background:color-mix(in srgb,var(--c) 48%,var(--surface))}
+.bar span{position:sticky;top:calc(var(--headh,46px) + 4px);writing-mode:vertical-rl;font-family:var(--label);font-weight:500;white-space:nowrap;color:var(--ink);pointer-events:none;letter-spacing:.01em}
+.band{position:absolute;z-index:3;pointer-events:none;border-top:2px solid var(--accent);
+  background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 16%,transparent) 0 5px,transparent 5px 10px)}
+.band.long{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 8%,transparent) 0 5px,transparent 5px 10px)}
+.bandlab{position:absolute;z-index:3;transform:translateY(-100%);background:var(--surface);border:1px solid var(--accent);border-bottom:0;border-radius:4px 4px 0 0;
+  font-family:var(--label);font-weight:600;font-size:11.5px;line-height:1;padding:3px 6px 2px;cursor:pointer;white-space:nowrap;color:var(--accent)}
+.bandlab.sel{background:var(--accent);color:var(--surface)}
+.ev{position:absolute;z-index:2;display:flex;gap:6px;align-items:flex-start;background:none;border:0;padding:3px;margin:-3px;cursor:pointer;text-align:left}
+.ev i{flex:none;width:10px;height:10px;margin-top:1px;transform:rotate(45deg);background:var(--ink);border:1.5px solid var(--surface);box-shadow:0 0 0 1px var(--ink)}
+.ev span{font-family:var(--label);font-weight:500;font-size:12.5px;line-height:13px;color:var(--ink)}
+.ev:hover i,.ev.sel i{background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ev.sel span{color:var(--accent);font-weight:600}
+.evrule{position:absolute;height:0;border-top:1px dotted var(--line-strong);z-index:0}
+.key.dia{width:9px;height:9px;border-radius:0;transform:rotate(45deg);background:var(--ink);border:0;margin:0 3px}
+.lensrow{display:none;flex-direction:column;gap:4px}
+.top.solo .lensrow{display:flex}
+.lenslab{flex:none;align-self:center;font-size:13px;color:var(--muted);font-family:var(--label);font-weight:600}
+.lensnote{margin:0;font-size:11.5px;color:var(--muted)}
+.chip.plain[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip.plain[aria-pressed="false"]{opacity:1}
+.head.evhead{border-top-color:var(--line-strong);color:var(--muted)}
+.facets{margin:6px 0 0;font-size:12.5px;color:var(--muted);max-width:75ch;display:flex;flex-wrap:wrap;gap:2px 14px}
+.facets b{font-weight:600;color:var(--ink)}
+@media (max-width:699px){ .top.solo .legend{display:none} }
+
+/* ---------- horizontal: time runs across, regions are rows ---------- */
+.htick{position:absolute;bottom:0;height:100%;padding:0 0 5px 4px;border-left:1px solid var(--line-strong);display:flex;align-items:flex-end;
+  font-family:var(--label);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.htick.major{color:var(--ink);font-weight:600;border-left-color:var(--ink)}
+.vgrid{position:absolute;top:0;bottom:0;width:0;border-left:1px solid var(--line);opacity:.6}
+.vgrid.major{border-left-color:var(--line-strong);opacity:.9}
+.rowbg{position:absolute;left:0;right:0;border-bottom:1px solid var(--line)}
+.rhead{position:absolute;left:0;right:0;padding:5px 8px;border-left:3px solid var(--c);border-bottom:1px solid var(--line);
+  font-family:var(--display);font-weight:600;font-size:13px;line-height:1.15;overflow:hidden}
+.rhead.evhead{border-left-color:var(--line-strong);color:var(--muted)}
+.sheet.horiz .bar{align-items:center;justify-content:flex-start}
+.sheet.horiz .bar span{writing-mode:horizontal-tb;top:auto;left:calc(var(--headw,136px) + 4px);line-height:1}
+.sheet.horiz .ev span{white-space:nowrap}
+.evrule.v{height:auto;width:0;border-top:0;border-left:1px dotted var(--line-strong)}
+.band.h{border-top:0;border-left:2px solid var(--accent)}
+.bandlab.h{transform:none;border:1px solid var(--accent);border-left:0;border-radius:0 4px 4px 0}
+.wiki{display:inline-block;margin-top:7px;font-size:13.5px;font-weight:500;color:var(--accent);text-underline-offset:2px}
+
+/* ---------- detail strip ---------- */
+.detail{flex:none;background:var(--surface);border-top:1px solid var(--line-strong);padding:10px 16px 12px;max-height:42%;overflow:auto}
+.detail .row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.detail h2{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.15;margin:0;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted);margin:3px 0 5px;font-variant-numeric:tabular-nums}
+.meta b{color:var(--ink);font-weight:600}
+.tag{display:inline-flex;align-items:center;gap:5px}
+.tag i{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.detail p{margin:0;max-width:65ch;font-size:14px}
+.detail .warn{margin-top:5px;font-size:12.5px;color:var(--muted)}
+.hint{color:var(--muted);font-size:13.5px}
+.x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
+
+/* ---------- about overlay ---------- */
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px);z-index:20;display:none;align-items:flex-end;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.card{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;max-width:620px;width:100%;max-height:100%;overflow:auto;padding:16px 18px 18px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.card h2{font-family:var(--display);font-size:19px;margin:0 0 2px}
+.card h3{font-family:var(--display);font-size:15px;color:var(--muted);margin:14px 0 4px}
+.card ul{margin:0;padding-left:18px}
+.card li{margin:4px 0;font-size:14px}
+.card p{font-size:14px;margin:6px 0}
+@media (min-width:700px){
+  .overlay{align-items:center}
+  h1{font-size:24px}
+}
+@media (prefers-reduced-motion:no-preference){ .scroller{scroll-behavior:smooth} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="titleRow">
+    <div>
+      <h1>World History in Eight Regions</h1>
+      <p class="sub" id="sub">3300 BCE to today. Time runs down, regions run across.</p>
+    </div>
+    <button class="btn" id="aboutBtn" type="button">About this chart</button>
+  </div>
+  <div class="strip" id="chips" role="group" aria-label="Regions shown"></div>
+  <div class="lensrow" id="lensRow">
+    <div class="strip" id="lensChips" role="group" aria-label="Group this region by"></div>
+    <p class="lensnote" id="lensNote"></p>
+  </div>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="Orientation">
+      <button type="button" id="orientV" aria-pressed="true">Vertical</button>
+      <button type="button" id="orientH" aria-pressed="false">Horizontal</button>
+    </div>
+    <div class="seg" role="group" aria-label="Time scale">
+      <button type="button" id="scaleEven" aria-pressed="true">Even scale</button>
+      <button type="button" id="scaleStretch" aria-pressed="false">Stretch recent</button>
+    </div>
+    <div class="seg" role="group" aria-label="Zoom">
+      <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+      <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+    </div>
+    <button class="btn" type="button" id="evBtn" aria-pressed="true">Events</button>
+    <button class="btn" type="button" id="linksBtn" aria-pressed="true">Cross-regional bands</button>
+    <select class="btn" id="jump" aria-label="Jump to a date">
+      <option value="">Jump to…</option>
+      <option value="-3300">3300 BCE</option>
+      <option value="-2000">2000 BCE</option>
+      <option value="-1200">1200 BCE</option>
+      <option value="-500">500 BCE</option>
+      <option value="1">1 CE</option>
+      <option value="600">600 CE</option>
+      <option value="1200">1200 CE</option>
+      <option value="1500">1500 CE</option>
+      <option value="1800">1800 CE</option>
+    </select>
+  </div>
+  <div class="legend" aria-hidden="true">
+    <span><i class="key"></i>state, firm dates</span>
+    <span><i class="key fade"></i>faded end: date uncertain or gradual</span>
+    <span><i class="key cult"></i>culture or movement, not a state</span>
+    <span><i class="key dia"></i>dated event</span>
+    <span><i class="key link"></i>event across regions</span>
+  </div>
+</header>
+
+<main class="scroller" id="scroller" tabindex="0" aria-label="Timeline chart">
+  <div class="sheet" id="sheet"></div>
+</main>
+
+<section class="detail" id="detail" aria-live="polite"></section>
+
+<div class="overlay" id="about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="card">
+    <div class="row" style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+      <h2 id="aboutTitle">About this chart</h2>
+      <button class="x" id="aboutClose" type="button" aria-label="Close">×</button>
+    </div>
+    <p>An original chart that keeps the side-by-side idea of printed world history wall charts and changes the parts that tend to mislead.</p>
+    <h3>What is different</h3>
+    <ul>
+      <li><b>Uncertainty is drawn.</b> A bar fades out where a date is traditional, disputed, or stands in for a gradual change. Tap a bar to see which.</li>
+      <li><b>States and cultures look different.</b> Dashed bars are archaeological cultures, migrations or periods, which had no capital, ruler or border.</li>
+      <li><b>No Europe-based period names.</b> The axis is plain dates. Labels like Classical Antiquity or Middle Ages fit Europe and little else.</li>
+      <li><b>Regions get equal standing.</b> Sub-Saharan Africa, the Americas, the steppe, Southeast Asia and Oceania each have a full column.</li>
+      <li><b>Events are marked.</b> Diamonds mark about 140 dated events, each in the region where it happened. Their names appear beside them when a column has room, so show one or two regions to read them.</li>
+      <li><b>Everything links out.</b> Each bar, event and band has a Wikipedia link. Links go through Wikipedia's search, so a few may open a results page instead of an article.</li>
+      <li><b>One region can be regrouped.</b> Select a single region and a Group by row appears. It re-sorts the same bars into columns by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
+      <li><b>Regions are linked.</b> Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed columns.</li>
+      <li><b>Two orientations.</b> Vertical runs time down the page with regions side by side. Horizontal runs time left to right with one row per region.</li>
+      <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
+      <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
+    </ul>
+    <h3>Limits</h3>
+    <ul>
+      <li>It is a selection of about 190 states and cultures and 140 events. Many states are missing, especially small or short-lived ones.</li>
+      <li>The Group by labels are one-word judgement calls about societies that were mixed and that changed. Each bar gets a single label per grouping, for its most typical or longest state. Treat them as a starting point.</li>
+      <li>Bar width means nothing. It does not show territory, population or importance.</li>
+      <li>Dates follow widely used conventional chronologies. Before about 1400 BCE, Near Eastern dates can shift by decades depending on the scheme.</li>
+      <li>Regions with fewer early bars had people and history too. Bars follow the surviving evidence, which favours societies that built in stone and wrote.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+"use strict";
+const NOW = 2026, START = -3300;
+const REG = [
+  {id:"am", name:"Americas"},
+  {id:"af", name:"Sub-Saharan Africa"},
+  {id:"eu", name:"Europe"},
+  {id:"me", name:"North Africa & West Asia"},
+  {id:"ca", name:"Central & Inner Asia"},
+  {id:"sa", name:"South Asia"},
+  {id:"ea", name:"East Asia"},
+  {id:"se", name:"Southeast Asia & Oceania"}
+];
+/* [name, short label, start, end, flags, note]
+   flags: s = start approximate, e = end approximate or gradual,
+          p = predates the chart, c = culture/movement rather than a state */
+const DATA = {
+am:[
+ ["Caral–Supe","",-3000,-1800,"se","Monumental centres on the Peruvian coast, among the oldest known in the Americas. Built without pottery or writing."],
+ ["Olmec centres","Olmec",-1200,-400,"se","San Lorenzo, then La Venta, on Mexico's Gulf coast. The centres declined one after another; there is no dated collapse."],
+ ["Maya city-states","Maya",-1000,1697,"s","Never one empire: dozens of rival cities. The collapse of c. 800–900 hit the southern lowlands only. The last kingdom, Nojpetén, fell to Spain in 1697."],
+ ["Chavín","",-900,-200,"sec","A religious and artistic horizon centred on Chavín de Huántar in the Andes. Whether it was a state is debated."],
+ ["Zapotec (Monte Albán)","Zapotec",-500,850,"se","Monte Albán dominated the Oaxaca valley for over a millennium and used one of Mesoamerica's earliest scripts."],
+ ["Teotihuacan","",-100,550,"se","A city of perhaps 100,000 people. Its rulers are unnamed and its language unknown. The centre was burned around 550."],
+ ["Nazca","",-100,750,"se","South-coast Peruvian culture known for its geoglyphs and underground aqueducts."],
+ ["Moche","",100,750,"se","North-coast Peru. Probably several states, not one, known for adobe pyramids and portrait ceramics."],
+ ["Tiwanaku","",500,1000,"se","High-altitude centre near Lake Titicaca. It declined during a long drought."],
+ ["Wari","",600,1000,"se","Often described as the first Andean empire. Its roads and provincial centres anticipate the Inca."],
+ ["Chaco Canyon","Chaco",850,1150,"se","Ancestral Puebloan great houses in New Mexico, linked by roads to distant communities."],
+ ["Toltec (Tula)","Toltec",900,1150,"se","Much of what is said about the Toltecs comes from later Aztec accounts that mix history and legend."],
+ ["Chimú (Chimor)","Chimú",900,1470,"s","Coastal kingdom ruled from Chan Chan. Conquered by the Inca around 1470."],
+ ["Cahokia & Mississippian towns","Mississippian",1050,1600,"se","Cahokia, near modern St Louis, peaked around 1100 with a population comparable to London's. Mississippian towns lasted into the 1500s."],
+ ["Aztec Triple Alliance","Aztec",1428,1521,"","An alliance of Tenochtitlan, Texcoco and Tlacopan, not a unitary empire. It fell to Spanish forces and their many Indigenous allies."],
+ ["Inca Empire","Inca",1438,1533,"s","Tawantinsuyu. Expansion is conventionally dated from 1438. A Neo-Inca state held out at Vilcabamba until 1572."],
+ ["Haudenosaunee Confederacy","Haudenosaunee",1450,NOW,"s","The founding date is debated: one reading of oral tradition gives 1142, many scholars prefer c. 1450–1600. The confederacy still exists."],
+ ["Portuguese Brazil","",1500,1822,"s","Claimed in 1500 and settled slowly from the 1530s. It received the largest share of enslaved Africans."],
+ ["Spanish America","",1521,1821,"e","Viceroyalties from Mexico to the Andes. Independence came piecemeal between 1810 and 1825."],
+ ["British North America","British colonies",1607,1776,"","Colonies from Jamestown onward. Canada stayed British after 1776."],
+ ["United States","",1776,NOW,"","Independence declared in 1776 and recognised in 1783."],
+ ["Latin American republics","",1810,NOW,"s","Independent states from Mexico to Argentina. Borders kept shifting through the 1800s."],
+ ["Brazil","",1822,NOW,"","An empire until 1889, then a republic."],
+ ["Canada","",1867,NOW,"","Confederation in 1867. Full legal independence came in stages up to 1982."]
+],
+af:[
+ ["Kerma","",-2500,-1500,"s","Nubian kingdom on the upper Nile, a rival of Egypt and later conquered by it."],
+ ["Nok culture","Nok",-1500,1,"sec","Central Nigeria. Known for terracotta sculpture and early iron working. Recent dating places it earlier than older charts show."],
+ ["Kush (Napata, Meroë)","Kush",-1070,350,"se","Nubian kingdom that ruled Egypt as its 25th Dynasty (c. 747–656 BCE), then flourished at Meroë for centuries."],
+ ["Bantu expansion","",-1000,500,"sec","A slow spread of Bantu-speaking farming communities from West-Central Africa across most of the subcontinent. The dates are broad estimates."],
+ ["Aksum","",100,940,"se","Red Sea trading power in Ethiopia and Eritrea. It minted its own coins and adopted Christianity around 330."],
+ ["Ghana (Wagadu)","Ghana",500,1240,"se","Sahelian kingdom grown rich on the gold trade. Its origins may go back to c. 300. The old story of an Almoravid conquest in 1076 is now doubted."],
+ ["Christian Nubia (Makuria)","Makuria",550,1500,"se","Halted the Arab advance at Dongola in 652 and kept a treaty with Egypt for some six centuries."],
+ ["Kanem–Bornu","",700,1893,"s","One of the longest-lived states anywhere, centred on Lake Chad. Kanem until c. 1380, then Bornu."],
+ ["Swahili city-states","Swahili cities",950,1513,"se","Kilwa, Mombasa, Zanzibar and others: Muslim trading towns tied into the Indian Ocean network."],
+ ["Great Zimbabwe","",1100,1450,"se","Stone-built capital of a Shona kingdom trading gold to the coast. Colonial writers long denied its African origin."],
+ ["Benin","",1180,1897,"s","Edo kingdom in today's Nigeria, known for its cast bronzes. Sacked by a British expedition in 1897."],
+ ["Mali Empire","Mali",1235,1670,"e","Founded by Sunjata Keita. Mansa Musa's pilgrimage of 1324 made its wealth famous. It shrank slowly after 1400."],
+ ["Ethiopian Empire","Ethiopia",1270,1974,"","Solomonic dynasty. It defeated Italy at Adwa in 1896 and avoided colonisation apart from the occupation of 1936–41."],
+ ["Kongo","",1390,1914,"s","Central African kingdom. Its kings became Catholic in 1491 and corresponded with Portugal and the papacy."],
+ ["Songhai Empire","Songhai",1464,1591,"","Largest of the Sahelian empires, ruled from Gao. Broken by a Moroccan musket army at Tondibi."],
+ ["Asante","",1701,1901,"","Akan state in today's Ghana. It fought a series of wars with Britain before annexation."],
+ ["Sokoto Caliphate","Sokoto",1804,1903,"","Founded by Usman dan Fodio's reform movement, it became one of the largest states in 19th-century Africa."],
+ ["Zulu Kingdom","Zulu",1816,1897,"","Consolidated under Shaka. It defeated the British at Isandlwana in 1879 before being conquered."],
+ ["European colonial rule","Colonial rule",1884,1960,"se","The Berlin Conference of 1884–85 set off partition. Coastal footholds are older. Independence ran from 1957 into the 1970s."],
+ ["Independent African states","",1957,NOW,"s","Ghana in 1957, seventeen states in 1960 alone. Majority rule reached South Africa in 1994."]
+],
+eu:[
+ ["Megalith builders","Megaliths",-3300,-1500,"pec","Stonehenge, Newgrange, Carnac. Farming communities with no known states or writing. The tradition predates this chart."],
+ ["Minoan Crete","Minoans",-2700,-1450,"se","Palace society centred on Knossos. Its Linear A script is undeciphered."],
+ ["Mycenaean Greece","Mycenae",-1600,-1100,"se","Palace states writing early Greek in Linear B. Destroyed in the Late Bronze Age collapse."],
+ ["Etruscan cities","Etruscans",-900,-264,"se","A league of city-states in central Italy, absorbed piece by piece by Rome."],
+ ["Greek city-states","Greek cities",-800,-146,"s","Hundreds of independent cities from Spain to the Black Sea. They never united by their own choice."],
+ ["Celtic Europe (Hallstatt, La Tène)","Celtic Europe",-800,-50,"sec","A family of cultures and languages. The dates follow the archaeological horizons."],
+ ["Roman Republic","",-509,-27,"s","509 is the traditional founding date. The slide into one-man rule ran from the 80s to 27 BCE."],
+ ["Macedon","",-359,-168,"","Philip II and Alexander. Alexander's empire split within a generation of his death in 323."],
+ ["Roman Empire","",-27,476,"e","At its height it ruled the whole Mediterranean, including Egypt and the Levant. 476 marks the end of the western court only, and even that was a gradual unravelling."],
+ ["Eastern Roman (Byzantine) Empire","Eastern Roman Empire",395,1453,"s","The Roman Empire carrying on from Constantinople, with no founding date of its own. Byzantine is a later Western label its people never used."],
+ ["Frankish kingdoms","Franks",481,843,"","Merovingian, then Carolingian. Charlemagne was crowned emperor in 800. The Treaty of Verdun divided the realm in 843."],
+ ["Venice","",697,1797,"s","Maritime republic. The traditional founding date is legendary. Real independence from Constantinople came gradually in the 800s."],
+ ["Al-Andalus","",711,1492,"","Muslim-ruled Iberia, from the Umayyad conquest to the fall of Granada. Its territory shrank steadily after 1085."],
+ ["Viking Age Scandinavia","Viking Age",793,1066,"sec","Conventional bookends: the Lindisfarne raid and Stamford Bridge. The kingdoms of Denmark, Norway and Sweden formed within it."],
+ ["France","",843,NOW,"s","Grew out of West Francia. Kingdom, republics and empires. A single continuous state is partly hindsight."],
+ ["Kievan Rus'","Rus'",882,1240,"s","Federation of East Slavic principalities, ancestral to Ukraine, Belarus and Russia. Ended by the Mongol sack of Kyiv."],
+ ["England, then Britain","Britain",927,NOW,"","A unified English kingdom from 927. Union with Scotland in 1707."],
+ ["Holy Roman Empire","",962,1806,"","A loose, elective empire of hundreds of territories in central Europe."],
+ ["Portugal","",1139,NOW,"","Among Europe's oldest borders. Launched the Atlantic voyages of the 1400s."],
+ ["Poland–Lithuania","",1385,1795,"","A dynastic union from 1385 and a commonwealth from 1569. Partitioned out of existence by its neighbours."],
+ ["Spain","",1479,NOW,"","Union of the crowns of Castile and Aragon."],
+ ["Muscovy, Russia, USSR","Russia",1480,NOW,"s","Muscovy threw off Mongol overlordship around 1480. Tsardom 1547, empire 1721, Soviet Union 1922–91."],
+ ["Italy","",1861,NOW,"","Unified in 1861. Rome was added in 1870."],
+ ["Germany","",1871,NOW,"","Unified in 1871 and divided from 1949 to 1990."]
+],
+me:[
+ ["Sumerian city-states","Sumer",-3300,-2334,"p","Uruk, Ur, Lagash and others. Cities and writing emerge here before the chart begins."],
+ ["Early Dynastic Egypt","Early Egypt",-3100,-2686,"s","Unification is traditionally credited to Narmer. Absolute dates this early carry a margin of a century or more."],
+ ["Elam","",-2700,-539,"se","Kingdom in south-west Iran with its own languages and scripts, a constant rival of Mesopotamia."],
+ ["Old Kingdom Egypt","Old Kingdom",-2686,-2181,"se","The age of the great pyramids. Dates vary by decades between chronologies."],
+ ["Akkadian Empire","Akkad",-2334,-2154,"se","Sargon's empire, often called the first. Dates follow the Middle Chronology. Other schemes shift them by up to a century."],
+ ["Ur III","",-2112,-2004,"se","A short-lived, heavily bureaucratic Sumerian revival."],
+ ["Middle Kingdom Egypt","Middle Kingdom",-2055,-1650,"e","Reunification under Mentuhotep II. It ended as the Hyksos took the Delta."],
+ ["Old Babylonian kingdom","Babylon",-1894,-1595,"se","Hammurabi's Babylon. Ended by a Hittite raid whose date depends on the chronology used."],
+ ["Hittite kingdom","Hittites",-1650,-1180,"se","Anatolian power that fought Egypt at Kadesh. It vanished in the Late Bronze Age collapse."],
+ ["New Kingdom Egypt","New Kingdom",-1550,-1069,"","Egypt's imperial age: Hatshepsut, Akhenaten, Ramesses II."],
+ ["Assyria","",-1365,-609,"s","Middle, then Neo-Assyrian empires. At its height around 670 BCE it ruled from Egypt to Iran."],
+ ["Phoenician cities","Phoenicia",-1200,-539,"se","Tyre, Sidon, Byblos: seafaring city-states that spread the alphabet."],
+ ["Israel & Judah","",-1000,-586,"s","Evidence for a united monarchy is thin and debated. Israel fell to Assyria in 722 BCE, Judah to Babylon in 586 BCE."],
+ ["Carthage","",-814,-146,"s","814 is the traditional date. Archaeology supports a founding in the late 800s BCE. Destroyed by Rome."],
+ ["Late Period Egypt","Late Egypt",-664,-332,"","Native dynasties alternating with Persian rule."],
+ ["Neo-Babylonian Empire","Babylon",-626,-539,"","Nebuchadnezzar II's Babylon. Taken by Cyrus of Persia in 539 BCE."],
+ ["Achaemenid Persia","Persia",-550,-330,"","From the Aegean to the Indus: the largest empire the world had yet seen."],
+ ["Seleucid Empire","Seleucids",-312,-63,"e","Successor state to Alexander. It lost Iran to the Parthians by about 140 BCE and dwindled to Syria."],
+ ["Ptolemaic Egypt","Ptolemies",-305,-30,"","Macedonian dynasty ruling from Alexandria. Ended with Cleopatra VII and Roman annexation."],
+ ["Parthian Empire","Parthia",-247,224,"s","Iranian empire and Rome's long-term rival on the Euphrates."],
+ ["Sasanian Empire","Sasanians",224,651,"","The last pre-Islamic Iranian empire. Exhausted by war with the Romans just before the Arab conquests."],
+ ["Rashidun & Umayyad Caliphates","Early caliphates",632,750,"","Within a century of Muhammad's death the caliphate reached from Spain to the Indus."],
+ ["Abbasid Caliphate","Abbasids",750,1258,"","Ruled from Baghdad. Real power fragmented after about 900. The Mongols ended the caliphate in 1258."],
+ ["Fatimid Caliphate","Fatimids",909,1171,"","Ismaili Shia dynasty. It founded Cairo in 969."],
+ ["Seljuk Empire","Seljuks",1037,1194,"","Turkic dynasty that took over the Abbasid heartland and opened Anatolia to Turkish settlement after 1071."],
+ ["Almoravids & Almohads","",1040,1269,"","Berber reform movements that ruled the Maghreb and Al-Andalus in turn."],
+ ["Ayyubid & Mamluk Egypt","Mamluks",1171,1517,"","Saladin's dynasty, then the Mamluk sultans who stopped the Mongols at Ain Jalut in 1260."],
+ ["Ilkhanate","",1256,1335,"","Mongol successor state in Iran and Iraq."],
+ ["Ottoman Empire","Ottomans",1299,1922,"s","The 1299 founding is traditional. It took Constantinople in 1453 and was dissolved after the First World War."],
+ ["Safavid Iran","Safavids",1501,1736,"","Made Twelver Shiism the state religion of Iran."],
+ ["Iran (Qajar to Islamic Republic)","Iran",1789,NOW,"","Qajar dynasty to 1925, Pahlavi to 1979, then the Islamic Republic."],
+ ["Modern states of the region","Modern states",1922,NOW,"s","Turkey, Egypt, Saudi Arabia, Iraq, Israel and others. Many borders derive from the mandates set up after 1918."]
+],
+ca:[
+ ["Oxus civilisation (BMAC)","Oxus (BMAC)",-2250,-1700,"se","Fortified oasis towns in Bactria and Margiana, trading with the Indus and Mesopotamia. Identified only in the 1970s."],
+ ["Sintashta & Andronovo cultures","Andronovo",-2100,-900,"sec","Steppe herders associated with the earliest spoke-wheeled chariots and the spread of Indo-Iranian languages."],
+ ["Scythians & Saka","Scythians",-900,-200,"sec","Mounted nomads from the Black Sea to the Altai. A cultural zone with many rulers."],
+ ["Xiongnu","",-209,91,"e","Steppe confederation that pressed Han China. The northern Xiongnu were broken around 89–91 CE."],
+ ["Kushan Empire","Kushans",30,375,"se","Straddled Bactria and north India at the hinge of the Silk Road. Its chronology is still argued over."],
+ ["Hunnic Empire","Huns",370,469,"s","Reached its height under Attila. Any link to the Xiongnu is unproven."],
+ ["Hephthalites","",440,560,"s","Dominated Bactria and raided both Sasanian Iran and Gupta India."],
+ ["Türk Khaganates","Türks",552,744,"","The first steppe empire to use the name Türk. Left the earliest Turkic inscriptions."],
+ ["Tibetan Empire","Tibet",618,842,"s","Rival of Tang China. It briefly occupied the Tang capital in 763."],
+ ["Khazar Khaganate","Khazars",650,969,"se","Controlled trade between the Caspian and Black Sea. Its elite adopted Judaism."],
+ ["Uyghur Khaganate","Uyghurs",744,840,"","Steppe successor to the Türks and ally of the Tang."],
+ ["Samanids","",819,999,"","Persianate dynasty at Bukhara and Samarkand, patron of New Persian literature."],
+ ["Khwarazmian Empire","Khwarazm",1077,1231,"","Its destruction by Genghis Khan in 1219–21 was among the bloodiest episodes of the Mongol conquests."],
+ ["Mongol Empire","Mongols",1206,1294,"e","The largest contiguous land empire. Unified rule frayed after 1260. By 1294 it was four successor states."],
+ ["Golden Horde","",1242,1502,"e","Mongol successor state on the western steppe, overlord of the Rus' principalities."],
+ ["Timurid Empire","Timurids",1370,1507,"","Timur's conquests, then a cultural flowering at Samarkand and Herat."],
+ ["Kazakh Khanate","Kazakhs",1465,1847,"","Steppe khanate absorbed by Russia in stages."],
+ ["Uzbek khanates","",1500,1920,"s","Bukhara, Khiva and Kokand."],
+ ["Dzungar Khanate","Dzungars",1634,1758,"","The last great steppe empire. Destroyed by the Qing."],
+ ["Russian & Soviet rule","",1865,1991,"s","Tashkent fell in 1865. Soviet republics from the 1920s."],
+ ["Independent republics","",1991,NOW,"","Kazakhstan, Uzbekistan, Turkmenistan, Kyrgyzstan and Tajikistan."]
+],
+sa:[
+ ["Indus Valley (Harappan) civilisation","Indus Valley",-3300,-1300,"se","Urban peak c. 2600–1900 BCE at Mohenjo-daro and Harappa. The script is undeciphered. The cities emptied gradually."],
+ ["Vedic period","Vedic",-1500,-600,"sec","A textual and cultural era. Its dates are inferred from the language of the Vedas."],
+ ["Mahajanapadas","",-600,-322,"s","Sixteen great realms of the Ganges plain, the world of the Buddha and Mahavira. Magadha came to dominate."],
+ ["Anuradhapura (Sri Lanka)","Anuradhapura",-377,1017,"s","The founding date comes from later chronicles. One of the longest-lived capitals in Asia."],
+ ["Maurya Empire","Maurya",-322,-185,"","The first empire to span most of the subcontinent. Ashoka's edicts are its own voice."],
+ ["Tamil kingdoms (Chera, Chola, Pandya)","Tamil kingdoms",-300,300,"se","The Sangam age. Dates rest largely on literature and finds from Roman trade."],
+ ["Satavahanas","",-100,225,"se","Deccan dynasty. Scholars place its start anywhere from c. 230 to c. 30 BCE."],
+ ["Pallavas","",275,897,"s","South Indian dynasty whose script and temple style travelled to Southeast Asia."],
+ ["Gupta Empire","Guptas",320,550,"e","North Indian empire associated with advances in mathematics and Sanskrit literature."],
+ ["Chalukyas & Rashtrakutas","Deccan empires",543,982,"","Successive powers of the Deccan. The Rashtrakutas cut the Kailasa temple at Ellora."],
+ ["Pala Empire","Palas",750,1161,"","Buddhist dynasty of Bengal and Bihar, patrons of Nalanda."],
+ ["Chola Empire","Cholas",848,1279,"","Tamil naval power that raided Srivijaya in 1025."],
+ ["Delhi Sultanate","",1206,1526,"","Five successive dynasties ruling from Delhi."],
+ ["Vijayanagara","",1336,1646,"e","Its capital at Hampi was sacked in 1565. A reduced state lasted into the 1600s."],
+ ["Mughal Empire","Mughals",1526,1857,"e","Effective power collapsed after 1707. The emperor was a figurehead long before the British deposed him in 1857."],
+ ["Maratha Confederacy","Marathas",1674,1818,"","Founded by Shivaji. The leading Indian power of the 1700s."],
+ ["British rule","",1757,1947,"s","East India Company dominance from Plassey in 1757. Crown rule from 1858."],
+ ["Sikh Empire","Sikhs",1799,1849,"","Ranjit Singh's Punjab kingdom. Annexed after two wars with the Company."],
+ ["India, Pakistan, Bangladesh, Sri Lanka","Modern states",1947,NOW,"","Partition in 1947. Bangladesh separated from Pakistan in 1971."]
+],
+ea:[
+ ["Jōmon Japan","Jōmon",-3300,-300,"pec","Pottery-making foragers for over 10,000 years. Rice farming may have begun as early as c. 900 BCE."],
+ ["Liangzhu culture","Liangzhu",-3300,-2300,"pe","Lower Yangtze. Large waterworks and jade workshops point to an early state."],
+ ["Longshan cultures","Longshan",-3000,-1900,"sec","Walled towns across north China."],
+ ["Erlitou (possibly the Xia)","Erlitou",-1900,-1600,"se","A Bronze Age palace city. Whether it is the Xia dynasty of later texts is unproven."],
+ ["Shang","",-1600,-1046,"s","The first Chinese dynasty attested by its own writing, on oracle bones from about 1250 BCE."],
+ ["Zhou","",-1046,-256,"","Western Zhou to 771 BCE. After that the kings reigned in name while rival states fought through the Warring States era."],
+ ["Gojoseon","",-700,-108,"s","Earliest Korean state. The legendary founding in 2333 BCE is not historical. Firm evidence dates from the 4th century BCE."],
+ ["Yayoi Japan","Yayoi",-300,250,"sec","Wet-rice farming, bronze and iron arrive from the mainland."],
+ ["Qin","",-221,-206,"","The first unified empire. Fifteen years that set a template for two millennia."],
+ ["Han","",-202,220,"","Contemporary and rough equal of Rome, with a comparable population."],
+ ["Three Kingdoms of Korea","Three Kingdoms",-57,668,"s","Goguryeo, Baekje and Silla. The traditional founding dates are probably too early."],
+ ["Period of division","Division",220,589,"","Three Kingdoms, Jin, then the Northern and Southern Dynasties."],
+ ["Kofun and Yamato Japan","Yamato",250,710,"s","Keyhole tombs and the rise of the Yamato court."],
+ ["Sui","",581,618,"","Reunified China and built the Grand Canal."],
+ ["Tang","",618,907,"","A cosmopolitan empire open to the Silk Road. Weakened permanently by the An Lushan rebellion of 755–63."],
+ ["Unified Silla","Silla",668,935,"","Silla ruled most of the Korean peninsula after defeating its rivals with Tang help."],
+ ["Nara & Heian Japan","Heian",710,1185,"","The classical court age. The Tale of Genji dates from about 1010."],
+ ["Liao & Jin (north)","Liao & Jin",916,1234,"","Khitan, then Jurchen dynasties ruling north China alongside the Song."],
+ ["Goryeo","",918,1392,"","The origin of the name Korea."],
+ ["Song","",960,1279,"","Paper money, gunpowder weapons and a printing boom. It lost the north in 1127."],
+ ["Kamakura & Muromachi shogunates","Shogunates",1185,1573,"","Warrior government. The last century was the Warring States period."],
+ ["Yuan","",1271,1368,"","Mongol dynasty founded by Kublai Khan."],
+ ["Ming","",1368,1644,"","Rebuilt the Great Wall and sent Zheng He's fleets across the Indian Ocean."],
+ ["Joseon","",1392,1910,"","Korea's longest dynasty. The Hangul alphabet was created in 1443."],
+ ["Tokugawa Japan","Tokugawa",1603,1868,"","Two and a half centuries of peace under tight limits on foreign contact."],
+ ["Qing","",1644,1912,"","Manchu dynasty. It roughly doubled the territory of China."],
+ ["Modern Japan","Japan",1868,NOW,"","Meiji Restoration, empire, defeat in 1945, then a constitutional democracy."],
+ ["China (Republic, then People's Republic)","China",1912,NOW,"","Republic from 1912, People's Republic from 1949."],
+ ["North & South Korea","Koreas",1945,NOW,"","Japanese rule 1910–45, then division."]
+],
+se:[
+ ["Aboriginal Australian societies","Aboriginal Australia",-3300,NOW,"pc","Continuous for at least 50,000 years, far beyond this chart. Hundreds of nations and languages. Wall charts usually omit them because there are no dynasties to draw."],
+ ["Lapita voyagers","Lapita",-1600,-500,"sec","Austronesian seafarers who settled the islands from the Bismarcks to Tonga and Samoa. Ancestors of the Polynesians."],
+ ["Đông Sơn culture","Đông Sơn",-1000,100,"sec","Bronze-drum culture of the Red River valley."],
+ ["Pyu city-states","Pyu cities",-200,1050,"se","Walled Buddhist cities of the Irrawaddy valley."],
+ ["Funan","",50,550,"se","Mekong delta trading polity, known mostly through Chinese reports."],
+ ["Champa","",192,1832,"","Cham kingdoms of central Vietnam, absorbed step by step by Đại Việt."],
+ ["Srivijaya","",670,1275,"se","Sumatran sea power controlling the Malacca Strait. Scholars rediscovered it only in 1918."],
+ ["Mataram (Borobudur, Prambanan)","Mataram",732,1016,"","Central Javanese kingdom that built both the Buddhist and the Hindu monuments."],
+ ["Khmer Empire (Angkor)","Khmer Empire",802,1431,"e","Angkor was among the largest pre-industrial cities. It was abandoned gradually."],
+ ["Pagan","",849,1297,"s","Burmese kingdom that built more than 2,000 surviving temples. Its imperial phase began in 1044."],
+ ["Đại Việt","",939,1884,"","Independent in 939 after a millennium of Chinese rule. A French protectorate by 1884."],
+ ["Tuʻi Tonga maritime network","Tuʻi Tonga",950,1500,"se","A Tongan paramount chiefdom with influence across western Polynesia. Dates rest on genealogies and archaeology."],
+ ["Settlement of East Polynesia","East Polynesia",1000,1300,"sec","Voyagers reached the Society Islands, Hawaiʻi, Rapa Nui and finally Aotearoa (c. 1250–1300). Radiocarbon revisions keep shortening this window."],
+ ["Sukhothai & Ayutthaya","Ayutthaya",1238,1767,"","Thai kingdoms. Ayutthaya was destroyed by a Burmese army in 1767."],
+ ["Majapahit","",1293,1527,"e","Javanese empire whose reach across the archipelago is debated."],
+ ["Malacca Sultanate","Malacca",1400,1511,"s","Port state on the busiest strait in Asia. Taken by Portugal in 1511."],
+ ["Taungoo & Konbaung Burma","Burma",1510,1885,"","Two Burmese dynasties. The last king was deposed by Britain in 1885."],
+ ["European colonial rule","Colonial rule",1565,1957,"se","Spanish Philippines from 1565, the Dutch in Java from 1619, then Britain and France. Thailand was never colonised."],
+ ["Siam, then Thailand","Thailand",1782,NOW,"","Chakri dynasty, ruling from Bangkok."],
+ ["Australia & New Zealand","",1788,NOW,"","British colonies from 1788 and 1840. Australian federation in 1901."],
+ ["Independent Southeast Asian states","Independent states",1945,NOW,"s","Indonesia and Vietnam declared independence in 1945. Others followed into the 1960s."]
+]};
+
+const EVENTS = [
+ {n:"4.2 kiloyear drought", a:-2200, b:-2000, r:["me","ca","sa","ea"], t:"A long dry spell in the climate record. It coincides with the end of Akkad, Egypt's Old Kingdom and the Indus cities, but how far it caused them is debated."},
+ {n:"Late Bronze Age collapse", a:-1200, b:-1150, r:["eu","me"], t:"Within about fifty years the Hittite kingdom, the Mycenaean palaces and many Levantine cities were destroyed. Egypt and Assyria survived, weakened."},
+ {n:"Alexander's conquests", a:-334, b:-323, r:["eu","me","ca","sa"], t:"In eleven years Macedonian armies went from the Aegean to the Indus, spreading Greek language and city life across West and Central Asia."},
+ {n:"Silk Road opens", a:-130, b:-125, r:["eu","me","ca","sa","ea"], t:"Han envoys reached Central Asia around 130 BCE. Overland routes linked China to the Mediterranean for the next 1,500 years."},
+ {n:"Plague of Justinian", a:541, b:549, r:["eu","me"], t:"The first recorded pandemic of bubonic plague. Recurred for two centuries. Its death toll is contested."},
+ {n:"Arab conquests", a:632, b:750, r:["eu","me","ca","sa"], t:"From Arabia to Spain and the Indus in little more than a century, joining these regions in one zone of trade, law and language."},
+ {n:"Indian Ocean trade at full reach", a:1000, b:1010, r:["af","me","sa","ea","se"], t:"By about 1000, monsoon shipping linked East Africa, Arabia, India, Southeast Asia and China in one market. The network was much older and lasted for centuries."},
+ {n:"Mongol conquests", a:1206, b:1294, r:["eu","me","ca","sa","ea","se"], t:"Created a single zone from Korea to Hungary. Devastating for the conquered, and a spur to trade and exchange across Eurasia."},
+ {n:"Black Death", a:1346, b:1353, r:["eu","me","ca"], t:"Killed perhaps a third to half of the population of Europe and the Middle East. Its course in China and India is poorly documented."},
+ {n:"Zheng He's voyages", a:1405, b:1433, r:["af","me","sa","ea","se"], t:"Seven Ming fleets sailed as far as East Africa, then the court stopped the programme."},
+ {n:"Columbian Exchange", a:1492, b:1650, r:["am","af","eu"], t:"Crops, animals and diseases crossed the Atlantic. Epidemics killed a large majority of the Indigenous population of the Americas within about 150 years."},
+ {n:"Atlantic slave trade", a:1526, b:1867, r:["am","af","eu"], t:"About 12.5 million Africans were embarked for the Americas. Roughly 10.7 million survived the crossing."},
+ {n:"Industrialisation begins", a:1760, b:1840, r:["eu","am"], t:"Began in Britain and spread through Europe and North America. It opened the wealth and power gap behind 19th-century empire."},
+ {n:"World wars", a:1914, b:1945, r:["am","af","eu","me","ca","sa","ea","se"], t:"Two global wars and the 1918 influenza pandemic. Four empires fell in 1917–22. The European colonial order was fatally weakened."},
+ {n:"Decolonisation", a:1945, b:1975, r:["af","me","sa","se"], t:"In thirty years most of Asia and Africa became independent, roughly tripling the number of sovereign states."}
+];
+
+
+/* [year, title, Wikipedia article, note, approximate?] */
+const POINTS = {
+am:[
+ [378,"Teotihuacan intervenes at Tikal","Tikal","A new dynasty with ties to Teotihuacan was installed in the Maya city."],
+ [1325,"Tenochtitlan founded","Tenochtitlan","Traditional date for the Mexica island city.",1],
+ [1492,"Columbus reaches the Caribbean","Voyages of Christopher Columbus","Opened lasting contact between the hemispheres."],
+ [1521,"Fall of Tenochtitlan","Fall of Tenochtitlan","Spanish and Indigenous allied forces took the city after a siege and a smallpox epidemic."],
+ [1532,"Atahualpa captured at Cajamarca","Battle of Cajamarca","Pizarro seized the Inca ruler during a civil war."],
+ [1680,"Pueblo Revolt","Pueblo Revolt","Pueblo peoples expelled the Spanish from New Mexico for twelve years."],
+ [1776,"US Declaration of Independence","United States Declaration of Independence",""],
+ [1791,"Haitian Revolution begins","Haitian Revolution","The only slave uprising to found a state. Haiti became independent in 1804."],
+ [1810,"Spanish American independence wars","Spanish American wars of independence","Fighting ran to 1825 and ended Spanish rule on the mainland."],
+ [1861,"American Civil War","American Civil War","Ended in 1865 with the abolition of slavery in the United States."],
+ [1888,"Brazil abolishes slavery","Lei Áurea","The last country in the Americas to do so."],
+ [1910,"Mexican Revolution","Mexican Revolution",""],
+ [1959,"Cuban Revolution","Cuban Revolution",""],
+ [1969,"First Moon landing","Apollo 11",""]
+],
+af:[
+ [-727,"Piye of Kush conquers Egypt","Piye","Start of Kushite rule over Egypt as the 25th Dynasty.",1],
+ [330,"Aksum adopts Christianity","Ezana of Axum","King Ezana's conversion, among the earliest by any state.",1],
+ [652,"Baqt treaty","Baqt","Makuria and Arab Egypt agreed a peace that held for centuries."],
+ [1235,"Battle of Kirina","Battle of Kirina","Sunjata Keita's victory, the founding moment of the Mali Empire.",1],
+ [1324,"Mansa Musa's pilgrimage","Mansa Musa","His spending in Cairo was remembered there for a generation."],
+ [1488,"Dias rounds the Cape","Bartolomeu Dias","Opened the sea route from Europe to the Indian Ocean."],
+ [1591,"Battle of Tondibi","Battle of Tondibi","Moroccan firearms broke the Songhai army."],
+ [1652,"Dutch settle the Cape","Dutch Cape Colony",""],
+ [1807,"Britain bans the slave trade","Slave Trade Act 1807","The trade itself continued illegally for decades."],
+ [1879,"Battle of Isandlwana","Battle of Isandlwana","A Zulu army destroyed a British column."],
+ [1884,"Berlin Conference","Berlin Conference","European powers set rules for partitioning Africa."],
+ [1896,"Battle of Adwa","Battle of Adwa","Ethiopia defeated an Italian invasion."],
+ [1957,"Ghana becomes independent","Kwame Nkrumah","The first sub-Saharan colony to win independence."],
+ [1960,"Year of Africa","Year of Africa","Seventeen countries became independent in one year."],
+ [1994,"South Africa's first democratic election","1994 South African general election","End of apartheid. The same year saw the genocide in Rwanda."]
+],
+eu:[
+ [-776,"First Olympic Games","Ancient Olympic Games","The traditional date.",1],
+ [-480,"Thermopylae and Salamis","Second Persian invasion of Greece","Greek cities turned back the Persian invasion."],
+ [-146,"Rome destroys Carthage and Corinth","Third Punic War",""],
+ [-44,"Assassination of Julius Caesar","Assassination of Julius Caesar",""],
+ [313,"Edict of Milan","Edict of Milan","Christianity became legal in the Roman Empire."],
+ [410,"Sack of Rome","Sack of Rome (410)","The first time in 800 years the city fell to an enemy."],
+ [800,"Charlemagne crowned emperor","Charlemagne",""],
+ [1054,"East–West Schism","East–West Schism","Conventional date for the split between the Latin and Greek churches."],
+ [1066,"Norman conquest of England","Norman Conquest",""],
+ [1204,"Crusaders sack Constantinople","Sack of Constantinople","The Fourth Crusade broke the Eastern Roman Empire into fragments."],
+ [1215,"Magna Carta","Magna Carta",""],
+ [1453,"Fall of Constantinople","Fall of Constantinople","The Ottoman conquest ended the Roman Empire in the east."],
+ [1455,"Gutenberg Bible","Gutenberg Bible","First major book printed in Europe with movable type.",1],
+ [1517,"Reformation begins","Reformation",""],
+ [1648,"Peace of Westphalia","Peace of Westphalia","Ended the Thirty Years' War."],
+ [1789,"French Revolution","French Revolution",""],
+ [1815,"Battle of Waterloo","Battle of Waterloo","End of the Napoleonic Wars."],
+ [1848,"Revolutions of 1848","Revolutions of 1848",""],
+ [1917,"Russian Revolution","Russian Revolution",""],
+ [1989,"Fall of the Berlin Wall","Fall of the Berlin Wall",""],
+ [2022,"Russia invades Ukraine","Russian invasion of Ukraine",""]
+],
+me:[
+ [-2560,"Great Pyramid of Giza","Great Pyramid of Giza","Built for Khufu.",1],
+ [-1754,"Code of Hammurabi","Code of Hammurabi","Date by the Middle Chronology.",1],
+ [-1274,"Battle of Kadesh","Battle of Kadesh","Egypt against the Hittites. It led to the earliest surviving peace treaty.",1],
+ [-586,"Babylon destroys Jerusalem","Siege of Jerusalem (587 BC)","Start of the Babylonian exile. Some scholars prefer 587."],
+ [-539,"Cyrus takes Babylon","Fall of Babylon",""],
+ [-331,"Battle of Gaugamela","Battle of Gaugamela","Alexander's decisive victory over Persia."],
+ [30,"Crucifixion of Jesus","Crucifixion of Jesus","Usually dated to 30 or 33.",1],
+ [70,"Romans destroy the Second Temple","Siege of Jerusalem (70 CE)",""],
+ [622,"Hijra","Hijrah","Muhammad's move to Medina, year one of the Islamic calendar."],
+ [762,"Baghdad founded","Baghdad","The new Abbasid capital."],
+ [1071,"Battle of Manzikert","Battle of Manzikert","A Seljuk victory that opened Anatolia to Turkish settlement."],
+ [1099,"First Crusade takes Jerusalem","First Crusade",""],
+ [1258,"Mongols sack Baghdad","Siege of Baghdad",""],
+ [1517,"Ottomans conquer Egypt","Ottoman–Mamluk War (1516–1517)",""],
+ [1869,"Suez Canal opens","Suez Canal",""],
+ [1923,"Republic of Turkey founded","Treaty of Lausanne",""],
+ [1948,"Israel founded; first Arab–Israeli war","1948 Arab–Israeli War",""],
+ [1979,"Iranian Revolution","Iranian Revolution",""],
+ [2011,"Arab Spring","Arab Spring",""]
+],
+ca:[
+ [-2000,"Earliest spoke-wheeled chariots","Chariot","Found in Sintashta burials on the southern Urals.",1],
+ [-138,"Zhang Qian sets out west","Zhang Qian","A Han envoy whose reports opened Chinese contact with Central Asia."],
+ [451,"Battle of the Catalaunian Plains","Battle of the Catalaunian Plains","Romans and Visigoths checked Attila in Gaul."],
+ [751,"Battle of Talas","Battle of Talas","Abbasid forces defeated a Tang army."],
+ [1206,"Temüjin proclaimed Genghis Khan","Genghis Khan",""],
+ [1219,"Mongols invade Khwarazm","Mongol invasion of the Khwarazmian Empire",""],
+ [1380,"Battle of Kulikovo","Battle of Kulikovo","Muscovy's first major victory over the Golden Horde."],
+ [1402,"Battle of Ankara","Battle of Ankara","Timur captured the Ottoman sultan Bayezid I."],
+ [1424,"Ulugh Beg's observatory","Ulugh Beg Observatory","Built in Samarkand in the 1420s.",1],
+ [1757,"Qing destroy the Dzungars","Dzungar genocide",""],
+ [1865,"Russia takes Tashkent","Russian conquest of Central Asia",""],
+ [1924,"Soviet republics drawn","National delimitation in the Soviet Union","The origin of today's Central Asian borders."],
+ [1991,"Soviet Union dissolves","Dissolution of the Soviet Union",""]
+],
+sa:[
+ [-2600,"Mohenjo-daro built","Mohenjo-daro","",1],
+ [-450,"The Buddha teaches","The Buddha","His dates are uncertain. Most scholars now place his death near 400 BCE.",1],
+ [-326,"Alexander at the Hydaspes","Battle of the Hydaspes",""],
+ [-261,"Kalinga War","Kalinga War","Its bloodshed is said to have turned Ashoka toward Buddhism.",1],
+ [499,"Aryabhata's Aryabhatiya","Aryabhatiya","A landmark of Indian mathematics and astronomy."],
+ [712,"Arab conquest of Sindh","Umayyad conquest of Sindh",""],
+ [1025,"Chola raid on Srivijaya","Chola invasion of Srivijaya","A naval expedition across the Bay of Bengal."],
+ [1192,"Second Battle of Tarain","Second Battle of Tarain","Opened north India to Ghurid rule, and so to the Delhi Sultanate."],
+ [1398,"Timur sacks Delhi","Sack of Delhi (1398)",""],
+ [1498,"Vasco da Gama reaches Calicut","Vasco da Gama","First direct sea voyage from Europe to India."],
+ [1526,"First Battle of Panipat","First Battle of Panipat","Babur's victory founded the Mughal Empire."],
+ [1632,"Taj Mahal begun","Taj Mahal",""],
+ [1757,"Battle of Plassey","Battle of Plassey","Gave the East India Company control of Bengal."],
+ [1857,"Indian Rebellion","Indian Rebellion of 1857",""],
+ [1947,"Partition of India","Partition of India","Independence for India and Pakistan, with mass displacement and violence."],
+ [1971,"Bangladesh Liberation War","Bangladesh Liberation War",""]
+],
+ea:[
+ [-1250,"Oracle bone writing","Oracle bone script","The earliest known Chinese writing.",1],
+ [-551,"Birth of Confucius","Confucius","The traditional date.",1],
+ [-221,"Qin unifies China","Qin's wars of unification",""],
+ [105,"Cai Lun's papermaking","Cai Lun","The traditional date. Paper itself is somewhat older."],
+ [552,"Buddhism reaches Japan","Buddhism in Japan","Traditionally dated to 552 or 538.",1],
+ [645,"Taika Reform","Taika Reform","Japan's court adopted Chinese-style government."],
+ [755,"An Lushan Rebellion","An Lushan rebellion",""],
+ [868,"Diamond Sutra printed","Diamond Sutra","The oldest dated printed book."],
+ [1127,"Jurchens take Kaifeng","Jingkang incident","The Song court fled south."],
+ [1274,"Mongol invasions of Japan","Mongol invasions of Japan","Both attempts, in 1274 and 1281, failed."],
+ [1443,"Hangul created","Hangul",""],
+ [1592,"Imjin War","Japanese invasions of Korea (1592–1598)",""],
+ [1839,"First Opium War","First Opium War",""],
+ [1850,"Taiping Rebellion","Taiping Rebellion","Among the deadliest wars in history."],
+ [1868,"Meiji Restoration","Meiji Restoration",""],
+ [1911,"Xinhai Revolution","1911 Revolution","Ended two thousand years of imperial rule."],
+ [1945,"Atomic bombings of Hiroshima and Nagasaki","Atomic bombings of Hiroshima and Nagasaki",""],
+ [1949,"People's Republic proclaimed","Proclamation of the People's Republic of China",""],
+ [1950,"Korean War","Korean War",""],
+ [1978,"China's reform and opening","Chinese economic reform",""]
+],
+se:[
+ [-111,"Han conquest of Nanyue","Han conquest of Nanyue","Began a millennium of Chinese rule in northern Vietnam."],
+ [40,"Trưng sisters' rebellion","Trưng sisters' rebellion",""],
+ [800,"Borobudur built","Borobudur","",1],
+ [938,"Battle of Bạch Đằng","Battle of Bạch Đằng (938)","The victory that secured Vietnamese independence."],
+ [1150,"Angkor Wat built","Angkor Wat","",1],
+ [1280,"Māori settle Aotearoa","Māori history","The last major landmass reached by people.",1],
+ [1293,"Mongol invasion of Java","Mongol invasion of Java",""],
+ [1511,"Portugal takes Malacca","Capture of Malacca (1511)",""],
+ [1521,"Magellan reaches the Philippines","Magellan expedition",""],
+ [1606,"First recorded European landing in Australia","Willem Janszoon",""],
+ [1788,"First Fleet at Sydney Cove","First Fleet",""],
+ [1840,"Treaty of Waitangi","Treaty of Waitangi",""],
+ [1883,"Krakatoa eruption","1883 eruption of Krakatoa",""],
+ [1945,"Indonesia declares independence","Proclamation of Indonesian Independence",""],
+ [1954,"Battle of Điện Biên Phủ","Battle of Dien Bien Phu","Ended French rule in Indochina."],
+ [1967,"ASEAN founded","ASEAN",""],
+ [1975,"Fall of Saigon","Fall of Saigon","End of the Vietnam War."]
+]};
+/* Wikipedia article titles where they differ from the bar name */
+const WIKI = {
+ "Caral–Supe":"Caral–Supe civilization","Olmec centres":"Olmecs","Maya city-states":"Maya civilization","Chavín":"Chavín culture",
+ "Zapotec (Monte Albán)":"Zapotec civilization","Nazca":"Nazca culture","Moche":"Moche culture","Tiwanaku":"Tiwanaku Empire","Wari":"Wari Empire",
+ "Chaco Canyon":"Chaco Culture National Historical Park","Toltec (Tula)":"Toltec","Chimú (Chimor)":"Chimor","Cahokia & Mississippian towns":"Mississippian culture",
+ "Aztec Triple Alliance":"Aztec Empire","Haudenosaunee Confederacy":"Iroquois","Portuguese Brazil":"Colonial Brazil","Spanish America":"Spanish Empire",
+ "British North America":"British America","Latin American republics":"History of Latin America",
+ "Kerma":"Kerma culture","Kush (Napata, Meroë)":"Kingdom of Kush","Aksum":"Kingdom of Aksum","Ghana (Wagadu)":"Ghana Empire","Christian Nubia (Makuria)":"Makuria",
+ "Kanem–Bornu":"Kanem–Bornu Empire","Swahili city-states":"Swahili coast","Benin":"Kingdom of Benin","Kongo":"Kingdom of Kongo","Asante":"Ashanti Empire",
+ "European colonial rule":"Scramble for Africa","Independent African states":"Decolonisation of Africa",
+ "Megalith builders":"Megalith","Minoan Crete":"Minoan civilization","Etruscan cities":"Etruscan civilization","Greek city-states":"Polis",
+ "Celtic Europe (Hallstatt, La Tène)":"Celts","Macedon":"Macedonia (ancient kingdom)","Eastern Roman (Byzantine) Empire":"Byzantine Empire",
+ "Frankish kingdoms":"Francia","Venice":"Republic of Venice","Viking Age Scandinavia":"Viking Age","England, then Britain":"History of the British Isles",
+ "Poland–Lithuania":"Polish–Lithuanian Commonwealth","Muscovy, Russia, USSR":"History of Russia",
+ "Sumerian city-states":"Sumer","Early Dynastic Egypt":"Early Dynastic Period (Egypt)","Old Kingdom Egypt":"Old Kingdom of Egypt","Ur III":"Third Dynasty of Ur",
+ "Middle Kingdom Egypt":"Middle Kingdom of Egypt","Old Babylonian kingdom":"Old Babylonian Empire","Hittite kingdom":"Hittites","New Kingdom Egypt":"New Kingdom of Egypt",
+ "Phoenician cities":"Phoenicia","Israel & Judah":"History of ancient Israel and Judah","Carthage":"Ancient Carthage","Late Period Egypt":"Late Period of ancient Egypt",
+ "Achaemenid Persia":"Achaemenid Empire","Ptolemaic Egypt":"Ptolemaic Kingdom","Rashidun & Umayyad Caliphates":"Early Muslim conquests",
+ "Almoravids & Almohads":"Almohad Caliphate","Ayyubid & Mamluk Egypt":"Mamluk Sultanate","Iran (Qajar to Islamic Republic)":"History of Iran",
+ "Modern states of the region":"History of the Middle East",
+ "Oxus civilisation (BMAC)":"Bactria–Margiana Archaeological Complex","Sintashta & Andronovo cultures":"Andronovo culture","Scythians & Saka":"Scythians",
+ "Hunnic Empire":"Huns","Türk Khaganates":"First Turkic Khaganate","Samanids":"Samanid Empire","Uzbek khanates":"Khanate of Bukhara",
+ "Russian & Soviet rule":"Russian Turkestan","Independent republics":"Central Asia",
+ "Indus Valley (Harappan) civilisation":"Indus Valley Civilisation","Anuradhapura (Sri Lanka)":"Anuradhapura Kingdom",
+ "Tamil kingdoms (Chera, Chola, Pandya)":"Three Crowned Kings","Satavahanas":"Satavahana dynasty","Pallavas":"Pallava dynasty",
+ "Chalukyas & Rashtrakutas":"Rashtrakuta Empire","Vijayanagara":"Vijayanagara Empire","Maratha Confederacy":"Maratha Empire","British rule":"British Raj",
+ "India, Pakistan, Bangladesh, Sri Lanka":"History of South Asia",
+ "Jōmon Japan":"Jōmon period","Longshan cultures":"Longshan culture","Erlitou (possibly the Xia)":"Erlitou culture","Shang":"Shang dynasty","Zhou":"Zhou dynasty",
+ "Yayoi Japan":"Yayoi period","Qin":"Qin dynasty","Han":"Han dynasty","Period of division":"Six Dynasties","Kofun and Yamato Japan":"Kofun period",
+ "Sui":"Sui dynasty","Tang":"Tang dynasty","Nara & Heian Japan":"Heian period","Liao & Jin (north)":"Jin dynasty (1115–1234)","Song":"Song dynasty",
+ "Kamakura & Muromachi shogunates":"Kamakura shogunate","Yuan":"Yuan dynasty","Ming":"Ming dynasty","Tokugawa Japan":"Tokugawa shogunate","Qing":"Qing dynasty",
+ "Modern Japan":"History of Japan","China (Republic, then People's Republic)":"History of China","North & South Korea":"Division of Korea",
+ "Aboriginal Australian societies":"Aboriginal Australians","Lapita voyagers":"Lapita culture","Mataram (Borobudur, Prambanan)":"Mataram kingdom",
+ "Khmer Empire (Angkor)":"Khmer Empire","Pagan":"Pagan kingdom","Tuʻi Tonga maritime network":"Tuʻi Tonga Empire",
+ "Settlement of East Polynesia":"Polynesian navigation","Sukhothai & Ayutthaya":"Ayutthaya Kingdom","Taungoo & Konbaung Burma":"Konbaung dynasty",
+ "Siam, then Thailand":"History of Thailand","Australia & New Zealand":"History of Australia","Independent Southeast Asian states":"History of Southeast Asia"
+};
+const BANDWIKI = {"4.2 kiloyear drought":"4.2-kiloyear event","Silk Road opens":"Silk Road","Indian Ocean trade at full reach":"Indian Ocean trade",
+ "Arab conquests":"Early Muslim conquests","Mongol conquests":"Mongol invasions and conquests","Zheng He's voyages":"Ming treasure voyages",
+ "Columbian Exchange":"Columbian exchange","Industrialisation begins":"Industrial Revolution","World wars":"World war","Decolonisation":"Decolonization"};
+const wikiURL = t => "https://en.wikipedia.org/wiki/Special:Search?go=Go&search="+encodeURIComponent(t);
+function wikiLink(t){ const a=document.createElement("a"); a.className="wiki"; a.href=wikiURL(t); a.target="_blank"; a.rel="noopener"; a.textContent="Read on Wikipedia"; return a; }
+
+
+/* One label per bar for each grouping, in the order of LENSKEYS.
+   These are judgement calls: the most typical or longest-lasting state of each entry. */
+const LENSKEYS = ["lang","rel","life","trade","eco","pol","line"];
+const LENS = {
+ lang:{name:"Language", note:"Main language of rule or record. Almost every state was multilingual.", cats:{
+  ie:"Indo-European", aa:"Afroasiatic", st:"Sino-Tibetan", tk:"Turkic", mt:"Mongolic & Tungusic", dr:"Dravidian", au:"Austronesian", as:"Austroasiatic",
+  kd:"Kra–Dai", kr:"Koreanic", jp:"Japonic", nc:"Niger–Congo", ns:"Nilo-Saharan", am:"American families", pn:"Australian families", iso:"Isolate or unknown", mx:"Several families"}},
+ rel:{name:"Religion", note:"Tradition favoured by the rulers. Subjects often followed others, and it could change within one bar.", cats:{
+  poly:"Local and polytheist traditions", tng:"Steppe sky-worship", hin:"Vedic and Hindu traditions", bud:"Buddhism", con:"Confucian state tradition",
+  zor:"Zoroastrianism", jud:"Judaism", chr:"Christianity", isl:"Islam", x:"Other", sec:"Secular or plural"}},
+ life:{name:"Way of life", note:"How most people in it made a living.", cats:{
+  for:"Foragers", pas:"Herders and nomads", agv:"Village farmers", agr:"Agrarian states", mar:"Sea and trade based", ind:"Industrial"}},
+ trade:{name:"Trade network", note:"The long-distance network that mattered most to it.", cats:{
+  loc:"Mainly regional", med:"Mediterranean", sr:"Silk Road and overland Eurasia", io:"Indian Ocean", cs:"China seas", sah:"Trans-Saharan",
+  nor:"North and Baltic seas", ame:"American networks", pac:"Pacific voyaging", atl:"Atlantic", glo:"Global"}},
+ eco:{name:"Ecology", note:"The landscape of its heartland.", cats:{
+  riv:"River valleys", med:"Mediterranean coasts", temp:"Temperate forest and plain", stp:"Steppe", arid:"Desert and oasis", sav:"Savanna and Sahel",
+  trop:"Tropical and monsoon", high:"Highlands and plateaus", isl:"Islands"}},
+ pol:{name:"Polity type", note:"Its usual form. Many changed form over time.", cats:{
+  non:"No state", city:"City-states", conf:"Confederations", king:"Kingdoms", emp:"Empires", col:"Colonial rule", nat:"Modern states"}},
+ line:{name:"Claimed lineage", note:"The tradition of legitimate rule its leaders claimed to inherit.", cats:{
+  own:"Own or local tradition", mes:"Mesopotamian kingship", egy:"Pharaonic", per:"Persian kingship", rom:"Roman", chi:"Mandate of Heaven",
+  ind:"Indic kingship", cal:"Caliphate and sultanate", mon:"Steppe khaganate", eur:"European crowns", mod:"Popular sovereignty"}}
+};
+const PAL = ["eu","af","am","me","sa","ea","se","ca"];
+const TAGS = {
+ "Caral–Supe":"iso poly agr ame riv city own","Olmec centres":"am poly agr ame trop city own","Maya city-states":"am poly agr ame trop city own",
+ "Chavín":"iso poly agv ame high non own","Zapotec (Monte Albán)":"am poly agr ame high king own","Teotihuacan":"iso poly agr ame high city own",
+ "Nazca":"iso poly agv ame arid non own","Moche":"iso poly agr ame arid king own","Tiwanaku":"am poly agr ame high king own","Wari":"am poly agr ame high emp own",
+ "Chaco Canyon":"am poly agv ame arid non own","Toltec (Tula)":"am poly agr ame high king own","Chimú (Chimor)":"iso poly agr ame arid king own",
+ "Cahokia & Mississippian towns":"am poly agv ame riv non own","Aztec Triple Alliance":"am poly agr ame high emp own","Inca Empire":"am poly agr ame high emp own",
+ "Haudenosaunee Confederacy":"am poly agv ame temp conf own","Portuguese Brazil":"ie chr agr atl trop col eur","Spanish America":"ie chr agr atl high col eur",
+ "British North America":"ie chr agr atl temp col eur","United States":"ie sec ind glo temp nat mod","Latin American republics":"ie chr agr atl trop nat mod",
+ "Brazil":"ie chr agr atl trop nat mod","Canada":"ie sec ind atl temp nat mod",
+
+ "Kerma":"iso poly agr loc riv king own","Nok culture":"iso poly agv loc sav non own","Kush (Napata, Meroë)":"ns poly agr med riv king egy",
+ "Bantu expansion":"nc poly agv loc trop non own","Aksum":"aa chr agr io high king own","Ghana (Wagadu)":"nc poly agr sah sav king own",
+ "Christian Nubia (Makuria)":"ns chr agr loc riv king own","Kanem–Bornu":"ns isl agr sah sav king cal","Swahili city-states":"nc isl mar io trop city own",
+ "Great Zimbabwe":"nc poly agr io high king own","Benin":"nc poly agr atl trop king own","Mali Empire":"nc isl agr sah sav emp own",
+ "Ethiopian Empire":"aa chr agr loc high emp own","Kongo":"nc chr agr atl trop king own","Songhai Empire":"ns isl agr sah sav emp own",
+ "Asante":"nc poly agr atl trop king own","Sokoto Caliphate":"mx isl agr sah sav emp cal","Zulu Kingdom":"nc poly pas loc sav king own",
+ "European colonial rule@af":"ie chr agr atl trop col eur","Independent African states":"mx sec agr glo sav nat mod",
+
+ "Megalith builders":"iso poly agv loc temp non own","Minoan Crete":"iso poly mar med isl king own","Mycenaean Greece":"ie poly agr med med king own",
+ "Etruscan cities":"iso poly agr med med city own","Greek city-states":"ie poly mar med med city own","Celtic Europe (Hallstatt, La Tène)":"ie poly agv loc temp non own",
+ "Roman Republic":"ie poly agr med med city rom","Macedon":"ie poly agr med med king own","Roman Empire":"ie poly agr med med emp rom",
+ "Eastern Roman (Byzantine) Empire":"ie chr agr med med emp rom","Frankish kingdoms":"ie chr agr loc temp king rom","Venice":"ie chr mar med med city own",
+ "Al-Andalus":"aa isl agr med med king cal","Viking Age Scandinavia":"ie poly mar nor temp non own","France":"ie chr agr atl temp king eur",
+ "Kievan Rus'":"ie chr agr nor temp conf own","England, then Britain":"ie chr mar atl temp king eur","Holy Roman Empire":"ie chr agr nor temp emp rom",
+ "Portugal":"ie chr mar atl med king eur","Poland–Lithuania":"ie chr agr nor temp king eur","Spain":"ie chr agr atl med king eur",
+ "Muscovy, Russia, USSR":"ie chr agr nor temp emp rom","Italy":"ie chr ind med med nat mod","Germany":"ie chr ind nor temp nat mod",
+
+ "Sumerian city-states":"iso poly agr loc riv city mes","Early Dynastic Egypt":"aa poly agr loc riv king egy","Elam":"iso poly agr loc high king own",
+ "Old Kingdom Egypt":"aa poly agr loc riv king egy","Akkadian Empire":"aa poly agr loc riv emp mes","Ur III":"iso poly agr loc riv king mes",
+ "Middle Kingdom Egypt":"aa poly agr med riv king egy","Old Babylonian kingdom":"aa poly agr loc riv king mes","Hittite kingdom":"ie poly agr med high king own",
+ "New Kingdom Egypt":"aa poly agr med riv emp egy","Assyria":"aa poly agr med riv emp mes","Phoenician cities":"aa poly mar med med city own",
+ "Israel & Judah":"aa jud agr med high king own","Carthage":"aa poly mar med med city own","Late Period Egypt":"aa poly agr med riv king egy",
+ "Neo-Babylonian Empire":"aa poly agr med riv emp mes","Achaemenid Persia":"ie zor agr sr high emp per","Seleucid Empire":"ie poly agr sr riv emp own",
+ "Ptolemaic Egypt":"ie poly agr med riv king egy","Parthian Empire":"ie zor agr sr high emp per","Sasanian Empire":"ie zor agr sr high emp per",
+ "Rashidun & Umayyad Caliphates":"aa isl agr med arid emp cal","Abbasid Caliphate":"aa isl agr io riv emp cal","Fatimid Caliphate":"aa isl agr med riv emp cal",
+ "Seljuk Empire":"tk isl pas sr high emp cal","Almoravids & Almohads":"aa isl agr sah arid emp cal","Ayyubid & Mamluk Egypt":"aa isl agr io riv king cal",
+ "Ilkhanate":"mt isl pas sr high king mon","Ottoman Empire":"tk isl agr med med emp cal","Safavid Iran":"ie isl agr sr high emp per",
+ "Iran (Qajar to Islamic Republic)":"ie isl agr glo high nat per","Modern states of the region":"aa isl ind glo arid nat mod",
+
+ "Oxus civilisation (BMAC)":"iso poly agr sr arid city own","Sintashta & Andronovo cultures":"ie poly pas loc stp non own","Scythians & Saka":"ie poly pas sr stp conf own",
+ "Xiongnu":"iso tng pas sr stp conf mon","Kushan Empire":"ie bud agr sr high emp own","Hunnic Empire":"iso tng pas loc stp conf mon",
+ "Hephthalites":"iso poly pas sr high conf own","Türk Khaganates":"tk tng pas sr stp emp mon","Tibetan Empire":"st bud agr sr high emp own",
+ "Khazar Khaganate":"tk jud pas sr stp king mon","Uyghur Khaganate":"tk x pas sr stp emp mon","Samanids":"ie isl agr sr arid king per",
+ "Khwarazmian Empire":"tk isl agr sr arid emp per","Mongol Empire":"mt tng pas sr stp emp mon","Golden Horde":"tk isl pas sr stp king mon",
+ "Timurid Empire":"tk isl agr sr arid emp mon","Kazakh Khanate":"tk isl pas sr stp king mon","Uzbek khanates":"tk isl agr sr arid king mon",
+ "Dzungar Khanate":"mt bud pas sr stp king mon","Russian & Soviet rule":"ie sec ind glo stp col eur","Independent republics":"tk isl ind glo stp nat mod",
+
+ "Indus Valley (Harappan) civilisation":"iso poly agr io riv city own","Vedic period":"ie hin pas loc riv non own","Mahajanapadas":"ie hin agr loc riv king ind",
+ "Anuradhapura (Sri Lanka)":"ie bud agr io isl king ind","Maurya Empire":"ie bud agr sr riv emp ind","Tamil kingdoms (Chera, Chola, Pandya)":"dr hin mar io trop king ind",
+ "Satavahanas":"ie hin agr io high king ind","Pallavas":"dr hin agr io trop king ind","Gupta Empire":"ie hin agr sr riv emp ind",
+ "Chalukyas & Rashtrakutas":"dr hin agr io high emp ind","Pala Empire":"ie bud agr io riv emp ind","Chola Empire":"dr hin mar io trop emp ind",
+ "Delhi Sultanate":"ie isl agr sr riv emp cal","Vijayanagara":"dr hin agr io high emp ind","Mughal Empire":"ie isl agr io riv emp mon",
+ "Maratha Confederacy":"ie hin agr io high conf ind","British rule":"ie chr agr glo riv col eur","Sikh Empire":"ie x agr sr riv king own",
+ "India, Pakistan, Bangladesh, Sri Lanka":"mx sec ind glo riv nat mod",
+
+ "Jōmon Japan":"iso poly for loc isl non own","Liangzhu culture":"iso poly agr loc riv city own","Longshan cultures":"iso poly agv loc riv non own",
+ "Erlitou (possibly the Xia)":"st poly agr loc riv king own","Shang":"st poly agr loc riv king chi","Zhou":"st con agr loc riv king chi",
+ "Gojoseon":"kr poly agr loc temp king own","Yayoi Japan":"jp poly agv cs isl non own","Qin":"st con agr loc riv emp chi","Han":"st con agr sr riv emp chi",
+ "Three Kingdoms of Korea":"kr bud agr cs temp king own","Period of division":"st bud agr sr riv king chi","Kofun and Yamato Japan":"jp poly agr cs isl king own",
+ "Sui":"st bud agr sr riv emp chi","Tang":"st bud agr sr riv emp chi","Unified Silla":"kr bud agr cs temp king own","Nara & Heian Japan":"jp bud agr cs isl king own",
+ "Liao & Jin (north)":"mt bud pas sr stp emp chi","Goryeo":"kr bud agr cs temp king own","Song":"st con mar cs riv emp chi",
+ "Kamakura & Muromachi shogunates":"jp bud agr cs isl king own","Yuan":"mt bud agr sr riv emp mon","Ming":"st con agr cs riv emp chi","Joseon":"kr con agr cs temp king own",
+ "Tokugawa Japan":"jp bud agr cs isl king own","Qing":"mt con agr cs riv emp chi","Modern Japan":"jp sec ind glo isl nat mod",
+ "China (Republic, then People's Republic)":"st sec ind glo riv nat mod","North & South Korea":"kr sec ind glo temp nat mod",
+
+ "Aboriginal Australian societies":"pn poly for loc arid non own","Lapita voyagers":"au poly mar pac isl non own","Đông Sơn culture":"as poly agv cs riv non own",
+ "Pyu city-states":"st bud agr io riv city own","Funan":"as hin mar io riv king ind","Champa":"au hin mar cs trop king ind","Srivijaya":"au bud mar io isl emp ind",
+ "Mataram (Borobudur, Prambanan)":"au hin agr io isl king ind","Khmer Empire (Angkor)":"as hin agr loc riv emp ind","Pagan":"st bud agr io riv king ind",
+ "Đại Việt":"as con agr cs riv king chi","Tuʻi Tonga maritime network":"au poly mar pac isl king own","Settlement of East Polynesia":"au poly mar pac isl non own",
+ "Sukhothai & Ayutthaya":"kd bud agr io riv king ind","Majapahit":"au hin mar io isl emp ind","Malacca Sultanate":"au isl mar io trop city cal",
+ "Taungoo & Konbaung Burma":"st bud agr io riv king ind","European colonial rule@se":"ie chr agr glo trop col eur","Siam, then Thailand":"kd bud agr glo riv king ind",
+ "Australia & New Zealand":"ie chr ind glo temp nat mod","Independent Southeast Asian states":"mx sec ind glo trop nat mod"
+};
+
+/* ---------- state ---------- */
+let savedOrient=null; try{ savedOrient=localStorage.getItem("wh8-orient"); }catch(e){}
+const qOrient=new URLSearchParams(location.search).get("layout");
+const state = {active:new Set(REG.map(r=>r.id)), stretch:false, zoom:2, links:true, events:true, lens:"geo", sel:null,
+  horiz:(qOrient||savedOrient)==="horizontal"};
+const ZOOMS = [0.5,0.7,1,1.4,2,3];
+const AXIS_W = 62, PAD_T = 16, PAD_B = 30;
+const $ = id => document.getElementById(id);
+const scroller = $("scroller"), sheet = $("sheet"), detail = $("detail");
+
+/* lane packing, done once */
+for (const r of REG){
+  const items = DATA[r.id].map(a=>({name:a[0], short:a[1]||a[0], s:a[2], e:a[3], f:a[4], note:a[5], reg:r.id}));
+  items.sort((x,y)=>x.s-y.s || y.e-x.e);
+  const ends=[];
+  for (const it of items){
+    let l = ends.findIndex(e=>e<=it.s);
+    if (l<0){ l=ends.length; ends.push(0); }
+    ends[l]=it.e; it.lane=l;
+  }
+  r.items=items; r.lanes=ends.length;
+  for (const it of items) it.tags=(TAGS[it.name]||TAGS[it.name+"@"+r.id]).split(" ");
+  r.points=POINTS[r.id].map(a=>({pt:true,y:a[0],name:a[1],w:a[2],note:a[3],approx:!!a[4],reg:r.id})).sort((x,y)=>x.y-y.y);
+}
+
+/* ---------- scale ---------- */
+function segs(){
+  const z = ZOOMS[state.zoom];
+  return state.stretch
+    ? [[START,-1000,0.6*z],[-1000,1500,1*z],[1500,NOW,3*z]]
+    : [[START,NOW,1*z]];
+}
+function Y(yr){
+  let y=PAD_T;
+  for (const [a,b,k] of segs()){
+    if (yr<=a) break;
+    y += (Math.min(yr,b)-a)*k;
+  }
+  return y;
+}
+function yearAt(y){
+  let acc=PAD_T;
+  for (const [a,b,k] of segs()){
+    const h=(b-a)*k;
+    if (y<=acc+h) return a+(y-acc)/k;
+    acc+=h;
+  }
+  return NOW;
+}
+function rateAt(yr){ for (const [a,b,k] of segs()) if (yr<b) return k; return segs().at(-1)[2]; }
+const fmt = y => y>=NOW ? "present" : (y<0 ? (-y)+" BCE" : y+" CE");
+
+/* ---------- render ---------- */
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+
+function pack(items){
+  items.sort((x,y)=>x.s-y.s || y.e-x.e);
+  const ends=[];
+  for (const it of items){
+    let l = ends.findIndex(e=>e<=it.s);
+    if (l<0){ l=ends.length; ends.push(0); }
+    ends[l]=it.e; it.lane=l;
+  }
+  return ends.length;
+}
+function soloLens(){ return state.active.size===1 && state.lens!=="geo" ? LENS[state.lens] : null; }
+function buildCols(){
+  const regs = REG.filter(r=>state.active.has(r.id)), lens = soloLens();
+  if (!lens) return regs.map(r=>({name:r.name,color:r.id,items:r.items,lanes:pack(r.items),points:state.events?r.points:[],ev:state.events,regs:[r.id]}));
+  const r=regs[0], idx=LENSKEYS.indexOf(state.lens), cols=[]; let i=0;
+  for (const [code,label] of Object.entries(lens.cats)){
+    const items=r.items.filter(it=>it.tags[idx]===code);
+    if (items.length) cols.push({name:label,color:PAL[i++%PAL.length],items,lanes:pack(items),points:[],ev:false,regs:[r.id]});
+  }
+  if (state.events) cols.push({name:"Events",color:null,items:[],lanes:0,points:r.points,ev:true,regs:[r.id]});
+  return cols;
+}
+
+function render(keepYear){
+  sheet.classList.toggle("horiz",state.horiz);
+  if (state.horiz) renderH(keepYear); else renderV(keepYear);
+}
+
+/* fade the uncertain ends of a bar; dir is "bottom" (vertical) or "right" (horizontal) */
+function fuzz(b,it,len,dir){
+  const fuzzS = /[sp]/.test(it.f), fuzzE = it.f.includes("e");
+  const fl = Math.min(22, len*0.3);
+  if (fuzzS||fuzzE){
+    const m=`linear-gradient(to ${dir},${fuzzS?`transparent 0,#000 ${fl}px`:"#000 0"},${fuzzE?`#000 ${len-fl}px,transparent ${len}px`:"#000 100%"})`;
+    b.style.webkitMaskImage=m; b.style.maskImage=m;
+  }
+  return {fuzzS,fuzzE,fl};
+}
+
+function renderV(keepYear){
+  const cols = buildCols(), lens = soloLens();
+  const HEAD_H = lens ? 60 : 46, minW = lens ? 84 : 92;
+  const totalLanes = cols.reduce((n,c)=>n+c.lanes,0), nEv = cols.filter(c=>c.ev).length;
+  const avail0 = scroller.clientWidth - AXIS_W - cols.length*9 - 2;
+  let evW = 0, evLabels = false;
+  if (nEv){
+    evLabels = (avail0 - totalLanes*22)/nEv >= 100;
+    evW = evLabels ? Math.max(100, Math.min(190, Math.floor((avail0 - totalLanes*27)/nEv))) : 30;
+  }
+  const laneW = Math.max(evLabels?22:27, Math.min(64, Math.floor((avail0 - nEv*evW)/Math.max(1,totalLanes))));
+  const fs = laneW>=44 ? 14 : laneW>=34 ? 13 : 12;
+  const cw = fs*0.47;                        /* average glyph advance, condensed face */
+  const H = Y(NOW)+PAD_B;
+
+  sheet.textContent=""; sheet.style.setProperty("--headh",HEAD_H+"px");
+  const heads = el("div","heads"); heads.style.height=HEAD_H+"px";
+  const corner = el("div","corner","Year"); corner.style.width=AXIS_W+"px"; heads.append(corner);
+  const body = el("div","body"); body.style.height=H+"px";
+  const axis = el("div","axis"); axis.style.width=AXIS_W+"px"; axis.style.height=H+"px";
+  const plot = el("div","plot"); plot.style.height=H+"px";
+
+  /* columns */
+  let x=0;
+  for (const c of cols){
+    const e = c.ev ? evW : 0;
+    c.w = c.lanes ? Math.max(c.lanes*laneW+8+e, minW) : Math.max(e+12, 64);
+    c.lw = c.lanes ? (c.w-8-e)/c.lanes : 0;
+    c.x = x; c.ex = x+4+c.lanes*c.lw+4;
+    c.cvar = c.color ? `var(--c-${c.color})` : "var(--muted)";
+    const h = el("div","head"+(c.color?"":" evhead"),c.name); h.style.width=c.w+"px"; h.style.setProperty("--c",c.color?c.cvar:"var(--line-strong)");
+    if (lens) h.style.fontSize="12px";
+    heads.append(h);
+    const bg = el("div","colbg"); bg.style.left=x+"px"; bg.style.width=c.w+"px"; plot.append(bg);
+    x+=c.w;
+  }
+  plot.style.width=x+"px";
+
+  /* ticks and grid */
+  for (let yr=-3300; yr<=2000; yr+=100){
+    const y=Y(yr), major = yr%500===0, dense = rateAt(yr)*100>=40;
+    const g=el("div","grid"+(major?" major":"")); g.style.top=y+"px"; plot.append(g);
+    if (major||dense){
+      const t=el("div","tick"+(major?" major":""), yr===0?"1 CE":fmt(yr)); t.style.top=y+"px"; axis.append(t);
+    }
+  }
+
+  /* bars */
+  for (const c of cols){
+    for (const it of c.items){
+      const y0=Y(it.s), y1=Y(it.e), h=Math.max(6,y1-y0-1);
+      const b=el("button","bar"+(it.f.includes("c")?" cult":"")); b.type="button";
+      b.style.cssText=`left:${c.x+4+it.lane*c.lw}px;width:${c.lw-2}px;top:${y0}px;height:${h}px;--c:${c.cvar}`;
+      const {fuzzS,fuzzE,fl} = fuzz(b,it,h,"bottom");
+      const room = h-8-(fuzzS?fl*0.6:0)-(fuzzE?fl*0.6:0);
+      const label = it.name.length*cw<=room ? it.name : (it.short.length*cw<=room ? it.short : "");
+      if (label){ const sp=el("span",null,label); sp.style.fontSize=fs+"px"; sp.style.paddingTop=(4+(fuzzS?fl*0.6:0))+"px"; b.append(sp); }
+      b.setAttribute("aria-label",`${it.name}, ${fmt(it.s)} to ${fmt(it.e)}`);
+      b.title=it.name;
+      if (state.sel===it) b.classList.add("sel");
+      b.addEventListener("click",()=>select(it));
+      it.node=b; plot.append(b);
+    }
+  }
+
+  /* dated events */
+  for (const c of cols){
+    if (!c.ev) continue;
+    let lastY=-99, lastBottom=-99, flip=false;
+    const tw=evW-26, cpl=Math.max(6,Math.floor(tw/5.9));
+    for (const p of c.points){
+      const y=Y(p.y);
+      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(el("i"));
+      let dx=0;
+      if (evLabels){
+        if (y-7>=lastBottom){ const sp=el("span",null,p.name); sp.style.width=tw+"px"; b.append(sp); lastBottom=y-7+Math.ceil(p.name.length/cpl)*13+3; }
+      } else if (y-lastY<13){ flip=!flip; dx=flip?13:0; } else flip=false;
+      const rule=el("div","evrule"); rule.style.cssText=`left:${c.x}px;width:${c.ex-c.x+4}px;top:${y}px`; plot.append(rule);
+      b.style.left=(c.ex+dx)+"px"; b.style.top=(y-7)+"px";
+      b.setAttribute("aria-label",`${p.name}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
+      b.addEventListener("click",()=>select(p));
+      p.node=b; plot.append(b); lastY=y;
+    }
+  }
+
+  /* cross-regional bands */
+  if (state.links){
+    for (const ev of EVENTS){
+      const runs=[]; let cur=null;
+      for (const c of cols){
+        if (c.regs.some(id=>ev.r.includes(id))){ if(cur) cur.w=c.x+c.w-cur.x; else {cur={x:c.x,w:c.w}; runs.push(cur);} }
+        else cur=null;
+      }
+      if (!runs.length) continue;
+      const y0=Y(ev.a), h=Math.max(3,Y(ev.b)-y0);
+      for (const run of runs){
+        const d=el("div","band"+(ev.b-ev.a>120?" long":"")); d.style.cssText=`left:${run.x}px;width:${run.w}px;top:${y0}px;height:${h}px`; plot.append(d);
+      }
+      const lab=el("button","bandlab"+(state.sel===ev?" sel":""),ev.n); lab.type="button";
+      lab.style.left=(runs[0].x+3)+"px"; lab.style.top=y0+"px";
+      lab.addEventListener("click",()=>select(ev));
+      ev.node=lab; plot.append(lab);
+    }
+  }
+
+  body.append(axis,plot); sheet.append(heads,body);
+  restore(keepYear);
+}
+
+function restore(keepYear){
+  if (keepYear==null) return;
+  const sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto";
+  const pos=Math.max(0,Y(keepYear)-PAD_T);
+  if (state.horiz) scroller.scrollLeft=pos; else scroller.scrollTop=pos;
+  scroller.style.scrollBehavior=sb;
+}
+
+/* Horizontal: the same chart turned. Time runs left to right, each column becomes a row. */
+function renderH(keepYear){
+  const cols = buildCols(), lens = soloLens();
+  const narrow = scroller.clientWidth < 600;
+  const HEAD_W = narrow ? 96 : (lens ? 132 : 150), AXIS_H = 30;
+  const totalLanes = cols.reduce((n,c)=>n+c.lanes,0), nEv = cols.filter(c=>c.ev).length;
+  const availH = scroller.clientHeight - AXIS_H - cols.length*9 - 2;
+  let lines = 0;
+  if (nEv) lines = Math.max(0, Math.min(4, Math.floor(((availH - totalLanes*20)/nEv - 8)/15)));
+  const evH = nEv ? (lines ? 6 + lines*15 : 26) : 0;
+  const laneH = Math.max(18, Math.min(40, Math.floor((availH - nEv*evH)/Math.max(1,totalLanes))));
+  const fs = laneH>=30 ? 14 : laneH>=24 ? 13 : 12;
+  const cw = fs*0.47;
+  const W = Y(NOW)+PAD_B;
+
+  sheet.textContent=""; sheet.style.setProperty("--headw",HEAD_W+"px");
+  const heads = el("div","heads"); heads.style.height=AXIS_H+"px";
+  const corner = el("div","corner","Year"); corner.style.width=HEAD_W+"px"; heads.append(corner);
+  const haxis = el("div"); haxis.style.cssText=`position:relative;flex:none;width:${W}px;height:${AXIS_H}px`; heads.append(haxis);
+  const body = el("div","body");
+  const rail = el("div","axis"); rail.style.width=HEAD_W+"px";
+  const plot = el("div","plot"); plot.style.width=W+"px";
+
+  /* rows */
+  let y=0;
+  for (const c of cols){
+    const e = c.ev ? evH : 0;
+    c.h = c.lanes ? c.lanes*laneH+8+e : Math.max(e+8, 30);
+    c.lh = c.lanes ? (c.h-8-e)/c.lanes : 0;
+    c.y = y; c.ey = y+4+c.lanes*c.lh+2;
+    c.cvar = c.color ? `var(--c-${c.color})` : "var(--muted)";
+    const h = el("div","rhead"+(c.color?"":" evhead"),c.name);
+    h.style.cssText=`top:${y}px;height:${c.h}px;--c:${c.color?c.cvar:"var(--line-strong)"}`;
+    if (narrow || lens) h.style.fontSize="12px";
+    rail.append(h);
+    const bg = el("div","rowbg"); bg.style.top=y+"px"; bg.style.height=c.h+"px"; plot.append(bg);
+    y+=c.h;
+  }
+  const H = y;
+  body.style.height=H+"px"; rail.style.height=H+"px"; plot.style.height=H+"px";
+
+  /* ticks and grid */
+  for (let yr=-3300; yr<=2000; yr+=100){
+    const x=Y(yr), major = yr%500===0, dense = rateAt(yr)*100>=70;
+    const g=el("div","vgrid"+(major?" major":"")); g.style.left=x+"px"; plot.append(g);
+    if (major||dense){
+      const t=el("div","htick"+(major?" major":""), yr===0?"1 CE":fmt(yr)); t.style.left=x+"px"; haxis.append(t);
+    }
+  }
+
+  /* bars */
+  for (const c of cols){
+    for (const it of c.items){
+      const x0=Y(it.s), x1=Y(it.e), w=Math.max(6,x1-x0-1);
+      const b=el("button","bar"+(it.f.includes("c")?" cult":"")); b.type="button";
+      b.style.cssText=`left:${x0}px;width:${w}px;top:${c.y+4+it.lane*c.lh}px;height:${c.lh-2}px;--c:${c.cvar}`;
+      const {fuzzS,fuzzE,fl} = fuzz(b,it,w,"right");
+      const room = w-8-(fuzzS?fl*0.6:0)-(fuzzE?fl*0.6:0);
+      const label = it.name.length*cw<=room ? it.name : (it.short.length*cw<=room ? it.short : "");
+      if (label){ const sp=el("span",null,label); sp.style.fontSize=fs+"px"; sp.style.paddingLeft=(4+(fuzzS?fl*0.6:0))+"px"; b.append(sp); }
+      b.setAttribute("aria-label",`${it.name}, ${fmt(it.s)} to ${fmt(it.e)}`);
+      b.title=it.name;
+      if (state.sel===it) b.classList.add("sel");
+      b.addEventListener("click",()=>select(it));
+      it.node=b; plot.append(b);
+    }
+  }
+
+  /* dated events: a strip under each row's bars; labels stagger down into free lines */
+  for (const c of cols){
+    if (!c.ev) continue;
+    const ends = new Array(Math.max(1,lines)).fill(-1e9);
+    let lastX=-99, flip=false;
+    for (const p of c.points){
+      const x=Y(p.y);
+      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(el("i"));
+      let line=0;
+      if (lines){
+        const tw = 16 + p.name.length*6.1 + 10;
+        let i = ends.findIndex(e=>x-5>=e);
+        if (i>=0){ const sp=el("span",null,p.name); b.append(sp); ends[i]=x-5+tw; line=i; }
+        else line = ends.indexOf(Math.min(...ends));
+        b.style.top=(c.ey+line*15)+"px";
+      } else {
+        if (x-lastX<13){ flip=!flip; } else flip=false;
+        b.style.top=(c.ey+(flip?11:0))+"px";
+      }
+      const top=parseFloat(b.style.top);
+      const rule=el("div","evrule v"); rule.style.cssText=`left:${x}px;top:${c.y}px;height:${top+6-c.y}px`; plot.append(rule);
+      b.style.left=(x-5)+"px";
+      b.setAttribute("aria-label",`${p.name}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
+      b.addEventListener("click",()=>select(p));
+      p.node=b; plot.append(b); lastX=x;
+    }
+  }
+
+  /* cross-regional bands */
+  if (state.links){
+    for (const ev of EVENTS){
+      const runs=[]; let cur=null;
+      for (const c of cols){
+        if (c.regs.some(id=>ev.r.includes(id))){ if(cur) cur.h=c.y+c.h-cur.y; else {cur={y:c.y,h:c.h}; runs.push(cur);} }
+        else cur=null;
+      }
+      if (!runs.length) continue;
+      const x0=Y(ev.a), w=Math.max(3,Y(ev.b)-x0);
+      for (const run of runs){
+        const d=el("div","band h"+(ev.b-ev.a>120?" long":"")); d.style.cssText=`left:${x0}px;width:${w}px;top:${run.y}px;height:${run.h}px`; plot.append(d);
+      }
+      const lab=el("button","bandlab h"+(state.sel===ev?" sel":""),ev.n); lab.type="button";
+      lab.style.left=(x0+2)+"px"; lab.style.top=(runs[0].y+2)+"px";
+      lab.addEventListener("click",()=>select(ev));
+      ev.node=lab; plot.append(lab);
+    }
+  }
+
+  body.append(rail,plot); sheet.append(heads,body);
+  restore(keepYear);
+}
+
+/* ---------- detail ---------- */
+function showHint(){
+  detail.innerHTML="";
+  detail.append(el("p","hint","Tap a bar, a diamond or an orange label for dates, a line of context and a Wikipedia link."));
+}
+function select(obj){
+  if (state.sel && state.sel.node) state.sel.node.classList.remove("sel");
+  state.sel=obj;
+  if (!obj){ showHint(); return; }
+  if (obj.node) obj.node.classList.add("sel");
+  detail.innerHTML="";
+  const row=el("div","row"), left=el("div");
+  const x=el("button","x","×"); x.type="button"; x.setAttribute("aria-label","Close details"); x.addEventListener("click",()=>select(null));
+  const meta=el("div","meta");
+  if (obj.n){                                   /* event */
+    left.append(el("h2",null,obj.n));
+    const d=el("span"); d.innerHTML=`<b>${obj.b-obj.a<=10?"c. "+fmt(obj.a):fmt(obj.a)+" to "+fmt(obj.b)}</b>`; meta.append(d);
+    meta.append(el("span",null,"Across: "+REG.filter(r=>obj.r.includes(r.id)).map(r=>r.name).join(", ")));
+    left.append(meta, el("p",null,obj.t), wikiLink(BANDWIKI[obj.n]||obj.n));
+  } else if (obj.pt){                            /* dated event */
+    left.append(el("h2",null,obj.name));
+    const d=el("span"); d.innerHTML=`<b>${obj.approx?"c. ":""}${fmt(obj.y)}</b>`; meta.append(d);
+    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(REG.find(r=>r.id===obj.reg).name)); meta.append(tag);
+    left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
+    left.append(wikiLink(obj.w));
+  } else {
+    left.append(el("h2",null,obj.name));
+    const f=obj.f, d=el("span");
+    const s = f.includes("p") ? "before "+fmt(START) : (f.includes("s")?"c. ":"")+fmt(obj.s);
+    const e = obj.e>=NOW ? "present" : (f.includes("e")?"c. ":"")+fmt(obj.e);
+    d.innerHTML=`<b>${s} to ${e}</b>`; meta.append(d);
+    if (!f.includes("p")) meta.append(el("span",null,"about "+(Math.round((obj.e-obj.s)/10)*10).toLocaleString()+" years"));
+    const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(REG.find(r=>r.id===obj.reg).name)); meta.append(tag);
+    left.append(meta, el("p",null,obj.note));
+    const w=[];
+    if (f.includes("c")) w.push("Shown dashed: a culture, period or movement, not a state.");
+    if (f.includes("p")) w.push("Began before this chart starts.");
+    else if (f.includes("s")) w.push("Start date is approximate, traditional or disputed.");
+    if (f.includes("e")) w.push("The end was gradual or its date is approximate.");
+    if (w.length) left.append(el("p","warn",w.join(" ")));
+    const fc=el("p","facets");
+    LENSKEYS.forEach((k,i)=>{ const f1=el("span"); f1.append(LENS[k].name+": ", el("b",null,LENS[k].cats[obj.tags[i]])); fc.append(f1); });
+    left.append(fc);
+    left.append(wikiLink(WIKI[obj.name]||obj.name));
+  }
+  row.append(left,x); detail.append(row);
+}
+
+/* ---------- controls ---------- */
+const chips=$("chips");
+function drawChips(){
+  chips.textContent="";
+  const all=state.active.size===REG.length;
+  const a=el("button","chip","All regions"); a.type="button"; a.setAttribute("aria-pressed",all); a.style.setProperty("--c","var(--muted)");
+  a.addEventListener("click",()=>{state.active=new Set(REG.map(r=>r.id)); refresh();}); chips.append(a);
+  for (const r of REG){
+    const b=el("button","chip"); b.type="button"; b.style.setProperty("--c",`var(--c-${r.id})`);
+    b.append(el("i"), document.createTextNode(r.name));
+    b.setAttribute("aria-pressed", state.active.has(r.id));
+    b.addEventListener("click",()=>{
+      if (state.active.size===REG.length) state.active=new Set([r.id]);
+      else { state.active.has(r.id)?state.active.delete(r.id):state.active.add(r.id); if(!state.active.size) state.active=new Set(REG.map(q=>q.id)); }
+      refresh();
+    });
+    chips.append(b);
+  }
+}
+const lensChips=$("lensChips");
+function drawLens(){
+  const solo = state.active.size===1;
+  document.querySelector(".top").classList.toggle("solo",solo);
+  lensChips.textContent="";
+  if (!solo) return;
+  lensChips.append(el("span","lenslab","Group by"));
+  for (const [k,name] of [["geo","Timeline only"],...LENSKEYS.map(k=>[k,LENS[k].name])]){
+    const b=el("button","chip plain",name); b.type="button"; b.setAttribute("aria-pressed",state.lens===k);
+    b.addEventListener("click",()=>{ state.lens=k; refresh(); });
+    lensChips.append(b);
+  }
+  $("lensNote").textContent = state.lens==="geo" ? "Regroup this region's bars into columns by another dimension." : LENS[state.lens].note+" One label per bar, a judgement call.";
+}
+function topYear(){ return yearAt((state.horiz?scroller.scrollLeft:scroller.scrollTop)+PAD_T); }
+function refresh(){ const y=topYear(); drawChips(); drawLens(); render(y); }
+$("scaleEven").addEventListener("click",()=>setScale(false));
+$("scaleStretch").addEventListener("click",()=>setScale(true));
+function setScale(v){ const y=topYear(); state.stretch=v; $("scaleEven").setAttribute("aria-pressed",!v); $("scaleStretch").setAttribute("aria-pressed",v); render(y); }
+$("zoomIn").addEventListener("click",()=>{ if(state.zoom<ZOOMS.length-1){const y=topYear(); state.zoom++; render(y);} });
+$("zoomOut").addEventListener("click",()=>{ if(state.zoom>0){const y=topYear(); state.zoom--; render(y);} });
+$("linksBtn").addEventListener("click",e=>{ state.links=!state.links; e.currentTarget.setAttribute("aria-pressed",state.links); if(!state.links&&state.sel&&state.sel.n) select(null); render(topYear()); });
+$("evBtn").addEventListener("click",e=>{ state.events=!state.events; e.currentTarget.setAttribute("aria-pressed",state.events); if(!state.events&&state.sel&&state.sel.pt) select(null); render(topYear()); });
+$("jump").addEventListener("change",e=>{ if(e.target.value!==""){ const pos=Math.max(0,Y(+e.target.value)-PAD_T); scroller.scrollTo(state.horiz?{left:pos}:{top:pos}); e.target.value=""; } });
+$("orientV").addEventListener("click",()=>setOrient(false));
+$("orientH").addEventListener("click",()=>setOrient(true));
+function setOrient(h){
+  if (state.horiz===h) return;
+  const y=topYear(); state.horiz=h;
+  try{ localStorage.setItem("wh8-orient",h?"horizontal":"vertical"); }catch(e){}
+  drawOrient();
+  const sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto";
+  scroller.scrollTop=0; scroller.scrollLeft=0; scroller.style.scrollBehavior=sb;
+  render(y);
+}
+function drawOrient(){
+  $("orientV").setAttribute("aria-pressed",!state.horiz); $("orientH").setAttribute("aria-pressed",state.horiz);
+  $("sub").textContent = state.horiz ? "3300 BCE to today. Time runs across, regions run down." : "3300 BCE to today. Time runs down, regions run across.";
+}
+const about=$("about");
+$("aboutBtn").addEventListener("click",()=>{about.classList.add("open"); $("aboutClose").focus();});
+$("aboutClose").addEventListener("click",()=>{about.classList.remove("open"); $("aboutBtn").focus();});
+about.addEventListener("click",e=>{ if(e.target===about) about.classList.remove("open"); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(about.classList.contains("open")) about.classList.remove("open"); else select(null);} });
+let rt; window.addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout(()=>render(topYear()),150); });
+
+drawOrient(); drawChips(); drawLens(); showHint(); render(0);
+</script>
+</body>
+</html>
