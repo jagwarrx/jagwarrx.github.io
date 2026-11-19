@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>World History in Eight Regions</title>
 <link rel="canonical" href="https://hmeyy.com/apps/history/app.html">
+<script>try{const t=localStorage.getItem("wh8-theme"); if(t==="light"||t==="dark") document.documentElement.dataset.theme=t;}catch(e){}</script>
 <style>
 @font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
 @font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
@@ -66,34 +67,102 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 button,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-/* ---------- top strip ---------- */
-.top{flex:none;background:var(--surface);border-bottom:1px solid var(--line);padding:10px 16px 8px;display:flex;flex-direction:column;gap:8px}
-.titleRow{display:flex;align-items:baseline;gap:12px;justify-content:space-between}
-h1{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1;margin:0;text-wrap:balance;letter-spacing:.01em}
-.sub{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+/* ---------- top bar ---------- */
+.top{flex:none;height:52px;background:var(--surface);border-bottom:1px solid var(--line-strong);padding:0 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:25}
+.brand{flex:none;min-width:0}
+h1{font-family:var(--display);font-weight:700;font-size:19px;line-height:1.1;margin:0;letter-spacing:.01em;white-space:nowrap}
+.sub{font-size:12px;color:var(--muted);margin:1px 0 0;white-space:nowrap}
 .btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:5px 10px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
 .btn:hover{border-color:var(--ink)}
-.btn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-.strip::-webkit-scrollbar{display:none}
-.chip{flex:none;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--line-strong);border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;white-space:nowrap}
-.chip i{width:9px;height:9px;border-radius:2px;background:var(--c)}
-.chip[aria-pressed="false"]{opacity:.5}
-.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 14%,var(--surface))}
-.tools{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}
-.tools::-webkit-scrollbar{display:none}
-.tools>*{flex:none}
+.btn[aria-pressed="true"],.btn[aria-expanded="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.showb{display:none}
+body.nopanel .showb{display:inline-flex}
+.search{position:relative;flex:1;max-width:460px;min-width:110px;margin-left:6px}
+.search input{width:100%;height:34px;border:1px solid var(--line-strong);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 30px 0 32px;font:inherit;font-size:14px}
+.search input::placeholder{color:var(--muted)}
+.search>svg{position:absolute;left:10px;top:9px;width:16px;height:16px;color:var(--muted);pointer-events:none}
+.search kbd{position:absolute;right:8px;top:8px;font:12px/16px var(--label);color:var(--muted);border:1px solid var(--line-strong);border-radius:4px;padding:0 5px;pointer-events:none}
+.search input:focus+kbd{display:none}
+.qres{position:absolute;left:0;right:0;top:39px;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.18);max-height:min(440px,70vh);overflow:auto;display:none;padding:4px;z-index:50;min-width:280px}
+.qres.open{display:block}
+.qr{display:flex;gap:9px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;padding:6px 8px;border-radius:6px;cursor:pointer}
+.qr[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.qr>i{flex:none;width:9px;height:9px;border-radius:2px;margin-top:5px;background:var(--c,var(--muted))}
+.qr .ico{margin-top:1px}
+.qr b{display:block;font-weight:600;font-size:14px;line-height:1.25}
+.qr small{display:block;font-size:12px;color:var(--muted);line-height:1.3}
+.qnone{padding:8px;font-size:13px;color:var(--muted)}
+.tbtools{display:flex;gap:6px;align-items:center;margin-left:auto}
+.moreb{display:none;margin-left:auto}
 .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
 .seg button{border:0;background:transparent;padding:5px 9px;font-size:13px;cursor:pointer}
 .seg button+button{border-left:1px solid var(--line-strong)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
-select.btn{padding-right:6px}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
-.legend span{display:inline-flex;align-items:center;gap:5px}
+/* key popover */
+.pop{position:fixed;top:58px;right:14px;z-index:40;background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:12px 14px 14px;width:min(380px,calc(100vw - 28px));display:none}
+.pop.open{display:block}
+.pop .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pop h2{font-family:var(--display);font-size:17px;margin:0}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:13.5px}
+.legend span{display:flex;align-items:center;gap:9px}
+.legend .kc{flex:none;width:58px;display:flex;justify-content:center;align-items:center;gap:2px}
+.legend .kc .ico{width:15px;height:15px}
 .key{width:22px;height:11px;border-radius:2px;display:inline-block;border:1px solid var(--muted);background:color-mix(in srgb,var(--muted) 30%,var(--surface))}
 .key.fade{-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
 .key.cult{border-style:dashed;background:color-mix(in srgb,var(--muted) 10%,var(--surface))}
-.key.link{border:0;border-top:2px solid var(--accent);border-radius:0;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 28%,transparent) 0 4px,transparent 4px 8px)}
+.key.link{border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,transparent) 0 4px,transparent 4px 8px)}
+.key.yr{width:3px;height:16px;border:0;border-radius:1px;background:#e0262b}
+.legend .ovk{border-radius:50%;background:color-mix(in srgb,var(--muted) 14%,var(--surface));box-shadow:0 0 0 1px var(--line-strong)}
+.legend .ovk img{width:78%;height:78%;margin:11%}
+.keyfoot{margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+
+/* ---------- three columns: Show panel, chart with time bar, map and detail ---------- */
+.app{flex:1;min-height:0;display:grid;grid-template-columns:236px minmax(0,1fr) 360px}
+body.nopanel .app{grid-template-columns:minmax(0,1fr) 360px}
+body.nopanel .panel{display:none}
+body.wide .app{grid-template-columns:236px minmax(0,1fr) 560px}
+body.nopanel.wide .app{grid-template-columns:minmax(0,1fr) 560px}
+.center{display:flex;flex-direction:column;min-width:0;min-height:0}
+.scrim{display:none}
+
+/* Show panel */
+.panel{background:var(--surface);border-right:1px solid var(--line-strong);overflow:auto;padding:10px 10px 18px 12px;display:flex;flex-direction:column;gap:16px;min-height:0;overscroll-behavior:contain}
+.phead{display:flex;align-items:center;justify-content:space-between}
+.phead b{font-family:var(--display);font-size:17px}
+.grp{display:flex;flex-direction:column;gap:1px}
+.ghead{display:flex;align-items:baseline;gap:10px;margin:0 0 3px 4px}
+.ghead h2{font-family:var(--display);font-weight:700;font-size:14.5px;margin:0;margin-right:auto}
+.ghead h3{font-family:var(--display);font-weight:600;font-size:13.5px;margin:0}
+.ghead .cnt{font-size:12px;color:var(--muted);margin-right:auto}
+.ghead.sub{margin-top:8px}
+.lk{border:0;background:none;padding:0;font:inherit;font-size:12.5px;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.lk:disabled{color:var(--muted);text-decoration:none;cursor:default}
+.crow{display:flex;align-items:center;gap:4px;min-height:28px;border-radius:6px;padding:0 2px 0 4px;font-size:13.5px}
+.crow:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.crow label{display:flex;align-items:center;gap:7px;flex:1;min-width:0;cursor:pointer;line-height:1.2;padding:4px 0}
+.crow input{margin:0;width:15px;height:15px;accent-color:var(--ink);flex:none;cursor:pointer}
+.crow .sw{flex:none;width:10px;height:10px;border-radius:2px;background:var(--c)}
+.crow .ico{width:16px;height:16px}
+.crow .mk{flex:none;width:18px;display:flex;justify-content:center}
+.crow .mk .key{width:16px}
+.crow.dis{color:var(--muted)}
+.crow.dis label{cursor:default}
+.only{flex:none;opacity:0;border:1px solid var(--line-strong);background:var(--surface);border-radius:5px;font-size:11.5px;line-height:1.3;padding:1px 6px;cursor:pointer}
+.crow:hover .only,.only:focus-visible{opacity:1}
+@media (hover:none){ .only{opacity:1} }
+.caret{flex:none;width:24px;height:24px;border:0;background:none;padding:0;border-radius:4px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.caret svg{width:12px;height:12px;transition:transform .15s}
+.caret[aria-expanded="true"] svg{transform:rotate(90deg)}
+.caret:hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.caret:disabled{opacity:.35;cursor:default;background:none}
+.hintline{font-size:12px;color:var(--muted);margin:3px 4px 0;line-height:1.35}
+.vrow{display:flex;flex-direction:column;gap:4px;margin:2px 4px 8px}
+.vrow>span{font-size:12.5px;color:var(--muted)}
+.vrow .seg{display:flex}
+.vrow .seg button{flex:1;padding:5px 4px}
+.gbsel{width:100%;height:30px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);padding:0 6px;font:inherit;font-size:13px}
+.gbsel:disabled{color:var(--muted)}
+.gblab{display:block;font-size:12.5px;color:var(--muted);margin:10px 4px 4px}
 
 /* ---------- chart ---------- */
 .scroller{flex:1;min-height:0;overflow:auto;background:var(--bg);overscroll-behavior:contain}
@@ -117,7 +186,7 @@ select.btn{padding-right:6px}
 .bar:hover{background:color-mix(in srgb,var(--c) 44%,var(--surface))}
 .bar.sel{outline:2px solid var(--accent);outline-offset:1px;z-index:2;background:color-mix(in srgb,var(--c) 48%,var(--surface))}
 .bar span{position:sticky;top:calc(var(--headh,46px) + 4px);writing-mode:vertical-rl;font-family:var(--label);font-weight:500;white-space:nowrap;color:var(--ink);pointer-events:none;letter-spacing:.01em}
-.band{position:absolute;z-index:3;pointer-events:none;border-top:2px solid var(--accent);
+.band{position:absolute;z-index:3;pointer-events:none;
   background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 16%,transparent) 0 5px,transparent 5px 10px)}
 .band.long{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 8%,transparent) 0 5px,transparent 5px 10px)}
 .bandlab{position:absolute;z-index:3;transform:translateY(-100%);background:var(--surface);border:1px solid var(--accent);border-bottom:0;border-radius:4px 4px 0 0;
@@ -134,7 +203,7 @@ select.btn{padding-right:6px}
 .ev .ico{margin-top:-2px}
 .ev:hover .ico{transform:scale(1.35)}
 .ev.sel .ico{transform:scale(1.35);filter:drop-shadow(0 0 1.5px var(--accent)) drop-shadow(0 0 1.5px var(--accent))}
-.legend .ico{width:14px;height:14px}
+.legend .ico{width:16px;height:16px}
 .legend .icos{display:inline-flex;gap:3px}
 .bandlab .ico{width:12px;height:12px;margin:-2px 4px 0 0;vertical-align:middle}
 .wartag{display:inline-flex;align-items:center;gap:5px}
@@ -143,16 +212,9 @@ select.btn{padding-right:6px}
 .ev.l1 span{font-weight:600}
 .evrule{position:absolute;height:0;border-top:1px dotted var(--line-strong);z-index:0}
 .key.dia{width:9px;height:9px;border-radius:0;transform:rotate(45deg);background:var(--ink);border:0;margin:0 3px}
-.lensrow{display:none;flex-direction:column;gap:4px}
-.top.solo .lensrow{display:flex}
-.lenslab{flex:none;align-self:center;font-size:13px;color:var(--muted);font-family:var(--label);font-weight:600}
-.lensnote{margin:0;font-size:11.5px;color:var(--muted)}
-.chip.plain[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.chip.plain[aria-pressed="false"]{opacity:1}
 .head.evhead{border-top-color:var(--line-strong);color:var(--muted)}
 .facets{margin:6px 0 0;font-size:12.5px;color:var(--muted);max-width:75ch;display:flex;flex-wrap:wrap;gap:2px 14px}
 .facets b{font-weight:600;color:var(--ink)}
-@media (max-width:699px){ .top.solo .legend{display:none} }
 
 /* ---------- horizontal: time runs across, regions are rows ---------- */
 .htick{position:absolute;bottom:0;height:100%;padding:0 0 5px 4px;border-left:1px solid var(--line-strong);display:flex;align-items:flex-end;
@@ -176,13 +238,6 @@ select.btn{padding-right:6px}
 .ev.ov .ico{border-radius:50%;background:color-mix(in srgb,var(--lc) 18%,var(--surface));box-shadow:0 0 0 1px color-mix(in srgb,var(--lc) 55%,transparent)}
 .life{position:absolute;z-index:1;height:2px;border-radius:1px;background:var(--lc);opacity:.4;pointer-events:none}
 .life.v{height:auto;width:2px}
-.layers{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.layers::-webkit-scrollbar{display:none}
-.layers>*{flex:none}
-.layerlab{font-size:12.5px;color:var(--muted);margin-right:2px}
-.chip.layer .ico{width:15px;height:15px}
-.chip.layer[aria-pressed="false"]{opacity:.62}
-.chip.layer[aria-pressed="true"]{background:color-mix(in srgb,var(--lc) 16%,var(--surface));border-color:var(--lc)}
 .links{position:absolute;left:0;top:0;pointer-events:none;z-index:3;overflow:visible}
 .links path{fill:none;stroke-width:1.7;stroke-linecap:round;opacity:.8}
 .links path.head{stroke:none;opacity:.9}
@@ -194,47 +249,21 @@ select.btn{padding-right:6px}
 .sheet.horiz .bar span{writing-mode:horizontal-tb;top:auto;left:calc(var(--headw,136px) + 4px);line-height:1}
 .sheet.horiz .ev span{white-space:nowrap}
 .evrule.v{height:auto;width:0;border-top:0;border-left:1px dotted var(--line-strong)}
-.band.h{border-top:0;border-left:2px solid var(--accent)}
 .bandlab.h{transform:none;border:1px solid var(--accent);border-left:0;border-radius:0 4px 4px 0}
 .wiki{display:inline-block;margin-top:7px;font-size:13.5px;font-weight:500;color:var(--accent);text-underline-offset:2px}
 
-/* ---------- detail strip ---------- */
-.detail{flex:none;background:var(--surface);border-top:1px solid var(--line-strong);padding:10px 16px 12px;max-height:42%;overflow:auto}
-.detail .row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
-.detail h2{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.15;margin:0;text-wrap:balance}
-.meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted);margin:3px 0 5px;font-variant-numeric:tabular-nums}
-.meta b{color:var(--ink);font-weight:600}
-.tag{display:inline-flex;align-items:center;gap:5px}
-.tag i{width:9px;height:9px;border-radius:2px;background:var(--c)}
-.detail p{margin:0;max-width:65ch;font-size:14px}
-.detail .warn{margin-top:5px;font-size:12.5px;color:var(--muted)}
-.hint{color:var(--muted);font-size:13.5px}
-.detail .txt{flex:1;min-width:0}
-.pic{flex:none;display:block;width:180px;height:128px;border-radius:6px;overflow:hidden;background:var(--line);border:1px solid var(--line)}
-.pic img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}
-.pic.ready img{opacity:1}
-@media (max-width:599px){ .pic{width:96px;height:72px} }
-.x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
-
-/* ---------- map of borders, bottom left ---------- */
-.bottom{flex:none;display:flex;background:var(--surface);border-top:1px solid var(--line-strong);height:330px}
-.bottom.nomap{height:auto}
-.bottom.nomap .mappane{display:none}
-.bottom .detail{flex:1;min-width:0;border-top:0;max-height:none;height:100%}
-.bottom.nomap .detail{max-height:42vh;height:auto}
-.mappane{flex:none;width:min(500px,48vw);display:flex;flex-direction:column;gap:3px;padding:6px 10px 5px;border-right:1px solid var(--line-strong);min-height:0}
-.mhead{display:flex;align-items:baseline;gap:8px;font-size:12.5px;color:var(--muted);flex:none}
-.mhead b{font-family:var(--display);font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
-.mtools{margin-left:auto;display:flex;gap:4px;align-self:center}
-.mb{background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:2px 8px;font-size:12px;line-height:1.35;cursor:pointer;white-space:nowrap}
-.mb:hover{border-color:var(--ink)}
-.mb[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.mapwrap{position:relative;flex:1;min-height:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:grab;touch-action:none}
-.mapwrap.panning{cursor:grabbing}
-.mapwrap.boxing{cursor:crosshair}
-.mapwrap canvas{display:block;width:100%;height:100%}
-.mtip{position:absolute;display:none;pointer-events:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:4px;padding:2px 7px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.boxsel{position:absolute;display:none;pointer-events:none;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+/* ---------- time bar, under the chart ---------- */
+.timebar{flex:none;background:var(--surface);border-top:1px solid var(--line-strong);padding:5px 12px 6px;display:flex;flex-direction:column;gap:2px}
+.trow{display:flex;align-items:center;gap:6px}
+.tyear{flex:none;min-width:96px;display:flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tyear::before{content:"";width:4px;height:20px;border-radius:2px;background:#e0262b}
+.ib{flex:none;width:30px;height:30px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
+.ib svg{width:14px;height:14px}
+.ib:hover{border-color:var(--ink)}
+.ib[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.trow .slider{flex:1;min-width:0}
+.zoomgrp{flex:none;display:flex;align-items:center;gap:4px;margin-left:4px}
+.zread{font-size:12px;color:var(--muted);min-width:118px;text-align:center;font-variant-numeric:tabular-nums;line-height:1.2;white-space:nowrap}
 .slider{position:relative;flex:none;height:34px;cursor:pointer;touch-action:none;border-radius:4px}
 .slider .track{position:absolute;left:10px;right:10px;top:9px;height:4px;border-radius:2px;background:var(--line-strong)}
 .thumb{position:absolute;top:1px;width:5px;height:20px;margin-left:-2.5px;border-radius:2px;background:#e0262b;box-shadow:0 0 0 1.5px var(--surface);pointer-events:none}
@@ -243,22 +272,92 @@ select.btn{padding-right:6px}
 .sticks .tk::before{content:"";position:absolute;left:50%;top:-7px;height:5px;border-left:1px solid var(--muted)}
 .ovrow{display:flex;align-items:center;gap:8px;flex:none;font-size:11.5px;color:var(--muted)}
 .ovlab{flex:none;min-width:96px;font-variant-numeric:tabular-nums}
-.overview{position:relative;flex:1;height:16px;border-radius:3px;background:var(--line);cursor:crosshair;touch-action:none;overflow:hidden}
+.overview{position:relative;flex:1;height:14px;border-radius:3px;background:var(--line);cursor:crosshair;touch-action:none;overflow:hidden}
 .ovhint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--muted);pointer-events:none}
 .ovhint[hidden]{display:none}
 .ovwin{position:absolute;top:0;bottom:0;display:none;background:color-mix(in srgb,var(--accent) 22%,transparent);border:1px solid var(--accent);border-radius:3px;pointer-events:none}
 .ovthumb{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#e0262b;pointer-events:none}
-.msrc{margin:0;flex:none;font-size:10.5px;color:var(--muted)}
-.msrc a{color:inherit}
 .yearline{position:absolute;z-index:4;background:#e0262b;pointer-events:none;opacity:.85}
-@media (max-width:699px){
-  .bottom{flex-direction:column;height:auto}
-  .mappane{width:auto;height:290px;border-right:0;border-bottom:1px solid var(--line)}
-  .bottom .detail{max-height:30vh;height:auto}
-}
+.yflag{position:absolute;z-index:3;background:#e0262b;color:#fff;font-family:var(--label);font-weight:600;font-size:11.5px;line-height:1;padding:3px 5px;border-radius:3px;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.yflag.h{top:3px;transform:translateX(-50%)}
+.yflag.v{left:3px;right:3px;text-align:center;transform:translateY(-50%);padding:3px 2px}
+
+/* ---------- right column: map, then This moment or the detail card ---------- */
+.side{background:var(--surface);border-left:1px solid var(--line-strong);display:flex;flex-direction:column;min-height:0;min-width:0}
+.mappane{flex:none;height:min(330px,46%);display:flex;flex-direction:column;gap:4px;padding:7px 10px 6px;border-bottom:1px solid var(--line-strong);min-height:0}
+body.wide .mappane{height:min(520px,62%)}
+.side.nomap .mappane{height:auto}
+.side.nomap .mapwrap,.side.nomap .msrc,.side.nomap .mapt{display:none}
+.mhead{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex:none;min-height:24px}
+.mhead b{font-family:var(--display);font-size:15px;color:var(--ink)}
+.asof{position:absolute;left:6px;bottom:6px;z-index:1;pointer-events:none;background:color-mix(in srgb,var(--surface) 88%,transparent);border-radius:4px;padding:1px 6px;font-size:11.5px;color:var(--ink)}
+.mtools{margin-left:auto;display:flex;gap:4px;align-items:center;flex:none}
+.mb{background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:2px 8px;font-size:12px;line-height:1.35;cursor:pointer;white-space:nowrap}
+.mb:hover{border-color:var(--ink)}
+@media (max-width:1099px){ #mapBig{display:none} }
+.mb[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.mapt{opacity:.0;transition:opacity .12s}
+.mappane:hover .mapt,.mapt:focus-visible,.mapt[aria-pressed="true"]{opacity:1}
+@media (hover:none){ .mapt{opacity:1} }
+.mapwrap{position:relative;flex:1;min-height:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:grab;touch-action:none}
+.mapwrap.panning{cursor:grabbing}
+.mapwrap.boxing{cursor:crosshair}
+.mapwrap canvas{display:block;width:100%;height:100%}
+.mtip{position:absolute;display:none;pointer-events:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:4px;padding:2px 7px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.boxsel{position:absolute;display:none;pointer-events:none;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.msrc{margin:0;flex:none;font-size:10.5px;color:var(--muted);line-height:1.3}
+.msrc a{color:inherit}
+
+.detail{flex:1;min-height:0;overflow:auto;padding:12px 14px 18px;overscroll-behavior:contain}
+.detail .row{position:relative;display:flex;flex-direction:column;gap:10px}
+.detail .x{position:absolute;right:0;top:0;background:var(--surface)}
+.detail h2{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.1;margin:0;padding-right:38px;text-wrap:balance}
+.kicker{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12.5px;color:var(--muted);margin:0 38px 3px 0}
+.meta{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:13px;color:var(--muted);margin:4px 0 6px;font-variant-numeric:tabular-nums}
+.meta b{color:var(--ink);font-weight:600;font-size:14px}
+.tag{display:inline-flex;align-items:center;gap:5px}
+.tag i{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.detail p{margin:0;font-size:14px;line-height:1.45}
+.detail .warn{margin-top:6px;font-size:12.5px;color:var(--muted)}
+.hint{color:var(--muted);font-size:13.5px}
+.detail .txt{min-width:0}
+.pic{display:block;width:100%;height:150px;border-radius:6px;overflow:hidden;background:var(--line);border:1px solid var(--line)}
+.pic img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}
+.pic.ready img{opacity:1}
+body.wide .pic{height:220px}
+.x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
+.facets{margin:10px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px;font-size:12.5px;color:var(--muted)}
+.facets b{font-weight:600;color:var(--ink)}
+.ctx h3{font-family:var(--body);font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--ink)}
+.pills{display:flex;flex-wrap:wrap;gap:5px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border:1px solid var(--line-strong);border-radius:999px;font-size:12.5px;line-height:1.3;background:var(--surface);cursor:pointer;text-align:left}
+.pill:hover{border-color:var(--ink)}
+.pill i{flex:none;width:8px;height:8px;border-radius:2px;background:var(--c)}
+.nav2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.navb{border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);padding:5px 8px;text-align:left;cursor:pointer;font-size:12.5px;line-height:1.25;min-width:0}
+.navb:hover:not(:disabled){border-color:var(--ink)}
+.navb small{display:block;color:var(--muted);font-size:11.5px}
+.navb span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.navb:disabled{opacity:.45;cursor:default}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}
+.wiki{display:inline-block;font-size:13.5px;font-weight:500;color:var(--accent);text-underline-offset:2px}
+/* This moment */
+.moment h2{padding-right:0}
+.msub{font-size:12.5px;color:var(--muted);margin:3px 0 8px!important}
+.mband{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 6px}
+.mrow{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--line)}
+.mrow>i{flex:none;width:3px;border-radius:2px;background:var(--c)}
+.mr{flex:1;min-width:0}
+.mr>b{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:1px}
+.mnames{font-size:13.5px;line-height:1.4}
+.mname{border:0;background:none;padding:0;font:inherit;color:var(--ink);cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.mname:hover{text-decoration-color:var(--ink)}
+.mnone{color:var(--muted);font-size:13px}
+.mev{font-size:12.5px;color:var(--muted);margin-top:2px}
+.mev .mname{color:var(--muted)}
 
 /* ---------- about overlay ---------- */
-.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px);z-index:20;display:none;align-items:flex-end;justify-content:center;padding:16px}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px);z-index:60;display:none;align-items:flex-end;justify-content:center;padding:16px}
 .overlay.open{display:flex}
 .card{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;max-width:620px;width:100%;max-height:100%;overflow:auto;padding:16px 18px 18px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
 .card h2{font-family:var(--display);font-size:19px;margin:0 0 2px}
@@ -266,92 +365,152 @@ select.btn{padding-right:6px}
 .card ul{margin:0;padding-left:18px}
 .card li{margin:4px 0;font-size:14px}
 .card p{font-size:14px;margin:6px 0}
-@media (min-width:700px){
-  .overlay{align-items:center}
-  h1{font-size:24px}
-}
+@media (min-width:700px){ .overlay{align-items:center} }
 @media (prefers-reduced-motion:no-preference){ .scroller{scroll-behavior:smooth} }
+
+/* ---------- narrower screens: the Show panel slides in over the chart ---------- */
+@media (max-width:1099px){
+  .showb{display:inline-flex}
+  .app,body.nopanel .app{grid-template-columns:minmax(0,1fr) 320px}
+  body.wide .app,body.nopanel.wide .app{grid-template-columns:minmax(0,1fr) 480px}
+  .panel,body.nopanel .panel{display:flex;position:fixed;left:0;top:52px;bottom:0;width:min(300px,86vw);z-index:31;box-shadow:0 10px 40px rgba(0,0,0,.25);transform:translateX(-105%);visibility:hidden;transition:transform .18s,visibility .18s}
+  body.panelopen .panel{transform:none;visibility:visible}
+  body.panelopen .scrim{display:block;position:fixed;left:0;right:0;top:52px;bottom:0;z-index:30;background:color-mix(in srgb,var(--bg) 55%,transparent)}
+  .zread{min-width:0}
+}
+/* ---------- phone: chart first, the right column becomes a sheet underneath ---------- */
+@media (max-width:759px){
+  .top{gap:8px;padding:0 10px}
+  h1{font-size:16px}
+  .h1r{display:none}
+  .search{min-width:0}
+  .sub{display:none}
+  .search{margin-left:0}
+  .search kbd{display:none}
+  .moreb{display:inline-flex}
+  .tbtools{display:none;position:absolute;right:8px;top:48px;flex-direction:column;align-items:stretch;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:45}
+  .tbtools.open{display:flex}
+  .app,body.nopanel .app,body.wide .app{display:flex;flex-direction:column}
+  .center{flex:1;min-height:0}
+  .side{flex:none;max-height:40vh;border-left:0;border-top:1px solid var(--line-strong)}
+  .side:not(.nomap){max-height:56vh}
+  .mappane,body.wide .mappane{height:210px}
+  .zread{display:none}
+  .tyear{min-width:0;font-size:16px}
+  .timebar{padding:4px 8px 5px}
+  .ovlab{min-width:0}
+  .pic{height:120px}
+}
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div class="titleRow">
-    <div>
-      <h1>World History in Eight Regions</h1>
-      <p class="sub" id="sub">3300 BCE to today. Time runs across, regions run down.</p>
-    </div>
-    <button class="btn" id="aboutBtn" type="button">About this chart</button>
+  <button class="btn showb" id="showBtn" type="button" aria-controls="panel">Show</button>
+  <div class="brand">
+    <h1>World History<span class="h1r"> in Eight Regions</span></h1>
+    <p class="sub">3300 BCE to today, eight regions side by side</p>
   </div>
-  <div class="strip" id="chips" role="group" aria-label="Regions shown"></div>
-  <div class="lensrow" id="lensRow">
-    <div class="strip" id="lensChips" role="group" aria-label="Group this region by"></div>
-    <p class="lensnote" id="lensNote"></p>
+  <div class="search" role="search">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.4 10.4L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search states, people, events or a year" aria-label="Search states, people, events or a year" role="combobox" aria-expanded="false" aria-controls="qres" aria-autocomplete="list">
+    <kbd>/</kbd>
+    <div class="qres" id="qres" role="listbox" aria-label="Search results"></div>
   </div>
-  <div class="tools">
-    <div class="seg" role="group" aria-label="Orientation">
-      <button type="button" id="orientH" aria-pressed="true">Horizontal</button>
-      <button type="button" id="orientV" aria-pressed="false">Vertical</button>
-    </div>
-    <div class="seg" role="group" aria-label="Time scale">
-      <button type="button" id="scaleEven" aria-pressed="true">Even scale</button>
-      <button type="button" id="scaleStretch" aria-pressed="false">Stretch recent</button>
-    </div>
-    <div class="seg" role="group" aria-label="Zoom">
-      <button type="button" id="zoomOut" aria-label="Zoom out" title="Zoom out: fewer, bigger events">−</button>
-      <button type="button" id="zoomIn" aria-label="Zoom in" title="Zoom in: more events">+</button>
-    </div>
-    <button class="btn" type="button" id="evBtn" aria-pressed="true">Events</button>
-    <button class="btn" type="button" id="linksBtn" aria-pressed="true">Cross-regional bands</button>
-    <button class="btn" type="button" id="mapBtn" aria-pressed="true" title="Show or hide the map of borders">Map</button>
-    <select class="btn" id="jump" aria-label="Jump to a date">
-      <option value="">Jump to…</option>
-      <option value="-3300">3300 BCE</option>
-      <option value="-2000">2000 BCE</option>
-      <option value="-1200">1200 BCE</option>
-      <option value="-500">500 BCE</option>
-      <option value="1">1 CE</option>
-      <option value="600">600 CE</option>
-      <option value="1200">1200 CE</option>
-      <option value="1500">1500 CE</option>
-      <option value="1800">1800 CE</option>
-    </select>
-  </div>
-  <div class="layers" id="layerRow" role="group" aria-label="Overlays and sections"></div>
-  <div class="legend" aria-hidden="true">
-    <span><i class="key"></i>state, firm dates</span>
-    <span><i class="key fade"></i>faded end: date uncertain or gradual</span>
-    <span><i class="key cult"></i>culture or movement, not a state</span>
-    <span id="legendIcons"></span>
-    <span><i class="key link"></i>event across regions</span>
+  <button class="btn moreb" id="moreBtn" type="button" aria-expanded="false" aria-controls="tbtools">Menu</button>
+  <div class="tbtools" id="tbtools">
+    <button class="btn" id="shareBtn" type="button" title="Copy a link to this view: year, regions, layers and detail">Share view</button>
+    <button class="btn" id="keyBtn" type="button" aria-expanded="false" aria-controls="keyPop">Key</button>
+    <button class="btn" id="themeBtn" type="button" title="Switch between light, dark and your system's setting">Theme: Auto</button>
+    <button class="btn" id="aboutBtn" type="button">About</button>
   </div>
 </header>
 
-<main class="scroller" id="scroller" tabindex="0" aria-label="Timeline chart">
-  <div class="sheet" id="sheet"></div>
-</main>
+<div class="pop" id="keyPop" role="dialog" aria-labelledby="keyTitle">
+  <div class="row"><h2 id="keyTitle">Key</h2><button class="x" id="keyClose" type="button" aria-label="Close the key">×</button></div>
+  <div class="legend" id="legend">
+    <span><span class="kc"><i class="key"></i></span>A state, with firm dates</span>
+    <span><span class="kc"><i class="key fade"></i></span>Faded end: the date is uncertain or the change was gradual</span>
+    <span><span class="kc"><i class="key cult"></i></span>A culture or movement, not a state</span>
+    <span id="legendIcons"></span>
+    <span><span class="kc"><i class="key link"></i></span>Shared event: something that crossed regions</span>
+    <span><span class="kc"><i class="key yr"></i></span>The red line: the year shown on the map and in This moment</span>
+  </div>
+  <p class="keyfoot">Tap anything on the chart for its dates, a picture and a link to read more.</p>
+</div>
 
-<div class="bottom" id="bottom">
-  <section class="mappane" id="mapPane" aria-label="Map of borders">
-    <div class="mhead">
-      <b id="mapYear">1500 CE</b><span id="mapAsOf"></span>
-      <span class="mtools">
-        <button type="button" class="mb" id="mapBox" aria-pressed="false" title="Drag a box on the map to zoom into it. Shift and drag also works.">Zoom to area</button>
-        <button type="button" class="mb" id="mapOut" aria-label="Zoom the map out">−</button>
-        <button type="button" class="mb" id="mapIn" aria-label="Zoom the map in">+</button>
-        <button type="button" class="mb" id="mapFit" title="Fit the selected regions">Fit</button>
-      </span>
+<div class="app" id="app">
+  <aside class="panel" id="panel" aria-label="What to show">
+    <div class="phead"><b>Show</b><button class="mb" id="panelHide" type="button" aria-label="Hide the Show panel">Hide</button></div>
+    <section class="grp" aria-labelledby="gReg">
+      <div class="ghead"><h2 id="gReg">Regions</h2><button class="lk" id="regAll" type="button">All</button><button class="lk" id="unfoldAll" type="button">Unfold all</button></div>
+      <div id="regRows"></div>
+      <label class="gblab" for="groupBy">Group by</label>
+      <select class="gbsel" id="groupBy"></select>
+      <p class="hintline" id="groupHint"></p>
+    </section>
+    <section class="grp" aria-labelledby="gLay">
+      <div class="ghead"><h2 id="gLay">Layers</h2></div>
+      <div id="layerRows"></div>
+      <div class="ghead sub"><h3>Overlays</h3><span class="cnt" id="ovCount"></span><button class="lk" id="ovAll" type="button">All</button><button class="lk" id="ovNone" type="button">None</button></div>
+      <div id="ovRows"></div>
+    </section>
+    <section class="grp" aria-labelledby="gView">
+      <div class="ghead"><h2 id="gView">View</h2></div>
+      <div class="vrow"><span id="lOr">Layout</span>
+        <div class="seg" role="group" aria-labelledby="lOr"><button type="button" id="orientH" aria-pressed="true" title="Time runs across, one row per region">Across</button><button type="button" id="orientV" aria-pressed="false" title="Time runs down, one column per region">Down</button></div></div>
+      <div class="vrow"><span id="lSc">Time scale</span>
+        <div class="seg" role="group" aria-labelledby="lSc"><button type="button" id="scaleEven" aria-pressed="true" title="Every century gets the same room">Even</button><button type="button" id="scaleStretch" aria-pressed="false" title="The last five centuries get three times the room">Stretch recent</button></div></div>
+      <div class="vrow"><span id="lDe">Detail</span>
+        <div class="seg" role="group" aria-labelledby="lDe"><button type="button" id="det1" aria-pressed="false" title="Only the major events and items. Key 1">Major</button><button type="button" id="det2" aria-pressed="true" title="Major and notable. Key 2">Notable</button><button type="button" id="det3" aria-pressed="false" title="Everything. Key 3">All</button></div></div>
+      <p class="hintline" id="detHint"></p>
+    </section>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="center">
+    <main class="scroller" id="scroller" tabindex="0" aria-label="Timeline chart">
+      <div class="sheet" id="sheet"></div>
+    </main>
+    <div class="timebar" id="timebar" aria-label="Time">
+      <div class="trow">
+        <span class="tyear" id="mapYear" aria-live="polite">1500 CE</span>
+        <button class="ib" id="prevEv" type="button" aria-label="Previous event" title="Previous event"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="ib" id="playBtn" type="button" aria-pressed="false" aria-label="Play through time" title="Play through time"></button>
+        <button class="ib" id="nextEv" type="button" aria-label="Next event" title="Next event"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="slider" id="slider" role="slider" tabindex="0" aria-label="Year"><div class="track"></div><div class="sticks" id="sliderTicks"></div><div class="thumb" id="thumb"></div></div>
+        <div class="zoomgrp" role="group" aria-label="Zoom">
+          <button class="ib" type="button" id="zoomOut" aria-label="Zoom out" title="Zoom out"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <span class="zread" id="zread"></span>
+          <button class="ib" type="button" id="zoomIn" aria-label="Zoom in" title="Zoom in"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+      <div class="ovrow">
+        <span class="ovlab" id="rangeLab">All time</span>
+        <div class="overview" id="overview" title="Drag to pick a range of years for the slider. Click to jump."><span class="ovhint" id="ovHint">Drag here to zoom the slider into a range of years</span><div class="ovwin" id="ovWin"></div><div class="ovthumb" id="ovThumb"></div></div>
+        <button type="button" class="mb" id="rangeAll" hidden>All time</button>
+      </div>
     </div>
-    <div class="mapwrap" id="mapWrap"><canvas id="mapCanvas" aria-label="Territories of the selected regions in the chosen year"></canvas><div class="mtip" id="mapTip"></div><div class="boxsel" id="boxSel"></div></div>
-    <div class="slider" id="slider" role="slider" tabindex="0" aria-label="Map year"><div class="track"></div><div class="sticks" id="sliderTicks"></div><div class="thumb" id="thumb"></div></div>
-    <div class="ovrow">
-      <span class="ovlab" id="rangeLab">All time</span>
-      <div class="overview" id="overview" title="Drag to pick a range of years for the slider. Click to jump."><span class="ovhint" id="ovHint">Drag here to zoom the slider into a range of years</span><div class="ovwin" id="ovWin"></div><div class="ovthumb" id="ovThumb"></div></div>
-      <button type="button" class="mb" id="rangeAll" hidden>All time</button>
-    </div>
-    <p class="msrc">Borders from <a href="https://github.com/aourednik/historical-basemaps" target="_blank" rel="noopener">historical-basemaps</a> by A. Ourednik (<a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>), today from Natural Earth. Dashed borders are approximate.</p>
-  </section>
-  <section class="detail" id="detail" aria-live="polite"></section>
+  </div>
+
+  <aside class="side" id="side" aria-label="Map and details">
+    <section class="mappane" id="mapPane" aria-label="Map of borders">
+      <div class="mhead">
+        <b>Map</b>
+        <span class="mtools">
+          <button type="button" class="mb mapt" id="mapBox" aria-pressed="false" title="Drag a box on the map to zoom into it. Shift and drag also works.">Zoom to area</button>
+          <button type="button" class="mb mapt" id="mapOut" aria-label="Zoom the map out">−</button>
+          <button type="button" class="mb mapt" id="mapIn" aria-label="Zoom the map in">+</button>
+          <button type="button" class="mb mapt" id="mapFit" title="Fit the selected regions">Fit</button>
+          <button type="button" class="mb mapt" id="mapBig" aria-pressed="false" title="Make the map and this column larger">Larger</button>
+          <button type="button" class="mb" id="mapBtn" title="Show or hide the map of borders">Hide</button>
+        </span>
+      </div>
+      <div class="mapwrap" id="mapWrap"><span class="asof" id="mapAsOf"></span><canvas id="mapCanvas" aria-label="Territories of the selected regions in the chosen year"></canvas><div class="mtip" id="mapTip"></div><div class="boxsel" id="boxSel"></div></div>
+      <p class="msrc">Borders from <a href="https://github.com/aourednik/historical-basemaps" target="_blank" rel="noopener">historical-basemaps</a> by A. Ourednik (<a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>), today from Natural Earth. Dashed borders are approximate.</p>
+    </section>
+    <section class="detail" id="detail" aria-live="polite"></section>
+  </aside>
 </div>
 
 <div class="overlay" id="about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
@@ -367,15 +526,18 @@ select.btn{padding-right:6px}
       <li><b>States and cultures look different.</b> Dashed bars are archaeological cultures, migrations or periods, which had no capital, ruler or border.</li>
       <li><b>No Europe-based period names.</b> The axis is plain dates. Labels like Classical Antiquity or Middle Ages fit Europe and little else.</li>
       <li><b>Regions get equal standing.</b> Sub-Saharan Africa, the Americas, the steppe, Southeast Asia and Oceania each have a full column.</li>
-      <li><b>Events are marked.</b> Small icons mark about 140 dated events, each in the region where it happened. The icon shows the kind: crossed swords for wars and battles, a ship for voyages, a book for writing and print, a crown for rulers, and so on. Zoom sets how many show: zoomed out, only the major events; zoomed in, notable events and then details join them, and the major ones are drawn bigger. Their names appear beside them when a column has room, so show one or two regions to read them.</li>
-      <li><b>Everything links out.</b> Each bar, event and band has a Wikipedia link and a picture from Wikipedia, loaded when you open it. Links go through Wikipedia's search, so a few may open a results page or show no picture.</li>
-      <li><b>One region can be regrouped.</b> Select a single region and a Group by row appears. It re-sorts the same bars into columns by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
-      <li><b>Regions are linked.</b> Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed columns.</li>
-      <li><b>Two orientations.</b> Horizontal runs time left to right with one row per region. Vertical runs time down the page with regions side by side.</li>
-      <li><b>Regions unfold into parts.</b> Tap a region's heading, or Unfold regions, to split it into sub-regions, and some of those split again. Each part only has a row for the years it has history; hatching marks the years before or after. Folded, everything sits in the one row.</li>
+      <li><b>Events are marked.</b> Small icons mark about 140 dated events, each in the region where it happened. The icon shows the kind: crossed swords for wars and battles, a ship for voyages, a book for writing and print, a crown for rulers, and so on. Detail in the Show panel sets how many show: Major, Notable or All. Zooming in raises it a step at a time until you pick one yourself. Names appear beside the icons when a row has room, so show one or two regions to read them.</li>
+      <li><b>Everything links out.</b> Each bar, event and shared event has a Wikipedia link and a picture from Wikipedia, loaded when you open it. Links go through Wikipedia's search, so a few may open a results page or show no picture.</li>
+      <li><b>One region can be regrouped.</b> Show a single region (Only, in the Show panel) and pick Group by. It re-sorts the same bars into columns by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
+      <li><b>Shared events.</b> Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed regions.</li>
+      <li><b>Two layouts.</b> Across runs time left to right with one row per region. Down runs time down the page with regions side by side.</li>
+      <li><b>Regions unfold into parts.</b> Tap a region's heading on the chart, or the small triangle next to it in the Show panel, to split it into sub-regions, and some of those split again. Each part only has a row for the years it has history; hatching marks the years before or after. Folded, everything sits in the one row.</li>
       <li><b>Overlays.</b> Ten layers add people, religion and belief, society, law and rights, arts and culture, technology and ideas, infrastructure and buildings, trade and business, disasters and disease, food, farming and subsistence, and migration and population. They follow the zoom like events: the most important first, more detail as you zoom in, most of it in recent centuries. A line after a person shows their lifetime. Each item was checked against a source, usually its Wikipedia article.</li>
-      <li><b>Links between regions.</b> Switch on Links between regions to draw arrows for things that crossed from one region to another: faiths, crops, inventions, people, trade, conquests. An arrow shows when both of its regions are selected. A slanted arrow left in one year and arrived in a later one.</li>
-      <li><b>A map of borders.</b> The map at the bottom left shows the territories of the selected regions in the year on the red slider. The slider moves in big steps where little happened and in single years where events crowd together. Drag the strip under it to zoom the slider into a range of years. Opening an event or bar moves the map to its year. Drag the map to pan, scroll or pinch to zoom, or use Zoom to area. Borders come from historical-basemaps, about 50 snapshots from 3000 BCE to 2010, with the borders of today from Natural Earth; the map shows the nearest snapshot at or before the year.</li>
+      <li><b>Links.</b> Switch on Links to draw arrows for things that crossed from one region to another: faiths, crops, inventions, people, trade, conquests. An arrow shows when both of its regions are selected. A slanted arrow left in one year and arrived in a later one.</li>
+      <li><b>One year at a time.</b> The red line marks one year. Move it with the slider in the time bar under the chart, the arrow keys, the step buttons or Play, or just scroll the chart: when the line leaves the screen it jumps back into view. The slider moves in big steps where little happened and in single years where events crowd together. Drag the strip under it to zoom the slider into a range of years.</li>
+      <li><b>This moment.</b> With nothing selected, the right column lists what each region looked like in the red line's year, and any shared event under way. Tap a name to open it.</li>
+      <li><b>A map of borders.</b> The map shows the territories of the selected regions in the red line's year. Opening an event or bar moves the line to its year. Drag the map to pan, scroll or pinch to zoom, or use Zoom to area. Borders come from historical-basemaps, about 50 snapshots from 3000 BCE to 2010, with the borders of today from Natural Earth; the map shows the nearest snapshot at or before the year.</li>
+      <li><b>Search and share.</b> Search finds states, events, people and years; press / to start. The address bar keeps the year, regions, layers, detail and what is open, so Share view copies a link that opens the same view. Keys: Left and Right step the year, 1, 2 and 3 set the detail, Escape closes.</li>
       <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
       <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
     </ul>
@@ -893,7 +1055,7 @@ const LEVEL3 = new Set([
  "Krakatoa eruption","ASEAN founded"
 ]);
 function levelOf(name){ return LEVEL1.has(name) ? 1 : LEVEL3.has(name) ? 3 : 2; }
-function shownLevel(){ return state.zoom<=1 ? 1 : state.zoom<=3 ? 2 : 3; }
+function shownLevel(){ return state.detail; }
 /* bigger icons for more important events once lesser ones are on screen */
 function iconSize(p){ return shownLevel()===1 ? 17 : ({1:22,2:16,3:13})[p.level]; }
 function eventIcon(p){
@@ -1088,13 +1250,6 @@ const TAGS = {
 };
 
 /* ---------- state ---------- */
-let savedOrient=null; try{ savedOrient=localStorage.getItem("wh8-layout"); }catch(e){}
-const qOrient=new URLSearchParams(location.search).get("layout");
-let savedOpen=[], savedLayers=[], savedLinks=false;
-try{ savedLinks=localStorage.getItem("wh8-links")==="on"; }catch(e){}
-try{ savedOpen=JSON.parse(localStorage.getItem("wh8-open")||"[]"); savedLayers=JSON.parse(localStorage.getItem("wh8-layers")||"[]"); }catch(e){}
-const state = {xlinks:savedLinks, open:new Set(savedOpen.filter(id=>NODES.has(id))), layers:new Set(savedLayers.filter(id=>LAYER[id])), active:new Set(REG.map(r=>r.id)), stretch:false, zoom:2, links:true, events:true, lens:"geo", sel:null,
-  horiz:(qOrient||savedOrient)!=="vertical"};
 const ZOOMS = [0.5,0.7,1,1.4,2,3];
 const AXIS_W = 62, PAD_T = 16, PAD_B = 30;
 const $ = id => document.getElementById(id);
@@ -1150,6 +1305,30 @@ const LINKKIND = Object.assign({war:{name:"War or conquest", icon:"war", c:"#6b7
 const XLINKS = (typeof LINKS!=="undefined" ? LINKS : []).filter(a=>NODES.has(a[4]) && NODES.has(a[5]) && LINKKIND[a[0]])
   .map(([kind,y,y2,name,from,to,level,approx,w,note,src])=>({pt:true, lk:true, kind, y, y2:y2||null, name, from, to, level, approx:!!approx, w, note, src,
     reg:NODES.get(from).reg}));
+/* ---------- state: from the address bar when it holds a view, else from the last visit ---------- */
+const Q = new URLSearchParams(location.search), FROM_URL = Q.has("y");
+const LS = k => { try{ return localStorage.getItem(k); }catch(e){ return null; } };
+function saveLS(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+const list = (v,ok) => (v||"").split(",").filter(ok);
+const okReg = id => REG.some(r=>r.id===id);
+let initRegs = FROM_URL ? list(Q.get("r"),okReg) : [];
+const state = {
+  active: new Set(initRegs.length ? initRegs : REG.map(r=>r.id)),
+  open: new Set(FROM_URL ? list(Q.get("u"),id=>NODES.has(id)) : (()=>{ try{ return JSON.parse(LS("wh8-open")||"[]").filter(id=>NODES.has(id)); }catch(e){ return []; } })()),
+  layers: new Set(FROM_URL ? list(Q.get("l"),id=>LAYER[id]) : (()=>{ try{ return JSON.parse(LS("wh8-layers")||"[]").filter(id=>LAYER[id]); }catch(e){ return []; } })()),
+  xlinks: FROM_URL ? Q.get("x")==="1" : LS("wh8-links")==="on",
+  links: Q.get("b")!=="0", events: Q.get("e")!=="0",
+  horiz: FROM_URL ? Q.get("o")!=="v" : (Q.get("layout")||LS("wh8-layout"))!=="vertical",
+  stretch: Q.get("s")==="1",
+  zoom: /^[0-5]$/.test(Q.get("z")||"") ? +Q.get("z") : 2,
+  detail: 2, detailAuto: true,
+  lens: LENSKEYS.includes(Q.get("g")) ? Q.get("g") : "geo",
+  sel: null};
+/* detail level follows the zoom until the reader picks one */
+const zoomDetail = z => z<=1 ? 1 : z<=3 ? 2 : 3;
+if (/^[123]$/.test(Q.get("d")||"")){ state.detail=+Q.get("d"); state.detailAuto=false; } else state.detail=zoomDetail(state.zoom);
+const INIT_YEAR = /^-?\d+$/.test(Q.get("y")||"") ? Math.max(START,Math.min(NOW,+Q.get("y"))) : 1500;
+
 function placeName(id){ const n=NODES.get(id); if (!n) return ""; return n.depth ? `${n.name}, ${REG.find(r=>r.id===n.reg).name}` : n.name; }
 
 /* ---------- scale ---------- */
@@ -1248,7 +1427,7 @@ function toggleNode(id){
   const y=topYear();
   if (state.open.has(id)){ for (const k of [...state.open]){ let n=NODES.get(k); while (n && n.id!==id) n=n.parent; if (n) state.open.delete(k); } }
   else state.open.add(id);
-  saveOpen(); drawLayers(); render(y);
+  saveOpen(); drawPanel(); render(y);
 }
 function saveOpen(){ try{ localStorage.setItem("wh8-open",JSON.stringify([...state.open])); }catch(e){} }
 /* the heading of a row or column: a fold button when the section has parts */
@@ -1464,7 +1643,7 @@ function renderH(keepYear){
   sheet.textContent=""; sheet.style.setProperty("--headw",HEAD_W+"px");
   const heads = el("div","heads"); heads.style.height=AXIS_H+"px";
   const corner = el("div","corner","Year"); corner.style.width=HEAD_W+"px"; heads.append(corner);
-  const haxis = el("div"); haxis.style.cssText=`position:relative;flex:none;width:${W}px;height:${AXIS_H}px`; heads.append(haxis);
+  const haxis = el("div","haxis"); haxis.style.cssText=`position:relative;flex:none;width:${W}px;height:${AXIS_H}px`; heads.append(haxis);
   const body = el("div","body");
   const rail = el("div","axis"); rail.style.width=HEAD_W+"px";
   const plot = el("div","plot"); plot.style.width=W+"px";
@@ -1571,26 +1750,100 @@ function renderH(keepYear){
   restore(keepYear);
 }
 
-/* ---------- detail ---------- */
-function showHint(){
-  detail.innerHTML="";
-  detail.append(el("p","hint","Tap a bar, an event icon or an orange label for dates, a line of context, a picture and a Wikipedia link."));
+/* ---------- detail: This moment when nothing is open, else a card ---------- */
+const curYear = () => typeof MAP!=="undefined" ? MAP.year : INIT_YEAR;
+const regName = id => REG.find(r=>r.id===id).name;
+function nameBtn(obj,label){ const b=el("button","mname",label||obj.n||obj.name); b.type="button"; b.addEventListener("click",()=>goTo(obj)); hoverLoad(b,obj); return b; }
+function drawMoment(){
+  if (state.sel) return;
+  const y=curYear();
+  detail.textContent="";
+  const w=el("div","moment");
+  w.append(el("h2",null,"This moment: "+(y>=NOW?"today":fmt(y===0?1:y))));
+  w.append(el("p","msub","What each region looked like in the red line's year. Move the line or scroll the chart."));
+  if (state.links){
+    const on=EVENTS.filter(e=>e.a<=y && y<=Math.max(e.b,e.a+5) && e.r.some(id=>state.active.has(id)));
+    if (on.length){ const p=el("div","mband"); for (const e of on.slice(0,4)){ const b=el("button","pill"); b.type="button"; if (kindOf(e.n)) b.append(icon(kindOf(e.n))); b.append(e.n); b.title="Shared event"; b.addEventListener("click",()=>goTo(e)); p.append(b); } w.append(p); }
+  }
+  for (const r of REG){
+    if (!state.active.has(r.id)) continue;
+    const row=el("div","mrow"); row.style.setProperty("--c",`var(--c-${r.id})`);
+    const body=el("div","mr"); body.append(el("b",null,r.name));
+    const alive=r.items.filter(it=>it.s<=y && y<(it.e>=NOW?NOW+1:it.e)).sort((a,b)=>a.s-b.s);
+    const names=el("div","mnames");
+    if (!alive.length) names.append(el("span","mnone","Nothing drawn for this year."));
+    alive.slice(0,5).forEach((it,i)=>{ if (i) names.append(", "); names.append(nameBtn(it)); });
+    if (alive.length>5) names.append(`, and ${alive.length-5} more`);
+    body.append(names);
+    const ev=[...r.points].reverse().find(p=>p.y<=y && p.y>y-60 && p.level<=Math.max(2,state.detail));
+    if (ev){ const m=el("div","mev"); m.append(`${y-ev.y<=1?"This year":"Recently"}: `, nameBtn(ev), `, ${fmt(ev.y)}`); body.append(m); }
+    row.append(el("i"), body); w.append(row);
+  }
+  detail.append(w);
+}
+/* things that overlap in time, in other regions */
+function sameTime(obj){
+  const a = obj.n ? obj.a : obj.pt ? obj.y : Math.max(obj.s,START), b = obj.n ? obj.b : obj.pt ? (obj.ov && obj.layer==="people" ? obj.y+30 : obj.y) : Math.min(obj.e,NOW);
+  const own = obj.n ? null : obj.reg, out=[];
+  for (const r of REG){
+    if (r.id===own) continue;
+    const c = r.items.map(it=>{ const o=Math.min(b,it.e)-Math.max(a,it.s); return [it, b===a ? (it.s<=a && a<it.e ? it.e-it.s : -1) : o/Math.max(1,Math.min(b-a,it.e-it.s))]; })
+      .filter(([it,o])=> b===a ? o>0 : o>=0.4).sort((x,y)=>y[1]-x[1]);
+    out.push(...c.slice(0,b===a?1:2).map(x=>x[0]));
+  }
+  return out.slice(0,9);
+}
+/* the item before and after, in the same list */
+function neighbours(obj){
+  let L, W=null;
+  if (obj.n) L=EVENTS;
+  else if (obj.lk) L=XLINKS;
+  else { const r=REG.find(q=>q.id===obj.reg);
+    if (obj.ov) L=r.over.filter(p=>p.layer===obj.layer);
+    else if (obj.pt) L=r.points;
+    else { L=r.items.filter(it=>it.sec===obj.sec); W=r.items; } }
+  const k = o => o.n ? o.a : o.pt ? o.y : o.s;
+  const nb = A => { const S=[...A].sort((x,y)=>k(x)-k(y)), i=S.indexOf(obj); return [S[i-1]||null, S[i+1]||null]; };
+  const a=nb(L);
+  if (W && (!a[0] || !a[1])){ const b=nb(W); return [a[0]||b[0], a[1]||b[1]]; }
+  return a;
+}
+function navBtn(label,o){
+  const b=el("button","navb"); b.type="button"; b.append(el("small",null,label), el("span",null,o?(o.n||o.name):"None"));
+  if (o){ b.title=o.n||o.name; b.addEventListener("click",()=>goTo(o)); } else b.disabled=true;
+  return b;
+}
+function context(obj){
+  const c=el("div","ctx");
+  const [pv,nx]=neighbours(obj);
+  const where = obj.n ? "Shared events" : obj.lk ? "Links" : obj.ov ? LAYER[obj.layer].name+", "+regName(obj.reg) : obj.pt ? "Events in "+regName(obj.reg) : regName(obj.reg);
+  c.append(el("h3",null,"Before and after: "+where));
+  const n=el("div","nav2"); n.append(navBtn("Before",pv), navBtn("After",nx)); c.append(n);
+  const st=sameTime(obj);
+  if (st.length){
+    c.append(el("h3",null,"At the same time elsewhere"));
+    const p=el("div","pills");
+    for (const it of st){ const b=el("button","pill"); b.type="button"; b.style.setProperty("--c",`var(--c-${it.reg})`); b.append(el("i"), it.name); b.title=`${it.name}, ${regName(it.reg)}`; b.addEventListener("click",()=>goTo(it)); hoverLoad(b,it); p.append(b); }
+    c.append(p);
+  }
+  return c;
 }
 function select(obj){
   if (state.sel && state.sel.node) state.sel.node.classList.remove("sel");
   state.sel=obj;
-  if (!obj){ showHint(); return; }
+  if (!obj){ drawMoment(); return; }
   if (obj.node) obj.node.classList.add("sel");
   detail.innerHTML="";
   const row=el("div","row"), left=el("div");
-  const x=el("button","x","×"); x.type="button"; x.setAttribute("aria-label","Close details"); x.addEventListener("click",()=>select(null));
+  const x=el("button","x","×"); x.type="button"; x.setAttribute("aria-label","Close details"); x.title="Close (Escape)"; x.addEventListener("click",()=>select(null));
   const meta=el("div","meta");
-  if (obj.n){                                   /* event */
+  let wiki;
+  if (obj.n){                                   /* shared event */
     left.append(el("h2",null,obj.n));
     const d=el("span"); d.innerHTML=`<b>${obj.b-obj.a<=10?"c. "+fmt(obj.a):fmt(obj.a)+" to "+fmt(obj.b)}</b>`; meta.append(d);
     if (kindOf(obj.n)){ const w=el("span","wartag"); w.append(icon(kindOf(obj.n)),KINDNAME[kindOf(obj.n)]); meta.append(w); }
-    meta.append(el("span",null,"Across: "+REG.filter(r=>obj.r.includes(r.id)).map(r=>r.name).join(", ")));
-    left.append(meta, el("p",null,obj.t), wikiLink(BANDWIKI[obj.n]||obj.n));
+    meta.append(el("span",null,"Shared event across: "+REG.filter(r=>obj.r.includes(r.id)).map(r=>r.name).join(", ")));
+    left.append(meta, el("p",null,obj.t)); wiki=BANDWIKI[obj.n]||obj.n;
   } else if (obj.lk){                            /* link between regions */
     left.append(el("h2",null,obj.name));
     const c = obj.approx ? "c. " : "";
@@ -1598,9 +1851,7 @@ function select(obj){
     meta.append(el("span",null,`From ${placeName(obj.from)} to ${placeName(obj.to)}`));
     const K=LINKKIND[obj.kind], w=el("span","wartag"); w.append(icon(K.icon),K.name); meta.append(w);
     meta.append(el("span",null,["","Major","Notable","Detail"][obj.level]));
-    left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
-    left.append(wikiLink(obj.w));
-    if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","srcl","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; left.append(a); }
+    left.append(meta); if (obj.note) left.append(el("p",null,obj.note)); wiki=obj.w;
   } else if (obj.ov){                            /* overlay item */
     left.append(el("h2",null,obj.name));
     const c = obj.approx ? "c. " : "";
@@ -1609,18 +1860,15 @@ function select(obj){
     const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(placeName(obj.sec))); meta.append(tag);
     const w=el("span","wartag"); w.append(icon(obj.kind),LAYER[obj.layer].name); meta.append(w);
     meta.append(el("span",null,["","Major","Notable","Detail"][obj.level]));
-    left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
-    left.append(wikiLink(obj.w));
-    if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","srcl","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; left.append(a); }
+    left.append(meta); if (obj.note) left.append(el("p",null,obj.note)); wiki=obj.w;
   } else if (obj.pt){                            /* dated event */
     left.append(el("h2",null,obj.name));
     const d=el("span"); d.innerHTML=`<b>${obj.approx?"c. ":""}${fmt(obj.y)}</b>`; meta.append(d);
     const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(placeName(obj.sec||obj.reg))); meta.append(tag);
     if (obj.kind){ const w=el("span","wartag"); w.append(icon(obj.kind),KINDNAME[obj.kind]); meta.append(w); }
     meta.append(el("span",null,["","Major event","Notable event","Detail"][obj.level]));
-    left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
-    left.append(wikiLink(obj.w));
-  } else {
+    left.append(meta); if (obj.note) left.append(el("p",null,obj.note)); wiki=obj.w;
+  } else {                                       /* bar: a state or culture */
     left.append(el("h2",null,obj.name));
     const f=obj.f, d=el("span");
     const s = f.includes("p") ? "before "+fmt(START) : (f.includes("s")?"c. ":"")+fmt(obj.s);
@@ -1628,121 +1876,372 @@ function select(obj){
     d.innerHTML=`<b>${s} to ${e}</b>`; meta.append(d);
     if (!f.includes("p")) meta.append(el("span",null,"about "+(Math.round((obj.e-obj.s)/10)*10).toLocaleString()+" years"));
     const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(placeName(obj.sec||obj.reg))); meta.append(tag);
+    meta.append(el("span",null,f.includes("c")?"Culture or movement":"State"));
     left.append(meta, el("p",null,obj.note));
     const w=[];
     if (f.includes("c")) w.push("Shown dashed: a culture, period or movement, not a state.");
     if (f.includes("p")) w.push("Began before this chart starts.");
     else if (f.includes("s")) w.push("Start date is approximate, traditional or disputed.");
-    if (f.includes("e")) w.push("The end was gradual or its date is approximate.");
+    if (f.includes("e")) w.push("The end was gradual or its date is approximate, so the bar fades.");
     if (w.length) left.append(el("p","warn",w.join(" ")));
-    const fc=el("p","facets");
-    LENSKEYS.forEach((k,i)=>{ const f1=el("span"); f1.append(LENS[k].name+": ", el("b",null,LENS[k].cats[obj.tags[i]])); fc.append(f1); });
-    left.append(fc);
-    left.append(wikiLink(WIKI[obj.name]||obj.name));
+    const fc=el("div","facets");
+    LENSKEYS.forEach((k,i)=>{ fc.append(el("span",null,LENS[k].name), el("b",null,LENS[k].cats[obj.tags[i]])); });
+    left.append(fc); wiki=WIKI[obj.name]||obj.name;
   }
+  const acts=el("div","acts"); acts.append(wikiLink(wiki));
+  if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","srcl","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; acts.append(a); }
+  left.append(acts, context(obj));
   left.className="txt";
-  row.append(left, picFigure(obj), x); detail.append(row);
+  row.append(picFigure(obj), left, x); detail.append(row);
+  detail.scrollTop=0;
 }
 
-/* ---------- controls ---------- */
-const layerRow=$("layerRow");
-function drawLayers(){
-  layerRow.textContent="";
-  layerRow.append(el("span","layerlab","Overlays"));
-  for (const L of LAYERS){
-    const b=el("button","chip layer"); b.type="button"; b.style.setProperty("--lc",L.c);
-    b.setAttribute("aria-pressed",state.layers.has(L.id)); b.append(icon(L.icon), document.createTextNode(L.name));
-    b.addEventListener("click",()=>{ const y=topYear(); state.layers.has(L.id)?state.layers.delete(L.id):state.layers.add(L.id);
-      try{ localStorage.setItem("wh8-layers",JSON.stringify([...state.layers])); }catch(e){}
-      if (state.sel && state.sel.ov && !state.layers.has(state.sel.layer)) select(null);
-      drawLayers(); render(y); });
-    layerRow.append(b);
+/* ---------- going to a thing: switch on what it needs, open it, bring it into view ---------- */
+let syncHold=0;
+const holdSync = (ms=700) => { syncHold=Date.now()+ms; };
+function goTo(obj){
+  let changed=false;
+  const need = id => { if (!state.active.has(id)){ state.active.add(id); changed=true; } };
+  if (obj.lk){ need(NODES.get(obj.from).reg); need(NODES.get(obj.to).reg); if (!state.xlinks){ state.xlinks=true; saveLS("wh8-links","on"); changed=true; } }
+  else if (obj.n){ if (!state.links){ state.links=true; changed=true; } if (!obj.r.some(id=>state.active.has(id))) obj.r.forEach(need); }
+  else {
+    need(obj.reg);
+    if (obj.ov && !state.layers.has(obj.layer)){ state.layers.add(obj.layer); saveLS("wh8-layers",JSON.stringify([...state.layers])); changed=true; }
+    if (obj.pt && !obj.ov && !state.events){ state.events=true; changed=true; }
   }
-  if (XLINKS.length){
-    const k=el("button","btn","Links between regions"); k.type="button"; k.setAttribute("aria-pressed",state.xlinks);
-    k.title="Arrows for things that crossed from one region to another: ideas, crops, people, trade, conquests";
-    k.hidden=!!soloLens();
-    k.addEventListener("click",()=>{ const y=topYear(); state.xlinks=!state.xlinks; try{ localStorage.setItem("wh8-links",state.xlinks?"on":"off"); }catch(e){}
-      if (!state.xlinks && state.sel && state.sel.lk) select(null); drawLayers(); render(y); });
-    layerRow.append(k);
-  }
-  const open = REG.some(r=>state.active.has(r.id) && state.open.has(r.id));
-  const f=el("button","btn",open?"Fold all regions":"Unfold regions"); f.type="button";
-  f.title = open ? "Show each region as one row again" : "Split each region shown into its parts. Tap a row heading to fold or unfold one.";
-  f.hidden = !!soloLens() || !anyFoldable();
-  f.addEventListener("click",()=>{ const y=topYear();
-    if (open) state.open.clear(); else REG.forEach(r=>{ if (state.active.has(r.id) && r.node.kids.length) state.open.add(r.id); });
-    saveOpen(); drawLayers(); render(y); });
-  layerRow.append(f);
+  if (obj.pt && obj.level>state.detail){ state.detail=obj.level; state.detailAuto=false; changed=true; }
+  if (obj.lk && state.lens!=="geo"){ state.lens="geo"; changed=true; }
+  if (changed) refresh();
+  select(obj);
+  revealNode(obj.node);
 }
-const chips=$("chips");
-function drawChips(){
-  chips.textContent="";
-  const all=state.active.size===REG.length;
-  const a=el("button","chip","All regions"); a.type="button"; a.setAttribute("aria-pressed",all); a.style.setProperty("--c","var(--muted)");
-  a.addEventListener("click",()=>{state.active=new Set(REG.map(r=>r.id)); refresh();}); chips.append(a);
+function revealNode(n){
+  if (!n || !n.isConnected) return;
+  const sr=scroller.getBoundingClientRect(), r=n.getBoundingClientRect();
+  const hw = state.horiz ? (parseFloat(sheet.style.getPropertyValue("--headw"))||150) : AXIS_W;
+  const hh = state.horiz ? 30 : (parseFloat(sheet.style.getPropertyValue("--headh"))||46);
+  const L=sr.left+hw, R=sr.right-16, T=sr.top+hh, B=sr.bottom-16;
+  let dx=0, dy=0;
+  if (r.left<L || r.left>R-40) dx = r.left-(L+(R-L)*0.3);
+  if (r.top<T || r.top>B-20) dy = r.top-(T+(B-T)*0.3);
+  if (dx||dy){ holdSync(); scroller.scrollBy({left:dx, top:dy, behavior:"auto"}); }
+}
+
+/* ---------- search ---------- */
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const INDEX = [];
+for (const r of REG){
+  for (const it of r.items) INDEX.push({t:it.name, k:it.f.includes("c")?"Culture or movement":"State", when:`${fmt(it.s)} to ${fmt(it.e)}`, obj:it, lv:1});
+  for (const p of r.points) INDEX.push({t:p.name, k:p.kind?KINDNAME[p.kind]:"Event", when:fmt(p.y), obj:p, lv:p.level});
+  for (const p of r.over) INDEX.push({t:p.name, k:LAYER[p.layer].name, when:p.layer==="people"?`${fmt(p.y)} to ${p.e?fmt(p.e):"living"}`:fmt(p.y), obj:p, lv:p.level});
+}
+for (const e of EVENTS) INDEX.push({t:e.n, k:"Shared event", when:fmt(e.a), obj:e, lv:1});
+for (const L of XLINKS) INDEX.push({t:L.name, k:"Link", when:fmt(L.y), obj:L, lv:L.level});
+for (const x of INDEX) x.n=norm(x.t);
+function runSearch(q){
+  q=q.trim(); if (!q) return [];
+  const out=[], m=q.match(/^(\d{1,4})\s*(bce|bc|ce|ad)?$/i);
+  if (m){ let y=+m[1]; if (/^bc/i.test(m[2]||"")) y=-y; if (y===0) y=1; if (y>=START && y<=NOW) out.push({year:y}); }
+  const n=norm(q), words=n.split(/\s+/).filter(Boolean), hits=[], seen=new Set();
+  for (const x of INDEX){
+    let s;
+    if (x.n.startsWith(n)) s=0;
+    else if (x.n.includes(" "+n) || x.n.includes("("+n)) s=1;
+    else if (x.n.includes(n)) s=2;
+    else if (words.length>1 && words.every(w=>x.n.includes(w))) s=3;
+    else continue;
+    hits.push([s,x]);
+  }
+  hits.sort((a,b)=>a[0]-b[0] || a[1].lv-b[1].lv || a[1].t.length-b[1].t.length);
+  for (const [,x] of hits){ const key=x.t+"|"+(x.obj.reg||""); if (seen.has(key)) continue; seen.add(key); out.push(x); if (out.length>=12) break; }
+  return out;
+}
+const qIn=$("q"), qRes=$("qres"); let qHits=[], qPos=0;
+function drawResults(){
+  qRes.textContent="";
+  const open = qIn.value.trim()!=="";
+  qRes.classList.toggle("open",open); qIn.setAttribute("aria-expanded",open);
+  if (!open) return;
+  if (!qHits.length){ qRes.append(el("div","qnone","Nothing found. Try a name, a place or a year like 1453 or 500 BCE.")); return; }
+  qHits.forEach((h,i)=>{
+    const b=el("button","qr"); b.type="button"; b.id="qr"+i; b.setAttribute("role","option"); b.setAttribute("aria-selected",i===qPos);
+    const t=el("span");
+    if (h.year!=null){ b.append(el("i")); b.style.setProperty("--c","#e0262b"); t.append(el("b",null,"Go to "+fmt(h.year)), el("small",null,"Move the red line to this year")); }
+    else {
+      const o=h.obj, reg = o.n ? o.r.map(regName).join(", ") : o.lk ? `${regName(NODES.get(o.from).reg)} to ${regName(NODES.get(o.to).reg)}` : regName(o.reg);
+      const ic = o.n ? kindOf(o.n) : o.lk ? LINKKIND[o.kind].icon : o.kind;
+      if (ic && (o.pt || o.n)) b.append(icon(ic)); else { b.append(el("i")); b.style.setProperty("--c",`var(--c-${o.reg})`); }
+      t.append(el("b",null,h.t), el("small",null,`${h.k}, ${reg}, ${h.when}`));
+    }
+    b.append(t);
+    b.addEventListener("mousedown",e=>e.preventDefault());
+    b.addEventListener("click",()=>pickResult(i));
+    qRes.append(b);
+  });
+  qIn.setAttribute("aria-activedescendant","qr"+qPos);
+}
+function pickResult(i){
+  const h=qHits[i]; if (!h) return;
+  qIn.value=""; qHits=[]; drawResults(); qIn.blur();
+  if (h.year!=null){ select(null); setYear(h.year,{scroll:true}); }
+  else goTo(h.obj);
+}
+qIn.addEventListener("input",()=>{ qHits=runSearch(qIn.value); qPos=0; drawResults(); });
+qIn.addEventListener("keydown",e=>{
+  if (e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); if (!qHits.length) return; qPos=(qPos+(e.key==="ArrowDown"?1:-1)+qHits.length)%qHits.length; drawResults(); $("qr"+qPos)?.scrollIntoView({block:"nearest"}); }
+  else if (e.key==="Enter"){ e.preventDefault(); pickResult(qPos); }
+  else if (e.key==="Escape"){ qIn.value=""; qHits=[]; drawResults(); qIn.blur(); e.stopPropagation(); }
+});
+qIn.addEventListener("blur",()=>setTimeout(()=>{ if (document.activeElement!==qIn){ qRes.classList.remove("open"); qIn.setAttribute("aria-expanded","false"); } },120));
+qIn.addEventListener("focus",()=>{ if (qIn.value.trim()) drawResults(); });
+
+/* ---------- the Show panel ---------- */
+const LINKSVG='<svg viewBox="0 0 18 12" width="18" height="12" aria-hidden="true"><path d="M2 10C6 10 8 2 14 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M11.5 0.6L15.6 2 12.6 5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function crow(o){
+  const row=el("div","crow"+(o.disabled?" dis":""));
+  const lab=el("label"), cb=el("input"); cb.type="checkbox"; cb.checked=!!o.checked; cb.disabled=!!o.disabled;
+  cb.addEventListener("change",()=>o.onchange(cb.checked));
+  lab.append(cb);
+  if (o.sw){ const s=el("i","sw"); s.style.setProperty("--c",o.sw); lab.append(s); }
+  if (o.ico) lab.append(icon(o.ico));
+  if (o.mark){ const m=el("span","mk"); m.innerHTML=o.mark; lab.append(m); }
+  lab.append(el("span",null,o.label));
+  if (o.title) lab.title=o.title;
+  row.append(lab, ...(o.extra||[]));
+  return row;
+}
+function drawPanel(){
+  const lensOn=!!soloLens();
+  /* regions */
+  const box=$("regRows"); box.textContent="";
   for (const r of REG){
-    const b=el("button","chip"); b.type="button"; b.style.setProperty("--c",`var(--c-${r.id})`);
-    b.append(el("i"), document.createTextNode(r.name));
-    b.setAttribute("aria-pressed", state.active.has(r.id));
-    b.addEventListener("click",()=>{
-      if (state.active.size===REG.length) state.active=new Set([r.id]);
-      else { state.active.has(r.id)?state.active.delete(r.id):state.active.add(r.id); if(!state.active.size) state.active=new Set(REG.map(q=>q.id)); }
-      refresh();
-    });
-    chips.append(b);
+    const on=state.active.has(r.id), extra=[];
+    const only=el("button","only","Only"); only.type="button"; only.setAttribute("aria-label",`Show only ${r.name}`);
+    only.addEventListener("click",()=>{ state.active=new Set([r.id]); refresh(); }); extra.push(only);
+    if (r.node.kids.length){
+      const op=state.open.has(r.id), c=el("button","caret"); c.type="button"; c.innerHTML=CHEV; c.setAttribute("aria-expanded",op);
+      c.setAttribute("aria-label",`${op?"Fold":"Unfold"} ${r.name}`); c.title = op ? `Fold ${r.name} into one row` : `Unfold ${r.name} into its parts`;
+      c.disabled = !on || lensOn; c.addEventListener("click",()=>toggleNode(r.id)); extra.push(c);
+    }
+    box.append(crow({checked:on, label:r.name, sw:`var(--c-${r.id})`, extra, onchange:v=>{
+      if (v) state.active.add(r.id); else if (state.active.size>1) state.active.delete(r.id);
+      refresh(); }}));
   }
-}
-const lensChips=$("lensChips");
-function drawLens(){
-  const solo = state.active.size===1;
-  document.querySelector(".top").classList.toggle("solo",solo);
-  lensChips.textContent="";
-  if (!solo) return;
-  lensChips.append(el("span","lenslab","Group by"));
-  for (const [k,name] of [["geo","Timeline only"],...LENSKEYS.map(k=>[k,LENS[k].name])]){
-    const b=el("button","chip plain",name); b.type="button"; b.setAttribute("aria-pressed",state.lens===k);
-    b.addEventListener("click",()=>{ state.lens=k; refresh(); });
-    lensChips.append(b);
+  $("regAll").disabled = state.active.size===REG.length;
+  const open = REG.some(r=>state.active.has(r.id) && state.open.has(r.id)), u=$("unfoldAll");
+  u.textContent = open ? "Fold all" : "Unfold all"; u.disabled = lensOn || !anyFoldable();
+  const solo = state.active.size===1, gb=$("groupBy");
+  gb.disabled=!solo; gb.value = solo ? state.lens : "geo";
+  $("groupHint").textContent = !solo ? "Show one region to regroup its bars." : state.lens==="geo" ? "Regroup this region's bars into columns by another dimension." : LENS[state.lens].note+" One label per bar, a judgement call.";
+  /* layers */
+  const lb=$("layerRows"); lb.textContent="";
+  lb.append(crow({checked:state.events, label:"Events", mark:'<i class="key dia"></i>', title:"Dated events, each in the region where it happened", onchange:v=>{
+    state.events=v; if (!v && state.sel && state.sel.pt && !state.sel.ov && !state.sel.lk) select(null); render(topYear()); drawPanel(); }}));
+  lb.append(crow({checked:state.links, label:"Shared events", mark:'<i class="key link"></i>', title:"Hatched bands for plagues, conquests, trade routes and climate shocks that crossed regions", onchange:v=>{
+    state.links=v; if (!v && state.sel && state.sel.n) select(null); render(topYear()); drawMoment(); drawPanel(); }}));
+  if (XLINKS.length) lb.append(crow({checked:state.xlinks && !lensOn, disabled:lensOn, label:"Links", mark:LINKSVG, title:"Arrows for things that crossed from one region to another: faiths, crops, inventions, people, trade, conquests", onchange:v=>{
+    state.xlinks=v; saveLS("wh8-links",v?"on":"off"); if (!v && state.sel && state.sel.lk) select(null); render(topYear()); drawPanel(); }}));
+  if (lensOn) lb.append(el("p","hintline","Links show when Group by is off."));
+  const ob=$("ovRows"); ob.textContent="";
+  for (const L of LAYERS){
+    const row=crow({checked:state.layers.has(L.id), label:L.name, ico:L.icon, onchange:v=>setLayers(v?[...state.layers,L.id]:[...state.layers].filter(id=>id!==L.id))});
+    ob.append(row);
   }
-  $("lensNote").textContent = state.lens==="geo" ? "Regroup this region's bars into columns by another dimension." : LENS[state.lens].note+" One label per bar, a judgement call.";
+  $("ovCount").textContent = `${state.layers.size} of ${LAYERS.length}`;
+  $("ovAll").disabled = state.layers.size===LAYERS.length; $("ovNone").disabled = !state.layers.size;
+  /* view */
+  $("orientH").setAttribute("aria-pressed",state.horiz); $("orientV").setAttribute("aria-pressed",!state.horiz);
+  $("scaleEven").setAttribute("aria-pressed",!state.stretch); $("scaleStretch").setAttribute("aria-pressed",state.stretch);
+  for (const d of [1,2,3]) $("det"+d).setAttribute("aria-pressed",state.detail===d);
+  $("detHint").textContent = state.detailAuto ? "Detail follows the zoom until you pick one." : "Detail stays where you set it. Zoom no longer changes it.";
 }
+function setLayers(ids){
+  const y=topYear(); state.layers=new Set(ids); saveLS("wh8-layers",JSON.stringify([...state.layers]));
+  if (state.sel && state.sel.ov && !state.layers.has(state.sel.layer)) select(null);
+  drawPanel(); render(y);
+}
+$("ovAll").addEventListener("click",()=>setLayers(LAYERS.map(l=>l.id)));
+$("ovNone").addEventListener("click",()=>setLayers([]));
+$("regAll").addEventListener("click",()=>{ state.active=new Set(REG.map(r=>r.id)); refresh(); });
+$("unfoldAll").addEventListener("click",()=>{ const y=topYear();
+  if (REG.some(r=>state.active.has(r.id) && state.open.has(r.id))) state.open.clear();
+  else REG.forEach(r=>{ if (state.active.has(r.id) && r.node.kids.length) state.open.add(r.id); });
+  saveOpen(); drawPanel(); render(y); });
+{ const gb=$("groupBy");
+  for (const [k,name] of [["geo","Off: one timeline"],...LENSKEYS.map(k=>[k,LENS[k].name])]){ const o=el("option",null,name); o.value=k; gb.append(o); }
+  gb.addEventListener("change",()=>{ state.lens=gb.value; if (state.sel && state.sel.lk) select(null); refresh(); }); }
+
 function topYear(){ return yearAt((state.horiz?scroller.scrollLeft:scroller.scrollTop)+PAD_T); }
-function refresh(){ const y=topYear(); drawChips(); drawLens(); drawLayers(); render(y); }
+function refresh(){ const y=topYear(); drawPanel(); render(y); if (!state.sel) drawMoment(); }
+
+/* zoom keeps the middle of the view in place */
+function visibleYears(){
+  const head = state.horiz ? (parseFloat(sheet.style.getPropertyValue("--headw"))||150) : (parseFloat(sheet.style.getPropertyValue("--headh"))||46);
+  const pos = state.horiz ? scroller.scrollLeft : scroller.scrollTop, len = (state.horiz ? scroller.clientWidth : scroller.clientHeight) - head;
+  return [yearAt(pos), yearAt(pos+Math.max(1,len)), len];
+}
+function setZoom(z){
+  if (z<0 || z>=ZOOMS.length || z===state.zoom) return;
+  const [a,b,len]=visibleYears(), mid=Math.min(NOW,Math.max(START,(MAP.year>=a && MAP.year<=b) ? MAP.year : (a+b)/2));
+  const frac = (Y(mid)-(state.horiz?scroller.scrollLeft:scroller.scrollTop))/Math.max(1,len);
+  state.zoom=z; if (state.detailAuto) state.detail=zoomDetail(z);
+  render(null);
+  const pos=Math.max(0,Y(mid)-frac*len), sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto"; holdSync();
+  if (state.horiz) scroller.scrollLeft=pos; else scroller.scrollTop=pos;
+  scroller.style.scrollBehavior=sb; drawPanel(); drawSpan();
+}
+function setDetail(d){ const y=topYear(); state.detail=d; state.detailAuto=false; if (state.sel && state.sel.pt && !state.sel.n && state.sel.level>d) select(null); render(y); drawPanel(); if (!state.sel) drawMoment(); }
+function drawSpan(){
+  const [a,b]=visibleYears(), span=Math.max(1,b-a);
+  const r = span>=2000 ? Math.round(span/100)*100 : span>=200 ? Math.round(span/10)*10 : Math.round(span);
+  $("zread").textContent = `${r.toLocaleString()} years in view`; $("zread").title="The span of time on screen";
+  $("zoomIn").disabled = state.zoom>=ZOOMS.length-1; $("zoomOut").disabled = state.zoom<=0;
+}
+$("zoomIn").addEventListener("click",()=>setZoom(state.zoom+1));
+$("zoomOut").addEventListener("click",()=>setZoom(state.zoom-1));
+for (const d of [1,2,3]) $("det"+d).addEventListener("click",()=>setDetail(d));
 $("scaleEven").addEventListener("click",()=>setScale(false));
 $("scaleStretch").addEventListener("click",()=>setScale(true));
-function setScale(v){ const y=topYear(); state.stretch=v; $("scaleEven").setAttribute("aria-pressed",!v); $("scaleStretch").setAttribute("aria-pressed",v); render(y); }
-$("zoomIn").addEventListener("click",()=>{ if(state.zoom<ZOOMS.length-1){const y=topYear(); state.zoom++; render(y);} });
-$("zoomOut").addEventListener("click",()=>{ if(state.zoom>0){const y=topYear(); state.zoom--; render(y);} });
-$("linksBtn").addEventListener("click",e=>{ state.links=!state.links; e.currentTarget.setAttribute("aria-pressed",state.links); if(!state.links&&state.sel&&state.sel.n) select(null); render(topYear()); });
-$("evBtn").addEventListener("click",e=>{ state.events=!state.events; e.currentTarget.setAttribute("aria-pressed",state.events); if(!state.events&&state.sel&&state.sel.pt) select(null); render(topYear()); });
-$("jump").addEventListener("change",e=>{ if(e.target.value!==""){ const pos=Math.max(0,Y(+e.target.value)-PAD_T); scroller.scrollTo(state.horiz?{left:pos}:{top:pos}); e.target.value=""; } });
+function setScale(v){ if (state.stretch===v) return; const y=topYear(); state.stretch=v; drawPanel(); render(y); }
 $("orientV").addEventListener("click",()=>setOrient(false));
 $("orientH").addEventListener("click",()=>setOrient(true));
 function setOrient(h){
   if (state.horiz===h) return;
-  const y=topYear(); state.horiz=h;
-  try{ localStorage.setItem("wh8-layout",h?"horizontal":"vertical"); }catch(e){}
-  drawOrient();
+  state.horiz=h; saveLS("wh8-layout",h?"horizontal":"vertical");
+  drawPanel();
   const sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto";
   scroller.scrollTop=0; scroller.scrollLeft=0; scroller.style.scrollBehavior=sb;
-  render(y);
+  render(null); setYear(MAP.year,{scroll:true});
 }
-function drawOrient(){
-  $("orientV").setAttribute("aria-pressed",!state.horiz); $("orientH").setAttribute("aria-pressed",state.horiz);
-  $("sub").textContent = state.horiz ? "3300 BCE to today. Time runs across, regions run down." : "3300 BCE to today. Time runs down, regions run across.";
+
+/* ---------- scrolling the chart moves the red line when it leaves the view ---------- */
+let scrollQ=false;
+scroller.addEventListener("scroll",()=>{
+  if (scrollQ) return; scrollQ=true;
+  requestAnimationFrame(()=>{ scrollQ=false; drawSpan();
+    if (Date.now()<syncHold || playT || typeof MAP==="undefined") return;
+    const [a,b]=visibleYears(), m=(b-a)*0.03;
+    if (MAP.year<a+m || MAP.year>b-m) setYear(Math.round(a+(b-a)*0.4));
+  });
+},{passive:true});
+
+/* ---------- time bar: step, play ---------- */
+const PLAYSVG='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.2v9.6L12.6 8z" fill="currentColor"/></svg>', PAUSESVG='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 3.5h2.4v9H4.5zM9.1 3.5h2.4v9H9.1z" fill="currentColor"/></svg>';
+function stepYears(){
+  const ys=new Set();
+  for (const r of REG) if (state.active.has(r.id)) for (const p of visiblePoints(r)) ys.add(p.y);
+  if (state.links) for (const e of EVENTS) if (e.r.some(id=>state.active.has(id))) ys.add(e.a);
+  return [...ys].sort((a,b)=>a-b);
 }
+function stepEvent(dir){
+  const ys=stepYears(), y=MAP.year;
+  const t = dir>0 ? ys.find(v=>v>y) : [...ys].reverse().find(v=>v<y);
+  if (t!=null){ setPlay(false); select(null); setYear(t,{scroll:true}); }
+}
+$("prevEv").addEventListener("click",()=>stepEvent(-1));
+$("nextEv").addEventListener("click",()=>stepEvent(1));
+let playT=null;
+function setPlay(on){
+  if (on===!!playT) return;
+  const b=$("playBtn");
+  if (on){
+    if (stopIndex(MAP.stops,MAP.year)>=MAP.stops.length-1) setYear(MAP.stops[0],{scroll:true});
+    playT=setInterval(()=>{ const st=MAP.stops, i=stopIndex(st,MAP.year); if (i>=st.length-1){ setPlay(false); return; } setYear(st[i+1],{scroll:true}); },160);
+  } else { clearInterval(playT); playT=null; }
+  b.innerHTML = on ? PAUSESVG : PLAYSVG; b.setAttribute("aria-pressed",on);
+  b.setAttribute("aria-label",on?"Pause":"Play through time"); b.title = on ? "Pause" : "Play through time";
+}
+$("playBtn").innerHTML=PLAYSVG;
+$("playBtn").addEventListener("click",()=>setPlay(!playT));
+
+/* ---------- top bar: panel, key, theme, share, about ---------- */
+const narrow = () => innerWidth<1100;
+function setPanel(open){
+  if (narrow()){ document.body.classList.toggle("panelopen",open); if (open) $("panelHide").focus(); }
+  else { document.body.classList.toggle("nopanel",!open); saveLS("wh8-panel",open?"on":"off"); }
+  $("showBtn").setAttribute("aria-expanded",open);
+}
+if (LS("wh8-panel")==="off") document.body.classList.add("nopanel");
+$("showBtn").addEventListener("click",()=>setPanel(narrow() ? !document.body.classList.contains("panelopen") : true));
+$("panelHide").addEventListener("click",()=>{ setPanel(false); if (narrow()) $("showBtn").focus(); });
+$("scrim").addEventListener("click",()=>setPanel(false));
+const keyPop=$("keyPop");
+function setKey(open){ keyPop.classList.toggle("open",open); $("keyBtn").setAttribute("aria-expanded",open); if (open) saveLS("wh8-keyseen","1"); }
+$("keyBtn").addEventListener("click",e=>{ e.stopPropagation(); setKey(!keyPop.classList.contains("open")); });
+$("keyClose").addEventListener("click",()=>setKey(false));
+document.addEventListener("click",e=>{
+  if (keyPop.classList.contains("open") && !keyPop.contains(e.target) && e.target!==$("keyBtn")) setKey(false);
+  if ($("tbtools").classList.contains("open") && !$("tbtools").contains(e.target) && e.target!==$("moreBtn")){ $("tbtools").classList.remove("open"); $("moreBtn").setAttribute("aria-expanded","false"); }
+});
+$("moreBtn").addEventListener("click",e=>{ e.stopPropagation(); const o=!$("tbtools").classList.contains("open"); $("tbtools").classList.toggle("open",o); $("moreBtn").setAttribute("aria-expanded",o); });
+let theme = LS("wh8-theme")==="light" ? "light" : LS("wh8-theme")==="dark" ? "dark" : "auto";
+function applyTheme(){
+  if (theme==="auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=theme;
+  $("themeBtn").textContent = "Theme: "+{auto:"Auto",light:"Light",dark:"Dark"}[theme];
+  if (typeof COLS!=="undefined"){ COLS.clear(); drawMap(); }
+}
+$("themeBtn").addEventListener("click",()=>{ theme={auto:"light",light:"dark",dark:"auto"}[theme]; saveLS("wh8-theme",theme); applyTheme(); });
+$("shareBtn").addEventListener("click",()=>{
+  writeURL(); const b=$("shareBtn"), done=t=>{ b.textContent=t; setTimeout(()=>b.textContent="Share view",1600); };
+  (navigator.clipboard ? navigator.clipboard.writeText(location.href) : Promise.reject()).then(()=>done("Link copied"),()=>{ window.prompt("Copy this link to share the view:",location.href); });
+});
 const about=$("about");
 $("aboutBtn").addEventListener("click",()=>{about.classList.add("open"); $("aboutClose").focus();});
 $("aboutClose").addEventListener("click",()=>{about.classList.remove("open"); $("aboutBtn").focus();});
 about.addEventListener("click",e=>{ if(e.target===about) about.classList.remove("open"); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(about.classList.contains("open")) about.classList.remove("open"); else select(null);} });
-let rt; window.addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout(()=>render(topYear()),150); });
 
-{ const L=$("legendIcons"), g=el("span","icos"); ["pyramid","ship","book","crown","lamp"].forEach(k=>g.append(icon(k))); L.append(g," dated event, the icon shows its kind");
-  const W=el("span"); W.style.cssText="display:inline-flex;align-items:center;gap:5px"; W.append(icon("war"),"war, battle or conquest"); L.after(W);
-  L.style.cssText="display:inline-flex;align-items:center;gap:5px"; }
-drawOrient(); drawChips(); drawLens(); drawLayers(); showHint(); render(0);
+/* ---------- keys: / search, Left and Right the year, 1 2 3 the detail, Escape closes ---------- */
+document.addEventListener("keydown",e=>{
+  const t=e.target, typing = t && t.matches && t.matches("input,select,textarea");
+  if (e.key==="Escape"){
+    if (about.classList.contains("open")){ about.classList.remove("open"); return; }
+    if (keyPop.classList.contains("open")){ setKey(false); return; }
+    if (document.body.classList.contains("panelopen")){ setPanel(false); return; }
+    if (!typing) select(null); return;
+  }
+  if (typing || e.metaKey || e.ctrlKey || e.altKey || about.classList.contains("open")) return;
+  if (e.key==="/"){ e.preventDefault(); qIn.focus(); return; }
+  if (t && t.id==="slider") return;
+  if (e.key==="ArrowLeft" || e.key==="ArrowRight"){
+    e.preventDefault(); setPlay(false);
+    const st=MAP.stops, i=stopIndex(st,MAP.year), j=Math.max(0,Math.min(st.length-1,i+(e.key==="ArrowRight"?1:-1)));
+    setYear(st[j],{scroll:true}); return;
+  }
+  if (e.key==="1" || e.key==="2" || e.key==="3") setDetail(+e.key);
+});
+
+/* ---------- the view lives in the address bar ---------- */
+let urlT=null;
+function writeURL(){
+  if (typeof MAP==="undefined") return;
+  const p=new URLSearchParams();
+  p.set("y",MAP.year);
+  if (state.active.size<REG.length) p.set("r",[...state.active].join(","));
+  if (state.layers.size) p.set("l",[...state.layers].join(","));
+  if (state.xlinks) p.set("x","1");
+  if (!state.links) p.set("b","0");
+  if (!state.events) p.set("e","0");
+  if (!state.horiz) p.set("o","v");
+  if (state.stretch) p.set("s","1");
+  if (state.zoom!==2) p.set("z",state.zoom);
+  if (!state.detailAuto) p.set("d",state.detail);
+  if (state.open.size) p.set("u",[...state.open].join(","));
+  if (state.active.size===1 && state.lens!=="geo") p.set("g",state.lens);
+  if (state.sel){ const nm=state.sel.n||state.sel.name; if (nm) p.set("i",nm); }
+  history.replaceState(null,"",location.pathname+"?"+p.toString().replace(/%2C/g,","));
+}
+function saveURL(){ clearTimeout(urlT); urlT=setTimeout(writeURL,300); }
+function onYearChange(){ if (!state.sel) drawMoment(); saveURL(); }
+
+let rt, lastSize="";
+new ResizeObserver(()=>{ const k=scroller.clientWidth+"x"+scroller.clientHeight; if (k===lastSize) return; const first=!lastSize; lastSize=k; if (first) return;
+  clearTimeout(rt); rt=setTimeout(()=>{ render(topYear()); drawSpan(); },150); }).observe(scroller);
+
+{ const L=$("legendIcons"), g=el("span","kc icos"); ["pyramid","ship","crown"].forEach(k=>g.append(icon(k))); L.append(g,"An event. The icon shows its kind: a monument, a voyage, a ruler");
+  const W=el("span"), k2=el("span","kc"); k2.append(icon("war")); W.append(k2,"A war, battle or conquest"); L.after(W);
+  const O=el("span"), k3=el("span","kc icos"); ["person","flame","bulb"].forEach(k=>{ const i=icon(k); i.classList.add("ovk"); k3.append(i); }); O.append(k3,"An overlay item: a person, a faith, an idea. A line after a person shows their lifetime"); W.after(O); }
+applyTheme(); drawPanel(); render(0); drawMoment();
+if (!LS("wh8-keyseen") && !FROM_URL && window.self===window.top) setTimeout(()=>setKey(true),400);
 </script>
 <script src="map.js"></script>
 </body>

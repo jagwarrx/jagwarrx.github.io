@@ -14,9 +14,10 @@ const WORLD = [-170,-50,180,75];
 
 const MAP = {on:true, year:1500, lo:START, hi:NOW, stops:[], full:[], view:null, data:new Map(), land:null,
   feats:null, snap:null, paths:[], boxMode:false, fitKey:"", line:null};
-try{ const v=localStorage.getItem("wh8-map"); MAP.on = v ? v==="on" : innerWidth>=700; }catch(e){ MAP.on = innerWidth>=700; }
+MAP.year = INIT_YEAR;
+try{ const v=localStorage.getItem("wh8-map"); MAP.on = v ? v==="on" : innerWidth>=760; }catch(e){ MAP.on = innerWidth>=760; }
 
-const bottom=$("bottom"), mapCanvas=$("mapCanvas"), mctx=mapCanvas.getContext("2d"), mapWrap=$("mapWrap");
+const side=$("side"), mapCanvas=$("mapCanvas"), mctx=mapCanvas.getContext("2d"), mapWrap=$("mapWrap");
 const sliderEl=$("slider"), thumbEl=$("thumb"), ticksEl=$("sliderTicks"), ovEl=$("overview"), ovWin=$("ovWin"), ovThumb=$("ovThumb");
 let mapW=0, mapH=0, dpr=1;
 
@@ -87,7 +88,7 @@ function hexToHsl(h){
 }
 function hash(s){ let h=2166136261; for (let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function colorFor(f){
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme!=="light";
+  const th = document.documentElement.dataset.theme, dark = th==="dark" || (th!=="light" && matchMedia("(prefers-color-scheme: dark)").matches);
   const key=(f.sub||f.name)+"|"+f.r+"|"+dark;
   if (COLS.has(key)) return COLS.get(key);
   const base=getComputedStyle(document.documentElement).getPropertyValue("--c-"+f.r);
@@ -191,6 +192,7 @@ function setYear(y, opt={}){
     const i=SNAPS.indexOf(s); if (SNAPS[i+1]) loadSnap(SNAPS[i+1]); if (SNAPS[i-1]) loadSnap(SNAPS[i-1]);
   }
   sliderEl.setAttribute("aria-valuetext", fmtYear(y));
+  if (typeof onYearChange==="function") onYearChange(y);
 }
 
 /* ---------- slider ---------- */
@@ -255,13 +257,19 @@ function setRange(a,b){
 $("rangeAll").addEventListener("click",()=>setRange(START,NOW));
 
 /* ---------- the red year line on the chart ---------- */
+/* the red line, and a flag with its year on the time axis */
 function placeYearLine(){
   const plot=sheet.querySelector(".plot"); if (!plot) return;
-  if (!MAP.on){ if (MAP.line) MAP.line.remove(); return; }
   if (!MAP.line) MAP.line=el("div","yearline");
   if (MAP.line.parentNode!==plot) plot.append(MAP.line);
   const p=Y(MAP.year);
   MAP.line.style.cssText = state.horiz ? `left:${p-1}px;top:0;width:2px;height:100%` : `top:${p-1}px;left:0;height:2px;width:100%`;
+  const ax = sheet.querySelector(state.horiz ? ".haxis" : ".axis");
+  if (!MAP.flag) MAP.flag=el("div","yflag");
+  if (ax){ if (MAP.flag.parentNode!==ax) ax.append(MAP.flag);
+    MAP.flag.className = "yflag "+(state.horiz?"h":"v");
+    MAP.flag.textContent = MAP.year>=NOW ? "Today" : fmt(MAP.year===0?1:MAP.year);
+    MAP.flag.style.cssText = state.horiz ? `left:${p}px` : `top:${p}px`; }
 }
 function revealYear(){
   const p=Y(MAP.year), sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto";
@@ -348,7 +356,7 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{ COLS.
 
 /* ---------- hooks into the chart ---------- */
 function afterRender(){
-  placeYearLine();
+  placeYearLine(); drawSpan(); saveURL();
   const key=[...state.active].sort().join();
   if (key!==MAP.fitKey){ MAP.fitKey=key; if (mapW){ fitSelected(); drawMap(); } }
 }
@@ -357,23 +365,31 @@ render = function(k){ chartRender(k); afterRender(); };
 const chartSelect = select;
 select = function(obj){
   chartSelect(obj);
-  if (!obj || !MAP.on) return;
+  if (!obj){ saveURL(); return; }
   const s0=Math.max(obj.s,SNAPS[0]), e0=Math.min(obj.e,NOW);
   const y = obj.n ? obj.a : obj.pt ? obj.y : Math.round(s0+Math.min(150,(e0-s0)/3));
-  setYear(y);
+  holdSync(); setYear(y);
+  saveURL();
 };
 function setMapOn(on){
   MAP.on=on; try{ localStorage.setItem("wh8-map",on?"on":"off"); }catch(e){}
-  bottom.classList.toggle("nomap",!on); $("mapBtn").setAttribute("aria-pressed",on);
-  render(topYear());
-  if (on) requestAnimationFrame(sizeMap);
+  drawMapBtn();
+  if (on) requestAnimationFrame(()=>{ sizeMap(); drawMap(); });
+}
+function drawMapBtn(){
+  side.classList.toggle("nomap",!MAP.on);
+  $("mapBtn").textContent = MAP.on ? "Hide" : "Show map";
+  $("mapBtn").title = MAP.on ? "Hide the map of borders" : "Show the map of borders";
 }
 $("mapBtn").addEventListener("click",()=>setMapOn(!MAP.on));
+$("mapBig").addEventListener("click",()=>{ const w=!document.body.classList.contains("wide"); document.body.classList.toggle("wide",w); $("mapBig").setAttribute("aria-pressed",w); $("mapBig").textContent = w ? "Smaller" : "Larger"; });
 
 /* ---------- start ---------- */
 MAP.full = buildStops(START,NOW); MAP.stops = MAP.full;
-bottom.classList.toggle("nomap",!MAP.on); $("mapBtn").setAttribute("aria-pressed",MAP.on);
+drawMapBtn();
 MAP.fitKey=[...state.active].sort().join();
 loadLand();
-setYear(MAP.year);
 afterRender();
+holdSync(); setYear(MAP.year,{scroll:true});
+if (Q.get("i")){ const h=INDEX.find(x=>x.t===Q.get("i")); if (h) goTo(h.obj); }
+drawSpan();
