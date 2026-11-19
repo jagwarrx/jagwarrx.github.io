@@ -23,6 +23,7 @@
 - [Ode to Systems Thinking](https://hmeyy.com/essays/ode-to-systems-thinking.html): Consumers, creators and investors, and what it means to see the whole.
 - [Principles, Experiments & Serendipity](https://hmeyy.com/essays/principles-experiments-serendipity.html): Turning 23. Lessons, professional and personal, and what comes next.
 - [Reason, Resonance & the Future](https://hmeyy.com/essays/reason-resonance-future.html): The future is created, not predicted. On meaning and what to build.
+- [The Spine and the Surface](https://hmeyy.com/essays/spine-and-surface.html): Why I kept losing things when I switched to-do apps, and the fix: keep a small, permanent spine and make everything around it disposable.
 - [The Chupacabra](https://hmeyy.com/essays/the-chupacabra.html): A short story.
 
 ## Projects

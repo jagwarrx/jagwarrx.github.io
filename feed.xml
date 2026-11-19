@@ -4,8 +4,15 @@
   <link href="https://hmeyy.com/"/>
   <link rel="self" href="https://hmeyy.com/feed.xml"/>
   <id>https://hmeyy.com/</id>
-  <updated>2026-09-22T00:00:00Z</updated>
+  <updated>2026-11-19T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
+  <entry>
+    <title>The Spine and the Surface</title>
+    <link href="https://hmeyy.com/essays/spine-and-surface.html"/>
+    <id>https://hmeyy.com/essays/spine-and-surface.html</id>
+    <updated>2026-11-19T00:00:00Z</updated>
+    <summary>Keep a small, permanent spine and make everything around it disposable.</summary>
+  </entry>
   <entry>
     <title>Your agent will say it sent the email</title>
     <link href="https://hmeyy.com/essays/agent-said-it-sent-the-email.html"/>
