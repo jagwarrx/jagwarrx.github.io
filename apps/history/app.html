@@ -35,6 +35,7 @@
   --line:#ccd5de; --line-strong:#9aa9b8; --accent:#c8410b;
   --c-am:#12897b; --c-af:#b97a08; --c-eu:#4a5fd0; --c-me:#bf4a34;
   --c-ca:#7a6a52; --c-sa:#a83d88; --c-ea:#1583b8; --c-se:#3b9148;
+  --sea:#d9e4ed; --land:#eef0ea;
   --display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
   --body:"Barlow","Helvetica Neue",Arial,sans-serif;
   --label:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
@@ -46,6 +47,7 @@
     --line:#293542; --line-strong:#465668; --accent:#ff8b4d;
     --c-am:#35bfae; --c-af:#e3a52f; --c-eu:#8494f2; --c-me:#ec7a63;
     --c-ca:#b39f84; --c-sa:#dc75bd; --c-ea:#4db4e6; --c-se:#69c276;
+    --sea:#0c1620; --land:#26313c;
     color-scheme:dark;
   }
 }
@@ -54,6 +56,7 @@
   --line:#293542; --line-strong:#465668; --accent:#ff8b4d;
   --c-am:#35bfae; --c-af:#e3a52f; --c-eu:#8494f2; --c-me:#ec7a63;
   --c-ca:#b39f84; --c-sa:#dc75bd; --c-ea:#4db4e6; --c-se:#69c276;
+  --sea:#0c1620; --land:#26313c;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -185,6 +188,47 @@ select.btn{padding-right:6px}
 @media (max-width:599px){ .pic{width:96px;height:72px} }
 .x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
 
+/* ---------- map of borders, bottom left ---------- */
+.bottom{flex:none;display:flex;background:var(--surface);border-top:1px solid var(--line-strong);height:330px}
+.bottom.nomap{height:auto}
+.bottom.nomap .mappane{display:none}
+.bottom .detail{flex:1;min-width:0;border-top:0;max-height:none;height:100%}
+.bottom.nomap .detail{max-height:42vh;height:auto}
+.mappane{flex:none;width:min(500px,48vw);display:flex;flex-direction:column;gap:3px;padding:6px 10px 5px;border-right:1px solid var(--line-strong);min-height:0}
+.mhead{display:flex;align-items:baseline;gap:8px;font-size:12.5px;color:var(--muted);flex:none}
+.mhead b{font-family:var(--display);font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+.mtools{margin-left:auto;display:flex;gap:4px;align-self:center}
+.mb{background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:2px 8px;font-size:12px;line-height:1.35;cursor:pointer;white-space:nowrap}
+.mb:hover{border-color:var(--ink)}
+.mb[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.mapwrap{position:relative;flex:1;min-height:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:grab;touch-action:none}
+.mapwrap.panning{cursor:grabbing}
+.mapwrap.boxing{cursor:crosshair}
+.mapwrap canvas{display:block;width:100%;height:100%}
+.mtip{position:absolute;display:none;pointer-events:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:4px;padding:2px 7px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.boxsel{position:absolute;display:none;pointer-events:none;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.slider{position:relative;flex:none;height:34px;cursor:pointer;touch-action:none;border-radius:4px}
+.slider .track{position:absolute;left:10px;right:10px;top:9px;height:4px;border-radius:2px;background:var(--line-strong)}
+.thumb{position:absolute;top:1px;width:5px;height:20px;margin-left:-2.5px;border-radius:2px;background:#e0262b;box-shadow:0 0 0 1.5px var(--surface);pointer-events:none}
+.slider.drag .thumb,.slider:focus-visible .thumb{width:7px;margin-left:-3.5px}
+.sticks .tk{position:absolute;top:20px;transform:translateX(-50%);font-family:var(--label);font-size:11px;color:var(--muted);white-space:nowrap;pointer-events:none}
+.sticks .tk::before{content:"";position:absolute;left:50%;top:-7px;height:5px;border-left:1px solid var(--muted)}
+.ovrow{display:flex;align-items:center;gap:8px;flex:none;font-size:11.5px;color:var(--muted)}
+.ovlab{flex:none;min-width:96px;font-variant-numeric:tabular-nums}
+.overview{position:relative;flex:1;height:16px;border-radius:3px;background:var(--line);cursor:crosshair;touch-action:none;overflow:hidden}
+.ovhint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--muted);pointer-events:none}
+.ovhint[hidden]{display:none}
+.ovwin{position:absolute;top:0;bottom:0;display:none;background:color-mix(in srgb,var(--accent) 22%,transparent);border:1px solid var(--accent);border-radius:3px;pointer-events:none}
+.ovthumb{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#e0262b;pointer-events:none}
+.msrc{margin:0;flex:none;font-size:10.5px;color:var(--muted)}
+.msrc a{color:inherit}
+.yearline{position:absolute;z-index:4;background:#e0262b;pointer-events:none;opacity:.85}
+@media (max-width:699px){
+  .bottom{flex-direction:column;height:auto}
+  .mappane{width:auto;height:290px;border-right:0;border-bottom:1px solid var(--line)}
+  .bottom .detail{max-height:30vh;height:auto}
+}
+
 /* ---------- about overlay ---------- */
 .overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px);z-index:20;display:none;align-items:flex-end;justify-content:center;padding:16px}
 .overlay.open{display:flex}
@@ -231,6 +275,7 @@ select.btn{padding-right:6px}
     </div>
     <button class="btn" type="button" id="evBtn" aria-pressed="true">Events</button>
     <button class="btn" type="button" id="linksBtn" aria-pressed="true">Cross-regional bands</button>
+    <button class="btn" type="button" id="mapBtn" aria-pressed="true" title="Show or hide the map of borders">Map</button>
     <select class="btn" id="jump" aria-label="Jump to a date">
       <option value="">Jump to…</option>
       <option value="-3300">3300 BCE</option>
@@ -257,7 +302,28 @@ select.btn{padding-right:6px}
   <div class="sheet" id="sheet"></div>
 </main>
 
-<section class="detail" id="detail" aria-live="polite"></section>
+<div class="bottom" id="bottom">
+  <section class="mappane" id="mapPane" aria-label="Map of borders">
+    <div class="mhead">
+      <b id="mapYear">1500 CE</b><span id="mapAsOf"></span>
+      <span class="mtools">
+        <button type="button" class="mb" id="mapBox" aria-pressed="false" title="Drag a box on the map to zoom into it. Shift and drag also works.">Zoom to area</button>
+        <button type="button" class="mb" id="mapOut" aria-label="Zoom the map out">−</button>
+        <button type="button" class="mb" id="mapIn" aria-label="Zoom the map in">+</button>
+        <button type="button" class="mb" id="mapFit" title="Fit the selected regions">Fit</button>
+      </span>
+    </div>
+    <div class="mapwrap" id="mapWrap"><canvas id="mapCanvas" aria-label="Territories of the selected regions in the chosen year"></canvas><div class="mtip" id="mapTip"></div><div class="boxsel" id="boxSel"></div></div>
+    <div class="slider" id="slider" role="slider" tabindex="0" aria-label="Map year"><div class="track"></div><div class="sticks" id="sliderTicks"></div><div class="thumb" id="thumb"></div></div>
+    <div class="ovrow">
+      <span class="ovlab" id="rangeLab">All time</span>
+      <div class="overview" id="overview" title="Drag to pick a range of years for the slider. Click to jump."><span class="ovhint" id="ovHint">Drag here to zoom the slider into a range of years</span><div class="ovwin" id="ovWin"></div><div class="ovthumb" id="ovThumb"></div></div>
+      <button type="button" class="mb" id="rangeAll" hidden>All time</button>
+    </div>
+    <p class="msrc">Borders from <a href="https://github.com/aourednik/historical-basemaps" target="_blank" rel="noopener">historical-basemaps</a> by A. Ourednik (<a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>), today from Natural Earth. Dashed borders are approximate.</p>
+  </section>
+  <section class="detail" id="detail" aria-live="polite"></section>
+</div>
 
 <div class="overlay" id="about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
   <div class="card">
@@ -277,6 +343,7 @@ select.btn{padding-right:6px}
       <li><b>One region can be regrouped.</b> Select a single region and a Group by row appears. It re-sorts the same bars into columns by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
       <li><b>Regions are linked.</b> Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed columns.</li>
       <li><b>Two orientations.</b> Horizontal runs time left to right with one row per region. Vertical runs time down the page with regions side by side.</li>
+      <li><b>A map of borders.</b> The map at the bottom left shows the territories of the selected regions in the year on the red slider. The slider moves in big steps where little happened and in single years where events crowd together. Drag the strip under it to zoom the slider into a range of years. Opening an event or bar moves the map to its year. Drag the map to pan, scroll or pinch to zoom, or use Zoom to area. Borders come from historical-basemaps, about 50 snapshots from 3000 BCE to 2010, with the borders of today from Natural Earth; the map shows the nearest snapshot at or before the year.</li>
       <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
       <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
     </ul>
@@ -1422,5 +1489,6 @@ let rt; window.addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout((
   L.style.cssText="display:inline-flex;align-items:center;gap:5px"; }
 drawOrient(); drawChips(); drawLens(); showHint(); render(0);
 </script>
+<script src="map.js"></script>
 </body>
 </html>
