@@ -201,6 +201,7 @@ body.nopanel.wide .app{grid-template-columns:minmax(0,1fr) 560px}
 .ico img{width:100%;height:100%;display:block;pointer-events:none}
 .ev.ov .ico img{width:78%;height:78%;margin:11%}
 .ev .ico{margin-top:-2px}
+.ev.ov .ico.head{background-color:color-mix(in srgb,var(--lc) 22%,var(--surface));background-repeat:no-repeat;image-rendering:pixelated;box-shadow:0 0 0 1.5px var(--lc)}
 .ev:hover .ico{transform:scale(1.35)}
 .ev.sel .ico{transform:scale(1.35);filter:drop-shadow(0 0 1.5px var(--accent)) drop-shadow(0 0 1.5px var(--accent))}
 .legend .ico{width:16px;height:16px}
@@ -324,6 +325,10 @@ body.wide .mappane{height:min(520px,62%)}
 .pic{display:block;width:100%;height:150px;border-radius:6px;overflow:hidden;background:var(--line);border:1px solid var(--line)}
 .pic img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}
 .pic.ready img{opacity:1}
+.pic.duo{display:flex;background:color-mix(in srgb,var(--muted) 10%,var(--surface))}
+.pic.duo .spr{flex:none;height:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 60%,color-mix(in srgb,#7fae5a 30%,var(--surface)) 0,transparent 70%)}
+.pic.duo .spr img{opacity:1;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.pic.duo > img{flex:1;min-width:0}
 body.wide .pic{height:220px}
 .x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
 .facets{margin:10px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px;font-size:12.5px;color:var(--muted)}
@@ -553,6 +558,7 @@ body.wide .pic{height:220px}
 </div>
 
 <script src="hier.js"></script>
+<script src="people/portraits.js"></script>
 <script>
 "use strict";
 const NOW = 2026, START = -3300;
@@ -1058,8 +1064,19 @@ function levelOf(name){ return LEVEL1.has(name) ? 1 : LEVEL3.has(name) ? 3 : 2; 
 function shownLevel(){ return state.detail; }
 /* bigger icons for more important events once lesser ones are on screen */
 function iconSize(p){ return shownLevel()===1 ? 17 : ({1:22,2:16,3:13})[p.level]; }
+/* pixel portraits of the major people: the head in the chart's circle, the whole figure on the card */
+const PORT = typeof PORTRAITS!=="undefined" ? PORTRAITS : {};
+const portraitOf = p => p.ov && p.layer==="people" ? PORT[p.name] : null;
+function headIcon(P){
+  const sp=el("span","ico head"), [x,y,w]=P.h, k=100/w;
+  sp.style.backgroundImage=`url(people/${P.f})`;
+  sp.style.backgroundSize=`${96*k}% ${96*k}%`;
+  sp.style.backgroundPosition=`${x/(96-w)*100}% ${y/(96-w)*100}%`;
+  return sp;
+}
 function eventIcon(p){
-  const sz=iconSize(p);
+  const sz=iconSize(p), P=portraitOf(p);
+  if (P){ const ic=headIcon(P), s2=sz+4; ic.style.width=ic.style.height=s2+"px"; ic.style.marginTop=(6-s2/2)+"px"; return ic; }
   if (!p.kind){ const d=el("i"); return d; }
   const ic=icon(p.kind); ic.style.width=ic.style.height=sz+"px"; ic.style.marginTop=(6-sz/2)+"px"; return ic;
 }
@@ -1133,15 +1150,16 @@ function wikiPic(title){
 }
 function hoverLoad(node,obj){ node.addEventListener("pointerenter",()=>wikiPic(wikiTitle(obj)),{once:true}); }
 function picFigure(obj){
-  const fig = el("a","pic"); fig.href = wikiURL(wikiTitle(obj)); fig.target="_blank"; fig.rel="noopener";
+  const fig = el("a","pic"), P=portraitOf(obj);
+  if (P){ fig.classList.add("duo"); const sp=el("span","spr"); const im=el("img"); im.src="people/"+P.f; im.alt=""; sp.append(im); fig.append(sp); } fig.href = wikiURL(wikiTitle(obj)); fig.target="_blank"; fig.rel="noopener";
   fig.title = "Picture from Wikipedia";
   wikiPic(wikiTitle(obj)).then(pic=>{
     if (state.sel!==obj) return;
-    if (!pic){ fig.remove(); return; }
+    if (!pic){ if (!P) fig.remove(); return; }
     const img = el("img"); img.alt = obj.n||obj.name; img.src = pic.src; img.decoding = "async";
     if (pic.page) fig.href = pic.page;
     img.addEventListener("load",()=>fig.classList.add("ready"));
-    img.addEventListener("error",()=>fig.remove());
+    img.addEventListener("error",()=>{ if (P) img.remove(); else fig.remove(); });
     fig.append(img);
   });
   return fig;
