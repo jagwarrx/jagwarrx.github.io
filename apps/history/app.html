@@ -124,7 +124,18 @@ select.btn{padding-right:6px}
 .ev i{flex:none;width:10px;height:10px;margin-top:1px;transform:rotate(45deg);background:var(--ink);border:1.5px solid var(--surface);box-shadow:0 0 0 1px var(--ink)}
 .ev span{font-family:var(--label);font-weight:500;font-size:12.5px;line-height:13px;color:var(--ink)}
 .ev:hover i,.ev.sel i{background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ico{display:inline-block;flex:none;width:16px;height:16px;line-height:0;transition:transform .15s}
+.ico svg{width:100%;height:100%;overflow:visible}
+.ev .ico{margin-top:-2px}
+.ev:hover .ico{transform:scale(1.35)}
+.ev.sel .ico{transform:scale(1.35);filter:drop-shadow(0 0 1.5px var(--accent)) drop-shadow(0 0 1.5px var(--accent))}
+.legend .ico{width:14px;height:14px}
+.legend .icos{display:inline-flex;gap:3px}
+.bandlab .ico{width:12px;height:12px;margin:-2px 4px 0 0;vertical-align:middle}
+.wartag{display:inline-flex;align-items:center;gap:5px}
+.wartag .ico{width:14px;height:14px}
 .ev.sel span{color:var(--accent);font-weight:600}
+.ev.l1 span{font-weight:600}
 .evrule{position:absolute;height:0;border-top:1px dotted var(--line-strong);z-index:0}
 .key.dia{width:9px;height:9px;border-radius:0;transform:rotate(45deg);background:var(--ink);border:0;margin:0 3px}
 .lensrow{display:none;flex-direction:column;gap:4px}
@@ -167,6 +178,11 @@ select.btn{padding-right:6px}
 .detail p{margin:0;max-width:65ch;font-size:14px}
 .detail .warn{margin-top:5px;font-size:12.5px;color:var(--muted)}
 .hint{color:var(--muted);font-size:13.5px}
+.detail .txt{flex:1;min-width:0}
+.pic{flex:none;display:block;width:180px;height:128px;border-radius:6px;overflow:hidden;background:var(--line);border:1px solid var(--line)}
+.pic img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}
+.pic.ready img{opacity:1}
+@media (max-width:599px){ .pic{width:96px;height:72px} }
 .x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
 
 /* ---------- about overlay ---------- */
@@ -191,7 +207,7 @@ select.btn{padding-right:6px}
   <div class="titleRow">
     <div>
       <h1>World History in Eight Regions</h1>
-      <p class="sub" id="sub">3300 BCE to today. Time runs down, regions run across.</p>
+      <p class="sub" id="sub">3300 BCE to today. Time runs across, regions run down.</p>
     </div>
     <button class="btn" id="aboutBtn" type="button">About this chart</button>
   </div>
@@ -202,16 +218,16 @@ select.btn{padding-right:6px}
   </div>
   <div class="tools">
     <div class="seg" role="group" aria-label="Orientation">
-      <button type="button" id="orientV" aria-pressed="true">Vertical</button>
-      <button type="button" id="orientH" aria-pressed="false">Horizontal</button>
+      <button type="button" id="orientH" aria-pressed="true">Horizontal</button>
+      <button type="button" id="orientV" aria-pressed="false">Vertical</button>
     </div>
     <div class="seg" role="group" aria-label="Time scale">
       <button type="button" id="scaleEven" aria-pressed="true">Even scale</button>
       <button type="button" id="scaleStretch" aria-pressed="false">Stretch recent</button>
     </div>
     <div class="seg" role="group" aria-label="Zoom">
-      <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
-      <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+      <button type="button" id="zoomOut" aria-label="Zoom out" title="Zoom out: fewer, bigger events">−</button>
+      <button type="button" id="zoomIn" aria-label="Zoom in" title="Zoom in: more events">+</button>
     </div>
     <button class="btn" type="button" id="evBtn" aria-pressed="true">Events</button>
     <button class="btn" type="button" id="linksBtn" aria-pressed="true">Cross-regional bands</button>
@@ -232,7 +248,7 @@ select.btn{padding-right:6px}
     <span><i class="key"></i>state, firm dates</span>
     <span><i class="key fade"></i>faded end: date uncertain or gradual</span>
     <span><i class="key cult"></i>culture or movement, not a state</span>
-    <span><i class="key dia"></i>dated event</span>
+    <span id="legendIcons"></span>
     <span><i class="key link"></i>event across regions</span>
   </div>
 </header>
@@ -256,11 +272,11 @@ select.btn{padding-right:6px}
       <li><b>States and cultures look different.</b> Dashed bars are archaeological cultures, migrations or periods, which had no capital, ruler or border.</li>
       <li><b>No Europe-based period names.</b> The axis is plain dates. Labels like Classical Antiquity or Middle Ages fit Europe and little else.</li>
       <li><b>Regions get equal standing.</b> Sub-Saharan Africa, the Americas, the steppe, Southeast Asia and Oceania each have a full column.</li>
-      <li><b>Events are marked.</b> Diamonds mark about 140 dated events, each in the region where it happened. Their names appear beside them when a column has room, so show one or two regions to read them.</li>
-      <li><b>Everything links out.</b> Each bar, event and band has a Wikipedia link. Links go through Wikipedia's search, so a few may open a results page instead of an article.</li>
+      <li><b>Events are marked.</b> Small icons mark about 140 dated events, each in the region where it happened. The icon shows the kind: crossed swords for wars and battles, a ship for voyages, a book for writing and print, a crown for rulers, and so on. Zoom sets how many show: zoomed out, only the major events; zoomed in, notable events and then details join them, and the major ones are drawn bigger. Their names appear beside them when a column has room, so show one or two regions to read them.</li>
+      <li><b>Everything links out.</b> Each bar, event and band has a Wikipedia link and a picture from Wikipedia, loaded when you open it. Links go through Wikipedia's search, so a few may open a results page or show no picture.</li>
       <li><b>One region can be regrouped.</b> Select a single region and a Group by row appears. It re-sorts the same bars into columns by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
       <li><b>Regions are linked.</b> Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed columns.</li>
-      <li><b>Two orientations.</b> Vertical runs time down the page with regions side by side. Horizontal runs time left to right with one row per region.</li>
+      <li><b>Two orientations.</b> Horizontal runs time left to right with one row per region. Vertical runs time down the page with regions side by side.</li>
       <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
       <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
     </ul>
@@ -279,14 +295,14 @@ select.btn{padding-right:6px}
 "use strict";
 const NOW = 2026, START = -3300;
 const REG = [
-  {id:"am", name:"Americas"},
-  {id:"af", name:"Sub-Saharan Africa"},
-  {id:"eu", name:"Europe"},
-  {id:"me", name:"North Africa & West Asia"},
   {id:"ca", name:"Central & Inner Asia"},
   {id:"sa", name:"South Asia"},
   {id:"ea", name:"East Asia"},
-  {id:"se", name:"Southeast Asia & Oceania"}
+  {id:"se", name:"Southeast Asia & Oceania"},
+  {id:"am", name:"Americas"},
+  {id:"af", name:"Sub-Saharan Africa"},
+  {id:"eu", name:"Europe"},
+  {id:"me", name:"North Africa & West Asia"}
 ];
 /* [name, short label, start, end, flags, note]
    flags: s = start approximate, e = end approximate or gradual,
@@ -671,6 +687,112 @@ se:[
  [1967,"ASEAN founded","ASEAN",""],
  [1975,"Fall of Saigon","Fall of Saigon","End of the Vietnam War."]
 ]};
+/* Dated events that were wars, battles, sieges, sacks, conquests or armed revolts (marked with crossed swords).
+   Political revolutions without a war at their core stay diamonds. */
+const WAR = new Set([
+ "Fall of Tenochtitlan","Atahualpa captured at Cajamarca","Pueblo Revolt","Haitian Revolution begins","Spanish American independence wars",
+ "American Civil War","Mexican Revolution","Cuban Revolution",
+ "Piye of Kush conquers Egypt","Battle of Kirina","Battle of Tondibi","Battle of Isandlwana","Battle of Adwa",
+ "Thermopylae and Salamis","Rome destroys Carthage and Corinth","Sack of Rome","Norman conquest of England","Crusaders sack Constantinople",
+ "Fall of Constantinople","Battle of Waterloo","Russia invades Ukraine",
+ "Battle of Kadesh","Babylon destroys Jerusalem","Cyrus takes Babylon","Battle of Gaugamela","Romans destroy the Second Temple","Battle of Manzikert",
+ "First Crusade takes Jerusalem","Mongols sack Baghdad","Ottomans conquer Egypt","Israel founded; first Arab–Israeli war",
+ "Battle of the Catalaunian Plains","Battle of Talas","Mongols invade Khwarazm","Battle of Kulikovo","Battle of Ankara","Qing destroy the Dzungars","Russia takes Tashkent",
+ "Alexander at the Hydaspes","Kalinga War","Arab conquest of Sindh","Chola raid on Srivijaya","Second Battle of Tarain","Timur sacks Delhi",
+ "First Battle of Panipat","Battle of Plassey","Indian Rebellion","Bangladesh Liberation War",
+ "Qin unifies China","An Lushan Rebellion","Jurchens take Kaifeng","Mongol invasions of Japan","Imjin War","First Opium War","Taiping Rebellion",
+ "Atomic bombings of Hiroshima and Nagasaki","Korean War",
+ "Han conquest of Nanyue","Trưng sisters' rebellion","Battle of Bạch Đằng","Mongol invasion of Java","Portugal takes Malacca","Battle of Điện Biên Phủ","Fall of Saigon",
+ "Alexander's conquests","Arab conquests","Mongol conquests","World wars"
+]);
+const ICON = {
+ war:'<path d="M2.5 2.5l8 8M13.5 2.5l-8 8" stroke="#5b6675" stroke-width="3.2" stroke-linecap="round"/><path d="M2.5 2.5l8 8M13.5 2.5l-8 8" stroke="#e4e9ef" stroke-width="1.5" stroke-linecap="round"/><path d="M8.6 12.8l4.2-4.2M3.2 8.6l4.2 4.2" stroke="#d99a1e" stroke-width="2" stroke-linecap="round"/><path d="M11 11l2.8 2.8M5 11l-2.8 2.8" stroke="#8a5a2b" stroke-width="2.2" stroke-linecap="round"/>',
+ pyramid:'<path d="M8 2.5L14.5 13.5h-13z" fill="#e8b860"/><path d="M8 2.5l2 11h4.5z" fill="#c98f3a"/><path d="M1 13.6h14" stroke="#b07a30" stroke-width="1.2" stroke-linecap="round"/>',
+ city:'<rect x="1.5" y="7" width="4.5" height="7" fill="#d98c5f"/><rect x="5.5" y="3.5" width="5" height="10.5" fill="#eeac7f"/><rect x="10" y="8" width="4.5" height="6" fill="#c9764b"/><path d="M5.5 3.5v-1.2h1.2v1.2M7.4 3.5v-1.2h1.2v1.2M9.3 3.5v-1.2h1.2v1.2" fill="#eeac7f" stroke="#eeac7f" stroke-width=".6"/><rect x="7.3" y="5.5" width="1.4" height="1.8" rx=".7" fill="#6b3b22"/><path d="M7 14v-2.4a1 1 0 0 1 2 0V14z" fill="#6b3b22"/><path d="M1 14.2h14" stroke="#9c5a35" stroke-width="1" stroke-linecap="round"/>',
+ dome:'<path d="M1.8 13.5V6M14.2 13.5V6" stroke="#cfc8b8" stroke-width="1.3"/><path d="M4 9a4 4 0 0 1 8 0z" fill="#fbf9f4" stroke="#9aa5b1" stroke-width=".8"/><path d="M8 2.2v2.8" stroke="#d4a72c" stroke-width="1.2"/><rect x="3" y="9" width="10" height="4.5" fill="#efeadf" stroke="#9aa5b1" stroke-width=".8"/><path d="M7 13.5v-2a1 1 0 0 1 2 0v2z" fill="#8fa3b8"/>',
+ stupa:'<rect x="1.5" y="11" width="13" height="3" rx=".5" fill="#a8916d"/><rect x="3.5" y="8" width="9" height="3" rx=".5" fill="#bfa77f"/><rect x="5.5" y="5.5" width="5" height="2.5" rx=".5" fill="#d1bb92"/><path d="M8 1.5l1.5 4h-3z" fill="#8f7853"/>',
+ ship:'<path d="M1 14.6q1.5-1 3 0t3 0 3 0 3 0 3 0" fill="none" stroke="#3b9bd1" stroke-width="1"/><path d="M2 10h12l-2 3.4H4z" fill="#a0612f"/><path d="M8 2v8" stroke="#6b3f1d" stroke-width="1"/><path d="M8.5 2.5c3 1.5 3.5 4.5 3 6.5h-3z" fill="#fbf5e6" stroke="#c9b48c" stroke-width=".6"/><path d="M7.5 3.5c-2 1.5-2.5 3.5-2 5.5h2z" fill="#fbf5e6" stroke="#c9b48c" stroke-width=".6"/><path d="M8 2l2.2.8L8 3.4z" fill="#e2493b"/>',
+ camel:'<path d="M2.5 9.5C2.5 7 4 5 5.5 6.5 6.5 4 9 4 9.8 7c.4-1.6 1.6-2.8 2.8-2.5l1 1.1-.9.5-.5 3.9H3z" fill="#d6a35c"/><path d="M4 10v3.8M6 10v3.8M9.3 10v3.8M11.3 10v3.8" stroke="#b8833f" stroke-width="1.2" stroke-linecap="round"/><circle cx="12.6" cy="5.4" r=".5" fill="#4a2f14"/>',
+ wheel:'<circle cx="8" cy="8" r="5.6" fill="none" stroke="#8a5a2b" stroke-width="1.9"/><path d="M8 2.5v11M2.5 8h11M4.1 4.1l7.8 7.8M11.9 4.1l-7.8 7.8" stroke="#b07a45" stroke-width="1"/><circle cx="8" cy="8" r="1.6" fill="#d99a1e"/>',
+ scroll:'<rect x="3.5" y="3" width="9" height="10" rx="1" fill="#f6e7c3" stroke="#b9975b" stroke-width=".8"/><rect x="2.5" y="2" width="11" height="2.2" rx="1.1" fill="#d9bd85"/><rect x="2.5" y="11.8" width="11" height="2.2" rx="1.1" fill="#d9bd85"/><path d="M5.5 6.4h5M5.5 8.3h5M5.5 10.1h2.6" stroke="#9c7b45" stroke-width=".8" stroke-linecap="round"/><circle cx="11" cy="10.2" r="1.3" fill="#c8412b"/>',
+ dove:'<path d="M13.4 5.4l1.7 1.1" stroke="#4f9a4a" stroke-width="1.1" stroke-linecap="round"/><path d="M2 9.5c2.5 0 4-1 5.5-3.5L10 3.5c.8-.6 2-.4 2.4.5l1.4.6-1.2.7c0 3.5-2.4 6.2-6.6 6.2L4 13.5l.6-2.6C3.4 10.8 2.4 10.3 2 9.5z" fill="#fff" stroke="#8fa3b8" stroke-width=".8" stroke-linejoin="round"/><path d="M5.8 9.2c1.6-.3 3.1-1.6 3.7-3.6" stroke="#8fa3b8" stroke-width=".8" fill="none"/><circle cx="11.6" cy="4.7" r=".55" fill="#334"/>',
+ book:'<path d="M8 4.5C6.5 3.3 4 3 1.8 3.4v9.2c2.2-.4 4.7-.1 6.2 1.1z" fill="#fdf8ec" stroke="#5c7cba" stroke-width=".9" stroke-linejoin="round"/><path d="M8 4.5c1.5-1.2 4-1.5 6.2-1.1v9.2c-2.2-.4-4.7-.1-6.2 1.1z" fill="#fdf8ec" stroke="#5c7cba" stroke-width=".9" stroke-linejoin="round"/><path d="M3.5 6.2h3M3.5 8.2h3M3.5 10.2h2M9.5 6.2h3M9.5 8.2h3M9.5 10.2h2" stroke="#a9b6cf" stroke-width=".8" stroke-linecap="round"/>',
+ star:'<path d="M8 1.8l1.8 3.9 4.2.5-3.1 2.9.8 4.2L8 11.2l-3.7 2.1.8-4.2L2 6.2l4.2-.5z" fill="#f5c542" stroke="#d29a12" stroke-width=".8" stroke-linejoin="round"/><circle cx="13.6" cy="12.6" r=".8" fill="#f5c542"/><circle cx="2.6" cy="12.8" r=".55" fill="#f5c542"/>',
+ lamp:'<path d="M11 9.3c-1.6-1.2-1.4-3.4 0-5.6 1.4 2.2 1.6 4.4 0 5.6z" fill="#ff9b3d"/><path d="M11 9c-.7-.6-.6-1.7 0-2.6.6.9.7 2 0 2.6z" fill="#ffe08a"/><path d="M1.8 9.6h8.6c1.2.5 2.6.5 3.8 0-.8 2.4-3.2 3.9-6.2 3.9-3.3 0-5.6-1.4-6.2-3.9z" fill="#c98f3a"/><path d="M5.5 13.4h5" stroke="#a8722a" stroke-width="1.2" stroke-linecap="round"/>',
+ crown:'<path d="M2 12.5L1.5 5l3.5 3L8 3.3 11 8l3.5-3-.5 7.5z" fill="#f5c542" stroke="#c9961a" stroke-width=".8" stroke-linejoin="round"/><circle cx="8" cy="10" r="1.05" fill="#d94b6a"/><circle cx="4.8" cy="10.3" r=".8" fill="#3b9bd1"/><circle cx="11.2" cy="10.3" r=".8" fill="#3b9bd1"/>',
+ dagger:'<path d="M8 1.4l1.3 2v6.6H6.7V3.4z" fill="#e4e9ef" stroke="#6b7685" stroke-width=".7" stroke-linejoin="round"/><path d="M4.5 10.3h7" stroke="#d99a1e" stroke-width="1.6" stroke-linecap="round"/><path d="M8 11v2.5" stroke="#8a5a2b" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="14.3" r="1" fill="#d99a1e"/>',
+ flag:'<path d="M3.5 1.8v12.6" stroke="#6b5a48" stroke-width="1.2" stroke-linecap="round"/><path d="M4 2.5c2-1 4 1 6 0s3-.5 3.5-.3v6c-.5-.2-1.5-.7-3.5.3s-4-1-6 0z" fill="#e2493b"/>',
+ coin:'<circle cx="8" cy="8" r="5.8" fill="#f5c542" stroke="#c9961a" stroke-width="1"/><circle cx="8" cy="8" r="3.8" fill="none" stroke="#e0a91f" stroke-width=".8"/><path d="M5.6 5.9a3 3 0 0 1 2-1.3" stroke="#fff6c9" stroke-width=".9" fill="none" stroke-linecap="round"/>',
+ chain:'<rect x="1.3" y="6" width="6.2" height="4" rx="2" fill="none" stroke="#8b96a3" stroke-width="1.6" transform="rotate(-30 4.4 8)"/><rect x="8.5" y="7" width="6.2" height="4" rx="2" fill="none" stroke="#8b96a3" stroke-width="1.6" transform="rotate(-30 11.6 9)"/><path d="M8.2 2.6v1.6M6.3 3.5l.9 1.1M10.1 3.5l-.9 1.1" stroke="#f5a524" stroke-width="1" stroke-linecap="round"/>',
+ volcano:'<circle cx="7" cy="3.8" r="1.7" fill="#b8c0c8"/><circle cx="9.4" cy="2.9" r="1.4" fill="#d3d8de"/><path d="M1.5 14l4-7.5h5l4 7.5z" fill="#8a6a55"/><path d="M5.5 6.5h5l-.8 1.5c-.8-.6-1.6.4-1.7 1.6-.3-.8-1-1.7-1.8-1.4z" fill="#ff7a3d"/>',
+ rocket:'<path d="M6.6 9.7h2.8L8 14.2z" fill="#ffb03d"/><path d="M8 1.5c2 1.5 2.8 4.5 2.3 8.2H5.7C5.2 6 6 3 8 1.5z" fill="#f2f4f8" stroke="#8792a2" stroke-width=".7"/><circle cx="8" cy="5.8" r="1.2" fill="#3b9bd1"/><path d="M5.7 7.5L3.8 10.6h2zM10.3 7.5l1.9 3.1h-2z" fill="#e2493b"/>',
+ medal:'<path d="M5 1.5l2 5h2l2-5H9L8 4 7 1.5z" fill="#3b9bd1"/><circle cx="8" cy="10" r="4" fill="#f5c542" stroke="#c9961a" stroke-width=".9"/><path d="M8 7.9l.6 1.3 1.4.1-1.1.9.4 1.4L8 10.9l-1.3.7.4-1.4-1.1-.9 1.4-.1z" fill="#fff6c9"/>',
+ ballot:'<path d="M5.5 2.5h5v6.5h-5z" fill="#fff" stroke="#9aa5b1" stroke-width=".7"/><path d="M6.8 5.5l1 1 1.6-2" stroke="#3b9148" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="2.5" y="8" width="11" height="6" rx="1" fill="#5c7cba"/><rect x="5" y="8" width="6" height="1" fill="#2e4372"/>',
+ germ:'<path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8l1.4 1.4M10.8 10.8l1.4 1.4M12.2 3.8l-1.4 1.4M5.2 10.8l-1.4 1.4" stroke="#5aa64a" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="8" r="4" fill="#86c873"/><circle cx="6.8" cy="7.6" r=".7" fill="#23402a"/><circle cx="9.2" cy="7.6" r=".7" fill="#23402a"/><path d="M7 9.4q1 .8 2 0" stroke="#23402a" stroke-width=".6" fill="none" stroke-linecap="round"/>',
+ sun:'<path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="#f5a524" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="8" r="3.3" fill="#f5b52e"/>',
+ factory:'<circle cx="13" cy="1.6" r="1" fill="#c3cad2"/><circle cx="11.6" cy="1" r=".7" fill="#d6dbe1"/><path d="M1.5 14V8l4 2.2V8l4 2.2V5h2.5V2.6h2V14z" fill="#8b96a3"/><rect x="3" y="11" width="1.6" height="1.4" fill="#f5c542"/><rect x="7" y="11" width="1.6" height="1.4" fill="#f5c542"/>'
+};
+const KIND = {
+ "Teotihuacan intervenes at Tikal":"crown","Tenochtitlan founded":"city","Columbus reaches the Caribbean":"ship","US Declaration of Independence":"flag",
+ "Brazil abolishes slavery":"chain","First Moon landing":"rocket",
+ "Aksum adopts Christianity":"lamp","Baqt treaty":"dove","Mansa Musa's pilgrimage":"coin","Dias rounds the Cape":"ship","Dutch settle the Cape":"ship",
+ "Britain bans the slave trade":"chain","Berlin Conference":"scroll","Ghana becomes independent":"flag","Year of Africa":"flag","South Africa's first democratic election":"ballot",
+ "First Olympic Games":"medal","Assassination of Julius Caesar":"dagger","Edict of Milan":"scroll","Charlemagne crowned emperor":"crown","East–West Schism":"lamp",
+ "Magna Carta":"scroll","Gutenberg Bible":"book","Reformation begins":"lamp","Peace of Westphalia":"dove","French Revolution":"flag","Revolutions of 1848":"flag",
+ "Russian Revolution":"flag","Fall of the Berlin Wall":"flag",
+ "Great Pyramid of Giza":"pyramid","Code of Hammurabi":"scroll","Crucifixion of Jesus":"lamp","Hijra":"lamp","Baghdad founded":"city","Suez Canal opens":"ship",
+ "Republic of Turkey founded":"flag","Iranian Revolution":"flag","Arab Spring":"flag",
+ "Earliest spoke-wheeled chariots":"wheel","Zhang Qian sets out west":"camel","Temüjin proclaimed Genghis Khan":"crown","Ulugh Beg's observatory":"star",
+ "Soviet republics drawn":"scroll","Soviet Union dissolves":"flag",
+ "Mohenjo-daro built":"city","The Buddha teaches":"lamp","Aryabhata's Aryabhatiya":"star","Vasco da Gama reaches Calicut":"ship","Taj Mahal begun":"dome","Partition of India":"flag",
+ "Oracle bone writing":"book","Birth of Confucius":"lamp","Cai Lun's papermaking":"book","Buddhism reaches Japan":"lamp","Taika Reform":"scroll","Diamond Sutra printed":"book",
+ "Hangul created":"book","Meiji Restoration":"crown","Xinhai Revolution":"flag","People's Republic proclaimed":"flag","China's reform and opening":"coin",
+ "Borobudur built":"stupa","Angkor Wat built":"stupa","Māori settle Aotearoa":"ship","Magellan reaches the Philippines":"ship",
+ "First recorded European landing in Australia":"ship","First Fleet at Sydney Cove":"ship","Treaty of Waitangi":"scroll","Krakatoa eruption":"volcano",
+ "Indonesia declares independence":"flag","ASEAN founded":"dove",
+ /* cross-regional bands */
+ "4.2 kiloyear drought":"sun","Silk Road opens":"camel","Plague of Justinian":"germ","Indian Ocean trade at full reach":"ship","Black Death":"germ",
+ "Zheng He's voyages":"ship","Columbian Exchange":"ship","Atlantic slave trade":"chain","Industrialisation begins":"factory","Decolonisation":"flag"
+};
+const KINDNAME = {war:"War or battle",pyramid:"Monument",city:"City",dome:"Monument",stupa:"Temple",ship:"Voyage",camel:"Overland route",wheel:"Invention",
+ scroll:"Law or treaty",dove:"Peace",book:"Writing and print",star:"Science",lamp:"Faith and ideas",crown:"Rulers",dagger:"Assassination",flag:"Revolution or new state",
+ coin:"Wealth and trade",chain:"Slavery and abolition",volcano:"Natural disaster",rocket:"Space",medal:"Games",ballot:"Election",germ:"Plague",sun:"Climate",factory:"Industry"};
+/* Importance. Level 1: turned world or regional history. Level 3: detail. Everything else is level 2.
+   Zoomed out shows level 1 only; the middle zooms add level 2; the closest zooms show all three. */
+const LEVEL1 = new Set([
+ "Columbus reaches the Caribbean","Fall of Tenochtitlan","US Declaration of Independence","First Moon landing",
+ "Mansa Musa's pilgrimage","Berlin Conference","Year of Africa",
+ "Sack of Rome","Fall of Constantinople","Gutenberg Bible","Reformation begins","French Revolution","Russian Revolution","Fall of the Berlin Wall",
+ "Great Pyramid of Giza","Code of Hammurabi","Battle of Gaugamela","Crucifixion of Jesus","Hijra","Mongols sack Baghdad",
+ "Temüjin proclaimed Genghis Khan","Soviet Union dissolves",
+ "Mohenjo-daro built","The Buddha teaches","Kalinga War","Vasco da Gama reaches Calicut","Partition of India",
+ "Oracle bone writing","Birth of Confucius","Qin unifies China","First Opium War","Meiji Restoration","Atomic bombings of Hiroshima and Nagasaki",
+ "People's Republic proclaimed","China's reform and opening",
+ "Angkor Wat built","Indonesia declares independence"
+]);
+const LEVEL3 = new Set([
+ "Teotihuacan intervenes at Tikal","Pueblo Revolt","Mexican Revolution",
+ "Baqt treaty","Battle of Tondibi","Dutch settle the Cape","Battle of Isandlwana",
+ "East–West Schism","Crusaders sack Constantinople","Revolutions of 1848",
+ "Battle of Kadesh","Battle of Manzikert","Ottomans conquer Egypt",
+ "Battle of the Catalaunian Plains","Mongols invade Khwarazm","Battle of Kulikovo","Battle of Ankara","Ulugh Beg's observatory","Qing destroy the Dzungars",
+ "Russia takes Tashkent","Soviet republics drawn",
+ "Arab conquest of Sindh","Chola raid on Srivijaya","Timur sacks Delhi",
+ "Buddhism reaches Japan","Taika Reform","Diamond Sutra printed","Jurchens take Kaifeng","Imjin War",
+ "Han conquest of Nanyue","Trưng sisters' rebellion","Mongol invasion of Java","First recorded European landing in Australia","Treaty of Waitangi",
+ "Krakatoa eruption","ASEAN founded"
+]);
+function levelOf(name){ return LEVEL1.has(name) ? 1 : LEVEL3.has(name) ? 3 : 2; }
+function shownLevel(){ return state.zoom<=1 ? 1 : state.zoom<=3 ? 2 : 3; }
+/* bigger icons for more important events once lesser ones are on screen */
+function iconSize(p){ return shownLevel()===1 ? 17 : ({1:22,2:16,3:13})[p.level]; }
+function eventIcon(p){
+  const sz=iconSize(p);
+  if (!p.kind){ const d=el("i"); return d; }
+  const ic=icon(p.kind); ic.style.width=ic.style.height=sz+"px"; ic.style.marginTop=(6-sz/2)+"px"; return ic;
+}
+function kindOf(name){ return WAR.has(name) ? "war" : (KIND[name]||null); }
+function icon(kind){ const sp=el("span","ico"); sp.innerHTML=`<svg viewBox="0 0 16 16" aria-hidden="true">${ICON[kind]}</svg>`; return sp; }
 /* Wikipedia article titles where they differ from the bar name */
 const WIKI = {
  "Caral–Supe":"Caral–Supe civilization","Olmec centres":"Olmecs","Maya city-states":"Maya civilization","Chavín":"Chavín culture",
@@ -711,6 +833,39 @@ const WIKI = {
 const BANDWIKI = {"4.2 kiloyear drought":"4.2-kiloyear event","Silk Road opens":"Silk Road","Indian Ocean trade at full reach":"Indian Ocean trade",
  "Arab conquests":"Early Muslim conquests","Mongol conquests":"Mongol invasions and conquests","Zheng He's voyages":"Ming treasure voyages",
  "Columbian Exchange":"Columbian exchange","Industrialisation begins":"Industrial Revolution","World wars":"World war","Decolonisation":"Decolonization"};
+function wikiTitle(obj){ return obj.n ? (BANDWIKI[obj.n]||obj.n) : obj.pt ? obj.w : (WIKI[obj.name]||obj.name); }
+const PICS = new Map();
+function wikiPic(title){
+  if (PICS.has(title)) return PICS.get(title);
+  const job = (async()=>{
+    try{
+      const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title.replace(/ /g,"_"))+"?redirect=true");
+      if (r.ok){ const j=await r.json(); if (j.thumbnail && j.type!=="disambiguation") return {src:j.thumbnail.source, page:j.content_urls&&j.content_urls.desktop.page}; }
+    }catch(e){}
+    try{
+      const u = "https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1&prop=pageimages|info&inprop=url&piprop=thumbnail&pithumbsize=400&gsrsearch="+encodeURIComponent(title);
+      const j = await (await fetch(u)).json(), pg = j.query && Object.values(j.query.pages)[0];
+      if (pg && pg.thumbnail) return {src:pg.thumbnail.source, page:pg.fullurl};
+    }catch(e){}
+    return null;
+  })().then(pic=>{ if (pic){ const im=new Image(); im.src=pic.src; } else PICS.delete(title); return pic; });
+  PICS.set(title, job); return job;
+}
+function hoverLoad(node,obj){ node.addEventListener("pointerenter",()=>wikiPic(wikiTitle(obj)),{once:true}); }
+function picFigure(obj){
+  const fig = el("a","pic"); fig.href = wikiURL(wikiTitle(obj)); fig.target="_blank"; fig.rel="noopener";
+  fig.title = "Picture from Wikipedia";
+  wikiPic(wikiTitle(obj)).then(pic=>{
+    if (state.sel!==obj) return;
+    if (!pic){ fig.remove(); return; }
+    const img = el("img"); img.alt = obj.n||obj.name; img.src = pic.src; img.decoding = "async";
+    if (pic.page) fig.href = pic.page;
+    img.addEventListener("load",()=>fig.classList.add("ready"));
+    img.addEventListener("error",()=>fig.remove());
+    fig.append(img);
+  });
+  return fig;
+}
 const wikiURL = t => "https://en.wikipedia.org/wiki/Special:Search?go=Go&search="+encodeURIComponent(t);
 function wikiLink(t){ const a=document.createElement("a"); a.className="wiki"; a.href=wikiURL(t); a.target="_blank"; a.rel="noopener"; a.textContent="Read on Wikipedia"; return a; }
 
@@ -815,10 +970,10 @@ const TAGS = {
 };
 
 /* ---------- state ---------- */
-let savedOrient=null; try{ savedOrient=localStorage.getItem("wh8-orient"); }catch(e){}
+let savedOrient=null; try{ savedOrient=localStorage.getItem("wh8-layout"); }catch(e){}
 const qOrient=new URLSearchParams(location.search).get("layout");
 const state = {active:new Set(REG.map(r=>r.id)), stretch:false, zoom:2, links:true, events:true, lens:"geo", sel:null,
-  horiz:(qOrient||savedOrient)==="horizontal"};
+  horiz:(qOrient||savedOrient)!=="vertical"};
 const ZOOMS = [0.5,0.7,1,1.4,2,3];
 const AXIS_W = 62, PAD_T = 16, PAD_B = 30;
 const $ = id => document.getElementById(id);
@@ -836,7 +991,7 @@ for (const r of REG){
   }
   r.items=items; r.lanes=ends.length;
   for (const it of items) it.tags=(TAGS[it.name]||TAGS[it.name+"@"+r.id]).split(" ");
-  r.points=POINTS[r.id].map(a=>({pt:true,y:a[0],name:a[1],w:a[2],note:a[3],approx:!!a[4],reg:r.id})).sort((x,y)=>x.y-y.y);
+  r.points=POINTS[r.id].map(a=>({pt:true,y:a[0],name:a[1],w:a[2],note:a[3],approx:!!a[4],reg:r.id,kind:kindOf(a[1]),level:levelOf(a[1])})).sort((x,y)=>x.y-y.y);
 }
 
 /* ---------- scale ---------- */
@@ -882,13 +1037,13 @@ function pack(items){
 function soloLens(){ return state.active.size===1 && state.lens!=="geo" ? LENS[state.lens] : null; }
 function buildCols(){
   const regs = REG.filter(r=>state.active.has(r.id)), lens = soloLens();
-  if (!lens) return regs.map(r=>({name:r.name,color:r.id,items:r.items,lanes:pack(r.items),points:state.events?r.points:[],ev:state.events,regs:[r.id]}));
+  if (!lens) return regs.map(r=>({name:r.name,color:r.id,items:r.items,lanes:pack(r.items),points:state.events?r.points.filter(p=>p.level<=shownLevel()):[],ev:state.events,regs:[r.id]}));
   const r=regs[0], idx=LENSKEYS.indexOf(state.lens), cols=[]; let i=0;
   for (const [code,label] of Object.entries(lens.cats)){
     const items=r.items.filter(it=>it.tags[idx]===code);
     if (items.length) cols.push({name:label,color:PAL[i++%PAL.length],items,lanes:pack(items),points:[],ev:false,regs:[r.id]});
   }
-  if (state.events) cols.push({name:"Events",color:null,items:[],lanes:0,points:r.points,ev:true,regs:[r.id]});
+  if (state.events) cols.push({name:"Events",color:null,items:[],lanes:0,points:r.points.filter(p=>p.level<=shownLevel()),ev:true,regs:[r.id]});
   return cols;
 }
 
@@ -968,7 +1123,7 @@ function renderV(keepYear){
       b.setAttribute("aria-label",`${it.name}, ${fmt(it.s)} to ${fmt(it.e)}`);
       b.title=it.name;
       if (state.sel===it) b.classList.add("sel");
-      b.addEventListener("click",()=>select(it));
+      b.addEventListener("click",()=>select(it)); hoverLoad(b,it);
       it.node=b; plot.append(b);
     }
   }
@@ -980,14 +1135,14 @@ function renderV(keepYear){
     const tw=evW-26, cpl=Math.max(6,Math.floor(tw/5.9));
     for (const p of c.points){
       const y=Y(p.y);
-      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(el("i"));
+      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(eventIcon(p)); if (p.level===1 && shownLevel()>1) b.classList.add("l1"); hoverLoad(b,p);
       let dx=0;
       if (evLabels){
         if (y-7>=lastBottom){ const sp=el("span",null,p.name); sp.style.width=tw+"px"; b.append(sp); lastBottom=y-7+Math.ceil(p.name.length/cpl)*13+3; }
       } else if (y-lastY<13){ flip=!flip; dx=flip?13:0; } else flip=false;
       const rule=el("div","evrule"); rule.style.cssText=`left:${c.x}px;width:${c.ex-c.x+4}px;top:${y}px`; plot.append(rule);
       b.style.left=(c.ex+dx)+"px"; b.style.top=(y-7)+"px";
-      b.setAttribute("aria-label",`${p.name}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
+      b.setAttribute("aria-label",`${p.name}${p.kind?", "+KINDNAME[p.kind].toLowerCase():""}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
       b.addEventListener("click",()=>select(p));
       p.node=b; plot.append(b); lastY=y;
     }
@@ -1006,7 +1161,7 @@ function renderV(keepYear){
       for (const run of runs){
         const d=el("div","band"+(ev.b-ev.a>120?" long":"")); d.style.cssText=`left:${run.x}px;width:${run.w}px;top:${y0}px;height:${h}px`; plot.append(d);
       }
-      const lab=el("button","bandlab"+(state.sel===ev?" sel":""),ev.n); lab.type="button";
+      const lab=el("button","bandlab"+(state.sel===ev?" sel":""),ev.n); lab.type="button"; if (kindOf(ev.n)) lab.prepend(icon(kindOf(ev.n))); hoverLoad(lab,ev);
       lab.style.left=(runs[0].x+3)+"px"; lab.style.top=y0+"px";
       lab.addEventListener("click",()=>select(ev));
       ev.node=lab; plot.append(lab);
@@ -1033,8 +1188,8 @@ function renderH(keepYear){
   const totalLanes = cols.reduce((n,c)=>n+c.lanes,0), nEv = cols.filter(c=>c.ev).length;
   const availH = scroller.clientHeight - AXIS_H - cols.length*9 - 2;
   let lines = 0;
-  if (nEv) lines = Math.max(0, Math.min(4, Math.floor(((availH - totalLanes*20)/nEv - 8)/15)));
-  const evH = nEv ? (lines ? 6 + lines*15 : 26) : 0;
+  if (nEv) lines = Math.max(0, Math.min(4, Math.floor(((availH - totalLanes*20)/nEv - 8)/19)));
+  const evH = nEv ? (lines ? 10 + lines*19 : 30) : 0;
   const laneH = Math.max(18, Math.min(40, Math.floor((availH - nEv*evH)/Math.max(1,totalLanes))));
   const fs = laneH>=30 ? 14 : laneH>=24 ? 13 : 12;
   const cw = fs*0.47;
@@ -1088,7 +1243,7 @@ function renderH(keepYear){
       b.setAttribute("aria-label",`${it.name}, ${fmt(it.s)} to ${fmt(it.e)}`);
       b.title=it.name;
       if (state.sel===it) b.classList.add("sel");
-      b.addEventListener("click",()=>select(it));
+      b.addEventListener("click",()=>select(it)); hoverLoad(b,it);
       it.node=b; plot.append(b);
     }
   }
@@ -1100,22 +1255,22 @@ function renderH(keepYear){
     let lastX=-99, flip=false;
     for (const p of c.points){
       const x=Y(p.y);
-      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(el("i"));
+      const b=el("button","ev"+(state.sel===p?" sel":"")); b.type="button"; b.append(eventIcon(p)); if (p.level===1 && shownLevel()>1) b.classList.add("l1"); hoverLoad(b,p);
       let line=0;
       if (lines){
         const tw = 16 + p.name.length*6.1 + 10;
         let i = ends.findIndex(e=>x-5>=e);
         if (i>=0){ const sp=el("span",null,p.name); b.append(sp); ends[i]=x-5+tw; line=i; }
         else line = ends.indexOf(Math.min(...ends));
-        b.style.top=(c.ey+line*15)+"px";
+        b.style.top=(c.ey+4+line*19)+"px";
       } else {
         if (x-lastX<13){ flip=!flip; } else flip=false;
-        b.style.top=(c.ey+(flip?11:0))+"px";
+        b.style.top=(c.ey+4+(flip?11:0))+"px";
       }
       const top=parseFloat(b.style.top);
       const rule=el("div","evrule v"); rule.style.cssText=`left:${x}px;top:${c.y}px;height:${top+6-c.y}px`; plot.append(rule);
-      b.style.left=(x-5)+"px";
-      b.setAttribute("aria-label",`${p.name}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
+      b.style.left=(x-(p.kind?iconSize(p)/2:5))+"px";
+      b.setAttribute("aria-label",`${p.name}${p.kind?", "+KINDNAME[p.kind].toLowerCase():""}, ${p.approx?"about ":""}${fmt(p.y)}`); b.title=p.name;
       b.addEventListener("click",()=>select(p));
       p.node=b; plot.append(b); lastX=x;
     }
@@ -1134,7 +1289,7 @@ function renderH(keepYear){
       for (const run of runs){
         const d=el("div","band h"+(ev.b-ev.a>120?" long":"")); d.style.cssText=`left:${x0}px;width:${w}px;top:${run.y}px;height:${run.h}px`; plot.append(d);
       }
-      const lab=el("button","bandlab h"+(state.sel===ev?" sel":""),ev.n); lab.type="button";
+      const lab=el("button","bandlab h"+(state.sel===ev?" sel":""),ev.n); lab.type="button"; if (kindOf(ev.n)) lab.prepend(icon(kindOf(ev.n))); hoverLoad(lab,ev);
       lab.style.left=(x0+2)+"px"; lab.style.top=(runs[0].y+2)+"px";
       lab.addEventListener("click",()=>select(ev));
       ev.node=lab; plot.append(lab);
@@ -1148,7 +1303,7 @@ function renderH(keepYear){
 /* ---------- detail ---------- */
 function showHint(){
   detail.innerHTML="";
-  detail.append(el("p","hint","Tap a bar, a diamond or an orange label for dates, a line of context and a Wikipedia link."));
+  detail.append(el("p","hint","Tap a bar, an event icon or an orange label for dates, a line of context, a picture and a Wikipedia link."));
 }
 function select(obj){
   if (state.sel && state.sel.node) state.sel.node.classList.remove("sel");
@@ -1162,12 +1317,15 @@ function select(obj){
   if (obj.n){                                   /* event */
     left.append(el("h2",null,obj.n));
     const d=el("span"); d.innerHTML=`<b>${obj.b-obj.a<=10?"c. "+fmt(obj.a):fmt(obj.a)+" to "+fmt(obj.b)}</b>`; meta.append(d);
+    if (kindOf(obj.n)){ const w=el("span","wartag"); w.append(icon(kindOf(obj.n)),KINDNAME[kindOf(obj.n)]); meta.append(w); }
     meta.append(el("span",null,"Across: "+REG.filter(r=>obj.r.includes(r.id)).map(r=>r.name).join(", ")));
     left.append(meta, el("p",null,obj.t), wikiLink(BANDWIKI[obj.n]||obj.n));
   } else if (obj.pt){                            /* dated event */
     left.append(el("h2",null,obj.name));
     const d=el("span"); d.innerHTML=`<b>${obj.approx?"c. ":""}${fmt(obj.y)}</b>`; meta.append(d);
     const tag=el("span","tag"); tag.style.setProperty("--c",`var(--c-${obj.reg})`); tag.append(el("i"), document.createTextNode(REG.find(r=>r.id===obj.reg).name)); meta.append(tag);
+    if (obj.kind){ const w=el("span","wartag"); w.append(icon(obj.kind),KINDNAME[obj.kind]); meta.append(w); }
+    meta.append(el("span",null,["","Major event","Notable event","Detail"][obj.level]));
     left.append(meta); if (obj.note) left.append(el("p",null,obj.note));
     left.append(wikiLink(obj.w));
   } else {
@@ -1190,7 +1348,8 @@ function select(obj){
     left.append(fc);
     left.append(wikiLink(WIKI[obj.name]||obj.name));
   }
-  row.append(left,x); detail.append(row);
+  left.className="txt";
+  row.append(left, picFigure(obj), x); detail.append(row);
 }
 
 /* ---------- controls ---------- */
@@ -1241,7 +1400,7 @@ $("orientH").addEventListener("click",()=>setOrient(true));
 function setOrient(h){
   if (state.horiz===h) return;
   const y=topYear(); state.horiz=h;
-  try{ localStorage.setItem("wh8-orient",h?"horizontal":"vertical"); }catch(e){}
+  try{ localStorage.setItem("wh8-layout",h?"horizontal":"vertical"); }catch(e){}
   drawOrient();
   const sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto";
   scroller.scrollTop=0; scroller.scrollLeft=0; scroller.style.scrollBehavior=sb;
@@ -1258,6 +1417,9 @@ about.addEventListener("click",e=>{ if(e.target===about) about.classList.remove(
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(about.classList.contains("open")) about.classList.remove("open"); else select(null);} });
 let rt; window.addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout(()=>render(topYear()),150); });
 
+{ const L=$("legendIcons"), g=el("span","icos"); ["pyramid","ship","book","crown","lamp"].forEach(k=>g.append(icon(k))); L.append(g," dated event, the icon shows its kind");
+  const W=el("span"); W.style.cssText="display:inline-flex;align-items:center;gap:5px"; W.append(icon("war"),"war, battle or conquest"); L.after(W);
+  L.style.cssText="display:inline-flex;align-items:center;gap:5px"; }
 drawOrient(); drawChips(); drawLens(); showHint(); render(0);
 </script>
 </body>
