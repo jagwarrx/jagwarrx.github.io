@@ -100,7 +100,7 @@ h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-
 .tbtools .tbt{display:none}
 .tbtools .tb{padding:0 9px;position:relative}
 @media (min-width:1200px){ .tbtools #storyBtn .tbt,.tbtools #shareBtn .tbt{display:inline} }
-.hello{flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line-strong);background:color-mix(in srgb,var(--accent) 9%,var(--surface))}
+.hello{flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--ink) 5%,var(--surface))}   /* a quiet grey ground: it is a note, not a warning */
 .hello p{margin:0;flex:1;font-size:14px;line-height:1.35}
 .hello .btn{flex:none;background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .hello .x{flex:none;position:static;background:none}
@@ -786,14 +786,14 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .ico.head{background-repeat:no-repeat;image-rendering:pixelated;border-radius:50%}
 .alive{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
 .who{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;background:var(--surface);cursor:pointer;font-size:13.5px;font-weight:500;line-height:1.2;text-align:center;min-width:0}
-.who:hover{border-color:#8e5bd6}
-.who .face{width:56px;height:56px;border-radius:50%;background-color:color-mix(in srgb,#8e5bd6 16%,var(--surface));box-shadow:0 0 0 1.5px color-mix(in srgb,#8e5bd6 55%,transparent);display:flex;align-items:center;justify-content:center}
+.who:hover{border-color:var(--ink)}
+.who .face{width:56px;height:56px;border-radius:50%;background-color:color-mix(in srgb,#8e5bd6 16%,var(--surface));box-shadow:0 0 0 1.5px var(--line-strong);display:flex;align-items:center;justify-content:center}
 .who .face .ico{width:58%;height:58%;margin:0}
 .who .face .ph{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 20%}
 .who small{font-weight:400;color:var(--muted);font-size:12.5px}
 .more{border:0;background:none;color:var(--accent);font:inherit;font-size:14px;font-weight:600;padding:6px 0 0;cursor:pointer}
-.dyk{display:block;width:100%;text-align:left;border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--lc) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--lc) 45%,transparent);cursor:pointer;font:inherit;color:inherit}
-.dyk:hover{border-color:var(--lc)}
+.dyk{display:block;width:100%;text-align:left;border-radius:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);cursor:pointer;font:inherit;color:inherit}   /* a plain card, like the rows under it: the only colour is its icon */
+.dyk:hover{border-color:var(--ink)}
 .dyk b{display:flex;gap:8px;align-items:center;font-size:16px;line-height:1.25;margin-bottom:4px}
 .dyk b .ico{width:24px;height:24px;flex:none}
 .dyk span{display:block;font-size:15px;line-height:1.5}
@@ -811,6 +811,8 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .up .ico.art{width:24px;height:24px;margin:-1px;background-repeat:no-repeat}
 .up>i{border-radius:4px;background:var(--c)}
 .up span{flex:1;min-width:0}
+.up[hidden]{display:none}
+.up.chgr>i{width:10px;height:10px;border-radius:3px;margin:0 6px}   /* What is changing: the region's small square, as in the filters column */
 .up small{flex:none;color:var(--muted);font-size:13px}
 .mnone{color:var(--muted);font-size:14px}
 details.more2{margin-top:12px;font-size:14px}
@@ -965,10 +967,13 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .fside .lclear{margin:0;padding:0;font-size:12.5px;order:0}
   .fside .thead{display:flex;align-items:baseline;justify-content:space-between;margin:3px 4px 2px}
   .fside .thead .rlab,.fside .thead .rlab2{margin:0}
-  /* a calm column: the colour sits in the square or the icon. A chip that is on has a soft tint, one that is off is plain. Every chip shows its count, so you can see what it would add */
-  .fside .lens,.fside .lens[aria-pressed="false"]:not(:disabled){border-width:1px;border-color:var(--line);box-shadow:none}
-  .fside .lens[aria-pressed="true"]{background:color-mix(in srgb,var(--lc) 14%,var(--surface));border-color:color-mix(in srgb,var(--lc) 50%,var(--line));box-shadow:none}
-  .fside .lens:not(:disabled):hover{border-color:var(--lc)}
+  /* a calm column: plain rows, no boxes and no tints. The colour sits only in the square or the icon. A row that is on has dark text on a soft grey ground; one that is off is plain and muted, its square hollow and its icon faded. Every row shows its count, so you can see what it would add; a zero is faint */
+  .fside .lens,.fside .lens[aria-pressed="false"]:not(:disabled){border-width:1px;border-color:transparent;background:none;box-shadow:none}
+  .fside .lens[aria-pressed="true"]{background:color-mix(in srgb,var(--ink) 6%,var(--surface));border-color:transparent;box-shadow:none}
+  .fside .lens:not(:disabled):hover{border-color:transparent;background:color-mix(in srgb,var(--ink) 11%,var(--surface))}
+  .fside .rchip[aria-pressed="false"] .rsw{opacity:1;background:none;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--lc) 70%,var(--surface))}
+  .fside .lens[aria-pressed="false"] .ico.pix img{opacity:.55;filter:saturate(.25)}
+  .fside .lens .n.z{opacity:.4}
   .fside .lens.rchip{font-family:var(--body)}
   .fside .lenses .lens .n{display:inline}
   .fside .lenses .lens .n::before,.fside .lenses .lens .n::after{content:none}
@@ -1174,20 +1179,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=187c3fd294"></script>
-<script src="books.js?v=187c3fd294"></script>
-<script src="videos.js?v=187c3fd294"></script>
-<script src="stories.js?v=187c3fd294"></script>
-<script src="deep.js?v=187c3fd294"></script>
-<script src="famous.js?v=187c3fd294"></script>
-<script src="kb.js?v=187c3fd294"></script>
-<script src="people/portraits.js?v=187c3fd294"></script>
-<script src="ovpics.js?v=187c3fd294"></script>
-<script src="kinds.js?v=187c3fd294"></script>
-<script src="events.js?v=187c3fd294"></script>
+<script src="hier.js?v=a7e92ff6a9"></script>
+<script src="books.js?v=a7e92ff6a9"></script>
+<script src="videos.js?v=a7e92ff6a9"></script>
+<script src="stories.js?v=a7e92ff6a9"></script>
+<script src="deep.js?v=a7e92ff6a9"></script>
+<script src="famous.js?v=a7e92ff6a9"></script>
+<script src="kb.js?v=a7e92ff6a9"></script>
+<script src="people/portraits.js?v=a7e92ff6a9"></script>
+<script src="ovpics.js?v=a7e92ff6a9"></script>
+<script src="kinds.js?v=a7e92ff6a9"></script>
+<script src="events.js?v=a7e92ff6a9"></script>
 <script>
 "use strict";
-const VER = "?v=187c3fd294";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=a7e92ff6a9";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -2508,6 +2513,7 @@ function renderH(keepYear){
 /* ---------- detail: The world in YEAR when nothing is open, else a card ---------- */
 const curYear = () => typeof MAP!=="undefined" ? MAP.year : INIT_YEAR;
 const regName = id => REG.find(r=>r.id===id).name;
+let chgOpen=false;   /* What is changing shows all its rows once asked */
 function nameBtn(obj,label){ const b=el("button","mname",label||obj.n||obj.name); b.type="button"; b.addEventListener("click",()=>goTo(obj)); hoverLoad(b,obj); return b; }
 const roundYrs = n => n<10 ? n : n<100 ? Math.round(n/5)*5 : n<1000 ? Math.round(n/10)*10 : Math.round(n/100)*100;
 function agoText(n){
@@ -2585,13 +2591,17 @@ function drawMoment(){
   }
   if (lines.length){
     w.append(el("h3",null,"What is changing"));
-    for (const [r,bits] of lines){
-      const row=el("div","chg"); row.style.setProperty("--c",`var(--c-${r.id})`);
-      const body=el("div"); body.append(el("b",null,r.name));
-      bits.forEach(([it,verb,yr],i)=>{ if (i) body.append(". "); body.append(nameBtn(it), ` ${verb==="begins" ? (yr===y?"begins":"began") : (yr===y?"ends":"ends")} in ${fmt(yr)}`); });
-      body.append(".");
-      row.append(el("i"), body); w.append(row);
-    }
+    /* rows like Coming up: the nearest change of each region first, four of them; the rest open on a click and stay open */
+    const flat=[]; for (const [r,bits] of lines) bits.forEach((b,i)=>flat.push([r,b,i]));
+    flat.sort((a,b)=>a[2]-b[2] || Math.abs(a[1][2]-y)-Math.abs(b[1][2]-y));
+    const u=el("div","ups"), SHOW=4;
+    flat.forEach(([r,[it,verb,yr]],i)=>{
+      const b=el("button","up chgr"); b.type="button"; const sq=el("i"); sq.style.setProperty("--c",`var(--c-${r.id})`);
+      b.append(sq, el("span",null,`${it.n||it.name} ${verb==="begins" ? (yr===y?"begins":"began") : "ends"}`), el("small",null, yr===y ? "this year" : fmt(yr)));
+      b.title=r.name; b.addEventListener("click",()=>goTo(it)); hoverLoad(b,it); if (i>=SHOW && !chgOpen) b.hidden=true; u.append(b);
+    });
+    w.append(u);
+    if (flat.length>SHOW && !chgOpen){ const m=el("button","more",`Show all ${flat.length}`); m.type="button"; m.addEventListener("click",()=>{ chgOpen=true; for (const b of u.children) b.hidden=false; m.remove(); }); w.append(m); }
   }
   /* what is still to come */
   const ups=[];
@@ -3266,7 +3276,8 @@ function lensChip(o){
 const mapView = () => typeof MAP!=="undefined" && MAP.mode==="full";
 function drawLenses(){
   const bar=$("lensBar"), lensOn=!!soloLens(), onMap=mapView(); bar.textContent="";
-  const many=state.layers.size>1, clear=cls=>{ const c=el("button",cls,"Clear all"); c.type="button"; c.title="Turn off all the overlays"; c.addEventListener("click",()=>setLayers([])); return c; };
+  /* one button by Topics that toggles: Select all turns every topic on; once all are on it reads Clear all */
+  const allOn=LAYERS.every(L=>state.layers.has(L.id)), clear=cls=>{ const c=el("button",cls,allOn ? "Clear all" : "Select all"); c.type="button"; c.title=allOn ? "Turn off all the topics" : "Turn on all the topics"; c.addEventListener("click",()=>setLayers(allOn ? [] : LAYERS.map(L=>L.id))); return c; };
   bar.append(el("span","rlab",onMap ? "On the map" : "On the chart"));
   bar.append(lensChip({key:"ev", on:state.events, label:"Events", ico:"calendar", mark:'<i class="key dia"></i>', c:"#5b6b7b", title:"The moments that matter most, picked from every topic", onclick:()=>{
     state.events=!state.events; if (!state.events && state.sel && state.sel.pt && !state.sel.lk && !state.sel.n && !itemOn(state.sel) && state.sel!==state.solo) select(null); render(topYear()); drawLenses(); }}));
@@ -3274,7 +3285,7 @@ function drawLenses(){
     state.links=!state.links; if (!state.links && state.sel && state.sel.n) select(null); render(topYear()); drawMoment(); drawLenses(); }}));
   if (XLINKS.length) bar.append(lensChip({key:"lk", on:state.xlinks && !lensOn && !onMap, disabled:lensOn||onMap, label:"Links", ico:"arrow", mark:LINKSVG, c:"#2b8db3", title: onMap ? "Links show on the chart" : lensOn ? "Links show when Group by is off" : "Arrows for things that travelled between regions: faiths, crops, inventions, people", onclick:()=>{
     state.xlinks=!state.xlinks; saveLS("wh8-links",state.xlinks?"on":"off"); if (!state.xlinks && state.sel && state.sel.lk) select(null); render(topYear()); drawLenses(); }}));
-  const th=el("span","thead"); th.append(el("span","rlab2","Topics")); if (many) th.append(clear("lclear"));
+  const th=el("span","thead"); th.append(el("span","rlab2","Topics")); th.append(clear("lclear"));
   bar.append(el("span","lsep"), th);
   for (const L of LAYERS){
     bar.append(lensChip({key:L.id, on:state.layers.has(L.id), label:SHORT[L.id][0], ico:L.icon, c:L.c, title:`${L.name}: ${SHORT[L.id][1]}`, onclick:()=>{
@@ -3295,7 +3306,7 @@ function lensCounts(){
       for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb && geoOf(p) && !isGuest(p)) C.ev++;
       for (const p of r.over) if (p.level<=lv && geoOf(p) && !isGuest(p) && onMapAt(p,y,wa,wb)){ C[p.layer]++; if (p.pick) C.ev++; }
     }
-    for (const n of bar.querySelectorAll(".n")) n.textContent=C[n.dataset.k]||0;
+    for (const n of bar.querySelectorAll(".n")){ const v=C[n.dataset.k]||0; n.textContent=v; n.classList.toggle("z",!v); }
     return;
   }
   const [a,b]=visibleYears();
@@ -3305,7 +3316,7 @@ function lensCounts(){
   }
   for (const e of EVENTS) if (e.a<=b && e.b>=a && e.r.some(id=>state.active.has(id))) C.band++;
   for (const L of XLINKS) if (L.level<=lv && L.y>=a && L.y<=b) C.lk++;
-  for (const n of bar.querySelectorAll(".n")) n.textContent=C[n.dataset.k]||0;
+  for (const n of bar.querySelectorAll(".n")){ const v=C[n.dataset.k]||0; n.textContent=v; n.classList.toggle("z",!v); }
 }
 function setLayers(ids){
   const y=topYear(); state.layers=new Set(ids); saveLS("wh8-layers",JSON.stringify([...state.layers]));
@@ -3878,9 +3889,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=187c3fd294"></script>
-<script src="routes.js?v=187c3fd294"></script>
-<script src="map.js?v=187c3fd294"></script>
+<script src="geo.js?v=a7e92ff6a9"></script>
+<script src="routes.js?v=a7e92ff6a9"></script>
+<script src="map.js?v=a7e92ff6a9"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3924,8 +3935,8 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=187c3fd294"></script>
-<script src="sidebar.js?v=187c3fd294"></script>
+<script src="ask.js?v=a7e92ff6a9"></script>
+<script src="sidebar.js?v=a7e92ff6a9"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

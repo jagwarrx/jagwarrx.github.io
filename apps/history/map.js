@@ -259,6 +259,7 @@ function paint(){
     mctx.lineWidth=.8; mctx.strokeStyle = dark ? "rgba(150,190,220,.3)" : "rgba(60,100,130,.45)"; mctx.stroke(ln);
   }
   MAP.paths=[];
+  const names=[];   /* the territories' names that fit: measured with the territories, drawn after the markers */
   if (MAP.feats){
     const shown=[], selF=featOf(state.sel);
     for (const f of MAP.feats){
@@ -308,29 +309,36 @@ function paint(){
       /* the selected territory's coast in red */
       if (sel){ const R=layer(2); paintFills(R,[sel]); R.globalCompositeOperation="source-in"; R.strokeStyle=RED; R.lineWidth=2; R.lineJoin="round"; R.stroke(coast); R.globalCompositeOperation="source-over"; blit(R,1); }
     }
-    /* names where they fit, biggest first, sized by the territory, in its own colour */
+    /* names where they fit, biggest first, sized by the territory, in its own colour. A territory's name is set in spaced capitals, so it reads as the ground
+       and not as one more item. The names are only measured here: they are drawn after the markers, so none sits half under a piece or an item's name */
     mctx.textAlign="center"; mctx.textBaseline="middle";
     const placed=[], LS="letterSpacing" in mctx;
     const order=shown.map(([,f])=>f).sort((a,b)=>(b===selF)-(a===selF) || (b.bb[2]-b.bb[0])*(b.bb[3]-b.bb[1])-(a.bb[2]-a.bb[0])*(a.bb[3]-a.bb[1]));
     for (const f of order){
       const w=(f.bb[2]-f.bb[0])*MAP.view.k, h=(f.bb[3]-f.bb[1])*MAP.view.k;
       if (h<14 || w<32) continue;
-      const size=Math.round(Math.max(10.5,Math.min(20,Math.sqrt(f.area)*MAP.view.k/8)));
-      mctx.font=`${size>=15?600:500} ${size}px "Barlow Condensed","Arial Narrow",Arial,sans-serif`;
-      if (LS) mctx.letterSpacing = size>=15 ? "1.2px" : size>=12 ? ".4px" : "0px";
-      const x=sx(f.lab.cx), y=sy(f.lab.cy), nm=mapLabel(f), tw=mctx.measureText(nm).width;
+      const size=Math.round(Math.max(9.5,Math.min(17,Math.sqrt(f.area)*MAP.view.k/9.5))), font=`500 ${size}px "Barlow Condensed","Arial Narrow",Arial,sans-serif`, sp=(size*.09).toFixed(1)+"px";
+      mctx.font=font; if (LS) mctx.letterSpacing=sp;
+      const x=sx(f.lab.cx), y=sy(f.lab.cy), nm=mapLabel(f).toUpperCase(), tw=mctx.measureText(nm).width;
       if (tw+8>w || x-tw/2<4 || x+tw/2>mapW-4 || y<size || y>mapH-size) continue;
       const r=[x-tw/2-2,y-size*.6,x+tw/2+2,y+size*.6];
       if (placed.some(q=>r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1])) continue;
-      placed.push(r);
-      const c=colorFor(f);
-      mctx.lineWidth=3; mctx.strokeStyle=c.fill; mctx.globalAlpha=.9; mctx.strokeText(nm,x,y);
-      mctx.globalAlpha=1; mctx.fillStyle = f===selF ? RED : c.text; mctx.fillText(nm,x,y);
+      placed.push(r); names.push({f, x, y, nm, r, font, sp, sel:f===selF});
     }
     if (LS) mctx.letterSpacing="0px";
   }
   paintRoutes(ink, surf);
-  paintMarks(cs, ink, surf);
+  paintMarks(cs, ink, surf, names.map(n=>n.r));
+  /* the territories' names, where no marker and no item's name took the place */
+  { const LS="letterSpacing" in mctx, hitB=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
+    mctx.textAlign="center"; mctx.textBaseline="middle"; mctx.lineJoin="round";
+    for (const n of names){
+      if (!n.sel && MAP.taken.some(q=>hitB(n.r,q))) continue;
+      const c=colorFor(n.f); mctx.font=n.font; if (LS) mctx.letterSpacing=n.sp;
+      mctx.lineWidth=3; mctx.strokeStyle=c.fill; mctx.globalAlpha=.9; mctx.strokeText(n.nm,n.x,n.y);
+      mctx.globalAlpha=1; mctx.fillStyle = n.sel ? RED : c.text; mctx.fillText(n.nm,n.x,n.y);
+    }
+    if (LS) mctx.letterSpacing="0px"; mctx.textAlign="left"; }
   paintRouteLabels(surf);
   if (!state.active.size || (MAP.feats && !MAP.paths.length)){
     mctx.fillStyle=cs.getPropertyValue("--muted").trim(); mctx.font='500 12px "Barlow",Arial,sans-serif'; mctx.textAlign="center";
@@ -586,8 +594,8 @@ function paintRoutes(ink, surf){
   mctx.restore();
   if (prog<1) requestAnimationFrame(drawMap);
 }
-function paintMarks(cs, ink, surf){
-  MAP.marks=[];
+function paintMarks(cs, ink, surf, nameBoxes=[]){
+  MAP.marks=[]; MAP.taken=[];   /* taken: the boxes of the markers and of their names, which a territory's name keeps out of */
   const y=MAP.year, W=winYears(y), [wa,wb]=shownAB(y), items=mapItems().map(o=>({o, g:geoOf(o)})).filter(m=>m.g);
   $("mapWin").textContent = (state.events||state.layers.size) && !MAP.small ? `Showing ${fmt(Math.max(START,wa))} to ${fmt(Math.min(NOW,wb))}` : "";
   placeWin();
@@ -668,11 +676,14 @@ function paintMarks(cs, ink, surf){
     if (!isSel && !away && m.o.level>(MAP.small ? 1 : deep>.6 ? 3 : 2)) continue;
     mctx.font=labFont(m.o);
     const tw=mctx.measureText(txt).width, tries=labAt(m,m.fx,m.fy,tw);
-    let b = m.lab || tries.find(t=>t[0]>2 && t[2]<mapW-2 && !boxes.some(q=>hit(t,q)));
+    /* a place that covers no territory's name first; else any free place, and that territory's name gives way */
+    const free = t=>t[0]>2 && t[2]<mapW-2 && !boxes.some(q=>hit(t,q));
+    let b = m.lab || tries.find(t=>free(t) && !nameBoxes.some(q=>hit(t,q))) || tries.find(free);
     if (!b){ if (!isSel) continue; b=tries[0]; }
     boxes.push(b); nL++;
     mctx.lineWidth=3.5*fs; mctx.strokeStyle=surf; mctx.strokeText(txt,b[0]+2,(b[1]+b[3])/2); mctx.fillStyle=isSel?RED:ink; mctx.fillText(txt,b[0]+2,(b[1]+b[3])/2);
   }
+  MAP.taken=boxes;
 }
 /* every territory on the map now that a bar stands for, in any region (an empire can span two) */
 function featsOf(obj, feats=MAP.feats){
