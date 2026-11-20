@@ -467,6 +467,24 @@ body.sized .app{grid-template-columns:minmax(0,1fr) var(--sidew) var(--pinw,0px)
 .sgrip{position:absolute;left:0;top:0;bottom:0;width:7px;margin-left:-1px;cursor:col-resize;z-index:30;touch-action:none}
 .sgrip::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .15s}
 .sgrip:hover::after,.sgrip.on::after{opacity:1}
+/* the right panel folds to a rail. The button shows on The world in YEAR; a card that opens unfolds the panel until it is closed */
+.sfoldb{position:absolute;top:9px;right:8px;z-index:31;width:30px;height:30px;border:1px solid transparent;border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0}
+.sfoldb:hover{border-color:var(--line-strong);color:var(--ink)}
+.sfoldb svg{transform:rotate(180deg)}
+body.hascard .sfoldb{display:none}
+#detail .moment h2{padding-right:34px}
+body.sfold .sfoldb svg{transform:none}
+body.sfold #side>.detail,body.sfold #side>.sgrip{display:none}
+body.sfold #side{cursor:pointer}
+@media (min-width:1300px){ body.sfold #app{grid-template-columns:minmax(0,1fr) 36px var(--pinw,0px)} }
+@media (min-width:760px) and (max-width:1299px){ body.sfold:not(.pinned) #app,body.sfold.pinhide #app{grid-template-columns:minmax(0,1fr) 36px var(--pinw,0px)} }
+@media (min-width:760px){ body.sfold .sfoldb{top:6px;right:2px} }
+@media (max-width:759px){
+  .sfoldb svg{transform:rotate(-90deg)}
+  body.sfold .sfoldb svg{transform:rotate(90deg)}
+  body.sfold #side{height:40px;max-height:40px}
+  body.sfold .sfoldb{top:4px}
+}
 body.resizing,body.resizing *{cursor:col-resize!important;user-select:none!important}
 /* the map: off, full (in place of the chart) or a floating window over the chart */
 .mappane{display:none;flex-direction:column;gap:4px;padding:7px 10px 6px;min-height:0;background:var(--surface)}
@@ -973,18 +991,18 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=2e57bdf3d0"></script>
-<script src="books.js?v=2e57bdf3d0"></script>
-<script src="videos.js?v=2e57bdf3d0"></script>
-<script src="stories.js?v=2e57bdf3d0"></script>
-<script src="deep.js?v=2e57bdf3d0"></script>
-<script src="famous.js?v=2e57bdf3d0"></script>
-<script src="kb.js?v=2e57bdf3d0"></script>
-<script src="people/portraits.js?v=2e57bdf3d0"></script>
-<script src="ovpics.js?v=2e57bdf3d0"></script>
+<script src="hier.js?v=f42f3dd77d"></script>
+<script src="books.js?v=f42f3dd77d"></script>
+<script src="videos.js?v=f42f3dd77d"></script>
+<script src="stories.js?v=f42f3dd77d"></script>
+<script src="deep.js?v=f42f3dd77d"></script>
+<script src="famous.js?v=f42f3dd77d"></script>
+<script src="kb.js?v=f42f3dd77d"></script>
+<script src="people/portraits.js?v=f42f3dd77d"></script>
+<script src="ovpics.js?v=f42f3dd77d"></script>
 <script>
 "use strict";
-const VER = "?v=2e57bdf3d0";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=f42f3dd77d";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -1138,16 +1156,30 @@ sa:[
  ["Anuradhapura (Sri Lanka)","Anuradhapura",-377,1017,"s","The founding date comes from later chronicles. One of the longest-lived capitals in Asia."],
  ["Maurya Empire","Maurya",-322,-185,"","The first empire to span most of the subcontinent. Ashoka's edicts are its own voice."],
  ["Tamil kingdoms (Chera, Chola, Pandya)","Tamil kingdoms",-300,300,"se","The Sangam age. Dates rest largely on literature and finds from Roman trade."],
+ ["Indo-Greek kingdoms","Indo-Greeks",-180,10,"se","Greek kings of Gandhara and Punjab, heirs of Alexander's settlers. Known mostly from their coins."],
  ["Satavahanas","",-100,225,"se","Deccan dynasty. Scholars place its start anywhere from c. 230 to c. 30 BCE."],
  ["Pallavas","",275,897,"s","South Indian dynasty whose script and temple style travelled to Southeast Asia."],
  ["Gupta Empire","Guptas",320,550,"e","North Indian empire associated with advances in mathematics and Sanskrit literature."],
  ["Chalukyas & Rashtrakutas","Deccan empires",543,982,"","Successive powers of the Deccan. The Rashtrakutas cut the Kailasa temple at Ellora."],
+ ["Rajput states","Rajputs",700,1949,"sc","Clan kingdoms of Rajasthan such as Mewar, Marwar and Amber. They outlasted the sultans, the Mughals and the British."],
+ ["Gurjara-Pratiharas","Pratiharas",730,1036,"s","Rulers of Kannauj and the leading power of north India in the 800s."],
  ["Pala Empire","Palas",750,1161,"","Buddhist dynasty of Bengal and Bihar, patrons of Nalanda."],
  ["Chola Empire","Cholas",848,1279,"","Tamil naval power that raided Srivijaya in 1025."],
+ ["Hoysala Empire","Hoysalas",1026,1343,"s","Karnataka kingdom known for the carved temples of Belur and Halebidu."],
+ ["Later Sinhalese kingdoms (Polonnaruwa, Kotte, Kandy)","Sinhalese kingdoms",1055,1815,"","The capital moved south-west after 1232. Kandy held out until 1815."],
+ ["Eastern Gangas & Gajapatis","Odisha",1078,1568,"s","Kings of Odisha who built the temples of Puri and Konark."],
+ ["Kerala kingdoms (Calicut, Cochin, Travancore)","Kerala kingdoms",1124,1949,"s","Small pepper kingdoms of the Malabar coast. Vasco da Gama landed at Calicut in 1498."],
+ ["Kakatiya dynasty","Kakatiyas",1163,1323,"","Telugu kingdom of Warangal, known for its reservoirs and for the queen Rudrama Devi."],
+ ["Nepal (Malla and Shah kings)","Nepal",1201,2008,"","Malla kings of the Kathmandu valley, then the Shahs of Gorkha from 1768. A republic since 2008."],
  ["Delhi Sultanate","",1206,1526,"","Five successive dynasties ruling from Delhi."],
+ ["Ahom kingdom","Ahoms",1228,1826,"","Founded in Assam by Tai settlers from the east. It beat back the Mughals."],
  ["Vijayanagara","",1336,1646,"e","Its capital at Hampi was sacked in 1565. A reduced state lasted into the 1600s."],
+ ["Bahmani & Deccan sultanates","Deccan sultanates",1347,1687,"","The Bahmani kingdom split into five about 1500. The Mughals took the last, Golconda, in 1687."],
+ ["Bengal Sultanate","",1352,1576,"","Independent kingdom of the delta, rich in rice and cotton cloth."],
  ["Mughal Empire","Mughals",1526,1857,"e","Effective power collapsed after 1707. The emperor was a figurehead long before the British deposed him in 1857."],
+ ["Kingdom of Mysore","Mysore",1610,1799,"s","A small chiefdom from 1399, a kingdom from about 1610. Under Hyder Ali and Tipu Sultan it fought four wars with the British."],
  ["Maratha Confederacy","Marathas",1674,1818,"","Founded by Shivaji. The leading Indian power of the 1700s."],
+ ["Hyderabad State","Hyderabad",1724,1948,"","The Nizam's kingdom, the largest princely state. Joined to India by force in 1948."],
  ["British rule","",1757,1947,"s","East India Company dominance from Plassey in 1757. Crown rule from 1858."],
  ["Sikh Empire","Sikhs",1799,1849,"","Ranjit Singh's Punjab kingdom. Annexed after two wars with the Company."],
  ["India, Pakistan, Bangladesh, Sri Lanka","Modern states",1947,NOW,"","Partition in 1947. Bangladesh separated from Pakistan in 1971."]
@@ -1549,6 +1581,7 @@ const WIKI = {
  "Tamil kingdoms (Chera, Chola, Pandya)":"Three Crowned Kings","Satavahanas":"Satavahana dynasty","Pallavas":"Pallava dynasty",
  "Chalukyas & Rashtrakutas":"Rashtrakuta Empire","Vijayanagara":"Vijayanagara Empire","Maratha Confederacy":"Maratha Empire","British rule":"British Raj",
  "India, Pakistan, Bangladesh, Sri Lanka":"History of South Asia",
+ "Indo-Greek kingdoms":"Indo-Greek Kingdom","Rajput states":"Rajput","Gurjara-Pratiharas":"Pratihara dynasty","Hoysala Empire":"Hoysala Kingdom","Later Sinhalese kingdoms (Polonnaruwa, Kotte, Kandy)":"Kingdom of Polonnaruwa","Eastern Gangas & Gajapatis":"Eastern Ganga dynasty","Kerala kingdoms (Calicut, Cochin, Travancore)":"Zamorin","Nepal (Malla and Shah kings)":"Malla dynasty (Nepal)","Bahmani & Deccan sultanates":"Deccan sultanates",
  "Jōmon Japan":"Jōmon period","Longshan cultures":"Longshan culture","Erlitou (possibly the Xia)":"Erlitou culture","Shang":"Shang dynasty","Zhou":"Zhou dynasty",
  "Yayoi Japan":"Yayoi period","Qin":"Qin dynasty","Han":"Han dynasty","Period of division":"Six Dynasties","Kofun and Yamato Japan":"Kofun period",
  "Sui":"Sui dynasty","Tang":"Tang dynasty","Nara & Heian Japan":"Heian period","Liao & Jin (north)":"Jin dynasty (1115–1234)","Song":"Song dynasty",
@@ -1679,6 +1712,7 @@ const TAGS = {
  "Delhi Sultanate":"ie isl agr sr riv emp cal","Vijayanagara":"dr hin agr io high emp ind","Mughal Empire":"ie isl agr io riv emp mon",
  "Maratha Confederacy":"ie hin agr io high conf ind","British rule":"ie chr agr glo riv col eur","Sikh Empire":"ie x agr sr riv king own",
  "India, Pakistan, Bangladesh, Sri Lanka":"mx sec ind glo riv nat mod",
+ "Indo-Greek kingdoms":"ie poly agr sr high king own","Rajput states":"ie hin agr loc arid king ind","Gurjara-Pratiharas":"ie hin agr loc riv emp ind","Hoysala Empire":"dr hin agr io high king ind","Later Sinhalese kingdoms (Polonnaruwa, Kotte, Kandy)":"ie bud agr io isl king ind","Eastern Gangas & Gajapatis":"ie hin agr io riv king ind","Kerala kingdoms (Calicut, Cochin, Travancore)":"dr hin mar io trop king ind","Kakatiya dynasty":"dr hin agr io high king ind","Nepal (Malla and Shah kings)":"ie hin agr sr high king ind","Ahom kingdom":"kd hin agr loc riv king own","Bahmani & Deccan sultanates":"ie isl agr io high king cal","Bengal Sultanate":"ie isl agr io riv king cal","Kingdom of Mysore":"dr hin agr io high king ind","Hyderabad State":"ie isl agr io high king cal",
 
  "Jōmon Japan":"iso poly for loc isl non own","Liangzhu culture":"iso poly agr loc riv city own","Longshan cultures":"iso poly agv loc riv non own",
  "Erlitou (possibly the Xia)":"st poly agr loc riv king own","Shang":"st poly agr loc riv king chi","Zhou":"st con agr loc riv king chi",
@@ -2501,6 +2535,7 @@ function select(obj){
   if (state.solo && obj!==state.solo){ state.solo=null; if (state.sel && state.sel.node) state.sel.node.classList.remove("sel"); state.sel=null; render(topYear()); }
   if (state.sel && state.sel.node) state.sel.node.classList.remove("sel");
   state.sel=obj;
+  if (window.sideSync) sideSync();
   if (!obj){ drawMoment(); return; }
   if (obj.node) obj.node.classList.add("sel");
   detail.innerHTML="";
@@ -3546,14 +3581,32 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=2e57bdf3d0"></script>
-<script src="map.js?v=2e57bdf3d0"></script>
+<script src="geo.js?v=f42f3dd77d"></script>
+<script src="map.js?v=f42f3dd77d"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
   /* the map sizes itself and loads borders after this runs: frame the step again once it is ready */
   setTimeout(()=>{ if (story && story.s===s) showStop(); }, 900); } }
 openStoryLink();
+/* ---------- the side panel folds to a rail. The choice is kept. A card that opens unfolds the panel until the card is closed ---------- */
+{
+  const side=$("side"), b=el("button","sfoldb"); b.type="button"; b.id="sideFold"; b.setAttribute("aria-controls","detail");
+  b.innerHTML='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  side.append(b);
+  let folded = LS("wh8-side")==="fold";
+  const B=document.body.classList;
+  window.sideSync=()=>{
+    const card=!!state.sel, f=folded && !card, was=B.contains("sfold");
+    B.toggle("hascard",card); B.toggle("sfold",f);
+    b.setAttribute("aria-expanded",!f); b.title = f ? "Show the panel" : "Fold the panel"; b.setAttribute("aria-label",b.title);
+    if (was!==f) requestAnimationFrame(()=>dispatchEvent(new Event("resize")));   /* the chart and the map take the freed space */
+  };
+  const set=f=>{ folded=f; saveLS("wh8-side",f?"fold":"open"); sideSync(); };
+  b.addEventListener("click",e=>{ e.stopPropagation(); set(!B.contains("sfold")); });
+  side.addEventListener("click",()=>{ if (B.contains("sfold")) set(false); });
+  sideSync();
+}
 /* ---------- the side panel's width, set by dragging its left edge ---------- */
 {
   const side=document.getElementById("side"), app=side.parentElement, grip=document.createElement("div");
@@ -3573,8 +3626,8 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=2e57bdf3d0"></script>
-<script src="sidebar.js?v=2e57bdf3d0"></script>
+<script src="ask.js?v=f42f3dd77d"></script>
+<script src="sidebar.js?v=f42f3dd77d"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
