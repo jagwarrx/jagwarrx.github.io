@@ -12,6 +12,7 @@
 ## Essays
 
 - [Your agent will say it sent the email](https://hmeyy.com/essays/agent-said-it-sent-the-email.html): What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.
+- [Ask a Better Question](https://hmeyy.com/essays/ask-a-better-question.html): Before I build a tool, I stop and ask what I'm trying to achieve and whether there's an easier, quicker or better way. Often that way is to run the thing through a prompt first.
 - [Artificial Intelligence: Where to dig](https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html): Improve features, create features, create products. The easier problems first.
 - [Is There a Best Possible Study Plan for a Subject?](https://hmeyy.com/essays/best-study-plan.html): No single one, but there is a best plan for a given goal and person, and good plans share a structure: an end test, a map, concepts with cases, retrieval, tacit practice and a changing surface.
 - [Change the Environment to Change the Actions](https://hmeyy.com/essays/change-the-environment.html): Change the environment and the situation, which changes the constraints, which changes the actions. The levers work on different time scales: minutes, days, months, years.
