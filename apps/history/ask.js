@@ -246,13 +246,28 @@ $("askKeyBtn").addEventListener("click", () => showKey(keyRow.hidden));
 $("askKeySave").addEventListener("click", () => { if (!keySave(keyRow)) return; showKey(false); if (keyGet() && askQ.value.trim() && !busy) go(); });
 askQ.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); go(); } });
 $("askGo").addEventListener("click", () => go());
-/* while a story is being made, the top bar shows a spinner and the current step; on hover, a stop button */
+/* the thinking mark (CSS .think in app.html): the logo, with three motions that take turns every few beats */
+const THINKSVG = '<svg viewBox="-50 -50 100 100"><g style="--k:0;--c:var(--c-eu)"><circle class="d" style="--i:0" cx="0.0" cy="-15.0" r="3.30"/><circle class="d" style="--i:1" cx="0.1" cy="-22.5" r="3.02"/><circle class="d" style="--i:2" cx="0.6" cy="-29.3" r="2.74"/><circle class="d" style="--i:3" cx="1.9" cy="-35.2" r="2.46"/><circle class="d" style="--i:4" cx="4.7" cy="-39.9" r="2.19"/><circle class="d" style="--i:5" cx="9.0" cy="-42.0" r="1.91"/><circle class="d" style="--i:6" cx="12.8" cy="-40.6" r="1.63"/><circle class="d" style="--i:7" cx="13.5" cy="-37.3" r="1.35"/></g><g style="--k:1;--c:var(--c-me)"><circle class="d" style="--i:0" cx="10.6" cy="-10.6" r="3.30"/><circle class="d" style="--i:1" cx="16.0" cy="-15.8" r="3.02"/><circle class="d" style="--i:2" cx="21.1" cy="-20.3" r="2.74"/><circle class="d" style="--i:3" cx="26.3" cy="-23.6" r="2.46"/><circle class="d" style="--i:4" cx="31.6" cy="-24.8" r="2.19"/><circle class="d" style="--i:5" cx="36.0" cy="-23.3" r="1.91"/><circle class="d" style="--i:6" cx="37.7" cy="-19.7" r="1.63"/><circle class="d" style="--i:7" cx="36.0" cy="-16.9" r="1.35"/></g><g style="--k:2;--c:var(--c-ca)"><circle class="d" style="--i:0" cx="15.0" cy="0.0" r="3.30"/><circle class="d" style="--i:1" cx="22.5" cy="0.1" r="3.02"/><circle class="d" style="--i:2" cx="29.3" cy="0.6" r="2.74"/><circle class="d" style="--i:3" cx="35.2" cy="1.9" r="2.46"/><circle class="d" style="--i:4" cx="39.9" cy="4.7" r="2.19"/><circle class="d" style="--i:5" cx="42.0" cy="9.0" r="1.91"/><circle class="d" style="--i:6" cx="40.6" cy="12.8" r="1.63"/><circle class="d" style="--i:7" cx="37.3" cy="13.5" r="1.35"/></g><g style="--k:3;--c:var(--c-ea)"><circle class="d" style="--i:0" cx="10.6" cy="10.6" r="3.30"/><circle class="d" style="--i:1" cx="15.8" cy="16.0" r="3.02"/><circle class="d" style="--i:2" cx="20.3" cy="21.1" r="2.74"/><circle class="d" style="--i:3" cx="23.6" cy="26.3" r="2.46"/><circle class="d" style="--i:4" cx="24.8" cy="31.6" r="2.19"/><circle class="d" style="--i:5" cx="23.3" cy="36.0" r="1.91"/><circle class="d" style="--i:6" cx="19.7" cy="37.7" r="1.63"/><circle class="d" style="--i:7" cx="16.9" cy="36.0" r="1.35"/></g><g style="--k:4;--c:var(--c-se)"><circle class="d" style="--i:0" cx="0.0" cy="15.0" r="3.30"/><circle class="d" style="--i:1" cx="-0.1" cy="22.5" r="3.02"/><circle class="d" style="--i:2" cx="-0.6" cy="29.3" r="2.74"/><circle class="d" style="--i:3" cx="-1.9" cy="35.2" r="2.46"/><circle class="d" style="--i:4" cx="-4.7" cy="39.9" r="2.19"/><circle class="d" style="--i:5" cx="-9.0" cy="42.0" r="1.91"/><circle class="d" style="--i:6" cx="-12.8" cy="40.6" r="1.63"/><circle class="d" style="--i:7" cx="-13.5" cy="37.3" r="1.35"/></g><g style="--k:5;--c:var(--c-sa)"><circle class="d" style="--i:0" cx="-10.6" cy="10.6" r="3.30"/><circle class="d" style="--i:1" cx="-16.0" cy="15.8" r="3.02"/><circle class="d" style="--i:2" cx="-21.1" cy="20.3" r="2.74"/><circle class="d" style="--i:3" cx="-26.3" cy="23.6" r="2.46"/><circle class="d" style="--i:4" cx="-31.6" cy="24.8" r="2.19"/><circle class="d" style="--i:5" cx="-36.0" cy="23.3" r="1.91"/><circle class="d" style="--i:6" cx="-37.7" cy="19.7" r="1.63"/><circle class="d" style="--i:7" cx="-36.0" cy="16.9" r="1.35"/></g><g style="--k:6;--c:var(--c-af)"><circle class="d" style="--i:0" cx="-15.0" cy="0.0" r="3.30"/><circle class="d" style="--i:1" cx="-22.5" cy="-0.1" r="3.02"/><circle class="d" style="--i:2" cx="-29.3" cy="-0.6" r="2.74"/><circle class="d" style="--i:3" cx="-35.2" cy="-1.9" r="2.46"/><circle class="d" style="--i:4" cx="-39.9" cy="-4.7" r="2.19"/><circle class="d" style="--i:5" cx="-42.0" cy="-9.0" r="1.91"/><circle class="d" style="--i:6" cx="-40.6" cy="-12.8" r="1.63"/><circle class="d" style="--i:7" cx="-37.3" cy="-13.5" r="1.35"/></g><g style="--k:7;--c:var(--c-am)"><circle class="d" style="--i:0" cx="-10.6" cy="-10.6" r="3.30"/><circle class="d" style="--i:1" cx="-15.8" cy="-16.0" r="3.02"/><circle class="d" style="--i:2" cx="-20.3" cy="-21.1" r="2.74"/><circle class="d" style="--i:3" cx="-23.6" cy="-26.3" r="2.46"/><circle class="d" style="--i:4" cx="-24.8" cy="-31.6" r="2.19"/><circle class="d" style="--i:5" cx="-23.3" cy="-36.0" r="1.91"/><circle class="d" style="--i:6" cx="-19.7" cy="-37.7" r="1.63"/><circle class="d" style="--i:7" cx="-16.9" cy="-36.0" r="1.35"/></g><circle class="h" r="9.5"/></svg>';
+const THINK = [["sweep", 4800], ["turn", 6000], ["gather", 5200]];
+let thinkAt = 0, thinkTimer = null;
+function thinkNext() {
+  const all = document.querySelectorAll(".think"); if (!all.length) { thinkTimer = null; return; }
+  thinkAt = (thinkAt + 1) % THINK.length; for (const t of all) t.dataset.v = THINK[thinkAt][0];
+  thinkTimer = setTimeout(thinkNext, THINK[thinkAt][1]);
+}
+function thinkMark() {
+  const s = el("span", "think"); s.setAttribute("aria-hidden", "true"); s.innerHTML = THINKSVG; s.dataset.v = THINK[thinkAt][0];
+  if (!thinkTimer) thinkTimer = setTimeout(thinkNext, THINK[thinkAt][1]);
+  return s;
+}
+/* while a story is being made, the top bar shows the thinking mark and the current step; on hover, a stop button */
 const runPill = el("div", "askrun"); runPill.hidden = true;
-runPill.innerHTML = `<button type="button" class="askrun-open" title="Show Ask the map"><span class="askspin" aria-hidden="true"></span><span class="askrun-t"></span></button><button type="button" class="askrun-x" aria-label="Stop making the story" title="Stop">×</button>`;
+runPill.innerHTML = `<button type="button" class="askrun-open" title="Show Ask the map"><span class="askrun-t"></span></button><button type="button" class="askrun-x" aria-label="Stop making the story" title="Stop">×</button>`;
 $("moreBtn").before(runPill);
+runPill.querySelector(".askrun-open").prepend(thinkMark());
 runPill.querySelector(".askrun-open").addEventListener("click", e => { e.stopPropagation(); setAsk(true); });
 runPill.querySelector(".askrun-x").addEventListener("click", e => { e.stopPropagation(); run.stop = true; try { run.stream && run.stream.abort(); } catch (x) {} runPill.querySelector(".askrun-t").textContent = "Stopping"; });
-const runShow = t => { runPill.hidden = t == null; if (t != null) { runPill.querySelector(".askrun-t").textContent = t; runPill.title = t; } };
+const runShow = t => { runPill.hidden = t == null; if (t != null) { if (!thinkTimer) thinkTimer = setTimeout(thinkNext, THINK[thinkAt][1]); runPill.querySelector(".askrun-t").textContent = t; runPill.title = t; } };
 async function go(q) {
   q = (q ?? askQ.value).trim(); if (!q || busy) return;
   askQ.value = q;
@@ -384,7 +399,7 @@ function drawThread(th) {
   for (const t of th.turns) {
     log.append(el("div", "chq", t.q));
     const a = el("div", "cha"); if (t.a) a.append(renderAnswer(t.a, th.kid));
-    if (t.status && !t.a) a.append(el("p", "chst", t.status));
+    if (t.status && !t.a) { const p = el("p", "chst"); p.append(thinkMark(), el("span", null, t.status)); a.append(p); }
     if (t.err) a.append(el("p", "askerr", t.err));
     log.append(a);
   }
