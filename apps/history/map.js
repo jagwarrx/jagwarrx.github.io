@@ -342,7 +342,14 @@ function paint(){
 /* Each item sits where Wikipedia or Wikidata places it (people at their birthplace).
    It shows while the red line is within a window of years around it; people show from age 20 to their death. */
 const GEOD = typeof GEO!=="undefined" ? GEO : {};
-const geoOf = o => { const g=o.ll||GEOD[wikiTitle(o)]; return g ? [g[1],g[0]] : null; };   /* [lon, lat] */
+/* set by hand: items that share a Wikipedia page with another item but happened somewhere else, by name and region: [lat, lon].
+   Without this they would all stand at the page's one spot (Francis Xavier in Japan at Goa) */
+const GEOOWN = {"Atisha comes to Tibet|ca":[31.48,79.8], "Crimean Tatars deported|ca":[41.3,69.27], "Millets from Africa|sa":[22.26,70.92], "East India Company|sa":[22.57,88.36],
+  "Plague reaches Bombay|sa":[18.96,72.82], "Champa rice|ea":[26.08,119.3], "Francis Xavier in Japan|ea":[31.6,130.56], "Asian financial crisis|ea":[37.57,126.98],
+  "Dutch East India Company|se":[-6.13,106.81], "Cholera reaches Java and Siam|se":[13.75,100.5], "1918 flu in Samoa|se":[-13.83,-171.77], "Manila galleons|am":[16.85,-99.9],
+  "Slavery Abolition Act|am":[18,-76.8], "Japanese migration to Brazil|am":[-23.96,-46.33], "Settlement of Madagascar|af":[-18.9,47.5], "Stolypin agrarian reform|eu":[59.94,30.31]};
+const ownLL = o => o.ll || GEOOWN[o.name+"|"+o.reg] || null;
+const geoOf = o => { const g=ownLL(o)||GEOD[wikiTitle(o)]; return g ? [g[1],g[0]] : null; };   /* [lon, lat] */
 /* how many years either side of the map's year it shows items for; zoomed in to fine detail, it narrows with the chart */
 /* how far the map is zoomed in: 0 with the whole world across it, 2 at about a continent, 3.3 at about a country */
 function mapZoom(){ return MAP.view && mapW ? Math.log2(MAP.view.k/Math.max(1e-6, mapW/360)) : 0; }
@@ -367,6 +374,17 @@ function onMapAt(p,y,a,b){
 /* the place a click opened: {g:[lon,lat], on}; away: the items shown there that are outside the years on the map */
 MAP.open=null; MAP.away=new Set();
 const atPlace=(o,g)=>{ const q=geoOf(o); return !!q && Math.abs(q[0]-g[0])<=.1 && Math.abs(q[1]-g[1])<=.1; };
+/* a guest: an item with no place of its own, drawn at the spot of a Wikipedia page it shares with another item, outside its own region
+   (Francis Xavier in Japan would stand at Goa, where Francis Xavier in Goa is at home). It is not really there, so it folds away like
+   an item from another time: an open place shows it, a folded one does not. GEOOWN gives the known ones their own place; this catches new ones */
+let GUESTS=null;
+function isGuest(o){
+  if (!GUESTS){ GUESTS=new Set(); const by=new Map(), out=(g,r)=>!!r && (g[1]<r[0]-3 || g[1]>r[2]+3 || g[0]<r[1]-3 || g[0]>r[3]+3);
+    for (const r of REG) for (const p of [...r.points, ...r.over]){ const w=wikiTitle(p); if (GEOD[w]){ if (!by.has(w)) by.set(w,[]); by.get(w).push(p); } }
+    for (const [w,L] of by){ if (L.length<2) continue; const g=GEOD[w], home=L.filter(p=>!out(g,REGBOX[p.reg]));
+      if (home.length) for (const p of L) if (!ownLL(p) && p.layer!=="people" && out(g,REGBOX[p.reg])) GUESTS.add(p); } }
+  return GUESTS.has(o);
+}
 /* a search's focus: the map shows the item found, its own events and a few big items near it, from any year, not the whole crowd.
    A click on the item opens it out to everything it links to. "Show everything", or a card outside the focus, ends it */
 MAP.focus=null;                                   /* {obj, own:[...], all:[...], near:[...], on} */
@@ -385,7 +403,7 @@ function focusOn(obj){
       const inYears=o=>a!=null && focusYr(o)!=null && focusYr(o)<=b+10 && (o.e ?? o.b ?? focusYr(o))>=a-10;   /* overlaps its years: a life counts from birth to death */
       F.S=S; F.seen=seen; F.inYears=inYears;
       F.all.sort((p,q)=>inYears(q)-inYears(p) || (p.level||0)-(q.level||0) || Math.abs(focusYr(p)-a)-Math.abs(focusYr(q)-a));
-      F.all=F.all.slice(0,30); F.own=(F.all.some(inYears) ? F.all.filter(inYears) : F.all).slice(0,8);   /* its own: from its years, when it has any */
+      F.all=F.all.slice(0,30); F.own=(F.all.some(inYears) ? F.all.filter(inYears) : F.all).filter(o=>!isGuest(o)).slice(0,8);   /* its own: from its years, when it has any, and really at the place they are drawn */
       /* near it: up to 4 of the most important items on the map in these years, inside the box round the item, its events and its path */
       let bx=null; const add=(lon,lat)=>{ bx = bx ? [Math.min(bx[0],lon),Math.min(bx[1],lat),Math.max(bx[2],lon),Math.max(bx[3],lat)] : [lon,lat,lon,lat]; };
       for (const o of [obj, ...F.own]){ const g=geoOf(o); if (g) add(g[0],g[1]); }
@@ -431,22 +449,23 @@ function mapItems(){
   const y=MAP.year, [wa,wb]=shownAB(y), lv=mapLevel(), out=[];
   for (const r of REG){
     if (!state.active.has(r.id)) continue;
-    if (state.events) for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb) out.push(p);
+    if (state.events) for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb && (p===state.sel || !isGuest(p))) out.push(p);
     for (const p of r.over){
-      if (p!==state.solo && (!itemOn(p) || p.level>lv)) continue;
+      if (p!==state.solo && (!itemOn(p) || p.level>lv || (isGuest(p) && p!==state.sel))) continue;   /* a guest shows only when chosen, or in an open place */
       if (onMapAt(p,y,wa,wb) || (p===state.sel && p.layer==="people" && p.y<=y && y<=(p.e||NOW))) out.push(p);
     }
   }
-  /* an open place (a click on a marker opens its place, a second click folds it): what else stands there, from any time,
-     under the same filters. At most 16, the most important and the nearest in time first. Folded, only the chosen one stays */
+  /* an open place (a click on a marker opens its place, a second click folds it): what else stands there, from any time
+     or as a guest, under the same filters; and the chosen item's own story elsewhere (the items that share its Wikipedia page:
+     Francis Xavier brings up Francis Xavier in Japan, in Japan). At most 16, the most important and the nearest in time first. Folded, only the chosen one stays */
   MAP.away=new Set();
-  if (MAP.open){ const g=MAP.open.g, has=new Set(out), more=[];
+  if (MAP.open){ const g=MAP.open.g, has=new Set(out), more=[], sw = state.sel && !state.sel.n ? wikiTitle(state.sel) : null, kin=p=>!!sw && wikiTitle(p)===sw;
     for (const r of REG){
       if (!state.active.has(r.id)) continue;
-      if (state.events) for (const p of r.points) if (p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
-      for (const p of r.over) if (itemOn(p) && p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
+      if (state.events) for (const p of r.points) if (p.level<=lv && !has.has(p) && (atPlace(p,g) || kin(p))) more.push(p);
+      for (const p of r.over) if (itemOn(p) && p.level<=lv && !has.has(p) && (atPlace(p,g) || kin(p))) more.push(p);
     }
-    more.sort((a,b)=>(b===state.sel)-(a===state.sel) || a.level-b.level || Math.abs(a.y-y)-Math.abs(b.y-y));
+    more.sort((a,b)=>(b===state.sel)-(a===state.sel) || kin(b)-kin(a) || a.level-b.level || Math.abs(a.y-y)-Math.abs(b.y-y));
     for (const p of (MAP.open.on ? more.slice(0,16) : more.filter(p=>p===state.sel))){ out.push(p); MAP.away.add(p); }
   }
   return out;
