@@ -4,8 +4,57 @@
   <link href="https://hmeyy.com/"/>
   <link rel="self" href="https://hmeyy.com/feed.xml"/>
   <id>https://hmeyy.com/</id>
-  <updated>2026-11-19T00:00:00Z</updated>
+  <updated>2026-11-20T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
+  <entry>
+    <title>How to Build and Test the Best Study Plan</title>
+    <link href="https://hmeyy.com/essays/test-study-plan.html"/>
+    <id>https://hmeyy.com/essays/test-study-plan.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>Model memory as chunks and formats as state changes, then test the plan by splitting the subject.</summary>
+  </entry>
+  <entry>
+    <title>Is There a Best Possible Study Plan for a Subject?</title>
+    <link href="https://hmeyy.com/essays/best-study-plan.html"/>
+    <id>https://hmeyy.com/essays/best-study-plan.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>No single best plan, but good plans share a structure.</summary>
+  </entry>
+  <entry>
+    <title>Change the Environment to Change the Actions</title>
+    <link href="https://hmeyy.com/essays/change-the-environment.html"/>
+    <id>https://hmeyy.com/essays/change-the-environment.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>Change the environment to change the constraints to change the actions, at the right time scale.</summary>
+  </entry>
+  <entry>
+    <title>Constraints Drive Actions</title>
+    <link href="https://hmeyy.com/essays/constraints-drive-actions.html"/>
+    <id>https://hmeyy.com/essays/constraints-drive-actions.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>Constraints decide most actions before you decide anything.</summary>
+  </entry>
+  <entry>
+    <title>Removing Bullshit</title>
+    <link href="https://hmeyy.com/essays/removing-bullshit.html"/>
+    <id>https://hmeyy.com/essays/removing-bullshit.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>Most of designing a system is taking things out.</summary>
+  </entry>
+  <entry>
+    <title>Design the Data and the Features Together</title>
+    <link href="https://hmeyy.com/essays/design-together.html"/>
+    <id>https://hmeyy.com/essays/design-together.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>Designing the data is designing what the app can do. Design the data and the features together.</summary>
+  </entry>
+  <entry>
+    <title>Every To-Do App Is the Same List</title>
+    <link href="https://hmeyy.com/essays/the-same-list.html"/>
+    <id>https://hmeyy.com/essays/the-same-list.html</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <summary>Any data structure can be a list. Keep the data in one plain format and change the surface instead.</summary>
+  </entry>
   <entry>
     <title>The Spine and the Surface</title>
     <link href="https://hmeyy.com/essays/spine-and-surface.html"/>
@@ -13,6 +62,7 @@
     <updated>2026-11-19T00:00:00Z</updated>
     <summary>Keep a small, permanent spine and make everything around it disposable.</summary>
   </entry>
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Your agent will say it sent the email</title>
     <link href="https://hmeyy.com/essays/agent-said-it-sent-the-email.html"/>
@@ -20,6 +70,8 @@
     <updated>2026-09-22T00:00:00Z</updated>
     <summary>What it takes to let an AI agent act on real systems.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>I built my personal system eighteen times</title>
     <link href="https://hmeyy.com/essays/eighteen-systems.html"/>
@@ -27,6 +79,8 @@
     <updated>2026-09-22T00:00:00Z</updated>
     <summary>The median lasted four days. What survived had no schema at all.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Artificial Intelligence: Where to dig</title>
     <link href="https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html"/>
@@ -34,6 +88,8 @@
     <updated>2022-05-14T00:00:00Z</updated>
     <summary>Improve features, create features, create products. The easier problems first.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Coach Wooden</title>
     <link href="https://hmeyy.com/essays/coach-wooden.html"/>
@@ -41,6 +97,8 @@
     <updated>2022-05-11T00:00:00Z</updated>
     <summary>John Wooden&#x27;s seven rules for living, and why they still hold.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Reason, Resonance &amp; the Future</title>
     <link href="https://hmeyy.com/essays/reason-resonance-future.html"/>
@@ -48,6 +106,8 @@
     <updated>2022-05-07T00:00:00Z</updated>
     <summary>The future is created, not predicted. On meaning and what to build.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Peter Kaufman on Interdisciplinary Thinking</title>
     <link href="https://hmeyy.com/essays/interdisciplinary-thinking.html"/>
@@ -55,6 +115,8 @@
     <updated>2021-08-18T00:00:00Z</updated>
     <summary>Notes on the talk that made multidisciplinary thinking click.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Lessons In Crypto Markets</title>
     <link href="https://hmeyy.com/essays/lessons-in-crypto-markets.html"/>
@@ -62,6 +124,8 @@
     <updated>2021-08-12T00:00:00Z</updated>
     <summary>What a year of trading taught me about risk, patience and myself.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Lists of Book Lists</title>
     <link href="https://hmeyy.com/essays/lists-of-book-lists.html"/>
@@ -69,6 +133,8 @@
     <updated>2021-02-18T00:00:00Z</updated>
     <summary>The reading lists I go back to when choosing what to read next.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Aim to Be Directionally Correct</title>
     <link href="https://hmeyy.com/essays/directionally-correct.html"/>
@@ -76,6 +142,8 @@
     <updated>2021-01-18T00:00:00Z</updated>
     <summary>Precision is expensive. Direction is what compounds.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>The Chupacabra</title>
     <link href="https://hmeyy.com/essays/the-chupacabra.html"/>
@@ -83,6 +151,8 @@
     <updated>2020-09-25T00:00:00Z</updated>
     <summary>A short story.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Ode to Systems Thinking</title>
     <link href="https://hmeyy.com/essays/ode-to-systems-thinking.html"/>
@@ -90,6 +160,8 @@
     <updated>2020-06-06T00:00:00Z</updated>
     <summary>Consumers, creators and investors, and what it means to see the whole.</summary>
   </entry>
+  -->
+<!-- hidden 20 Nov 2026
   <entry>
     <title>Principles, Experiments &amp; Serendipity</title>
     <link href="https://hmeyy.com/essays/principles-experiments-serendipity.html"/>
@@ -97,4 +169,5 @@
     <updated>2020-04-21T00:00:00Z</updated>
     <summary>Turning 23. Lessons, professional and personal, and what comes next.</summary>
   </entry>
+  -->
 </feed>

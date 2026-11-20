@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design the Data and the Features Together — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/design-together.html">
+<meta name="description" content="Designing the data is designing what the app can do. Like a language and a program in Lisp, data and features should be designed together, with the interface as a surface on top.">
+<meta property="og:title" content="Design the Data and the Features Together — Hari Meyyappan">
+<meta property="og:description" content="Designing the data is designing what the app can do. Like a language and a program in Lisp, data and features should be designed together, with the interface as a surface on top.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/design-together.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Design the Data and the Features Together", "description": "Designing the data is designing what the app can do. Like a language and a program in Lisp, data and features should be designed together, with the interface as a surface on top.", "url": "https://hmeyy.com/essays/design-together.html", "mainEntityOfPage": "https://hmeyy.com/essays/design-together.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-20"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page on" href="index.html" aria-current="page">Essays</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>Design the Data and the Features Together</h1>
+  <p class="meta">November 2026. 903 words.</p>
+
+<p>In <a href="the-same-list.html">the last essay</a> I argued that every to-do app is the same list, and that the interface is mostly a reformatting of the data underneath. The obvious conclusion is to design the data first, get it right, and build the app on top. I tried that. It doesn&rsquo;t work either, and working out why changed what I mean by designing the data.</p>
+<h2>What designing the data means</h2>
+<p>Designing the data is deciding what the system knows. Which facts it keeps, what they&rsquo;re called, how they connect. A task has a mark for started, a mark for whether it matters, and a date, and it sits under an area.</p>
+<p>But you can&rsquo;t decide that on its own, because the app can only do what the data can say. &ldquo;Show me what&rsquo;s started&rdquo; is a feature. The started mark is the data that makes it possible. With no dates in the data there&rsquo;s no calendar, however good the screen looks. So designing the data is really designing what the app can do, written down in a form that outlives any screen.</p>
+<h2>Three layers, not two</h2>
+<p>I used to split a system into data and application. It&rsquo;s cleaner to see three layers:</p>
+<ul>
+<li><strong>Data</strong> is what it knows. It lasts for years.</li>
+<li><strong>Features</strong> are what it can do. They move with the data.</li>
+<li><strong>The interface</strong> is how it looks. It changes whenever I get bored.</li>
+</ul>
+<p>The interface is the surface from the last essay: a reformatting that sits on top and can be replaced without touching anything underneath. Data and features are the pair that has to be designed together.</p>
+<h2>Two ways to get it wrong</h2>
+<p><strong>Data first.</strong> You design the perfect schema before you know what the app will do. Then the first feature needs something the data can&rsquo;t say, like whether a task is started, or which of two dates is the real one. So you bolt it on in the app, a flag here and a special case there, where you can&rsquo;t see it from the data. The schema you were proud of is now wrapped in exceptions.</p>
+<p><strong>Screens first.</strong> You design the interface, and the data becomes whatever the screens happened to need. It works until the next redesign. Then you find the data is shaped like last year&rsquo;s screens, and changing the surface means migrating everything under it. That&rsquo;s the trap the last essay was about.</p>
+<h2>What Lisp knew</h2>
+<p>Paul Graham describes the alternative in <a href="https://paulgraham.com/progbot.html">Programming Bottom-Up</a>: &ldquo;In Lisp, you don&rsquo;t just write your program down toward the language, you also build the language up toward your program.&rdquo; You write some of the program, notice what the language is missing, add it, and the next part of the program gets shorter. &ldquo;Language and program evolve together.&rdquo;</p>
+<p>His image for it is the one I keep coming back to: &ldquo;Like the border between two warring states, the boundary between language and program is drawn and redrawn,&rdquo; until it settles along the natural frontiers of the problem.</p>
+<p>Swap the words and it describes data and features. The data is the language. The features are the program written in it. Design the data, design the features, together, and let the border between them move until it stops moving. The interface stays out of that fight. It gets built on whatever the border settles into.</p>
+<h2>What that looks like</h2>
+<p>The format in the last essay was built this way. I didn&rsquo;t sit down and design it. I started with one feature, a list of what to do today, and the smallest data that could support it. Today needed to know what was already started, so the data got a mark for started. The calendar needed dates, so lines got a date. When the data got awkward to read by hand, I changed the feature instead. Each side pushed on the other until neither needed anything new.</p>
+<p>A few rules came out of it:</p>
+<ul>
+<li>Start with one feature and the least data that supports it.</li>
+<li>When a feature needs something the data can&rsquo;t say, change the data. Don&rsquo;t hide the fix in the app.</li>
+<li>When the data gets hard to read on its own, change the feature. Don&rsquo;t add fields to make one feature easier.</li>
+<li>The data has to make sense without the app. If you can&rsquo;t read it in a text editor, the app has leaked into it.</li>
+<li>Keep the interface out of both. If a screen needs something, it asks through a feature.</li>
+<li>Stop when the border stops moving.</li>
+</ul>
+<p>Hackathons teach this whether you want it or not. There&rsquo;s no time to finish the schema before the demo, or the demo before the schema. The teams that do well decide what the thing does and what it needs to know in the same first hour, and keep both rough until the end.</p>
+<p>Graham says bottom-up design &ldquo;yields programs which are smaller and more agile,&rdquo; and that it &ldquo;makes programs easier to read.&rdquo; I&rsquo;d say the same about data designed next to its features. It stays small because nothing goes in that a feature didn&rsquo;t ask for. It stays readable because the screen isn&rsquo;t allowed to carry the meaning. And when I get bored and build a new surface, the data and features are still the right shape, because they were never shaped by one surface.</p>
+<p>Most of designing them together turned out to be cutting. That deserves its own essay: <a href="removing-bullshit.html">Removing Bullshit</a>.</p>
+
+<ul class="related">
+<li><a href="the-same-list.html">Every To-Do App Is the Same List</a></li>
+<li><a href="removing-bullshit.html">Removing Bullshit</a></li>
+<li><a href="index.html">All essays</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>

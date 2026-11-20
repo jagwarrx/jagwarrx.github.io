@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Every To-Do App Is the Same List — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/the-same-list.html">
+<meta name="description" content="Any data structure can be a list, so every task manager can hold what any other can. What differs is the surface. Keep the data in one plain format and change the surface instead.">
+<meta property="og:title" content="Every To-Do App Is the Same List — Hari Meyyappan">
+<meta property="og:description" content="Any data structure can be a list, so every task manager can hold what any other can. What differs is the surface. Keep the data in one plain format and change the surface instead.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/the-same-list.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Every To-Do App Is the Same List", "description": "Any data structure can be a list, so every task manager can hold what any other can. What differs is the surface. Keep the data in one plain format and change the surface instead.", "url": "https://hmeyy.com/essays/the-same-list.html", "mainEntityOfPage": "https://hmeyy.com/essays/the-same-list.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-20"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page on" href="index.html" aria-current="page">Essays</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>Every To-Do App Is the Same List</h1>
+  <p class="meta">November 2026. 1204 words.</p>
+
+<p>I&rsquo;ve used Google Keep, Things, NotePlan, Amplenote, and a dozen others. Each time I switched, I believed the new one could do something the old one couldn&rsquo;t. It took me far too long to notice that underneath, they were all the same thing.</p>
+<p>Any data structure can be written as a list. A tree is a list with indentation. A project is a list under a heading. A kanban board is a list where each line has a status. A calendar is a list sorted by date. Tags are words on the line. Programmers have known this forever: Lisp built a whole language on it. So every task manager can hold anything any other one can. They are computationally equivalent. No app ever let me store a task I couldn&rsquo;t have stored in a text file.</p>
+<p>If the data is the same, what was I switching for? The surface. How the list looks, what it shows me, what it hides, how it feels to open. That turned out to matter more than any feature, because of three constraints I didn&rsquo;t take seriously until recently.</p>
+<h2>The constraints</h2>
+<p><strong>The apps are built for neurotypical brains.</strong> They assume you&rsquo;ll remember the app exists, open it on your own, and do a weekly review because you know you should. Most of them reward careful filing: areas, projects, headings, tags. That works if your attention goes where you send it. Mine doesn&rsquo;t.</p>
+<p><strong>Out of sight is out of existence.</strong> For me, a task two clicks deep inside a project is the same as a task I never wrote down. I need visual persistence: the important things have to be in front of me without my asking. The app that worked best by accident was Keep, which isn&rsquo;t really a task manager at all. It&rsquo;s a wall of cards, pinned and colored, and I saw it every time I opened it.</p>
+<p><strong>I run on novelty.</strong> I do things because they&rsquo;re new or interesting, not because they&rsquo;re important. Daniel Gross <a href="https://marginalrevolution.com/marginalrevolution/2020/01/daniel-gross-on-productivity.html">put the trouble with to-do lists well</a>: &ldquo;The longer you think about a task without doing it, the less novel it becomes to do.&rdquo; Write an idea on a list and come back to it later, and &ldquo;you&rsquo;ve now converted an interesting idea into work.&rdquo; His fix is to not think about a task until he&rsquo;s ready to do all of it: &ldquo;I do not unwrap the piece of gum until I&rsquo;m ready to enjoy it in its entirety.&rdquo;</p>
+<p>At first that looks like it fights the last constraint. If I don&rsquo;t write it down, it&rsquo;s gone. But the two fit once you separate the line from the thinking. The list gets one line, enough to keep the task in existence. The thinking, the plan and the first step wait until I start, so the fun is still there when I need it to pull me in. An app that asks you to break everything into subtasks and notes up front is unwrapping the gum early. And every app switch was me looking for a fresh piece.</p>
+<h2>Change the surface, keep the data</h2>
+<p>The switching wasn&rsquo;t the problem. Novelty is a real need and I&rsquo;ve stopped fighting it. The problem was that each app keeps the same list in its own private shape. Things keeps it in a database. Keep keeps it on Google&rsquo;s servers, behind an export. So every switch was a migration, and migrations are where things get lost.</p>
+<p>If every app is the same list, the fix is to own the list. Keep the data in one plain format that never changes, and let the apps, views and rituals be the surface that changes as often as I want. That&rsquo;s the spine and the surface again, but this time the spine needs a format.</p>
+<h2>What the apps get right</h2>
+<p>Before inventing one, I looked at what each app I&rsquo;d stuck with did well.</p>
+<p><strong>Google Keep</strong>: cards, pins, colors, checkboxes. It&rsquo;s fast to capture into and everything important stays visible. But items have no dates, there&rsquo;s almost no structure, and getting your data out means a Takeout export.</p>
+<p><strong>Things</strong>: areas, projects, headings and to-dos, each with a When: Today, Upcoming, Anytime or Someday. The When is the best idea in any task app I&rsquo;ve used, because it answers the only question that matters each morning. But the tree is deep, and the data lives in a database you can&rsquo;t open in a text editor.</p>
+<p><strong>NotePlan and Amplenote</strong>: tasks live inside notes, next to the thinking that produced them. NotePlan stores everything as Markdown files on disk, and a date on a task line schedules it. Amplenote lets a task hide until its start date, and gives each task a score that grows the longer it waits. Text first, which I love. But tasks end up scattered across hundreds of notes, and you need a query to find them all again.</p>
+<h2>The merge</h2>
+<p>So I took one thing from each. From NotePlan, plain Markdown in a file I own. From Things, flat areas as headings and a single When. From Amplenote, tasks that stay hidden until their date. From Keep, nothing in the format at all, because visibility belongs to the surface.</p>
+<pre><code># Money
+- [/] Move the old 401k !
+- [ ] Pay the water bill &gt;2026-11-24
+
+# Home
+- [ ] Fix the gate
+- [x] Call the plumber</code></pre>
+<p>Each line carries the three things from the spine: whether it&rsquo;s started (<code>[/]</code>), whether it matters (<code>!</code>), and when (<code>&gt;date</code>). A date in the future means hidden until then. That&rsquo;s the whole format. A person can read it, a script can read it, and any app can be taught to.</p>
+<p>Now the apps are just views of the file. A Today view shows what&rsquo;s started or due. A wall of cards, one per area, gives me Keep&rsquo;s visibility. A calendar is the dated lines, sorted. When I get bored, I build or pick a new view, and the list underneath doesn&rsquo;t move.</p>
+<h2>Every app is a spreadsheet</h2>
+<p>There&rsquo;s a common saying in the hackathon world: every app can be a spreadsheet. Strip away the screens, and most products are rows and columns with rules about who can change what. It&rsquo;s the same point as the list. The data can almost always be flattened into something plain.</p>
+<p>But it doesn&rsquo;t have to be a spreadsheet. There are real limits on both sides. Machines have performance limits: some shapes are fast to search and some are slow, and a file with a million lines is not a database. People have limits too: what we can see at once, what we forget, what bores us. That&rsquo;s why UI and UX absolutely matter. For a brain like mine they matter more than any feature.</p>
+<p>Still, for many practical purposes, the interface is a reformatting of the data. It lives on top of the data, and it can be replaced without touching what&rsquo;s underneath. The list was never the interesting part. It&rsquo;s the lowest common denominator, which is exactly why it lasts. Put the permanence in the plainest thing you have, and spend the novelty on the surface.</p>
+<p>Which raises the next question. If the interface sits on top of the data, should you design the data first and the app after? I don&rsquo;t think so. I think you <a href="design-together.html">design them together</a>.</p>
+
+<ul class="related">
+<li><a href="spine-and-surface.html">The Spine and the Surface</a></li>
+<li><a href="design-together.html">Design the Data and the Features Together</a></li>
+<li><a href="index.html">All essays</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>

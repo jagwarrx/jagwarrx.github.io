@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Build and Test the Best Study Plan — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/test-study-plan.html">
+<meta name="description" content="Model memory as chunks with states, model each format by the state change it is good at, treat the plan as a schedule, and test it by splitting the subject, not the learner.">
+<meta property="og:title" content="How to Build and Test the Best Study Plan — Hari Meyyappan">
+<meta property="og:description" content="Model memory as chunks with states, model each format by the state change it is good at, treat the plan as a schedule, and test it by splitting the subject, not the learner.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/test-study-plan.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "How to Build and Test the Best Study Plan", "description": "Model memory as chunks with states, model each format by the state change it is good at, treat the plan as a schedule, and test it by splitting the subject, not the learner.", "url": "https://hmeyy.com/essays/test-study-plan.html", "mainEntityOfPage": "https://hmeyy.com/essays/test-study-plan.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-20"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page on" href="index.html" aria-current="page">Essays</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>How to Build and Test the Best Study Plan</h1>
+  <p class="meta">November 2026. 884 words.</p>
+
+<p>In <a href="best-study-plan.html">the last essay</a> I said there&rsquo;s no single best study plan, only a best plan for a given goal and person. That still leaves a harder question. For that goal and that person, can you find the best plan objectively, instead of guessing? I think you can get surprisingly close, if you model two things: how knowledge sits in memory, and how each format moves it there.</p>
+<h2>What &ldquo;best&rdquo; has to mean</h2>
+<p>Objective needs a number. The cleanest one: score on the end test, measured some time after you stop studying, divided by the hours it took. Measured later, because cramming wins tomorrow and loses next month. Divided by hours, because a plan that works in two hundred hours isn&rsquo;t better than one that works in fifty.</p>
+<p>The end test is the one subjective choice, and it has to be made first. Once it&rsquo;s fixed, &ldquo;best plan&rdquo; is just the plan that gets the highest score per hour on it. Everything after that can be measured.</p>
+<h2>Modelling memory: chunks</h2>
+<p>Psychologists studying chess masters found they don&rsquo;t remember more pieces than beginners. They remember bigger chunks: whole patterns as one unit. Working memory holds only about four chunks at once. Expertise is mostly having big, well-built chunks, so four of them carry a lot.</p>
+<p>So model a subject as a set of chunks, and each chunk as having a state:</p>
+<ul>
+<li><strong>Unseen.</strong> Not met yet.</li>
+<li><strong>Encoded.</strong> Met once, and fading.</li>
+<li><strong>Retrievable.</strong> You can pull it out without help, with some chance that falls over time.</li>
+<li><strong>Connected.</strong> Linked to the chunks it depends on and the cases it explains, so you can use it on a problem you haven&rsquo;t seen.</li>
+</ul>
+<p>The first three are memory. The last one is understanding. They need different work, and a plan that only builds memory will pass a recall quiz and fail the real test.</p>
+<p>Memory has good models already. Since Ebbinghaus we&rsquo;ve known recall fades on a curve, and that each successful retrieval makes the next fade slower. Modern flashcard schedulers like FSRS track each card&rsquo;s difficulty, stability and current chance of recall, and fit those numbers to your own review history. That&rsquo;s a working model of one person&rsquo;s memory, already in use.</p>
+<p>Understanding is harder to model, but you can make it visible. Draw the chunks as a graph, with an edge where one depends on another or explains a case. A chunk is understood when you can answer a question that needs it together with its neighbours, on a case you haven&rsquo;t seen before.</p>
+<h2>Modelling formats: what each one moves</h2>
+<p>Text, diagrams, video, worked examples, cases, Socratic questioning, flashcards, projects. Each is a channel with its own properties, and the useful property is which state change it&rsquo;s good at:</p>
+<ul>
+<li><strong>Unseen to encoded:</strong> explanations, video, diagrams with words. Pictures and words together encode better than either alone.</li>
+<li><strong>Encoded to retrievable:</strong> retrieval itself. Flashcards, practice questions, explaining from memory. Testing beats rereading by a wide margin.</li>
+<li><strong>Retrievable to connected:</strong> cases compared side by side, Socratic questions, problems that mix topics, writing.</li>
+<li><strong>Tacit skill:</strong> watching experts work, and projects with feedback.</li>
+</ul>
+<p>Each format also has a cost: minutes, attention, and how fast it gets boring. And the right format changes with the learner. Worked examples help beginners most, and start to get in the way once you&rsquo;re past them. So a format isn&rsquo;t good or bad. It&rsquo;s good for a state change, for a person, at a stage.</p>
+<h2>The plan is a schedule</h2>
+<p>With both models, a study plan stops being a list of resources. It&rsquo;s a schedule of moves: this chunk, this format, these minutes. Each session, the model can say what the next best move is: the important chunk whose recall is about to drop, the chunk whose prerequisites are finally ready, the connection the last practice test showed was missing. And the format comes from the state change you need, with enough variety to keep a novelty-driven brain showing up.</p>
+<h2>Testing it</h2>
+<p>A model is only a guess until you test it, and testing a study plan has one awkward problem: you can&rsquo;t unlearn a subject to try a second plan on it.</p>
+<p>The way around it is to split the subject instead of the learner. Take the chunks, randomly assign half to one treatment and half to another (flashcards against Socratic sessions, say, or spaced against massed), and compare later scores on the held-out questions for each half. Same person, same subject, same weeks. That&rsquo;s a fair experiment you can run on yourself.</p>
+<p>Three rules keep it honest. Write the prediction down before you see the result. Keep some test questions you never study from, so you&rsquo;re measuring the skill and not the questions. And log every session: chunk, format, minutes, and whether retrieval worked. After a few weeks the log is enough to fit the model to you, not to an average student.</p>
+<h2>How close you can get</h2>
+<p>You won&rsquo;t find the single best plan. The space of schedules is too big, and you change as you learn. But you can find a plan that&rsquo;s measurably better than the one you&rsquo;d have guessed, and keep making it better, with a number to tell you whether you did. That&rsquo;s as objective as learning gets, and it&rsquo;s a lot more than most study plans have ever been.</p>
+
+<ul class="related">
+<li><a href="best-study-plan.html">Is There a Best Possible Study Plan for a Subject?</a></li>
+<li><a href="index.html">All essays</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>
