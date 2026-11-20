@@ -347,6 +347,9 @@ function onMapAt(p,y,W){
   if (p.layer==="people"){ const end=p.e||NOW; return Math.min(p.y+20,end)<=y && y<=end; }
   return p.e ? p.y-W<=y && y<=p.e+W : Math.abs(p.y-y)<=W;
 }
+/* the place a click opened: {g:[lon,lat], on}; away: the items shown there that are outside the years on the map */
+MAP.open=null; MAP.away=new Set();
+const atPlace=(o,g)=>{ const q=geoOf(o); return !!q && Math.abs(q[0]-g[0])<=.1 && Math.abs(q[1]-g[1])<=.1; };
 function mapItems(){
   const y=MAP.year, W=winYears(y), lv=shownLevel(), out=[];
   for (const r of REG){
@@ -356,6 +359,18 @@ function mapItems(){
       if (p!==state.solo && (!state.layers.has(p.layer) || p.level>lv)) continue;
       if (onMapAt(p,y,W) || (p===state.sel && p.layer==="people" && p.y<=y && y<=(p.e||NOW))) out.push(p);
     }
+  }
+  /* an open place (a click on a marker opens its place, a second click folds it): what else stands there, from any time,
+     under the same filters. At most 16, the most important and the nearest in time first. Folded, only the chosen one stays */
+  MAP.away=new Set();
+  if (MAP.open){ const g=MAP.open.g, has=new Set(out), more=[];
+    for (const r of REG){
+      if (!state.active.has(r.id)) continue;
+      if (state.events) for (const p of r.points) if (p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
+      for (const p of r.over) if (state.layers.has(p.layer) && p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
+    }
+    more.sort((a,b)=>(b===state.sel)-(a===state.sel) || a.level-b.level || Math.abs(a.y-y)-Math.abs(b.y-y));
+    for (const p of (MAP.open.on ? more.slice(0,16) : more.filter(p=>p===state.sel))){ out.push(p); MAP.away.add(p); }
   }
   return out;
 }
@@ -445,56 +460,82 @@ function paintMarks(cs, ink, surf){
   $("mapWin").textContent = (state.events||state.layers.size) && !MAP.small ? `Showing ${fmt(Math.max(START,y-W))} to ${fmt(Math.min(NOW,y+W))}` : "";
   if (!items.length) return;
   /* most important first, so they keep their place; the rest step aside when they would cover one */
-  items.sort((a,b)=>(b.o===state.sel)-(a.o===state.sel) || a.o.level-b.o.level || Math.abs(a.o.y-y)-Math.abs(b.o.y-y));
+  items.sort((a,b)=>(b.o===state.sel)-(a.o===state.sel) || MAP.away.has(a.o)-MAP.away.has(b.o) || a.o.level-b.o.level || Math.abs(a.o.y-y)-Math.abs(b.o.y-y));
   /* markers grow as the map zooms in, so they stay readable against big territories: up to 2.2 times at 8 times the world view */
   const zf = Math.max(1, Math.min(MAP.small ? 1.6 : 2.2, 1 + 0.45*Math.log2(MAP.view.k/Math.max(1e-6, mapW/360))));
-  const R = (MAP.small ? 10 : 13)*zf, placed=[];
-  const RING=[[0,0]]; for (let k=1;k<=2;k++) for (let i=0;i<6*k;i++){ const a=i/(6*k)*Math.PI*2; RING.push([Math.cos(a)*k*R*1.9, Math.sin(a)*k*R*1.9]); }
+  /* What stands on the map for an item: its own model or portrait, else the shared icon for its kind (levels 1 and 2), else a dot.
+     A piece stands on a small base in its topic colour, and the base sits on the place. */
+  const KD = typeof KINDS!=="undefined" ? KINDS : {}, KDEF = typeof KIND_DEFAULT!=="undefined" ? KIND_DEFAULT : {}, BOX = typeof ARTBOX!=="undefined" ? ARTBOX : {};
+  const grow = Math.min(1,(zf-1)/1.2), sz = (MAP.small ? .85 : 1)*(.62+.38*grow), placed=[];
+  const picOf = o => { const P=portraitOf(o), own = ovPicOf(o) || (P ? "people/"+P.f : null); if (own) return [own, o.level===1 ? 60 : 54, 1];
+    if (o.level>2) return null; const k = KD[o.name] || KDEF[o.ov ? o.layer : "event"]; return k ? ["kinds/"+k+".png", o.level===1 ? 50 : 44] : null; };
+  const hit = (a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1], held=[];
+  const labFont = o => (o.level===1 ? '600 13px' : '600 12px')+' "Barlow Condensed","Arial Narrow",Arial,sans-serif';
+  /* where a name can go by its marker: right, left, under */
+  const labAt = (m,fx,fy,tw) => { const hw=m.w/2, ty = m.dot ? fy : fy-m.h*.34, under = fy+(m.dot ? m.dot+3 : m.s*.13+4);
+    return [[fx+hw+3, ty-8, fx+hw+7+tw, ty+8], [fx-hw-7-tw, ty-8, fx-hw-3, ty+8], [fx-tw/2-2, under, fx+tw/2+2, under+16]]; };
+  /* an item listed under two regions (the same name at the same place) stands once: the chosen one, else the more important */
+  const once=new Set();
   for (const m of items){
+    const ok=m.o.name+"|"+m.g[0].toFixed(2)+"|"+m.g[1].toFixed(2); if (once.has(ok)) continue; once.add(ok);
     const x0=sx(m.g[0]), y0=sy(m.g[1]); if (x0<-20||x0>mapW+20||y0<-20||y0>mapH+20) continue;
-    const r = m.o.level===1 ? R+2 : R;
-    let pos=null; for (const [dx,dy] of RING){ const x=x0+dx, yy=y0+dy; if (!placed.some(q=>Math.hypot(q.x-x,q.y-yy)<q.r+r-2)){ pos=[x,yy]; break; } }
-    if (!pos){ if (m.o!==state.sel) continue; pos=[x0,y0]; }
-    const mk={x:pos[0], y:pos[1], r, o:m.o, x0, y0}; placed.push(mk); MAP.marks.push(mk);
+    let P=picOf(m.o); const sel=m.o===state.sel; let mk;
+    /* seen from far, a level 2 item with a shared icon keeps it only where its own place is free; in a crowd it is a dot */
+    if (P && !P[2] && m.o.level===2 && !sel && !MAP.away.has(m.o) && grow<.5){ const s=P[1]*sz, b=[x0-s*.5, y0-s*.86, x0+s*.5, y0+s*.1]; if (placed.some(q=>hit(b,q.b))) P=null; }
+    if (P){ const s=P[1]*sz, bb=BOX[P[0]]||[0,0,96,96], k=s/Math.max(bb[2],bb[3]), w=bb[2]*k, h=bb[3]*k;
+      mk={o:m.o, x0, y0, pic:P[0], bb, w, h, s, r:Math.max(w,h)*.5, box:(fx,fy)=>[fx-w*.5, fy-h*.86, fx+w*.5, fy+s*.1]}; }
+    else { const r = (m.o.level<=2 ? 5 : m.o.level===3 ? 4 : 3.2) + 1.2*grow; mk={o:m.o, x0, y0, dot:r, w:2*r, h:2*r, s:2*r, r:r+3, box:(fx,fy)=>[fx-r-1, fy-r-1, fx+r+1, fy+r+1]}; }
+    /* the true place first, then a step aside on a ring; two markers may not cover each other.
+       An item from another time stands further out and needs room for its name and year, which it then holds */
+    const aw=MAP.away.has(m.o) && !sel, holds = aw || (sel && !!MAP.open && MAP.open.on), kMax = aw ? 3 : 2; let tw=0;      /* the chosen one holds its name's room too, while its place is open */
+    if (holds){ mctx.font=labFont(m.o); tw=mctx.measureText(MAP.away.has(m.o) ? m.o.name+", "+fmt(m.o.y) : m.o.name).width; }
+    const st=Math.max(11, mk.w*.9)*(aw ? 1.5 : 1); let pos=null;
+    for (let k=0; k<=kMax && !pos; k++){ const n=Math.max(1,6*k); for (let i=0;i<n;i++){ const a=i/n*Math.PI*2, fx=x0+Math.cos(a)*k*st, fy=y0+Math.sin(a)*k*st*.8, b=mk.box(fx,fy);
+      if (placed.some(q=>hit(b,q.b)) || held.some(q=>hit(b,q))) continue;
+      if (holds){ const L=labAt(mk,fx,fy,tw).find(t=>t[0]>2 && t[2]<mapW-2 && !placed.some(q=>hit(t,q.b)) && !held.some(q=>hit(t,q))); if (!L && aw && k<kMax) continue; mk.lab=L||null; }
+      pos=[fx,fy,b]; break; } }
+    if (pos && mk.lab) held.push(mk.lab);
+    if (!pos){ if (!sel) continue; pos=[x0,y0,mk.box(x0,y0)]; }
+    mk.fx=pos[0]; mk.fy=pos[1]; mk.b=pos[2]; mk.x=mk.fx; mk.y = mk.dot ? mk.fy : mk.fy-mk.h*.42;      /* x, y: the middle of the marker, for pointing at it */
+    placed.push(mk); MAP.marks.push(mk);
   }
-  /* draw from the least important up, so the important ones sit on top */
-  for (let i=MAP.marks.length-1;i>=0;i--){
-    const m=MAP.marks[i], o=m.o, col = o.ov ? LAYER[o.layer].c : "#5b6b7b", sel=o===state.sel;
-    if (m.x!==m.x0 || m.y!==m.y0){ mctx.strokeStyle=ink; mctx.globalAlpha=.45; mctx.lineWidth=1; mctx.beginPath(); mctx.moveTo(m.x0,m.y0); mctx.lineTo(m.x,m.y); mctx.stroke(); mctx.globalAlpha=1;
+  /* dots first, then the pieces from the back of the map to the front, the chosen one last */
+  const order=MAP.marks.slice().sort((a,b)=>(a.o===state.sel)-(b.o===state.sel) || (!!a.pic)-(!!b.pic) || a.fy-b.fy);
+  const oval=(x,yy,rx,ry)=>{ mctx.beginPath(); mctx.ellipse(x,yy,rx,ry,0,0,7); };
+  for (const m of order){
+    const o=m.o, col = o.ov ? LAYER[o.layer].c : "#5b6b7b", sel=o===state.sel;
+    if (m.fx!==m.x0 || m.fy!==m.y0){ mctx.strokeStyle=ink; mctx.globalAlpha=.45; mctx.lineWidth=1; mctx.beginPath(); mctx.moveTo(m.x0,m.y0); mctx.lineTo(m.fx,m.fy); mctx.stroke(); mctx.globalAlpha=1;
       mctx.fillStyle=ink; mctx.beginPath(); mctx.arc(m.x0,m.y0,2,0,7); mctx.fill(); }
-    const fade = o.layer==="people" || sel ? 1 : 1-0.45*Math.min(1,Math.abs(o.y-y)/W);
-    const O = ovPicOf(o), oim = O && img(O);
-    if (oim){ /* the whole object, standing on a small base in its layer colour */
-      const s=m.r*3.2; mctx.globalAlpha=fade;
-      mctx.fillStyle=col; mctx.globalAlpha=fade*.35; mctx.beginPath(); mctx.ellipse(m.x,m.y+m.r*.75,m.r*1.05,m.r*.42,0,0,7); mctx.fill(); mctx.globalAlpha=fade;
-      if (sel){ mctx.lineWidth=2.5; mctx.strokeStyle=RED; mctx.beginPath(); mctx.ellipse(m.x,m.y+m.r*.75,m.r*1.25,m.r*.52,0,0,7); mctx.stroke(); }
-      if (vidOf(o)){ mctx.lineWidth=1.5; mctx.strokeStyle = sel ? RED : col; mctx.beginPath(); mctx.ellipse(m.x,m.y+m.r*.75,m.r*1.55,m.r*.7,0,0,7); mctx.stroke(); }
-      mctx.imageSmoothingEnabled=false; mctx.drawImage(oim,m.x-s/2,m.y-s*.62,s,s); mctx.imageSmoothingEnabled=true; mctx.globalAlpha=1; continue; }
-    mctx.globalAlpha=fade;
-    mctx.shadowColor="rgba(0,0,0,.28)"; mctx.shadowBlur=5; mctx.shadowOffsetY=1.5;
-    mctx.beginPath(); mctx.arc(m.x,m.y,m.r,0,7); mctx.fillStyle=surf; mctx.fill();
-    mctx.shadowColor="transparent"; mctx.shadowBlur=0; mctx.shadowOffsetY=0;
-    mctx.lineWidth = sel ? 3 : 2; mctx.strokeStyle = sel ? RED : col; mctx.stroke();
-    if (vidOf(o)){ mctx.lineWidth=1.5; mctx.beginPath(); mctx.arc(m.x,m.y,m.r+4.5,0,7); mctx.stroke(); }   /* a second ring: the item has a video */
-    const P = portraitOf(o);
-    if (P){ const im=img("people/"+P.f); if (im){ const [hx,hy,hw]=P.h; mctx.save(); mctx.beginPath(); mctx.arc(m.x,m.y,m.r-1.5,0,7); mctx.clip();
-        mctx.imageSmoothingEnabled=false; mctx.drawImage(im,hx,hy,hw,hw,m.x-m.r+1.5,m.y-m.r+1.5,2*m.r-3,2*m.r-3); mctx.restore(); } }
-    else { const c=EMOJI[o.ov && o.layer!=="war" ? LAYER[o.layer].icon : o.kind] || EMOJI[o.kind]; const im = c && img("emoji/u"+c+".svg"); const s=m.r*1.35;
-      if (im) mctx.drawImage(im,m.x-s/2,m.y-s/2,s,s); else { mctx.fillStyle=col; mctx.beginPath(); mctx.arc(m.x,m.y,m.r*.45,0,7); mctx.fill(); } }
+    const far = sel ? 0 : MAP.away.has(o) ? 1.4 : o.layer==="people" ? 0 : Math.min(1,Math.abs(o.y-y)/W);      /* how far the item is from the map's year, 0 to 1 */
+    mctx.globalAlpha = 1-(m.dot ? .45 : .22)*far;
+    if (m.dot){ mctx.beginPath(); mctx.arc(m.fx,m.fy,m.dot,0,7); mctx.fillStyle=col; mctx.fill(); mctx.lineWidth=1.5; mctx.strokeStyle=surf; mctx.stroke();
+      if (vidOf(o)){ mctx.lineWidth=1.25; mctx.strokeStyle = sel ? RED : col; mctx.beginPath(); mctx.arc(m.fx,m.fy,m.dot+3.5,0,7); mctx.stroke(); }
+      if (sel){ mctx.lineWidth=2.5; mctx.strokeStyle=RED; mctx.beginPath(); mctx.arc(m.fx,m.fy,m.dot+2,0,7); mctx.stroke(); }
+      mctx.globalAlpha=1; continue; }
+    const rx=Math.max(m.w*.42, m.s*.27), ry=rx*.36;
+    mctx.fillStyle="rgba(10,20,30,.28)"; oval(m.fx,m.fy+2.5,rx+1.5,ry+1.5); mctx.fill();
+    mctx.fillStyle=col; oval(m.fx,m.fy,rx,ry); mctx.fill(); mctx.lineWidth=1.25; mctx.strokeStyle="rgba(255,255,255,.75)"; mctx.stroke();
+    if (vidOf(o)){ mctx.lineWidth=1.5; mctx.strokeStyle = sel ? RED : col; oval(m.fx,m.fy,rx+7.5,ry+6); mctx.stroke(); }   /* a second ring: the item has a video */
+    if (sel){ mctx.lineWidth=2.5; mctx.strokeStyle=RED; oval(m.fx,m.fy,rx+3.5,ry+3); mctx.stroke(); }
+    const im=img(m.pic);
+    if (im){ mctx.imageSmoothingEnabled=true; mctx.imageSmoothingQuality="high"; mctx.drawImage(im,m.bb[0],m.bb[1],m.bb[2],m.bb[3], m.fx-m.w/2, m.fy+ry*.45-m.h, m.w, m.h); }
     mctx.globalAlpha=1;
   }
-  /* names beside the most important markers, where they fit */
-  mctx.font='600 12px "Barlow Condensed","Arial Narrow",Arial,sans-serif'; mctx.textAlign="left"; mctx.textBaseline="middle";
-  const boxes=MAP.marks.map(m=>[m.x-m.r,m.y-m.r,m.x+m.r,m.y+m.r]), maxL = MAP.small ? 6 : 24; let nL=0;
+  /* names beside the most important markers, where they fit: to the right, else to the left, else under */
+  mctx.textAlign="left"; mctx.textBaseline="middle"; mctx.lineJoin="round";
+  const boxes=MAP.marks.map(m=>m.b).concat(held), maxL = MAP.small ? 6 : 24; let nL=0;
   for (const m of MAP.marks){
     if (nL>=maxL) break;
-    if (m.o!==state.sel && m.o.level>(MAP.small?1:2)) continue;
-    const off = ovPicOf(m.o) ? m.r*1.4 : m.r, tw=mctx.measureText(m.o.name).width, b=[m.x+off+2, m.y-8, m.x+off+6+tw, m.y+8];
     const isSel = m.o===state.sel;
-    if (b[2]>mapW-2 && !isSel) continue;
-    if (!isSel && boxes.some(q=>b[0]<q[2]&&b[2]>q[0]&&b[1]<q[3]&&b[3]>q[1])) continue;
+    const away=MAP.away.has(m.o), txt = away ? m.o.name+", "+fmt(m.o.y) : m.o.name;
+    if (!isSel && !away && m.o.level>(MAP.small?1:2)) continue;
+    mctx.font=(m.o.level===1 ? '600 13px' : '600 12px')+' "Barlow Condensed","Arial Narrow",Arial,sans-serif';
+    const tw=mctx.measureText(txt).width, hw=m.w/2, ty = m.dot ? m.fy : m.fy-m.h*.34, under = m.fy+(m.dot ? m.dot+3 : m.s*.13+4);
+    const tries=[[m.fx+hw+3, ty-8, m.fx+hw+7+tw, ty+8], [m.fx-hw-7-tw, ty-8, m.fx-hw-3, ty+8], [m.fx-tw/2-2, under, m.fx+tw/2+2, under+16]];
+    let b = m.lab || tries.find(t=>t[0]>2 && t[2]<mapW-2 && !boxes.some(q=>hit(t,q)));
+    if (!b){ if (!isSel) continue; b=tries[0]; }
     boxes.push(b); nL++;
-    mctx.lineWidth=3.5; mctx.strokeStyle=surf; mctx.strokeText(m.o.name,b[0]+2,m.y); mctx.fillStyle=m.o===state.sel?RED:ink; mctx.fillText(m.o.name,b[0]+2,m.y);
+    mctx.lineWidth=3.5; mctx.strokeStyle=surf; mctx.strokeText(txt,b[0]+2,(b[1]+b[3])/2); mctx.fillStyle=isSel?RED:ink; mctx.fillText(txt,b[0]+2,(b[1]+b[3])/2);
   }
 }
 /* every territory on the map now that a bar stands for, in any region (an empire can span two) */
@@ -900,7 +941,7 @@ function endPtr(e){
     }
     setBoxMode(false);
   }
-  if (drag && !drag.box && !drag.pinch && MAP.down && Math.hypot(x-MAP.down[0],y-MAP.down[1])<5){ const mk=markAt(x,y); if (mk) select(mk.o); else { const t=terrAt(x,y); if (t) clickTerr(t); else if (state.sel) select(null); } }   /* sea or empty land: clear the selection */
+  if (drag && !drag.box && !drag.pinch && MAP.down && Math.hypot(x-MAP.down[0],y-MAP.down[1])<5){ const mk=markAt(x,y); if (mk){ const g=geoOf(mk.o), fold = mk.o===state.sel && MAP.open && MAP.open.on; MAP.keepYear=true; select(mk.o); MAP.keepYear=false; MAP.open = g ? {g, on:!fold} : null; drawMap(); } else { const t=terrAt(x,y); if (t) clickTerr(t); else if (state.sel) select(null); } }   /* sea or empty land: clear the selection */
   ptrs.delete(e.pointerId); if (ptrs.size<2 && drag && drag.pinch) drag=null;
   if (!ptrs.size){ drag=null; mapWrap.classList.remove("panning"); }
 }
@@ -964,6 +1005,7 @@ function cardBack(){
 }
 const chartSelect = select;
 select = function(obj){
+  MAP.open=null;
   hxPush(obj);
   chartSelect(obj);
   if (obj){ cardBack(); const h=$("detail").querySelector("h2"); $("liveSay").textContent = h ? h.textContent+", card open" : ""; }

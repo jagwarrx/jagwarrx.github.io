@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>World History in Eight Regions</title>
+<title>Tellurae</title>
 <link rel="canonical" href="https://hmeyy.com/apps/history/app.html">
 <meta name="description" content="5,300 years of world history side by side: eight regions, about 190 states and cultures, over 300 events and battles and about 5,900 short pages, with a map of borders for every year.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="World History in Eight Regions">
+<meta property="og:title" content="Tellurae">
 <meta property="og:description" content="5,300 years of world history side by side in eight regions, with a map of borders for every year.">
 <meta property="og:url" content="https://hmeyy.com/apps/history/app.html">
 <meta property="og:image" content="https://hmeyy.com/apps/history/og.png">
@@ -78,7 +78,8 @@ button,select{font:inherit;color:inherit}
 
 /* ---------- top bar ---------- */
 .top{flex:none;height:52px;background:var(--surface);border-bottom:1px solid var(--line-strong);padding:0 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:25}
-.brand{flex:none;min-width:0}
+.brand{flex:none;min-width:0;width:194px}   /* the search box starts just past the filters column (214px), in line with the map column, and does not move when the column folds */
+.brand h1{padding-left:12px}
 h1{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.1;margin:0;letter-spacing:.01em;white-space:nowrap}
 .sub{font-size:12px;color:var(--muted);margin:1px 0 0;white-space:nowrap}
 .btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:0 12px;height:36px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
@@ -821,11 +822,11 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 </head>
 <body>
 <a class="skip" href="#scroller">Skip to the chart</a><a class="skip" href="#slider">Skip to the time line</a><a class="skip" href="#detail">Skip to the card</a>
-<noscript><p style="padding:20px;font:16px system-ui">World History in Eight Regions needs JavaScript to draw the chart and the map. Switch it on for this page, or read <a href="index.html">what the page is</a>.</p></noscript>
+<noscript><p style="padding:20px;font:16px system-ui">Tellurae needs JavaScript to draw the chart and the map. Switch it on for this page, or read <a href="index.html">what the page is</a>.</p></noscript>
 
 <header class="top">
   <div class="brand">
-    <h1 title="3300 BCE to today, eight regions side by side">World History<span class="h1r"> in Eight Regions</span></h1>
+    <h1 title="3300 BCE to today, eight regions side by side">Tellurae</h1>
   </div>
   <div class="search" role="search">
     <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.4 10.4L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -997,18 +998,19 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=152d10fcb5"></script>
-<script src="books.js?v=152d10fcb5"></script>
-<script src="videos.js?v=152d10fcb5"></script>
-<script src="stories.js?v=152d10fcb5"></script>
-<script src="deep.js?v=152d10fcb5"></script>
-<script src="famous.js?v=152d10fcb5"></script>
-<script src="kb.js?v=152d10fcb5"></script>
-<script src="people/portraits.js?v=152d10fcb5"></script>
-<script src="ovpics.js?v=152d10fcb5"></script>
+<script src="hier.js?v=1243fec879"></script>
+<script src="books.js?v=1243fec879"></script>
+<script src="videos.js?v=1243fec879"></script>
+<script src="stories.js?v=1243fec879"></script>
+<script src="deep.js?v=1243fec879"></script>
+<script src="famous.js?v=1243fec879"></script>
+<script src="kb.js?v=1243fec879"></script>
+<script src="people/portraits.js?v=1243fec879"></script>
+<script src="ovpics.js?v=1243fec879"></script>
+<script src="kinds.js?v=1243fec879"></script>
 <script>
 "use strict";
-const VER = "?v=152d10fcb5";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=1243fec879";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -3588,8 +3590,8 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=152d10fcb5"></script>
-<script src="map.js?v=152d10fcb5"></script>
+<script src="geo.js?v=1243fec879"></script>
+<script src="map.js?v=1243fec879"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3633,8 +3635,8 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=152d10fcb5"></script>
-<script src="sidebar.js?v=152d10fcb5"></script>
+<script src="ask.js?v=1243fec879"></script>
+<script src="sidebar.js?v=1243fec879"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
