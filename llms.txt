@@ -11,6 +11,7 @@
 
 ## Essays
 
+- [What Difference Does ADHD Medication Make?](https://hmeyy.com/essays/adhd-medication.html): It turns the noise down. It doesn't choose what to focus on, and it doesn't pick itself up from the pharmacy. A practical answer, not medical advice.
 - [Your agent will say it sent the email](https://hmeyy.com/essays/agent-said-it-sent-the-email.html): What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.
 - [Ask a Better Question](https://hmeyy.com/essays/ask-a-better-question.html): Before I build a tool, I stop and ask what I'm trying to achieve and whether there's an easier, quicker or better way. Often that way is to run the thing through a prompt first.
 - [Artificial Intelligence: Where to dig](https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html): Improve features, create features, create products. The easier problems first.
