@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tellurae · Hari Meyyappan</title>
 <link rel="canonical" href="https://hmeyy.com/apps/history/">
-<meta name="description" content="5,300 years of world history side by side: eight regions, about 190 states and cultures, over 300 events and battles and about 5,900 short pages, with a map of borders for every year and uncertain dates drawn as fades.">
+<meta name="description" content="World history on one map and one timeline, from 3300 BCE to today. See a country's story, find connections you were not looking for, and see the whole world in any one year, and ask your own questions.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Tellurae · Hari Meyyappan">
-<meta property="og:description" content="5,300 years of world history side by side in eight regions. Turn it vertical or horizontal.">
+<meta property="og:description" content="World history on one map and one timeline. See a country's story, find connections you were not looking for, and see the whole world in any one year.">
 <meta property="og:url" content="https://hmeyy.com/apps/history/">
-<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta property="og:image" content="https://hmeyy.com/apps/history/og.png">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="../../img/logo.png">
 <link rel="stylesheet" href="../../css/site.css">
@@ -42,11 +42,24 @@
 <div class="col app-page chess-page">
 <header class="head">
 <h1>Tellurae</h1>
-<p class="lede">5,300 years side by side, from Sumer to today. Eight regions with equal standing, and the uncertain dates drawn as fades instead of hidden.</p>
+<p class="lede">World history on one map and one timeline, from 3300 BCE to today. Pick a country, a year or a question, and see what was going on.</p>
 </header>
 <div class="wide-frame"><iframe src="app.html" title="Tellurae"></iframe></div>
 <p class="more"><a href="app.html" data-nostack>Open full screen</a> <span class="meta">(best on a laptop)</span></p>
 <div class="app-side">
+<h2>What it is good for</h2>
+<ul class="rb">
+<li><strong>See a country's story.</strong> Search for a country and its history comes up on one card: the kingdoms before it, its wars and trade, and the people who shaped it. Malaysia starts with the Malacca Sultanate in 1400 and runs through tin, rubber and the Emergency to the federation of 1963. Zoom in on the map and the smaller turning points appear. <a href="app.html?y=1957&amp;i=Malaysia&amp;m=map" data-nostack>Open Malaysia</a></li>
+<li><strong>Find connections you were not looking for.</strong> Every card shows what was going on elsewhere at the same time and which pages link to it, so one click leads to the next. Silver mined at Potosí in the Andes ended up paying taxes in Ming China. Gandhi entered politics in Natal, and his methods later shaped Martin Luther King Jr. The Library keeps over 140 hand-picked pairs like these to play on the map. <a href="app.html?y=1600&amp;i=Potos%C3%AD%20silver&amp;m=map" data-nostack>Open Potosí silver</a></li>
+<li><strong>See the whole world in one year.</strong> Pick any year. The map draws the borders of that year, and a panel shows who was alive, what was changing and what came next. In 1600 Akbar ruled the Mughal Empire, Elizabeth I was Queen of England, Tokugawa Ieyasu won at Sekigahara, and a trading company was founded in London that later ruled most of India. <a href="app.html?y=1600&amp;m=map" data-nostack>Open the year 1600</a></li>
+<li><strong>Ask your own question.</strong> Press Ask the map and type a topic or a question. Claude builds a story from Tellurae's own pages and plays it on the map, step by step. It needs your own Claude API key, which stays in your browser.</li>
+</ul>
+<h2>What is in it</h2>
+<ul class="rb">
+<li><strong>Eight regions with equal standing.</strong> About 200 states and cultures on the chart, 5,200 places on the map and 380 routes of journeys, migrations and campaigns, across twelve topics from battles and faiths to food and trade.</li>
+<li><strong>Stories.</strong> Twelve stories play across the map like short films, among them the Silk Road, the Mongol conquests and the settling of the Pacific. <a href="app.html?st=mongols.1" data-nostack>Play The Mongol conquests</a></li>
+<li><strong>Voices and battle films.</strong> 31 passages from texts of the time, such as Ibn Battuta in Delhi and Marco Polo, and ten short films on how a battle was won, from Marathon to Isandlwana.</li>
+</ul>
 <h2>How to use it</h2>
 <ul class="rb">
 <li><strong>Search</strong> for a state, a person, an event or a year (like 1453 or 500 BCE). Press / to start typing.</li>
@@ -54,7 +67,7 @@
 <li>The <strong>red line</strong> marks one year. The map, in a small window or full size with the Map button, shows the borders in that year and where things happened, and <strong>The world in that year</strong> shows who was alive, what was changing and what comes next. Drag the slider, use the arrows or play to move it.</li>
 <li>The buttons above the chart switch on events, shared events, links between regions and twelve <strong>overlays</strong> such as people, battles, faiths, trade and voices.</li>
 <li>The region buttons above the chart show and hide regions. <strong>View</strong> picks <strong>Across</strong> or <strong>Down</strong>, even or stretched time, and how much detail.</li>
-<li><strong>Stories</strong> play like a short film across the chart and the map. Pause at any time to look around.</li>
+<li>The <strong>Library</strong> holds the stories, the voices and the battle films. A story plays like a short film across the chart and the map. Pause at any time to look around.</li>
 <li>Show one region and <strong>Group by</strong> re-sorts its bars by language, religion, way of life, trade network, ecology, polity type or claimed lineage.</li>
 <li><strong>Share view</strong> copies a link to exactly what you see.</li>
 </ul>
@@ -62,8 +75,8 @@
 <ul class="rb">
 <li>A bar fades where its date is traditional, disputed or stands in for a gradual change. Dashed bars are cultures and movements, not states.</li>
 <li>The axis is plain dates, with no European period names. Hatched bands mark plagues, conquests, trade routes and climate shocks that crossed regions.</li>
-<li>It is a selection: about 190 states and cultures and over 300 events and battles. Bar width means nothing, and the bars favour societies that built in stone and wrote.</li>
-<li>The 5,900 short pages behind the chart were written with Claude from general knowledge. They are not fact-checked. Use them as a way in, and check before you rely on one.</li>
+<li>It is a selection: about 200 states and cultures and about 5,200 events, people and places. Bar width means nothing, and the bars favour societies that built in stone and wrote.</li>
+<li>The 8,400 short pages behind the chart were written with Claude from general knowledge. They are not fact-checked. Use them as a way in, and check before you rely on one.</li>
 </ul>
 <p class="meta">Nov 2026 · HTML · built with Claude.</p>
 </div>
