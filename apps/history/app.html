@@ -1180,20 +1180,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=07be45aeda"></script>
-<script src="books.js?v=07be45aeda"></script>
-<script src="videos.js?v=07be45aeda"></script>
-<script src="stories.js?v=07be45aeda"></script>
-<script src="deep.js?v=07be45aeda"></script>
-<script src="famous.js?v=07be45aeda"></script>
-<script src="kb.js?v=07be45aeda"></script>
-<script src="people/portraits.js?v=07be45aeda"></script>
-<script src="ovpics.js?v=07be45aeda"></script>
-<script src="kinds.js?v=07be45aeda"></script>
-<script src="events.js?v=07be45aeda"></script>
+<script src="hier.js?v=4cd24a4e38"></script>
+<script src="books.js?v=4cd24a4e38"></script>
+<script src="videos.js?v=4cd24a4e38"></script>
+<script src="stories.js?v=4cd24a4e38"></script>
+<script src="deep.js?v=4cd24a4e38"></script>
+<script src="famous.js?v=4cd24a4e38"></script>
+<script src="kb.js?v=4cd24a4e38"></script>
+<script src="people/portraits.js?v=4cd24a4e38"></script>
+<script src="ovpics.js?v=4cd24a4e38"></script>
+<script src="kinds.js?v=4cd24a4e38"></script>
+<script src="events.js?v=4cd24a4e38"></script>
 <script>
 "use strict";
-const VER = "?v=07be45aeda";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=4cd24a4e38";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -3588,6 +3588,7 @@ function setStories(open){
     const h=document.createElement("summary"); h.append(el("b",null,name), el("span",null,String(n))); d.append(h);
     d.addEventListener("toggle",()=>saveLS("history.lib."+key, d.open ? "1" : "0")); root.append(d); return d; };
   const vids=Object.values(typeof VIDEOS!=="undefined" ? VIDEOS : {}).filter(V=>V.item && kbTarget(V.item));
+  if (typeof cxLibrary==="function") cxLibrary(sec);   /* Connections (cx.js): first, since the one on offer changes each time */
   const SV=sec("stories","Stories",STORYS.length);
   SV.append(el("p","spint","A story plays like a short film. Each step sets the year, the regions and the map, and opens one item. Leave any time to explore."));
   const L=SV;
@@ -3652,7 +3653,7 @@ function showStop(){
   for (const l of st.l||[]) if (LAYER[l]) state.layers.add(l);   /* not saved: the reader's own layers come back when the story ends */
   if (MAP.mode==="off" && !story.mapOff){ setMapMode("float"); }
   refresh();
-  const it=findItem(st.item); if (it) goTo(it);
+  const it = st.k ? kbTarget(st.k) : findItem(st.item); if (it) goTo(it);   /* a step names a chart item, or a page by its id (connections) */
   setYear(st.y,{scroll:true});                    /* the step's year wins over the item's start */
   drawStoryCard(); drawStoryVideo(st); syncTransport(); if (typeof placeMarks==="function") placeMarks();
   saveURL();
@@ -3890,9 +3891,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=07be45aeda"></script>
-<script src="routes.js?v=07be45aeda"></script>
-<script src="map.js?v=07be45aeda"></script>
+<script src="geo.js?v=4cd24a4e38"></script>
+<script src="routes.js?v=4cd24a4e38"></script>
+<script src="map.js?v=4cd24a4e38"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3936,8 +3937,10 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=07be45aeda"></script>
-<script src="sidebar.js?v=07be45aeda"></script>
+<script src="ask.js?v=4cd24a4e38"></script>
+<script src="sidebar.js?v=4cd24a4e38"></script>
+<script src="connections.js?v=4cd24a4e38"></script>
+<script src="cx.js?v=4cd24a4e38"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
