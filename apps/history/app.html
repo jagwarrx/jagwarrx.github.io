@@ -529,6 +529,7 @@ body.hascard .sfoldb{display:none}
 body.sfold .sfoldb svg{transform:none}
 body.sfold #side>.detail,body.sfold #side>.sgrip{display:none}
 body.sfold #side{cursor:pointer}
+.sfoldt{display:none;align-items:center;height:40px;padding:0 44px 0 12px;font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (min-width:1300px){ body.sfold #app{grid-template-columns:minmax(0,1fr) 36px var(--pinw,0px)} }
 @media (min-width:760px) and (max-width:1299px){ body.sfold:not(.pinned) #app,body.sfold.pinhide #app{grid-template-columns:minmax(0,1fr) 36px var(--pinw,0px)} }
 @media (min-width:760px){ body.sfold .sfoldb{top:6px;right:2px} }
@@ -900,7 +901,11 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 @media (max-width:759px){
   .svid{position:fixed;top:64px;right:8px;width:min(260px,64vw)}
   .sgrip{display:none}
-  .scard{position:fixed;top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:46vh;overflow:auto;z-index:45}
+  /* a story takes the place of the panel under the time line; its text scrolls and its buttons stay in reach */
+  .scard{position:static;order:5;flex:none;width:auto;max-height:44dvh;overflow:hidden;border:0;border-top:1px solid var(--line-strong);border-radius:0;box-shadow:none;padding:9px 12px 10px}
+  .scard>*{flex:none}
+  .scard>.stext{flex:0 1 auto;min-height:0;overflow-y:auto}
+  .app:has(#storyCard:not([hidden])) .side,.cmain:has(#storyCard:not([hidden])) .trow{display:none}
   .top{gap:8px;padding:0 10px}
   h1{font-size:26.667px}
   .h1r{display:none}
@@ -918,7 +923,17 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .tbn{display:none}
   .tb{padding:0 8px}
   .center{flex:1;min-height:0}
-  .side{flex:none;max-height:40vh;border-left:0;border-top:1px solid var(--line-strong)}
+  .side{flex:none;max-height:40dvh;border-left:0;border-top:1px solid var(--line-strong)}
+  /* a phone gives the map the room: the panel under it starts as a bar and opens for a card */
+  body.sfold .sfoldt{display:flex}
+  #mapHead>b,#mapMin,#mapOut,#mapIn,.msrc{display:none}   /* two fingers zoom the map; the credit for the borders is in About */
+  body.mapfull .mappane{position:relative;padding:6px 8px}
+  body.mapfull .mhead{position:absolute;right:14px;top:12px;z-index:3;min-height:0}   /* its two buttons sit on the map */
+  .mfocus{top:44px;left:8px;right:8px;transform:none;max-width:none;font-size:12.5px;gap:6px;padding:4px 6px 4px 8px}
+  .mfocus span{flex:1}
+  .mfocus.low{bottom:32px}
+  .cmain>.hello{border-bottom:0;border-top:1px solid var(--line);padding:8px 10px}
+  .cmain>.hello p{font-size:13.5px}
   body.mapfloat .mappane{width:min(300px,72vw);height:210px;right:8px;bottom:84px}
   .vsw{height:36px}
   .vsw button{padding:0 9px;font-size:0;gap:0}
@@ -1182,20 +1197,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=112d46bc79"></script>
-<script src="books.js?v=112d46bc79"></script>
-<script src="videos.js?v=112d46bc79"></script>
-<script src="stories.js?v=112d46bc79"></script>
-<script src="deep.js?v=112d46bc79"></script>
-<script src="famous.js?v=112d46bc79"></script>
-<script src="kb.js?v=112d46bc79"></script>
-<script src="people/portraits.js?v=112d46bc79"></script>
-<script src="ovpics.js?v=112d46bc79"></script>
-<script src="kinds.js?v=112d46bc79"></script>
-<script src="events.js?v=112d46bc79"></script>
+<script src="hier.js?v=ad256dc6ae"></script>
+<script src="books.js?v=ad256dc6ae"></script>
+<script src="videos.js?v=ad256dc6ae"></script>
+<script src="stories.js?v=ad256dc6ae"></script>
+<script src="deep.js?v=ad256dc6ae"></script>
+<script src="famous.js?v=ad256dc6ae"></script>
+<script src="kb.js?v=ad256dc6ae"></script>
+<script src="people/portraits.js?v=ad256dc6ae"></script>
+<script src="ovpics.js?v=ad256dc6ae"></script>
+<script src="kinds.js?v=ad256dc6ae"></script>
+<script src="events.js?v=ad256dc6ae"></script>
 <script>
 "use strict";
-const VER = "?v=112d46bc79";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=ad256dc6ae";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -2546,6 +2561,7 @@ function drawMoment(){
   detail.textContent="";
   const w=el("div","moment");
   w.append(el("h2",null, y>=NOW ? "The world today" : "The world in "+fmt(yy)));
+  { const sb=$("sideBar"); if (sb) sb.textContent = y>=NOW ? "The world today" : "The world in "+fmt(yy); }   /* the folded panel on a phone names the year too */
   if (y<NOW) w.append(el("p","msub", agoText(NOW-y)));
   if (state.active.size<REG.length){             /* "the world" is only the regions switched on: say so, and offer the rest */
     const n=state.active.size, note=el("p","mpart", n===1 ? "Showing "+regName([...state.active][0])+" only. " : `Showing ${n} of ${REG.length} regions. `);
@@ -3166,6 +3182,7 @@ function runSearch(q){
   return out;
 }
 const qIn=$("q"), qRes=$("qres"); let qHits=[], qPos=0;
+if (matchMedia("(max-width:759px)").matches) qIn.placeholder="Search";   /* the long hint is cut off on a phone; the label keeps it for a screen reader */
 function drawResults(){
   qRes.textContent="";
   const open = qIn.value.trim()!=="";
@@ -3526,6 +3543,8 @@ document.addEventListener("click",e=>{
   if ($("tbtools").classList.contains("open") && !$("tbtools").contains(e.target) && e.target!==$("moreBtn")){ $("tbtools").classList.remove("open"); $("moreBtn").setAttribute("aria-expanded","false"); }
 });
 $("moreBtn").addEventListener("click",e=>{ e.stopPropagation(); const o=!$("tbtools").classList.contains("open"); $("tbtools").classList.toggle("open",o); $("moreBtn").setAttribute("aria-expanded",o); });
+/* a choice in the menu closes it: on a phone it stayed open behind the Library or Ask the map */
+$("tbtools").addEventListener("click",e=>{ if (e.target.closest("button") && $("tbtools").classList.contains("open")){ $("tbtools").classList.remove("open"); $("moreBtn").setAttribute("aria-expanded","false"); } });
 let theme = LS("wh8-theme")==="light" ? "light" : LS("wh8-theme")==="dark" ? "dark" : "auto";
 function applyTheme(){
   if (theme==="auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=theme;
@@ -3889,15 +3908,16 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
   const h=el("div","hello"); h.id="hello";
   const b=el("button","btn","Play a story"); b.type="button"; b.addEventListener("click",()=>{ const s=STORYS.find(x=>x.id===STARTER)||STORYS[0]; if (s) startStory(s); });
   const x=el("button","x","\u00d7"); x.type="button"; x.setAttribute("aria-label","Close this note"); x.addEventListener("click",()=>h.remove());
-  h.append(el("p",null,"Drag the red line to move through time. Click anything on the map or the chart to read about it."), b, x);
-  $("side").prepend(h);
+  const small=matchMedia("(max-width:759px)").matches;   /* on a phone the panel is folded, so the note sits above the time line */
+  h.append(el("p",null, small ? "Drag the red line to move through time. Tap anything to read about it." : "Drag the red line to move through time. Click anything on the map or the chart to read about it."), b, x);
+  small ? $("timebar").before(h) : $("side").prepend(h);
 }
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=112d46bc79"></script>
-<script src="routes.js?v=112d46bc79"></script>
-<script src="map.js?v=112d46bc79"></script>
+<script src="geo.js?v=ad256dc6ae"></script>
+<script src="routes.js?v=ad256dc6ae"></script>
+<script src="map.js?v=ad256dc6ae"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3909,7 +3929,10 @@ openStoryLink();
   const side=$("side"), b=el("button","sfoldb"); b.type="button"; b.id="sideFold"; b.setAttribute("aria-controls","detail");
   b.innerHTML='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   side.append(b);
-  let folded = LS("wh8-side")==="fold";
+  const PH=matchMedia("(max-width:759px)").matches;   /* on a phone the panel is a bar under the map until a card opens it; the choice is not kept */
+  const bar=el("div","sfoldt"); bar.id="sideBar"; side.prepend(bar);
+  { const h=side.querySelector(".moment h2"); if (h) bar.textContent=h.textContent; }
+  let folded = PH || LS("wh8-side")==="fold";
   const B=document.body.classList;
   window.sideSync=()=>{
     const card=!!state.sel, f=folded && !card, was=B.contains("sfold");
@@ -3917,7 +3940,7 @@ openStoryLink();
     b.setAttribute("aria-expanded",!f); b.title = f ? "Show the panel" : "Fold the panel"; b.setAttribute("aria-label",b.title);
     if (was!==f) requestAnimationFrame(()=>dispatchEvent(new Event("resize")));   /* the chart and the map take the freed space */
   };
-  const set=f=>{ folded=f; saveLS("wh8-side",f?"fold":"open"); sideSync(); };
+  const set=f=>{ folded=f; if (!PH) saveLS("wh8-side",f?"fold":"open"); sideSync(); };
   b.addEventListener("click",e=>{ e.stopPropagation(); set(!B.contains("sfold")); });
   side.addEventListener("click",()=>{ if (B.contains("sfold")) set(false); });
   sideSync();
@@ -3941,10 +3964,10 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=112d46bc79"></script>
-<script src="sidebar.js?v=112d46bc79"></script>
-<script src="connections.js?v=112d46bc79"></script>
-<script src="cx.js?v=112d46bc79"></script>
+<script src="ask.js?v=ad256dc6ae"></script>
+<script src="sidebar.js?v=ad256dc6ae"></script>
+<script src="connections.js?v=ad256dc6ae"></script>
+<script src="cx.js?v=ad256dc6ae"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

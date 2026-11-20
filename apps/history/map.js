@@ -19,6 +19,9 @@ MAP.year = INIT_YEAR;
    A link with m=map opens the full map, and a link without it the chart; otherwise the last choice, and on a first visit the full map. */
 MAP.mode = (()=>{ if (Q.get("m")==="map") return "full"; let v=null; try{ v=localStorage.getItem("wh8-mapmode"); }catch(e){}
   return v==="full"||v==="float"||v==="off" ? v : typeof FROM_URL!=="undefined" && FROM_URL ? (innerWidth>=760 ? "float" : "off") : "full"; })();
+/* a phone has no room for a map window over the chart: there it is the chart or the map */
+const PHONE = () => innerWidth < 760;
+if (PHONE() && MAP.mode==="float") MAP.mode="off";
 MAP.on = MAP.mode!=="off";
 
 const side=$("side"), mapCanvas=$("mapCanvas"), mctx=mapCanvas.getContext("2d"), mapWrap=$("mapWrap");
@@ -1407,6 +1410,7 @@ select = function(obj){
 };
 function setMapMode(m){
   if (m==="off" && typeof story!=="undefined" && story) story.mapOff=true;   /* closed during a story: the next steps leave it closed */
+  if (m==="float" && PHONE()) m="full";
   const wasFull = MAP.mode==="full";
   MAP.mode=m; MAP.on = m!=="off"; MAP.small = m==="float";
   try{ localStorage.setItem("wh8-mapmode",m); }catch(e){}
@@ -1423,7 +1427,7 @@ function drawMapBtn(){
   $("mapBtn").hidden = MAP.mode==="full";
 }
 MAP.small = MAP.mode==="float";
-$("viewChart").addEventListener("click",()=>{ if (MAP.mode==="full") setMapMode("float"); });
+$("viewChart").addEventListener("click",()=>{ if (MAP.mode==="full") setMapMode(PHONE() ? "off" : "float"); });
 $("viewMap").addEventListener("click",()=>setMapMode("full"));
 $("mapMin").addEventListener("click",()=>setMapMode(MAP.mode==="full" ? "float" : "full"));
 $("mapBtn").addEventListener("click",()=>setMapMode("off"));
