@@ -31,7 +31,7 @@
 - [The Spine and the Surface](https://hmeyy.com/essays/spine-and-surface.html): Why I kept losing things when I switched to-do apps, and the fix: keep a small, permanent spine and make everything around it disposable.
 - [How to Build and Test the Best Study Plan](https://hmeyy.com/essays/test-study-plan.html): Model memory as chunks with states, model each format by the state change it is good at, treat the plan as a schedule, and test it by splitting the subject, not the learner.
 - [The Chupacabra](https://hmeyy.com/essays/the-chupacabra.html): A short story.
-- [Every To-Do App Is the Same List](https://hmeyy.com/essays/the-same-list.html): Any data structure can be a list, so every task manager can hold what any other can. What differs is the surface. Keep the data in one plain format and change the surface instead.
+- [The worst task manager, except for all others](https://hmeyy.com/essays/the-same-list.html): Any data structure can be a list, so every task manager can hold what any other can. What differs is the surface. Keep the data in one plain format and change the surface instead.
 
 ## Projects
 
