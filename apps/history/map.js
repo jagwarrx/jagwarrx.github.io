@@ -229,6 +229,7 @@ function inland(landP, coast, d){
 }
 function paint(){
   if (!MAP.on || !mapW || !MAP.view) return;
+  { const sk = typeof story!=="undefined" && story ? story.s : null; if (sk!==MAP.barStory){ MAP.barStory=sk; if (!sk) MAP.storyAll=null; focusBar(); } }   /* a story began or ended: its line at the foot of the map comes or goes */
   { const ml=mapLevel(); if (ml!==MAP.lastLv){ MAP.lastLv=ml; if (typeof lensCounts==="function") lensCounts(); } }   /* a zoom that brings in another level changes the counts on the topics */
   const cs=getComputedStyle(document.documentElement), dark=isDark();
   const ink=cs.getPropertyValue("--ink").trim(), surf=cs.getPropertyValue("--surface").trim();
@@ -379,12 +380,56 @@ function onMapAt(p,y,a,b){
   if (p.layer==="people"){ const end=p.e||NOW; return Math.min(p.y+20,end)<=y && y<=end; }
   return p.e ? p.y<=b && p.e>=a : p.y>=a && p.y<=b;
 }
-/* the place a click opened: {g:[lon,lat], on}; away: the items shown there that are outside the years on the map */
-MAP.open=null; MAP.away=new Set();
-const atPlace=(o,g)=>{ const q=geoOf(o); return !!q && Math.abs(q[0]-g[0])<=.1 && Math.abs(q[1]-g[1])<=.1; };
+/* the links a click on a marker opened: {obj, on, cand:[{o, d, i, s}]}. cand: the chart items its page is tied to.
+   d, the kind of tie, closest first: 0 the same story elsewhere (it shares the Wikipedia page); 1 a named relation (part of, by, sides, from, to);
+   2 each page links to the other; 3 its page links there; 4 only linked from there, or only the place it stands in.
+   i: where in its text the link comes. s: how much the two share, from 0 to 1 (the pages both are tied to), worked out once their texts have loaded.
+   away: the items on the map that are outside its years; linked: the links shown, which get a line from the chosen item */
+MAP.open=null; MAP.away=new Set(); MAP.linked=new Set();
+let CHARTSET=null;
+/* while time plays the map only brings items on in the order they happened: no links, and no lines. Links are for a paused map and a click */
+const playingNow=()=>typeof playT!=="undefined" && !!playT;
+function openLinks(obj,on){
+  const O={obj,on,cand:[]}; MAP.open=O;
+  if (!on) return;
+  const id = typeof KBOF!=="undefined" ? (KBOF.get(obj)||obj.kb) : null;
+  const ties=t=>new Set([...(t&&t.links||[]), ...(t&&t.back||[]), ...Object.values(t&&t.rel||{}).flat()]);
+  const fill=tx=>{
+    if (MAP.open!==O) return;
+    if (!CHARTSET){ CHARTSET=new Set(); for (const r of REG) for (const p of [...r.points, ...r.over]) CHARTSET.add(p); }
+    const best=new Map(), w=wikiTitle(obj), put=(o,d,i)=>{ if (o && o!==obj && CHARTSET.has(o) && geoOf(o) && !(best.has(o) && best.get(o).d<=d)) best.set(o,{o,d,i:i??99,s:0}); };
+    for (const p of CHARTSET) if (wikiTitle(p)===w) put(p,0);
+    /* the place it stands in adds nothing on the map: left out when it is the same spot, the weakest tie when it is elsewhere */
+    const g=geoOf(obj), here=new Set(), place=new Set();
+    for (const k of ["where","capital"]) for (const t of (tx&&tx.rel||{})[k]||[]){ const o=KBOBJ.get(t), q=o&&geoOf(o); if (!o) continue;
+      (g && q && Math.abs(q[0]-g[0])<=.1 && Math.abs(q[1]-g[1])<=.1 ? here : place).add(o); }
+    for (const [k,ids] of Object.entries(tx&&tx.rel||{})) if (k!=="where" && k!=="capital") for (const t of ids){ const o=KBOBJ.get(t); if (!here.has(o)) put(o,1); }
+    const back=new Set((tx&&tx.back||[]).map(k=>KBOBJ.get(k)));
+    (tx&&tx.links||[]).forEach((k,i)=>{ const o=KBOBJ.get(k); if (!here.has(o) && !place.has(o)) put(o, back.has(o) ? 2 : 3, i); });
+    for (const o of [...back, ...place]) if (!here.has(o)) put(o,4);
+    O.cand=[...best.values()].sort((p,q)=>p.d-q.d || p.i-q.i).slice(0,40); drawMap();
+    const mine=ties(tx); if (id) mine.add(id);
+    if (typeof kbText==="function") Promise.all(O.cand.map(c=>{ const k=KBOF.get(c.o)||c.o.kb; return k ? kbText(k) : null; })).then(txs=>{
+      if (MAP.open!==O) return;
+      txs.forEach((t,j)=>{ if (!t) return; const n=ties(t); let both=0; for (const k of n) if (k!==id && mine.has(k)) both++; O.cand[j].s = both/Math.sqrt(Math.max(1,n.size)*Math.max(1,mine.size)); });
+      drawMap(); });
+  };
+  if (id && typeof kbText==="function") kbText(id).then(fill); else fill(null);
+}
+/* the links to show, at most 8. First the close ties (the same story elsewhere, a named relation, pages that link to each other, what its text names),
+   in that order, and within a kind the ones that share the most with the chosen item, then the ones its text names first.
+   Then the pages that only mention it, when they share enough with it (.15 or more); a mere mention fills in only when there are fewer than four links.
+   A link may come from any year: that is the point of a link */
+function linksShown(O){
+  const a=focusYr(O.obj), b=O.obj.e ?? a, gap=p=>{ const pa=p.y, pb=p.e ?? p.y; return pb<a ? a-pb : pa>b ? pa-b : 0; };
+  const L=O.cand.slice().sort((p,q)=>p.d-q.d || q.s-p.s || p.i-q.i || gap(p.o)-gap(q.o) || (p.o.level||0)-(q.o.level||0));
+  const out=L.filter(c=>c.d<4).slice(0,8);
+  for (const c of L) if (c.d===4 && out.length<8 && (c.s>=.15 || out.length<4)) out.push(c);
+  return out.map(c=>c.o);
+}
 /* a guest: an item with no place of its own, drawn at the spot of a Wikipedia page it shares with another item, outside its own region
    (Francis Xavier in Japan would stand at Goa, where Francis Xavier in Goa is at home). It is not really there, so it folds away like
-   an item from another time: an open place shows it, a folded one does not. GEOOWN gives the known ones their own place; this catches new ones */
+   an item from another time: it shows when it is chosen, or as a link of the chosen item. GEOOWN gives the known ones their own place; this catches new ones */
 let GUESTS=null;
 function isGuest(o){
   if (!GUESTS){ GUESTS=new Set(); const by=new Map(), out=(g,r)=>!!r && (g[1]<r[0]-3 || g[1]>r[2]+3 || g[0]<r[1]-3 || g[0]>r[3]+3);
@@ -443,7 +488,12 @@ function focusOpen(){
 function focusItems(){ const F=MAP.focus, out=[]; if (geoOf(F.obj)) out.push(F.obj); for (const p of [...(F.on ? F.all : F.own), ...F.near]) if (!out.includes(p)) out.push(p); return out; }
 function focusBar(){
   const bar=$("mapFocus"); if (!bar) return;
-  const F=MAP.focus; bar.hidden=!F; bar.textContent="";
+  const F=MAP.focus, st = !F && typeof story!=="undefined" && story ? story.s : null; bar.hidden=!F && !st; bar.textContent=""; bar.classList.toggle("low",!!st);
+  if (st){   /* a story playing: a line at the foot of the map, clear of the story's card, to bring the other items back or hide them again */
+    const all=MAP.storyAll===st, b=el("button",null, all ? "Only this story" : "Show everything"); b.type="button";
+    b.addEventListener("click",()=>{ MAP.storyAll = all ? null : st; focusBar(); drawMap(); });
+    bar.append(el("span",null, all ? "Showing everything" : "Showing only this story"), b);
+  }
   if (F){
     const nm=F.obj.n||F.obj.name, n=(F.on ? F.all : F.own).length;
     bar.append(el("span",null, n ? `${nm} and ${n} linked ${n===1?"item":"items"}` : `Only ${nm}`));
@@ -452,29 +502,37 @@ function focusBar(){
   }
   if (typeof lensCounts==="function") lensCounts();
 }
+/* a story or a connection playing: only its own steps stand on the map, the ones reached so far, so nothing else pulls the eye from it.
+   Show everything (the bar at the foot of the map) brings the rest back for that story; it ends with the story */
+function storyOnly(){
+  if (typeof story==="undefined" || !story || MAP.storyAll===story.s) return null;
+  const out=[];
+  const upto = story.s.cx ? story.s.stops.length-1 : story.i;   /* a connection shows both its ends from the first step */
+  for (let i=0;i<=upto;i++){ const st=story.s.stops[i], it = st && (st.k ? kbTarget(st.k) : findItem(st.item)); if (it && it.pt && !it.lk && geoOf(it) && !out.includes(it)) out.push(it); }   /* a step that is a state has its territory, not a marker */
+  return out;
+}
 function mapItems(){
-  if (MAP.focus){ MAP.away=new Set(); return focusItems(); }   /* a search's focus: only the item and its own */
-  const y=MAP.year, [wa,wb]=shownAB(y), lv=mapLevel(), out=[];
+  if (MAP.focus){ MAP.away=new Set(); MAP.steps=null; return focusItems(); }   /* a search's focus: only the item and its own */
+  const y=MAP.year, [wa,wb]=shownAB(y), lv=mapLevel(), out=[], S=storyOnly();
+  MAP.steps = S ? new Set(S) : null;
   for (const r of REG){
+    if (S) break;
     if (!state.active.has(r.id)) continue;
     if (state.events) for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb && (p===state.sel || !isGuest(p))) out.push(p);
     for (const p of r.over){
-      if (p!==state.solo && (!itemOn(p) || p.level>lv || (isGuest(p) && p!==state.sel))) continue;   /* a guest shows only when chosen, or in an open place */
+      if (p!==state.solo && (!itemOn(p) || p.level>lv || (isGuest(p) && p!==state.sel))) continue;   /* a guest shows only when chosen, or as a link */
       if (onMapAt(p,y,wa,wb) || (p===state.sel && p.layer==="people" && p.y<=y && y<=(p.e||NOW))) out.push(p);
     }
   }
-  /* an open place (a click on a marker opens its place, a second click folds it): what else stands there, from any time
-     or as a guest, under the same filters; and the chosen item's own story elsewhere (the items that share its Wikipedia page:
-     Francis Xavier brings up Francis Xavier in Japan, in Japan). At most 16, the most important and the nearest in time first. Folded, only the chosen one stays */
-  MAP.away=new Set();
-  if (MAP.open){ const g=MAP.open.g, has=new Set(out), more=[], sw = state.sel && !state.sel.n ? wikiTitle(state.sel) : null, kin=p=>!!sw && wikiTitle(p)===sw;
-    for (const r of REG){
-      if (!state.active.has(r.id)) continue;
-      if (state.events) for (const p of r.points) if (p.level<=lv && !has.has(p) && (atPlace(p,g) || kin(p))) more.push(p);
-      for (const p of r.over) if (itemOn(p) && p.level<=lv && !has.has(p) && (atPlace(p,g) || kin(p))) more.push(p);
-    }
-    more.sort((a,b)=>(b===state.sel)-(a===state.sel) || kin(b)-kin(a) || a.level-b.level || Math.abs(a.y-y)-Math.abs(b.y-y));
-    for (const p of (MAP.open.on ? more.slice(0,16) : more.filter(p=>p===state.sel))){ out.push(p); MAP.away.add(p); }
+  /* a click on a marker opens its links (a second click folds them): the items its page is tied to, from any year, each at its own place.
+     Folded, or while they load, only the chosen one stays */
+  MAP.away=new Set(); MAP.linked=new Set();
+  if (S){ if (state.sel && state.sel.pt && !state.sel.n && !state.sel.lk && geoOf(state.sel) && !S.includes(state.sel)) S.push(state.sel);   /* and whatever the reader opened meanwhile */
+    for (const p of S){ out.push(p); if (p!==state.sel && !(p.ov ? onMapAt(p,y,wa,wb) : p.y>=wa && p.y<=wb)) MAP.away.add(p); } }   /* a step from another year carries its year */
+  const O=MAP.open;
+  if (O && O.obj===state.sel){ const has=new Set(out);
+    if (!has.has(O.obj) && geoOf(O.obj)){ out.push(O.obj); MAP.away.add(O.obj); has.add(O.obj); }
+    if (O.on && !playingNow()) for (const p of linksShown(O)){ MAP.linked.add(p); if (!has.has(p)){ out.push(p); if (!onMapAt(p,y,wa,wb)) MAP.away.add(p); } }
   }
   return out;
 }
@@ -612,7 +670,7 @@ function paintMarks(cs, ink, surf, nameBoxes=[]){
   const deep = MAP.small ? 0 : Math.max(0, Math.log2(MAP.view.k/Math.max(1e-6, mapW/360))-2.67), big = Math.min(2, 1+.3*deep), fs = 1+(big-1)*.5;
   const grow = Math.min(1,(zf-1)/1.2), sz = (MAP.small ? .85 : 1)*(.62+.38*grow)*big, placed=[];
   const picOf = o => { const P=portraitOf(o), own = ovPicOf(o) || (P ? "people/"+P.f : null); if (own) return [own, o.level===1 ? 60 : 54, 1];
-    if (o.level>(deep>.6 ? 3 : 2)) return null; const k = KD[o.name] || KDEF[o.ov ? o.layer : "event"]; return k ? ["kinds/"+k+".png", o.level===1 ? 50 : o.level===2 ? 44 : 38] : null; };   /* zoomed into a country, level 3 gets its icon too */
+    if (o.level>(deep>.6 ? 3 : 2) && !(MAP.steps && MAP.steps.has(o))) return null; const k = KD[o.name] || KDEF[o.ov ? o.layer : "event"]; return k ? ["kinds/"+k+".png", o.level===1 ? 50 : o.level===2 ? 44 : 38] : null; };   /* zoomed into a country, level 3 gets its icon too */
   const hit = (a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1], held=[];
   const labFont = o => `600 ${((o.level===1 ? 13 : 12)*fs).toFixed(1)}px "Barlow Condensed","Arial Narrow",Arial,sans-serif`, lh=8*fs;
   /* where a name can go by its marker: right, left, under */
@@ -647,9 +705,14 @@ function paintMarks(cs, ink, surf, nameBoxes=[]){
   /* dots first, then the pieces from the back of the map to the front, the chosen one last */
   const order=MAP.marks.slice().sort((a,b)=>(a.o===state.sel)-(b.o===state.sel) || (!!a.pic)-(!!b.pic) || a.fy-b.fy);
   const oval=(x,yy,rx,ry)=>{ mctx.beginPath(); mctx.ellipse(x,yy,rx,ry,0,0,7); };
+  /* the chosen item's links: a dashed red line from it to each. The thin grey lines only tie a marker that stepped aside to its true spot */
+  if (MAP.linked.size){ const c=MAP.marks.find(m=>m.o===state.sel);
+    if (c){ mctx.save(); mctx.strokeStyle=RED; mctx.globalAlpha=.6; mctx.lineWidth=1.5; mctx.setLineDash([6,4]);
+      for (const m of MAP.marks) if (MAP.linked.has(m.o)){ mctx.beginPath(); mctx.moveTo(c.x,c.y); mctx.lineTo(m.x,m.y); mctx.stroke(); }
+      mctx.restore(); } }
   for (const m of order){
     const o=m.o, col = o.ov ? LAYER[o.layer].c : "#5b6b7b", sel=o===state.sel;
-    if (m.fx!==m.x0 || m.fy!==m.y0){ mctx.strokeStyle=ink; mctx.globalAlpha=.45; mctx.lineWidth=1; mctx.beginPath(); mctx.moveTo(m.x0,m.y0); mctx.lineTo(m.fx,m.fy); mctx.stroke(); mctx.globalAlpha=1;
+    if ((m.fx!==m.x0 || m.fy!==m.y0) && !playingNow()){ mctx.strokeStyle=ink; mctx.globalAlpha=.3; mctx.lineWidth=1;   /* a faint tie to its true spot, not a link */ mctx.beginPath(); mctx.moveTo(m.x0,m.y0); mctx.lineTo(m.fx,m.fy); mctx.stroke(); mctx.globalAlpha=1;
       mctx.fillStyle=ink; mctx.beginPath(); mctx.arc(m.x0,m.y0,2,0,7); mctx.fill(); }
     const far = sel ? 0 : MAP.away.has(o) ? 1.4 : o.layer==="people" ? 0 : Math.min(1,Math.abs(o.y-y)/W);      /* how far the item is from the map's year, 0 to 1 */
     mctx.globalAlpha = 1-(m.dot ? .45 : .22)*far;
@@ -671,15 +734,15 @@ function paintMarks(cs, ink, surf, nameBoxes=[]){
   const boxes=MAP.marks.map(m=>m.b).concat(held), maxL = MAP.small ? 6 : 24; let nL=0;
   for (const m of MAP.marks){
     const isSel = m.o===state.sel;
-    if (nL>=maxL && !isSel) continue;
-    const away=MAP.away.has(m.o), txt = away ? m.o.name+", "+fmt(m.o.y) : m.o.name;
-    if (!isSel && !away && m.o.level>(MAP.small ? 1 : deep>.6 ? 3 : 2)) continue;
+    const away=MAP.away.has(m.o), link=MAP.linked.has(m.o), txt = away ? m.o.name+", "+fmt(m.o.y) : m.o.name;   /* a link always carries its name */
+    if (nL>=maxL && !isSel && !link) continue;
+    if (!isSel && !away && !link && m.o.level>(MAP.small ? 1 : deep>.6 ? 3 : 2)) continue;
     mctx.font=labFont(m.o);
     const tw=mctx.measureText(txt).width, tries=labAt(m,m.fx,m.fy,tw);
     /* a place that covers no territory's name first; else any free place, and that territory's name gives way */
     const free = t=>t[0]>2 && t[2]<mapW-2 && !boxes.some(q=>hit(t,q));
     let b = m.lab || tries.find(t=>free(t) && !nameBoxes.some(q=>hit(t,q))) || tries.find(free);
-    if (!b){ if (!isSel) continue; b=tries[0]; }
+    if (!b){ if (!isSel && !link) continue; b=tries[0]; }
     boxes.push(b); nL++;
     mctx.lineWidth=3.5*fs; mctx.strokeStyle=surf; mctx.strokeText(txt,b[0]+2,(b[1]+b[3])/2); mctx.fillStyle=isSel?RED:ink; mctx.fillText(txt,b[0]+2,(b[1]+b[3])/2);
   }
@@ -1173,7 +1236,7 @@ function endPtr(e){
     }
     setBoxMode(false);
   }
-  if (drag && !drag.box && !drag.pinch && MAP.down && Math.hypot(x-MAP.down[0],y-MAP.down[1])<5){ const mk=markAt(x,y); if (mk && MAP.focus && mk.o===MAP.focus.obj) focusOpen(); else if (mk){ const g=geoOf(mk.o), fold = mk.o===state.sel && MAP.open && MAP.open.on; MAP.keepYear=true; select(mk.o); MAP.keepYear=false; MAP.open = g ? {g, on:!fold} : null; drawMap(); } else { const t=terrAt(x,y); if (t) clickTerr(t); else if (state.sel) select(null); } }   /* sea or empty land: clear the selection */
+  if (drag && !drag.box && !drag.pinch && MAP.down && Math.hypot(x-MAP.down[0],y-MAP.down[1])<5){ const mk=markAt(x,y); if (mk && MAP.focus && mk.o===MAP.focus.obj) focusOpen(); else if (mk){ const fold = mk.o===state.sel && MAP.open && MAP.open.on; MAP.keepYear=true; select(mk.o); MAP.keepYear=false; openLinks(mk.o, !fold && !playingNow()); drawMap(); } else { const t=terrAt(x,y); if (t) clickTerr(t); else if (state.sel) select(null); } }   /* sea or empty land: clear the selection */
   ptrs.delete(e.pointerId); if (ptrs.size<2 && drag && drag.pinch) drag=null;
   if (!ptrs.size){ drag=null; mapWrap.classList.remove("panning"); }
 }
@@ -1254,6 +1317,9 @@ function cardBack(){
   b.append(el("span",null,"Back to "+(prev.n||prev.name||"the last item"))); b.addEventListener("click",()=>history.back());
   $("detail").prepend(b);
 }
+/* Play folds any open links, so a pause shows none until an item is clicked again */
+const basePlay = setPlay;
+setPlay = function(on){ const was=playingNow(); if (on && MAP.open) MAP.open.on=false; basePlay(on); if (was!==playingNow()) drawMap(); };
 const chartSelect = select;
 select = function(obj){
   MAP.open=null;

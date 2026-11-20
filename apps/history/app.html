@@ -548,6 +548,7 @@ body.mapfloat .mhead{cursor:move;touch-action:none}
 body.mapfloat .msrc{display:none}
 .mfocus{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:8px;padding:4px 6px 4px 10px;font-size:13px;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .mfocus[hidden]{display:none}
+.mfocus.low{top:auto;bottom:8px}   /* in a story the line sits at the foot of the map, clear of the story's card */
 .mfocus span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mfocus button{flex:none;font:inherit;font-size:12.5px;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .mfocus button:hover{border-color:var(--ink)}
@@ -1179,20 +1180,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=a7e92ff6a9"></script>
-<script src="books.js?v=a7e92ff6a9"></script>
-<script src="videos.js?v=a7e92ff6a9"></script>
-<script src="stories.js?v=a7e92ff6a9"></script>
-<script src="deep.js?v=a7e92ff6a9"></script>
-<script src="famous.js?v=a7e92ff6a9"></script>
-<script src="kb.js?v=a7e92ff6a9"></script>
-<script src="people/portraits.js?v=a7e92ff6a9"></script>
-<script src="ovpics.js?v=a7e92ff6a9"></script>
-<script src="kinds.js?v=a7e92ff6a9"></script>
-<script src="events.js?v=a7e92ff6a9"></script>
+<script src="hier.js?v=07be45aeda"></script>
+<script src="books.js?v=07be45aeda"></script>
+<script src="videos.js?v=07be45aeda"></script>
+<script src="stories.js?v=07be45aeda"></script>
+<script src="deep.js?v=07be45aeda"></script>
+<script src="famous.js?v=07be45aeda"></script>
+<script src="kb.js?v=07be45aeda"></script>
+<script src="people/portraits.js?v=07be45aeda"></script>
+<script src="ovpics.js?v=07be45aeda"></script>
+<script src="kinds.js?v=07be45aeda"></script>
+<script src="events.js?v=07be45aeda"></script>
 <script>
 "use strict";
-const VER = "?v=a7e92ff6a9";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=07be45aeda";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -3301,7 +3302,7 @@ function lensCounts(){
   if (mapView()){
     /* on the map: what the map can show in its window of years, placed items only */
     const y=MAP.year, [wa,wb]=shownAB(y);
-    if (MAP.focus){ for (const p of mapItems()) if (geoOf(p)){ if (p.layer) C[p.layer]++; if (p.pick || !p.layer) C.ev++; } }   /* a search's focus: count what it shows */
+    if (MAP.focus || (typeof storyOnly==="function" && storyOnly())){ for (const p of mapItems()) if (geoOf(p)){ if (p.layer) C[p.layer]++; if (p.pick || !p.layer) C.ev++; } }   /* a search's focus: count what it shows */
     else for (const r of REG) if (act(r)){
       for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb && geoOf(p) && !isGuest(p)) C.ev++;
       for (const p of r.over) if (p.level<=lv && geoOf(p) && !isGuest(p) && onMapAt(p,y,wa,wb)){ C[p.layer]++; if (p.pick) C.ev++; }
@@ -3889,9 +3890,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=a7e92ff6a9"></script>
-<script src="routes.js?v=a7e92ff6a9"></script>
-<script src="map.js?v=a7e92ff6a9"></script>
+<script src="geo.js?v=07be45aeda"></script>
+<script src="routes.js?v=07be45aeda"></script>
+<script src="map.js?v=07be45aeda"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3935,8 +3936,8 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=a7e92ff6a9"></script>
-<script src="sidebar.js?v=a7e92ff6a9"></script>
+<script src="ask.js?v=07be45aeda"></script>
+<script src="sidebar.js?v=07be45aeda"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
