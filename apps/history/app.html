@@ -1055,6 +1055,8 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
       <div class="vrow"><span id="lDe">Detail</span>
         <div class="seg" role="group" aria-labelledby="lDe"><button type="button" id="det0" aria-pressed="true" title="Detail follows the zoom: zoom in to see more. Key 0">Auto</button><button type="button" id="det1" aria-pressed="false" title="Only the major events and items. Key 1">Major</button><button type="button" id="det2" aria-pressed="false" title="Major and notable. Key 2">Notable</button><button type="button" id="det3" aria-pressed="false" title="Everything. Key 3">All</button></div></div>
       <p class="hintline" id="detHint"></p>
+      <div class="vrow"><span id="lTi">Map</span>
+        <div class="seg" role="group" aria-labelledby="lTi"><button type="button" id="tiltOn" aria-pressed="true" title="The map leans toward you as you zoom in, and its top and bottom curl away when the whole world is in view">Tilted</button><button type="button" id="tiltOff" aria-pressed="false" title="The map stays flat">Flat</button></div></div>
       <div class="vrow"><span id="lRg">Regions</span>
         <div class="seg" role="group" aria-labelledby="lRg"><button type="button" id="unfoldAll" title="Show every region's parts as their own rows">Unfold all</button></div></div>
       <label class="gblab" for="groupBy">Group by</label>
@@ -1180,20 +1182,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=0a80dd4fc3"></script>
-<script src="books.js?v=0a80dd4fc3"></script>
-<script src="videos.js?v=0a80dd4fc3"></script>
-<script src="stories.js?v=0a80dd4fc3"></script>
-<script src="deep.js?v=0a80dd4fc3"></script>
-<script src="famous.js?v=0a80dd4fc3"></script>
-<script src="kb.js?v=0a80dd4fc3"></script>
-<script src="people/portraits.js?v=0a80dd4fc3"></script>
-<script src="ovpics.js?v=0a80dd4fc3"></script>
-<script src="kinds.js?v=0a80dd4fc3"></script>
-<script src="events.js?v=0a80dd4fc3"></script>
+<script src="hier.js?v=112d46bc79"></script>
+<script src="books.js?v=112d46bc79"></script>
+<script src="videos.js?v=112d46bc79"></script>
+<script src="stories.js?v=112d46bc79"></script>
+<script src="deep.js?v=112d46bc79"></script>
+<script src="famous.js?v=112d46bc79"></script>
+<script src="kb.js?v=112d46bc79"></script>
+<script src="people/portraits.js?v=112d46bc79"></script>
+<script src="ovpics.js?v=112d46bc79"></script>
+<script src="kinds.js?v=112d46bc79"></script>
+<script src="events.js?v=112d46bc79"></script>
 <script>
 "use strict";
-const VER = "?v=0a80dd4fc3";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=112d46bc79";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -3893,9 +3895,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=0a80dd4fc3"></script>
-<script src="routes.js?v=0a80dd4fc3"></script>
-<script src="map.js?v=0a80dd4fc3"></script>
+<script src="geo.js?v=112d46bc79"></script>
+<script src="routes.js?v=112d46bc79"></script>
+<script src="map.js?v=112d46bc79"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3939,10 +3941,10 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=0a80dd4fc3"></script>
-<script src="sidebar.js?v=0a80dd4fc3"></script>
-<script src="connections.js?v=0a80dd4fc3"></script>
-<script src="cx.js?v=0a80dd4fc3"></script>
+<script src="ask.js?v=112d46bc79"></script>
+<script src="sidebar.js?v=112d46bc79"></script>
+<script src="connections.js?v=112d46bc79"></script>
+<script src="cx.js?v=112d46bc79"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

@@ -13,8 +13,8 @@
 
 - [What Difference Does ADHD Medication Make?](https://hmeyy.com/essays/adhd-medication.html): It turns the noise down. It doesn't choose what to focus on, and it doesn't pick itself up from the pharmacy. A practical answer, not medical advice.
 - [Your agent will say it sent the email](https://hmeyy.com/essays/agent-said-it-sent-the-email.html): What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.
-- [Ask a Better Question](https://hmeyy.com/essays/ask-a-better-question.html): Before I build a tool, I stop and ask what I'm trying to achieve and whether there's an easier, quicker or better way. Often that way is to run the thing through a prompt first.
 - [Artificial Intelligence: Where to dig](https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html): Improve features, create features, create products. The easier problems first.
+- [Ask a Better Question](https://hmeyy.com/essays/ask-a-better-question.html): Before I build a tool, I stop and ask what I'm trying to achieve and whether there's an easier, quicker or better way. Often that way is to run the thing through a prompt first.
 - [Is There a Best Possible Study Plan for a Subject?](https://hmeyy.com/essays/best-study-plan.html): No single one, but there is a best plan for a given goal and person, and good plans share a structure: an end test, a map, concepts with cases, retrieval, tacit practice and a changing surface.
 - [Change the Environment to Change the Actions](https://hmeyy.com/essays/change-the-environment.html): Change the environment and the situation, which changes the constraints, which changes the actions. The levers work on different time scales: minutes, days, months, years.
 - [Coach Wooden](https://hmeyy.com/essays/coach-wooden.html): John Wooden's seven rules for living, and why they still hold.
@@ -27,6 +27,7 @@
 - [Lessons In Crypto Markets](https://hmeyy.com/essays/lessons-in-crypto-markets.html): What a year of trading taught me about risk, patience and myself.
 - [Lists of Book Lists](https://hmeyy.com/essays/lists-of-book-lists.html): The reading lists I go back to when choosing what to read next.
 - [Ode to Systems Thinking](https://hmeyy.com/essays/ode-to-systems-thinking.html): Consumers, creators and investors, and what it means to see the whole.
+- [One Thing at a Time](https://hmeyy.com/essays/one-thing-at-a-time.html): A constraint worth adding: do one thing at a time, picked from a short menu, and don't drop it once it's started. The start is where neurospicy minds get tripped.
 - [Principles, Experiments & Serendipity](https://hmeyy.com/essays/principles-experiments-serendipity.html): Turning 23. Lessons, professional and personal, and what comes next.
 - [Reason, Resonance & the Future](https://hmeyy.com/essays/reason-resonance-future.html): The future is created, not predicted. On meaning and what to build.
 - [Removing Bullshit](https://hmeyy.com/essays/removing-bullshit.html): Most of designing a system is taking things out: fields, features and rules that cost something every day and change nothing about what you do.

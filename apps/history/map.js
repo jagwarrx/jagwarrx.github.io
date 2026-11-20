@@ -197,6 +197,64 @@ const sy = lat => (MAP.view.y-lat)*MAP.view.k + mapH/2;
 const lonAt = x => (x-mapW/2)/MAP.view.k + MAP.view.x;
 const latAt = y => MAP.view.y - (y-mapH/2)/MAP.view.k;
 
+/* ---------- the tilt ----------
+   The ground leans toward the reader. Seen whole, the world stays flat in the middle and only its top and bottom curl away;
+   zoomed in to a region the ground tips like a road map on a dashboard, far at the top and near at the bottom, and a story or
+   a connection playing tips it a little more. Markers, names and labels stay upright: only the ground is warped, row by row,
+   after it is drawn flat (tiltGround). tiltPt takes a flat position (what sx and sy give) to where it shows; untilt takes a
+   pointer back to the flat position under it. View has the switch. */
+const TILT = { on: LS("history.maptilt")!=="0", st:0, at:0, key:"", N:0, F:null, S:null, t:0, rho:0 };
+function tiltSet(){
+  let t=0, rho=0;
+  if (TILT.on && !MAP.small && MAP.view && mapW){
+    const q=Math.max(0,Math.min(1,(mapZoom()-.9)/1.7)), w=q*q*(3-2*q), goal = typeof story!=="undefined" && story ? 1 : 0;
+    const now=performance.now(), d=Math.min(100,now-(TILT.at||now))/500; TILT.at=now;
+    if (TILT.st!==goal){ TILT.st = goal>TILT.st ? Math.min(goal,TILT.st+d) : Math.max(goal,TILT.st-d); drawMap(); }   /* a story eases it in and out, over half a second */
+    t = .30*w + .10*TILT.st; rho = (1-w)*(1-.5*TILT.st);
+  }
+  const N=Math.max(2,Math.round(mapH)), key=t.toFixed(4)+","+rho.toFixed(4)+","+N;
+  TILT.t=t; TILT.rho=rho;
+  if (key===TILT.key) return;
+  TILT.key=key; TILT.N=N;
+  if (!t && !rho){ TILT.F=null; return; }
+  /* for each row of the map as shown: the flat row it shows (F) and how much wider the ground is there (S, never under 1,
+     so the flat picture always has the pixels). The tip: rows crowd at the top and spread at the bottom. The curl: the
+     middle is the flat map a touch larger (m), and rows crowd toward both edges */
+  const F=TILT.F=new Float32Array(N+1), S=TILT.S=new Float32Array(N+1), H=mapH, c=H/2, m=1+.05*rho, u0=.6;   /* m stays small: it is also how much of the world's left and right ends leave the picture */
+  for (let i=0;i<=N;i++){
+    const Y=i*H/N, y1=Y*(1+t)/(1+t*Y/H), u=(y1-c)/c, q=Math.max(0,(Math.abs(u)-u0)/(1-u0));
+    F[i]=c+c*(u/m+(1-1/m)*Math.sign(u)*q*q*q); S[i]=(1+t*Y/H)*(m-(m-1)*q*q);
+  }
+}
+function tiltAt(Y){ const N=TILT.N, f=Math.max(0,Math.min(N,Y*N/mapH)), i=Math.min(N-1,Math.floor(f)), r=f-i; return [TILT.F[i]+(TILT.F[i+1]-TILT.F[i])*r, TILT.S[i]+(TILT.S[i+1]-TILT.S[i])*r]; }
+function untilt(X,Y){ if (!TILT.F) return [X,Y]; const [y,s]=tiltAt(Y); return [mapW/2+(X-mapW/2)/s, y]; }
+function tiltPt(x,y){
+  if (!TILT.F) return [x,y];
+  const F=TILT.F, S=TILT.S, N=TILT.N; let f;
+  if (y<=F[0]) f=(y-F[0])/(F[1]-F[0]);
+  else if (y>=F[N]) f=N+(y-F[N])/(F[N]-F[N-1]);
+  else { let lo=0, hi=N; while (hi-lo>1){ const mid=(lo+hi)>>1; if (F[mid]<=y) lo=mid; else hi=mid; } f=lo+(y-F[lo])/(F[lo+1]-F[lo]); }
+  const g=Math.max(0,Math.min(N,f)), i=Math.min(N-1,Math.floor(g)), s=S[i]+(S[i+1]-S[i])*(g-i);
+  return [mapW/2+(x-mapW/2)*s, f*mapH/N];
+}
+/* the flat ground on the canvas, redrawn tilted: one thin strip per row */
+function tiltGround(dark){
+  if (!TILT.F) return;
+  const src=layer(6); blitTo(src,{canvas:mapCanvas});
+  const W=mapCanvas.width, H=mapCanvas.height, cx=W/2, step = dpr>=2 ? 2 : 1, g=mctx;
+  g.save(); g.setTransform(1,0,0,1,0,0); g.imageSmoothingEnabled=true;
+  for (let j=0;j<H;j+=step){
+    const a=tiltAt(j/dpr), b=tiltAt((j+step)/dpr), s=(a[1]+b[1])/2, sh=Math.max(.01,(b[0]-a[0])*dpr), sw=W/s;
+    g.drawImage(src.canvas, cx-sw/2, a[0]*dpr, sw, sh, 0, j, W, step);   /* whole rows on the canvas: strips that overlapped by half a row cost half as much again */
+  }
+  g.restore();
+  /* the far edge fades a little: both edges when the world curls, the top when the ground tips */
+  const shade=(y0,y1,col)=>{ const gr=g.createLinearGradient(0,y0,0,y1); gr.addColorStop(0,col); gr.addColorStop(1,col.replace(/[\d.]+\)$/,"0)")); g.fillStyle=gr; g.fillRect(0,Math.min(y0,y1),mapW,Math.abs(y1-y0)); };
+  const base = dark ? "0,0,0" : "24,52,84";
+  if (TILT.rho>0){ const a=((dark?.34:.17)*TILT.rho).toFixed(3), h=mapH*.2; shade(0,h,`rgba(${base},${a})`); shade(mapH,mapH-h,`rgba(${base},${a})`); }
+  if (TILT.t>0){ const a=((dark?.30:.15)*Math.min(1,TILT.t/.3)).toFixed(3); shade(0,mapH*.34,`rgba(${base},${a})`); }
+}
+
 /* outlines only: no line where a ring jumps across the 180th meridian */
 function ringLine(path, a, off=0){
   path.moveTo(sx(a[0]+off), sy(a[1]));
@@ -231,6 +289,7 @@ function paint(){
   if (!MAP.on || !mapW || !MAP.view) return;
   { const sk = typeof story!=="undefined" && story ? story.s : null; if (sk!==MAP.barStory){ MAP.barStory=sk; if (!sk) MAP.storyAll=null; focusBar(); } }   /* a story began or ended: its line at the foot of the map comes or goes */
   { const ml=mapLevel(); if (ml!==MAP.lastLv){ MAP.lastLv=ml; if (typeof lensCounts==="function") lensCounts(); } }   /* a zoom that brings in another level changes the counts on the topics */
+  tiltSet();
   const cs=getComputedStyle(document.documentElement), dark=isDark();
   const ink=cs.getPropertyValue("--ink").trim(), surf=cs.getPropertyValue("--surface").trim();
   const sea=cs.getPropertyValue("--sea").trim(), land=cs.getPropertyValue("--land").trim();
@@ -320,7 +379,7 @@ function paint(){
       if (h<14 || w<32) continue;
       const size=Math.round(Math.max(9.5,Math.min(17,Math.sqrt(f.area)*MAP.view.k/9.5))), font=`500 ${size}px "Barlow Condensed","Arial Narrow",Arial,sans-serif`, sp=(size*.09).toFixed(1)+"px";
       mctx.font=font; if (LS) mctx.letterSpacing=sp;
-      const x=sx(f.lab.cx), y=sy(f.lab.cy), nm=mapLabel(f).toUpperCase(), tw=mctx.measureText(nm).width;
+      const [x,y]=tiltPt(sx(f.lab.cx),sy(f.lab.cy)), nm=mapLabel(f).toUpperCase(), tw=mctx.measureText(nm).width;
       if (tw+8>w || x-tw/2<4 || x+tw/2>mapW-4 || y<size || y>mapH-size) continue;
       const r=[x-tw/2-2,y-size*.6,x+tw/2+2,y+size*.6];
       if (placed.some(q=>r[0]<q[2]&&r[2]>q[0]&&r[1]<q[3]&&r[3]>q[1])) continue;
@@ -328,6 +387,7 @@ function paint(){
     }
     if (LS) mctx.letterSpacing="0px";
   }
+  tiltGround(dark);   /* all that follows stands upright on the tilted ground */
   paintRoutes(ink, surf);
   paintMarks(cs, ink, surf, names.map(n=>n.r));
   /* the territories' names, where no marker and no item's name took the place */
@@ -610,7 +670,7 @@ function paintRoutes(ink, surf){
   mctx.save(); mctx.lineCap="round"; mctx.lineJoin="round";
   const labels=[], ends=new Set();
   for (const r of R.list){
-    const P=r.p.map(([la,lo])=>[sx(lo),sy(la)]); if (P.length<2) continue;
+    const P=r.p.map(([la,lo])=>tiltPt(sx(lo),sy(la))); if (P.length<2) continue;
     const path=new Path2D(); let len=0;
     for (let i=1;i<P.length;i++) len+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);
     path.moveTo(P[0][0],P[0][1]);
@@ -681,7 +741,7 @@ function paintMarks(cs, ink, surf, nameBoxes=[]){
   for (const m of items){ const k=okey(m), c=once.get(k); if (!c || m.o===state.sel) once.set(k,m); }
   for (const m of items){
     if (once.get(okey(m))!==m) continue;
-    const x0=sx(m.g[0]), y0=sy(m.g[1]); if (x0<-20||x0>mapW+20||y0<-20||y0>mapH+20) continue;
+    const [x0,y0]=tiltPt(sx(m.g[0]),sy(m.g[1])); if (x0<-20||x0>mapW+20||y0<-20||y0>mapH+20) continue;
     let P=picOf(m.o); const sel=m.o===state.sel; let mk;
     /* seen from far, a level 2 item with a shared icon keeps it only where its own place is free; in a crowd it is a dot */
     if (P && !P[2] && m.o.level===2 && !MAP.away.has(m.o) && grow<.5){ const s=P[1]*sz, b=[x0-s*.5, y0-s*.86, x0+s*.5, y0+s*.1]; if (placed.some(q=>hit(b,q.b))) P=null; }
@@ -770,7 +830,7 @@ function inFeat(f, lon, lat){
   }
   return c;
 }
-function terrAt(x,y){ for (let i=MAP.paths.length-1;i>=0;i--) if (mctx.isPointInPath(MAP.paths[i][0],x*dpr,y*dpr,"evenodd")) return MAP.paths[i][1]; return null; }
+function terrAt(x,y){ [x,y]=untilt(x,y); for (let i=MAP.paths.length-1;i>=0;i--) if (mctx.isPointInPath(MAP.paths[i][0],x*dpr,y*dpr,"evenodd")) return MAP.paths[i][1]; return null; }
 /* a click on a territory opens its bar on the timeline, or a card for the territory when the chart has none; the year and view stay */
 function clickTerr(f){
   const it=itemOfFeat(f);
@@ -1188,6 +1248,7 @@ function revealYear(){
 const tip=$("mapTip"), boxSel=$("boxSel"), ptrs=new Map();
 let drag=null;
 function zoomAt(f,x,y){
+  [x,y]=untilt(x,y);   /* the ground under the pointer, on the flat map */
   const lon=lonAt(x), lat=latAt(y), k=clampK(MAP.view.k*f);
   MAP.view={x:lon-(x-mapW/2)/k, y:lat+(y-mapH/2)/k, k}; clampView(); drawMap();
 }
@@ -1197,7 +1258,7 @@ mapCanvas.addEventListener("pointerdown",e=>{
   mapCanvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,local(e)); tip.style.display="none";
   if (ptrs.size===2){ const [a,b]=[...ptrs.values()]; drag={pinch:true, d:Math.hypot(a[0]-b[0],a[1]-b[1]), k:MAP.view.k}; return; }
   const [x,y]=local(e);
-  drag = (MAP.boxMode||e.shiftKey) ? {box:true,x,y} : {x,y,vx:MAP.view.x,vy:MAP.view.y};
+  drag = (MAP.boxMode||e.shiftKey) ? {box:true,x,y} : {x,y,f:untilt(x,y),vx:MAP.view.x,vy:MAP.view.y};
   MAP.down=[x,y];
   if (!drag.box) mapWrap.classList.add("panning");
 });
@@ -1211,7 +1272,7 @@ mapCanvas.addEventListener("pointermove",e=>{
   if (drag && drag.box){
     boxSel.style.cssText=`display:block;left:${Math.min(x,drag.x)}px;top:${Math.min(y,drag.y)}px;width:${Math.abs(x-drag.x)}px;height:${Math.abs(y-drag.y)}px`; return;
   }
-  if (drag){ MAP.view.x=drag.vx-(x-drag.x)/MAP.view.k; MAP.view.y=drag.vy+(y-drag.y)/MAP.view.k; clampView(); drawMap(); return; }
+  if (drag){ const f=untilt(x,y); MAP.view.x=drag.vx-(f[0]-drag.f[0])/MAP.view.k; MAP.view.y=drag.vy+(f[1]-drag.f[1])/MAP.view.k; clampView(); drawMap(); return; }   /* the ground follows the pointer, tilted or not */
   /* hover: a marker first, then which territory */
   const mk=markAt(x,y);
   if (mk){ tip.textContent=`${mk.o.name}, ${mk.o.approx?"about ":""}${fmt(mk.o.y)}`; tip.style.display="block";
@@ -1229,7 +1290,8 @@ function endPtr(e){
   if (drag && drag.box){
     boxSel.style.display="none";
     if (Math.abs(x-drag.x)>8 && Math.abs(y-drag.y)>8){
-      fitBox([lonAt(Math.min(x,drag.x)), latAt(Math.max(y,drag.y)), lonAt(Math.max(x,drag.x)), latAt(Math.min(y,drag.y))]);
+      const a=untilt(Math.min(x,drag.x),Math.min(y,drag.y)), b=untilt(Math.max(x,drag.x),Math.max(y,drag.y));
+      fitBox([lonAt(Math.min(a[0],b[0])), latAt(b[1]), lonAt(Math.max(a[0],b[0])), latAt(a[1])]);
       MAP.view.k=clampK(MAP.view.k/0.94); drawMap();
     }
     setBoxMode(false);
@@ -1266,6 +1328,10 @@ $("mapBox").addEventListener("click",()=>setBoxMode(!MAP.boxMode));
 $("mapIn").addEventListener("click",()=>zoomAt(1.6,mapW/2,mapH/2));
 $("mapOut").addEventListener("click",()=>zoomAt(1/1.6,mapW/2,mapH/2));
 $("mapFit").addEventListener("click",()=>{ fitSelected(); drawMap(); });
+/* View: the map tilted, or flat */
+{ const show=()=>{ $("tiltOn").setAttribute("aria-pressed",TILT.on); $("tiltOff").setAttribute("aria-pressed",!TILT.on); };
+  for (const [id,v] of [["tiltOn",true],["tiltOff",false]]) $(id).addEventListener("click",()=>{ TILT.on=v; saveLS("history.maptilt",v?"1":"0"); show(); drawMap(); });
+  show(); }
 
 /* ---------- size ---------- */
 function sizeMap(){
