@@ -1180,20 +1180,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=7eee293c2f"></script>
-<script src="books.js?v=7eee293c2f"></script>
-<script src="videos.js?v=7eee293c2f"></script>
-<script src="stories.js?v=7eee293c2f"></script>
-<script src="deep.js?v=7eee293c2f"></script>
-<script src="famous.js?v=7eee293c2f"></script>
-<script src="kb.js?v=7eee293c2f"></script>
-<script src="people/portraits.js?v=7eee293c2f"></script>
-<script src="ovpics.js?v=7eee293c2f"></script>
-<script src="kinds.js?v=7eee293c2f"></script>
-<script src="events.js?v=7eee293c2f"></script>
+<script src="hier.js?v=a4147b7e20"></script>
+<script src="books.js?v=a4147b7e20"></script>
+<script src="videos.js?v=a4147b7e20"></script>
+<script src="stories.js?v=a4147b7e20"></script>
+<script src="deep.js?v=a4147b7e20"></script>
+<script src="famous.js?v=a4147b7e20"></script>
+<script src="kb.js?v=a4147b7e20"></script>
+<script src="people/portraits.js?v=a4147b7e20"></script>
+<script src="ovpics.js?v=a4147b7e20"></script>
+<script src="kinds.js?v=a4147b7e20"></script>
+<script src="events.js?v=a4147b7e20"></script>
 <script>
 "use strict";
-const VER = "?v=7eee293c2f";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=a4147b7e20";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -2513,6 +2513,8 @@ function renderH(keepYear){
 
 /* ---------- detail: The world in YEAR when nothing is open, else a card ---------- */
 const curYear = () => typeof MAP!=="undefined" ? MAP.year : INIT_YEAR;
+/* the last year a person counts as alive: the year they died, else 100 years after their birth (a page with no death year), never past today */
+const lifeEnd = p => p.e || Math.min(NOW, p.y+100);
 const regName = id => REG.find(r=>r.id===id).name;
 let chgOpen=false;   /* What is changing shows all its rows once asked */
 function nameBtn(obj,label){ const b=el("button","mname",label||obj.n||obj.name); b.type="button"; b.addEventListener("click",()=>goTo(obj)); hoverLoad(b,obj); return b; }
@@ -2553,7 +2555,7 @@ function drawMoment(){
   }
   /* who was alive */
   const alive=[];
-  for (const r of REG) if (act(r)) for (const p of r.over) if (p.layer==="people" && p.y<=y && y<=(p.e||NOW)) alive.push(p);
+  for (const r of REG) if (act(r)) for (const p of r.over) if (p.layer==="people" && p.y<=y && y<=lifeEnd(p)) alive.push(p);
   alive.sort((a,b)=>(!!portraitOf(b))-(!!portraitOf(a)) || a.level-b.level || a.y-b.y);
   if (alive.length){
     w.append(el("h3",null,"Alive this year"));
@@ -3891,9 +3893,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=7eee293c2f"></script>
-<script src="routes.js?v=7eee293c2f"></script>
-<script src="map.js?v=7eee293c2f"></script>
+<script src="geo.js?v=a4147b7e20"></script>
+<script src="routes.js?v=a4147b7e20"></script>
+<script src="map.js?v=a4147b7e20"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3937,10 +3939,10 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=7eee293c2f"></script>
-<script src="sidebar.js?v=7eee293c2f"></script>
-<script src="connections.js?v=7eee293c2f"></script>
-<script src="cx.js?v=7eee293c2f"></script>
+<script src="ask.js?v=a4147b7e20"></script>
+<script src="sidebar.js?v=a4147b7e20"></script>
+<script src="connections.js?v=a4147b7e20"></script>
+<script src="cx.js?v=a4147b7e20"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

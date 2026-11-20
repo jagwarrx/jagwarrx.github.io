@@ -377,7 +377,7 @@ function shownAB(y){ const [a,b]=winAB(y); return MAP.upto && MAP.win ? [a,Math.
 function winAB(y){ const W=winYears(y); let a = y-(MAP.win ? MAP.win[0] : W), b = y+(MAP.win ? MAP.win[1] : W); if (a===0) a=-1; if (b===0) b=1; return [a,b]; }
 /* what happened shows when it falls in the window; who was alive, like the borders, is told for the marker's own year */
 function onMapAt(p,y,a,b){
-  if (p.layer==="people"){ const end=p.e||NOW; return Math.min(p.y+20,end)<=y && y<=end; }
+  if (p.layer==="people"){ const end=lifeEnd(p); return Math.min(p.y+20,end)<=y && y<=end; }
   return p.e ? p.y<=b && p.e>=a : p.y>=a && p.y<=b;
 }
 /* the links a click on a marker opened: {obj, on, cand:[{o, d, i, s}]}. cand: the chart items its page is tied to.
@@ -521,7 +521,7 @@ function mapItems(){
     if (state.events) for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb && (p===state.sel || !isGuest(p))) out.push(p);
     for (const p of r.over){
       if (p!==state.solo && (!itemOn(p) || p.level>lv || (isGuest(p) && p!==state.sel))) continue;   /* a guest shows only when chosen, or as a link */
-      if (onMapAt(p,y,wa,wb) || (p===state.sel && p.layer==="people" && p.y<=y && y<=(p.e||NOW))) out.push(p);
+      if (onMapAt(p,y,wa,wb) || (p===state.sel && p.layer==="people" && p.y<=y && y<=lifeEnd(p))) out.push(p);
     }
   }
   /* a click on a marker opens its links (a second click folds them): the items its page is tied to, from any year, each at its own place.
