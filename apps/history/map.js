@@ -705,15 +705,13 @@ function paintMarks(cs, ink, surf, nameBoxes=[]){
   /* dots first, then the pieces from the back of the map to the front, the chosen one last */
   const order=MAP.marks.slice().sort((a,b)=>(a.o===state.sel)-(b.o===state.sel) || (!!a.pic)-(!!b.pic) || a.fy-b.fy);
   const oval=(x,yy,rx,ry)=>{ mctx.beginPath(); mctx.ellipse(x,yy,rx,ry,0,0,7); };
-  /* the chosen item's links: a dashed red line from it to each. The thin grey lines only tie a marker that stepped aside to its true spot */
+  /* the chosen item's links: a dashed red line from it to each. A marker that stepped aside from a crowded spot has no line back to it: near is enough */
   if (MAP.linked.size){ const c=MAP.marks.find(m=>m.o===state.sel);
     if (c){ mctx.save(); mctx.strokeStyle=RED; mctx.globalAlpha=.6; mctx.lineWidth=1.5; mctx.setLineDash([6,4]);
       for (const m of MAP.marks) if (MAP.linked.has(m.o)){ mctx.beginPath(); mctx.moveTo(c.x,c.y); mctx.lineTo(m.x,m.y); mctx.stroke(); }
       mctx.restore(); } }
   for (const m of order){
     const o=m.o, col = o.ov ? LAYER[o.layer].c : "#5b6b7b", sel=o===state.sel;
-    if ((m.fx!==m.x0 || m.fy!==m.y0) && !playingNow()){ mctx.strokeStyle=ink; mctx.globalAlpha=.3; mctx.lineWidth=1;   /* a faint tie to its true spot, not a link */ mctx.beginPath(); mctx.moveTo(m.x0,m.y0); mctx.lineTo(m.fx,m.fy); mctx.stroke(); mctx.globalAlpha=1;
-      mctx.fillStyle=ink; mctx.beginPath(); mctx.arc(m.x0,m.y0,2,0,7); mctx.fill(); }
     const far = sel ? 0 : MAP.away.has(o) ? 1.4 : o.layer==="people" ? 0 : Math.min(1,Math.abs(o.y-y)/W);      /* how far the item is from the map's year, 0 to 1 */
     mctx.globalAlpha = 1-(m.dot ? .45 : .22)*far;
     if (m.dot){ mctx.beginPath(); mctx.arc(m.fx,m.fy,m.dot,0,7); mctx.fillStyle=col; mctx.fill(); mctx.lineWidth=1.5; mctx.strokeStyle=surf; mctx.stroke();
