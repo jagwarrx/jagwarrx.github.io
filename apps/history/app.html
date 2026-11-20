@@ -37,6 +37,7 @@
 @font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-semi-condensed-700-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
 @font-face{font-family:'Barlow Semi Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-semi-condensed-700-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/jetbrains-mono-500-digits.woff2) format('woff2');unicode-range:U+0020, U+0028-0029, U+002C, U+0030-0039}   /* digits and brackets only, for the counts in the filter chips */
+@font-face{font-family:'Pixelta';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/pixelta.woff2) format('woff2')}   /* Pixelta by Blankids Studio, personal-use licence */
 /* Layout idea: one-screen atlas sheet. Fixed control strip on top, a two-way
    scrolling chart (time runs down, regions run across) with sticky axis and
    region heads, and a detail strip at the bottom. */
@@ -80,7 +81,7 @@ button,select{font:inherit;color:inherit}
 .top{flex:none;height:52px;background:var(--surface);border-bottom:1px solid var(--line-strong);padding:0 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:25}
 .brand{flex:none;min-width:0;width:194px}   /* the search box starts just past the filters column (214px), in line with the map column, and does not move when the column folds */
 .brand h1{padding-left:12px}
-h1{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.1;margin:0;letter-spacing:.01em;white-space:nowrap}
+h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;margin:0;letter-spacing:0;white-space:nowrap}   /* 33.333px: one font pixel per screen pixel */
 .sub{font-size:12px;color:var(--muted);margin:1px 0 0;white-space:nowrap}
 .btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:0 12px;height:36px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
 .btn svg{width:16px;height:16px}
@@ -388,6 +389,39 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .slider.drag .thumb,.slider:focus-visible .thumb{transform:scale(1.2)}
 .slider.drag{cursor:grabbing}
 .slider.pick,.slider.shift{cursor:col-resize}
+/* the lens: the years shown on the map, as one object on the track. Its body moves through time, a dark end changes where it
+   starts or stops, and the marker inside it becomes a needle for the year the borders are drawn for */
+.tlens{position:absolute;top:1px;height:20px;box-sizing:border-box;border-radius:7px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1.5px solid var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.2);cursor:grab;touch-action:none;display:none}
+.slider.drag .tlens{cursor:grabbing}
+.twh{position:absolute;top:-1.5px;bottom:-1.5px;width:10px;background:var(--ink);cursor:ew-resize;display:grid;place-items:center;transition:background .12s}
+.twh::before{content:"";width:3px;height:8px;border-left:1px solid var(--surface);border-right:1px solid var(--surface);opacity:.85}
+.twh::after{content:"";position:absolute;top:-6px;bottom:-6px}
+#tWa{left:-1.5px;border-radius:7px 0 0 7px}
+#tWb{right:-1.5px;border-radius:0 7px 7px 0}
+#tWa::after{left:-7px;right:0}
+#tWb::after{left:0;right:-7px}
+.twh:hover,.twh.on{background:var(--accent)}
+.slider.haslens .thumb{top:-5px;width:2px;height:30px;margin-left:-1px;border:0;border-radius:1px;box-shadow:none;transform:none!important}
+.slider.haslens .thumb::before{content:"";position:absolute;left:-5px;top:-2px;width:12px;height:12px;box-sizing:border-box;border-radius:50%;background:#e0262b;border:2px solid var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .12s}
+.slider.haslens:hover .thumb::before{transform:scale(1.15)}
+.slider.haslens.drag .thumb::before{transform:scale(1.3)}
+/* the red line can be held on its own: it grows under the pointer, and has room round it to catch */
+.slider.haslens .thumb{pointer-events:auto;cursor:ew-resize;transition:box-shadow .12s}
+.slider.haslens .thumb::after{content:"";position:absolute;left:-7px;right:-7px;top:-6px;bottom:-2px}
+.slider.haslens .thumb:hover,.slider.needle .thumb{box-shadow:0 0 0 1px #e0262b}
+.slider.haslens .thumb:hover::before,.slider.needle .thumb::before{transform:scale(1.6)}
+@media (pointer:coarse){ .slider.haslens .thumb::after{left:-12px;right:-12px;top:-10px;bottom:-6px} }
+/* the year at each end of the lens, shown while the pointer is on it or it is being dragged */
+.ttag{position:absolute;bottom:calc(100% + 6px);transform:translateX(-50%);background:var(--ink);color:var(--surface);font:600 12px/1.25 var(--label);font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s}
+.slider.lenson .ttag.show{opacity:1}
+.slider.lenson .ttip{opacity:0}
+.twsel{max-width:150px}
+.tshow{flex:none;font:500 13.5px var(--label);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tshow b{font-weight:600;color:var(--ink)}
+.twsel[hidden],.tshow[hidden]{display:none}
+@media (pointer:coarse){ .twh::after{top:-11px;bottom:-11px} #tWa::after{left:-14px;right:0} #tWb::after{left:0;right:-14px} }
+@media (max-width:1099px){ .tshow{display:none} }
+@media (max-width:759px){ .twsel{display:none} }
 .ttip{position:absolute;bottom:calc(100% + 1px);transform:translateX(-50%);background:var(--ink);color:var(--surface);font:600 12px/1.25 var(--label);font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:5px;white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;transition:opacity .1s}
 .slider.tipon .ttip{opacity:1}
 .sticks .tk{position:absolute;top:19px;transform:translateX(-50%);font-family:var(--label);font-size:11px;line-height:12px;color:var(--muted);white-space:nowrap;pointer-events:none}
@@ -398,7 +432,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .sticks .tk.r::before{left:100%}
 /* the controls under it: the year, play, speed, then the years the line covers and the chart's zoom */
 .trow{display:flex;align-items:center;gap:8px;min-width:0}
-.tyear{flex:none;min-width:92px;height:34px;display:flex;align-items:center;border:1px solid transparent;border-radius:6px;background:none;color:var(--ink);padding:0 6px;margin-left:-6px;cursor:text;font-family:var(--display);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tyear{flex:none;min-width:124px;height:34px;display:flex;align-items:center;border:1px solid transparent;border-radius:6px;background:none;color:var(--ink);padding:0 6px;margin-left:-6px;cursor:text;font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;white-space:nowrap}
 .tyear:hover{border-color:var(--line-strong)}
 .tyin{flex:none;width:118px;height:34px;margin-left:-6px;border:1px solid var(--ink);border-radius:6px;background:var(--surface);color:var(--ink);padding:0 6px;font-family:var(--display);font-weight:700;font-size:17px;user-select:text;-webkit-user-select:text}
 .tyin.bad{border-color:#e0262b;animation:tyshake .25s}
@@ -495,6 +529,11 @@ body.mapfull .mappane{display:flex;flex:1}
 body.mapfloat .mappane{display:flex;position:absolute;right:14px;bottom:96px;width:400px;height:300px;z-index:20;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);resize:both;overflow:hidden;min-width:240px;min-height:180px;max-width:calc(100% - 16px);max-height:calc(100% - 110px)}
 body.mapfloat .mhead{cursor:move;touch-action:none}
 body.mapfloat .msrc{display:none}
+.mfocus{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:8px;padding:4px 6px 4px 10px;font-size:13px;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.mfocus[hidden]{display:none}
+.mfocus span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mfocus button{flex:none;font:inherit;font-size:12.5px;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.mfocus button:hover{border-color:var(--ink)}
 .mwin{position:absolute;left:6px;top:6px;z-index:1;pointer-events:none;background:color-mix(in srgb,var(--surface) 88%,transparent);border-radius:4px;padding:1px 6px;font-size:12px;color:var(--ink)}
 .mwin:empty{display:none}
 body.mapfull .zoomgrp{display:none}
@@ -564,7 +603,7 @@ body.wide .pic{height:220px}
 .vread{margin:0 0 10px}
 .kbrel a[href]{color:var(--accent);text-underline-offset:2px}
 .kbvoices{margin:10px 0 4px}
-.kbvoices h3{margin:0 0 2px;font-size:14px}
+.kbvoices h3{margin:0 0 6px;font-size:14px}
 .kbl{color:var(--accent);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--accent) 35%,transparent);text-underline-offset:2px;cursor:pointer}
 .kbl:hover,.kbl:focus-visible{text-decoration-color:var(--accent)}
 .kbl[data-stub]{text-decoration-style:dashed}
@@ -634,17 +673,60 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .insb:hover,.insb:focus-visible{background:var(--surface);border-color:var(--line-strong)}
 .insb>span:not(.ico){flex:1;min-width:0}
 .insb .ico{width:17px;height:17px}
+.insb .ico.pix{width:22px;height:22px}
+.insb .ico.lh,.up .ico.lh{width:24px;height:24px;margin:-1px}
+.insb .ico.art{width:24px;height:24px;margin:-3px -1px;background-repeat:no-repeat}
+.insb .ico.pix img{image-rendering:pixelated}
+.insb .insw{margin:0 5px}
 .insb small{color:var(--muted);font-size:13px;white-space:nowrap}
 .linkb{border:0;background:none;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
 .insw{flex:none;width:12px;height:12px;margin:0 2px;border-radius:3px;background:var(--c)}
 .insmore{color:var(--muted);font-size:13px;margin:2px 8px}
 .nav2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.navb{border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:7px 10px;text-align:left;cursor:pointer;font-size:14px;line-height:1.25;min-width:0}
+.navb{display:flex;align-items:center;gap:10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:7px 10px;text-align:left;cursor:pointer;font-size:14px;line-height:1.25;min-width:0}
+.navb .nt{display:block;min-width:0;flex:1}
+.nthumb{flex:none;width:40px;height:40px;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--muted) 14%,var(--surface))}
+.nthumb.o{border-radius:50%}
+.nthumb.sw{background:color-mix(in srgb,var(--c) 55%,var(--surface))}
+.nthumb .ph{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.nthumb .px{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.nthumb .ico{width:56%;height:56%;margin:0}
+.nthumb .ico.head{width:100%;height:100%}
 .navb:hover:not(:disabled){border-color:var(--ink)}
 .navb small{display:block;color:var(--muted);font-size:11.5px}
-.navb span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.navb .nt span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:break-word}
+@container (max-width:400px){ .navb{gap:8px;padding:7px 8px} .nthumb{width:32px;height:32px} }
 .navb:disabled{opacity:.45;cursor:default}
-.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin:8px -14px 8px;padding:6px 14px;align-items:center;background:var(--surface);border-bottom:1px solid transparent;z-index:3}
+@media (min-width:760px){ .acts{position:sticky;top:-12px} }
+.detail{container-type:inline-size}
+@container (max-width:400px){ .acts svg,.acts .wmark{display:none} .acts .btn{padding:0 10px} }
+.acts.stuck{border-bottom-color:var(--line-strong);box-shadow:0 4px 8px -6px rgba(0,0,0,.25)}
+.actb{height:32px;font-size:13.5px;text-decoration:none;color:var(--ink)}
+.wmark{font-family:Georgia,"Times New Roman",serif;font-size:15px;font-weight:700;line-height:1}
+/* short first: the rest of a long page waits behind Read more */
+.kbt.clip>:not([hidden]):has(+[hidden]){margin-bottom:4px}
+.morebt[hidden]{display:none}
+.morebt{display:block;margin:0 0 8px;font-size:14.5px;font-weight:600;text-underline-offset:2px}
+/* a voice from the time: a line of its words, then whose they are */
+.vq{display:block;width:100%;margin:0 0 8px;padding:6px 10px 7px 12px;border:0;border-left:3px solid #2f6fd0;border-radius:0 8px 8px 0;background:color-mix(in srgb,#2f6fd0 7%,var(--surface));text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.vq:hover{background:color-mix(in srgb,#2f6fd0 13%,var(--surface))}
+.vq .vqq{display:block;font-size:16px;line-height:1.5;margin-bottom:5px}
+.vq .vqq:empty{display:none}
+.vq b{display:block;font-size:13.5px;font-weight:600}
+.vq .vqby{display:block;font-size:12.5px;color:var(--muted)}
+/* Explore: the foot of a card */
+.xpl{margin-top:18px;padding:12px 14px 14px;border-radius:10px;background:var(--bg)}
+.xpl:not(:has(.xl)){display:none}
+.ctx .xpl h3{margin:0 0 2px}
+.xl h4{margin:12px 0 6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.xlinks{display:flex;flex-wrap:wrap;gap:2px 16px}
+.xlk{display:inline-flex;align-items:baseline;gap:7px;padding:3px 0;border:0;background:none;font:inherit;font-size:14.5px;line-height:1.35;color:var(--ink);text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:2px}
+.xlk:hover,.xlk:focus-visible{text-decoration-color:currentColor}
+.xlk i{flex:none;width:8px;height:8px;border-radius:2px;background:var(--c,var(--muted));transform:translateY(-1px)}
+.xlk i.o{border-radius:50%;width:6px;height:6px;transform:translateY(-2px)}
+.xmore{font-size:13.5px;padding:3px 0}
+@media (pointer:coarse){ .xlk{padding:7px 0} }
 /* Ask about this: the chat on an item's card */
 .detail .xchat{right:36px;display:flex;align-items:center;justify-content:center;padding:0}
 .detail .xchat svg{width:16px;height:16px}
@@ -671,10 +753,14 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .chkey input{flex:1;min-width:0;font:inherit;font-size:14px;padding:6px 9px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--ink)}
 .chkey .askhint{flex-basis:100%;margin:0}
 .chkey[hidden],.ichat[hidden]{display:none}
-.chfoot{display:flex;gap:12px;margin-top:6px}
+.chfoot{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
+.ichat.carry{margin:12px 0 14px}
+.chfrom{display:flex;justify-content:space-between;gap:10px;margin:0 0 8px;font-size:13px;color:var(--muted)}
+.chfrom[hidden]{display:none}
+.cha a.kbl.now{background:color-mix(in srgb,var(--accent) 18%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 18%,transparent);border-radius:2px;text-decoration-color:var(--accent)}
 .wiki{display:inline-block;font-size:15px;font-weight:600;color:var(--accent);text-underline-offset:2px}
 /* The world in a year */
-.moment h2{padding-right:0}
+.moment h2{padding-right:0;font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:36px;letter-spacing:0}
 .msub{font-size:14px;color:var(--muted);margin:4px 0 4px!important}
 .mband{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
 .ico.head{background-repeat:no-repeat;image-rendering:pixelated;border-radius:50%}
@@ -683,6 +769,7 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .who:hover{border-color:#8e5bd6}
 .who .face{width:56px;height:56px;border-radius:50%;background-color:color-mix(in srgb,#8e5bd6 16%,var(--surface));box-shadow:0 0 0 1.5px color-mix(in srgb,#8e5bd6 55%,transparent);display:flex;align-items:center;justify-content:center}
 .who .face .ico{width:58%;height:58%;margin:0}
+.who .face .ph{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 20%}
 .who small{font-weight:400;color:var(--muted);font-size:12.5px}
 .more{border:0;background:none;color:var(--accent);font:inherit;font-size:14px;font-weight:600;padding:6px 0 0;cursor:pointer}
 .dyk{display:block;width:100%;text-align:left;border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--lc) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--lc) 45%,transparent);cursor:pointer;font:inherit;color:inherit}
@@ -700,6 +787,8 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .up{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 10px;cursor:pointer;text-align:left;font:inherit;font-size:15px;line-height:1.3;color:inherit}
 .up:hover{border-color:var(--ink)}
 .up .ico,.up>i{width:22px;height:22px;flex:none}
+.up .ico.pix img{image-rendering:pixelated}
+.up .ico.art{width:24px;height:24px;margin:-1px;background-repeat:no-repeat}
 .up>i{border-radius:4px;background:var(--c)}
 .up span{flex:1;min-width:0}
 .up small{flex:none;color:var(--muted);font-size:13px}
@@ -736,12 +825,27 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 .lens .ico,.lens .mk{width:18px;height:18px;flex:none;display:flex;align-items:center;justify-content:center}
 .lens .n{font-family:'JetBrains Mono',var(--label);font-size:11.5px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
 .lens:hover{border-color:var(--lc)}
-.lens[aria-pressed="true"]{background:color-mix(in srgb,var(--lc) 17%,var(--surface));border-color:var(--lc)}
+.lens[aria-pressed="true"]{background:color-mix(in srgb,var(--lc) 26%,var(--surface));border-color:var(--lc);box-shadow:inset 0 0 0 1px var(--lc)}
+/* off: plain outline, grey text, a faded icon. On: tinted fill and a thick border in the chip's colour */
+.lens[aria-pressed="false"]:not(:disabled){border-color:var(--line);color:var(--muted)}
+.lens[aria-pressed="false"]:not(:disabled):hover{border-color:var(--lc);color:var(--ink)}
+.lens[aria-pressed="false"] .ico.pix img{opacity:.8;filter:saturate(.7)}
+.lens[aria-pressed="false"]:hover .ico.pix img{opacity:1;filter:none}
+/* pixel icons on the overlay chips (pix/*.png, 22 px, shown 1:1 so they stay sharp) */
+.lens .ico.pix,.lenses.t1 .lens .ico.pix{width:22px;height:22px}
+.ico.pix img{image-rendering:pixelated}
+/* a chip that is on says how many it shows right now, in brackets; the number follows the time line */
+.lenses .lens:not([aria-pressed="true"]) .n{display:none}
+.lenses .lens[aria-pressed="true"] .n{display:inline}
+.lenses .lens[aria-pressed="true"] .n::before{content:"("}
+.lenses .lens[aria-pressed="true"] .n::after{content:")"}
+.rlab2{flex:none;font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap;margin-right:3px}
 .lens[aria-pressed="true"] .n{color:var(--ink)}
 .lens:disabled{opacity:.45;cursor:default}
-.lsep{width:1px;height:26px;background:var(--line-strong);margin:0 4px}
+.lsep{flex:none;width:1px;height:22px;background:var(--line-strong);margin:0 4px}
 .lhead{display:flex;flex-direction:column;justify-content:center;height:30px;margin-right:6px}
-.lclear{flex:none;border:0;background:none;color:var(--accent);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:0 4px;white-space:nowrap}
+.lclear{flex:none;border:0;background:none;color:var(--accent);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:0 4px;white-space:nowrap;order:9}
+.thead{display:contents}   /* a label with its "Show all" or "Clear all" beside it; only the filters column lays it out as a row */
 .ltitle{font-family:var(--display);font-weight:600;font-size:14px;line-height:1.15;color:var(--muted)}
 /* ---------- about overlay ---------- */
 .overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px);z-index:60;display:none;align-items:flex-end;justify-content:center;padding:16px}
@@ -775,7 +879,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .sgrip{display:none}
   .scard{position:fixed;top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:46vh;overflow:auto;z-index:45}
   .top{gap:8px;padding:0 10px}
-  h1{font-size:16px}
+  h1{font-size:26.667px}
   .h1r{display:none}
   .search{min-width:0}
   .sub{display:none}
@@ -798,7 +902,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .vsw button svg{width:18px;height:18px}
   .brand{display:none}
   .zread{display:none}
-  .tyear{min-width:0;font-size:16px;padding:0 4px;margin-left:-4px}
+  .tyear{min-width:0;font-size:26.667px;padding:0 4px;margin-left:-4px}
   .tyin{width:96px;font-size:16px}
   .timebar{padding:5px 8px 5px}
   .trow{gap:6px}
@@ -817,6 +921,51 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .lsep{display:none}
   .lens{height:38px}
   .lenses::-webkit-scrollbar{display:none}
+}
+@media (max-width:759px){ .rlab2{display:none} }
+/* ---------- filters: a left column on a wide screen (it folds to a rail of icons), two scrolling rows on a phone ---------- */
+.cmain{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+.fhead{display:none}
+@media (min-width:760px){
+  .center{flex-direction:row}
+  .fside{flex:none;width:214px;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line-strong);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;padding-bottom:6px}
+  .fhead{flex:none;display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 6px 0 12px}
+  .fhead b{font-family:var(--display);font-weight:700;font-size:15px}
+  .fbtn{width:30px;height:30px;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+  .fbtn:hover{border-color:var(--line-strong);color:var(--ink)}
+  .fside .rbar,.fside .lenses{flex:none;flex-direction:column;align-items:stretch;gap:2px;padding:0 8px;overflow:visible;border-bottom:0}
+  .fside .lenses{margin-top:4px}
+  .fside .rlab,.fside .rlab2{width:auto;margin:3px 4px 2px;font-size:12.5px}
+  .fside .lens{height:25px;border-radius:7px;justify-content:flex-start;padding:0 8px 0 6px;gap:7px;font-size:13.5px;min-width:0}
+  .fside .lens .lt{overflow:hidden;text-overflow:ellipsis}
+  .fside .lens .n{margin-left:auto}
+  .fside .rsw{width:12px;height:12px;margin:0 5px}
+  .fside .lens .mk{width:22px;height:22px}
+  .fside .lsep{width:auto;height:1px;margin:6px 4px 1px}
+  .fside .lclear{margin:0;padding:0;font-size:12.5px;order:0}
+  .fside .thead{display:flex;align-items:baseline;justify-content:space-between;margin:3px 4px 2px}
+  .fside .thead .rlab,.fside .thead .rlab2{margin:0}
+  /* a calm column: the colour sits in the square or the icon. A chip that is on has a soft tint, one that is off is plain. Every chip shows its count, so you can see what it would add */
+  .fside .lens,.fside .lens[aria-pressed="false"]:not(:disabled){border-width:1px;border-color:var(--line);box-shadow:none}
+  .fside .lens[aria-pressed="true"]{background:color-mix(in srgb,var(--lc) 14%,var(--surface));border-color:color-mix(in srgb,var(--lc) 50%,var(--line));box-shadow:none}
+  .fside .lens:not(:disabled):hover{border-color:var(--lc)}
+  .fside .lens.rchip{font-family:var(--body)}
+  .fside .lenses .lens .n{display:inline}
+  .fside .lenses .lens .n::before,.fside .lenses .lens .n::after{content:none}
+  .fside .lens[aria-pressed="false"] .n{opacity:.75}
+  .fside .lens:disabled .n{display:none}
+  body.fsmall .fside{width:48px}
+  body.fsmall .fhead{justify-content:center;padding:0}
+  body.fsmall .fbtn svg{transform:rotate(180deg)}
+  body.fsmall .fhead b,body.fsmall .fside .lens .lt,body.fsmall .fside .lens .n,body.fsmall .fside .rlab,body.fsmall .fside .rlab2,body.fsmall .fside .lclear{display:none}
+  body.fsmall .fside .rbar,body.fsmall .fside .lenses{padding:0 6px}
+  body.fsmall .fside .lens{justify-content:center;padding:0;gap:0}
+  body.fsmall .fside .lsep{margin:6px 2px}
+}
+@media (min-width:760px) and (min-height:1000px){   /* a tall window has room for taller rows */
+  .fside .lens{height:30px}
+  .fside .rbar,.fside .lenses{gap:4px}
+  .fside .thead,.fside .rlab{margin-top:8px}
 }
 </style>
 </head>
@@ -878,7 +1027,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
       <div class="vrow"><span id="lSc">Time scale</span>
         <div class="seg" role="group" aria-labelledby="lSc"><button type="button" id="scaleEven" aria-pressed="false" title="Every century gets the same room">Even</button><button type="button" id="scaleStretch" aria-pressed="true" title="The last five centuries get three times the room">Stretch recent</button></div></div>
       <div class="vrow"><span id="lDe">Detail</span>
-        <div class="seg" role="group" aria-labelledby="lDe"><button type="button" id="det1" aria-pressed="false" title="Only the major events and items. Key 1">Major</button><button type="button" id="det2" aria-pressed="true" title="Major and notable. Key 2">Notable</button><button type="button" id="det3" aria-pressed="false" title="Everything. Key 3">All</button></div></div>
+        <div class="seg" role="group" aria-labelledby="lDe"><button type="button" id="det0" aria-pressed="true" title="Detail follows the zoom: zoom in to see more. Key 0">Auto</button><button type="button" id="det1" aria-pressed="false" title="Only the major events and items. Key 1">Major</button><button type="button" id="det2" aria-pressed="false" title="Major and notable. Key 2">Notable</button><button type="button" id="det3" aria-pressed="false" title="Everything. Key 3">All</button></div></div>
       <p class="hintline" id="detHint"></p>
       <div class="vrow"><span id="lRg">Regions</span>
         <div class="seg" role="group" aria-labelledby="lRg"><button type="button" id="unfoldAll" title="Show every region's parts as their own rows">Unfold all</button></div></div>
@@ -891,8 +1040,12 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 <div class="app" id="app">
 
   <div class="center">
-    <nav class="rbar" id="regBar" aria-label="Regions"></nav>
-    <nav class="lenses" id="lensBar" aria-label="What to show on the chart"></nav>
+    <aside class="fside" id="fside" aria-label="Filters">
+      <div class="fhead"><b>Filters</b><button type="button" class="fbtn" id="fsideBtn" aria-controls="fside"></button></div>
+      <nav class="rbar" id="regBar" aria-label="Regions"></nav>
+      <nav class="lenses" id="lensBar" aria-label="What to show on the chart"></nav>
+    </aside>
+    <div class="cmain">
     <section class="scard" id="storyCard" aria-label="Story" hidden></section>
     <section class="svid" id="storyVid" aria-label="Video for this step" hidden></section>
     <main class="scroller" id="scroller" tabindex="0" aria-label="Timeline chart">
@@ -910,11 +1063,11 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
           <button type="button" class="mb" id="mapBtn" aria-label="Close the map" title="Close the map. The Map button at the top brings it back.">×</button>
         </span>
       </div>
-      <div class="mapwrap" id="mapWrap"><span class="asof" id="mapAsOf"></span><span class="mwin" id="mapWin"></span><canvas id="mapCanvas" aria-label="Territories of the selected regions in the chosen year"></canvas><div class="mtip" id="mapTip"></div><div class="boxsel" id="boxSel"></div></div>
+      <div class="mapwrap" id="mapWrap"><span class="asof" id="mapAsOf"></span><span class="mwin" id="mapWin"></span><div class="mfocus" id="mapFocus" hidden></div><canvas id="mapCanvas" aria-label="Territories of the selected regions in the chosen year"></canvas><div class="mtip" id="mapTip"></div><div class="boxsel" id="boxSel"></div></div>
       <p class="msrc">Borders from <a href="https://github.com/aourednik/historical-basemaps" target="_blank" rel="noopener">historical-basemaps</a> by A. Ourednik (<a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>), today from Natural Earth. Dashed borders are approximate.</p>
     </section>
     <div class="timebar" id="timebar" aria-label="Time">
-      <div class="slider" id="slider" role="slider" tabindex="0" aria-label="Year" aria-valuemin="-3300" aria-valuemax="2026"><div class="track"></div><div class="tfill" id="tFill"></div><div class="tsel" id="tSel"></div><div class="vwin" id="vWin"></div><div class="sticks" id="sliderTicks"></div><div class="tdots" id="tDots"></div><div class="tband" id="tBand"></div><div class="thumb" id="thumb"></div><div class="ttip" id="tTip"></div></div>
+      <div class="slider" id="slider" role="slider" tabindex="0" aria-label="Year" aria-valuemin="-3300" aria-valuemax="2026"><div class="track"></div><div class="tfill" id="tFill"></div><div class="tsel" id="tSel"></div><div class="vwin" id="vWin"></div><div class="sticks" id="sliderTicks"></div><div class="tdots" id="tDots"></div><div class="tband" id="tBand"></div><div class="tlens" id="tWin"><i class="twh" id="tWa"></i><i class="twh" id="tWb"></i></div><div class="thumb" id="thumb"></div><div class="ttag" id="tTa"></div><div class="ttag" id="tTb"></div><div class="ttip" id="tTip"></div></div>
       <div class="trow">
         <button class="tyear" id="yearBtn" type="button" title="Type a year"><span id="mapYear" aria-live="polite">1500 CE</span></button>
         <input class="tyin" id="yearIn" type="text" autocomplete="off" spellcheck="false" aria-label="Go to a year, like 1453 or 500 BCE" placeholder="1453, 500 BCE" hidden>
@@ -924,6 +1077,8 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
           <button class="ib" id="nextEv" type="button" aria-label="Next event" title="Next event"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.8 3.6v8.8L9.6 8z" fill="currentColor"/></svg></button>
         </div>
         <select class="speed" id="speedSel" aria-label="Play speed" title="Play speed"><option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option><option value="4">4x</option><option value="8">8x</option></select>
+        <select class="speed twsel" id="winSel" aria-label="Years shown on the map" title="How many years the map shows round the red line. Or drag the ends of the window on the time line" hidden></select>
+        <span class="tshow" id="tShow" hidden></span>
         <div class="tmid">
           <span class="tnow" id="tNow"></span>
           <div class="overview" id="overview" hidden title="Where these years sit in all of time. Drag the window to move it, its edges to change it, or drag elsewhere to pick new years."><div class="ovwin" id="ovWin"></div><div class="ovthumb" id="ovThumb"></div></div>
@@ -939,6 +1094,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
           <button class="ib" type="button" id="zoomIn" aria-label="Zoom in" title="Zoom the chart in. Or scroll on the time axis, or hold Ctrl or Cmd and scroll on the chart"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
       </div>
+    </div>
     </div>
   </div>
 
@@ -998,19 +1154,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=1243fec879"></script>
-<script src="books.js?v=1243fec879"></script>
-<script src="videos.js?v=1243fec879"></script>
-<script src="stories.js?v=1243fec879"></script>
-<script src="deep.js?v=1243fec879"></script>
-<script src="famous.js?v=1243fec879"></script>
-<script src="kb.js?v=1243fec879"></script>
-<script src="people/portraits.js?v=1243fec879"></script>
-<script src="ovpics.js?v=1243fec879"></script>
-<script src="kinds.js?v=1243fec879"></script>
+<script src="hier.js?v=00536ac26b"></script>
+<script src="books.js?v=00536ac26b"></script>
+<script src="videos.js?v=00536ac26b"></script>
+<script src="stories.js?v=00536ac26b"></script>
+<script src="deep.js?v=00536ac26b"></script>
+<script src="famous.js?v=00536ac26b"></script>
+<script src="kb.js?v=00536ac26b"></script>
+<script src="people/portraits.js?v=00536ac26b"></script>
+<script src="ovpics.js?v=00536ac26b"></script>
+<script src="kinds.js?v=00536ac26b"></script>
+<script src="events.js?v=00536ac26b"></script>
 <script>
 "use strict";
-const VER = "?v=1243fec879";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=00536ac26b";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -1832,9 +1989,15 @@ const WARPAGE = new Set();
 for (const p of Object.values(KBX)) if (/\b(battle|siege)\b|\bwar$|^military campaign$/.test(p.kind||"")){ WARPAGE.add(p.chart||p.name); WARPAGE.add(p.name); }
 for (const r of REG){
   for (const p of r.points) if (p.kind==="war" || WARPAGE.has(p.name)){ p.kind="war"; p.ov=true; p.layer="war"; r.over.push(p); }
+  /* every other plain event has a topic too (events.js) and moves into it, with its own icon */
+  for (const p of r.points) if (!p.ov && LAYER[EVTOPIC[p.name]]){ p.ov=true; p.layer=EVTOPIC[p.name]; if (!p.kind) p.kind=LAYER[p.layer].icon; r.over.push(p); }
   r.points=r.points.filter(p=>!p.ov);
 }
 for (const r of REG){ r.over.sort((a,b)=>a.y-b.y); r.points.sort((a,b)=>a.y-b.y); }
+/* the Events row is a pick across the topics (events.js): the items that matter most, whatever their topic.
+   An item shows when its topic is on, or when Events is on and it is one of the picked */
+for (const r of REG) for (const p of r.over) p.pick = p.layer!=="people" && EVPICK.has(p.name);
+const itemOn = p => state.layers.has(p.layer) || (state.events && !!p.pick);
 const ROMAN=["","I","II","III","IV","V"];
 const cite = (bk, short) => { const B=BOOKS[bk.b]; return short ? `${B.short}, vol. ${ROMAN[bk.v]}, p. ${bk.p}` : `${B.author}, ${B.title}, vol. ${ROMAN[bk.v]}: ${B.vols[bk.v]}, p. ${bk.p}`; };
 const LINKKIND = Object.assign({war:{name:"War or conquest", icon:"war", c:"#6b7280"}}, LAYER);
@@ -1931,7 +2094,7 @@ function visiblePoints(r){
   const lv=shownLevel();
   const ev = state.events ? r.points.filter(p=>p.level<=lv) : [];
   /* state.solo: an item opened while its layer is off shows by itself, and goes when another item opens */
-  const so=state.solo, ov = (state.layers.size || so) ? r.over.filter(p=>p===so || (state.layers.has(p.layer) && p.level<=lv)) : [];
+  const so=state.solo, ov = (state.layers.size || state.events || so) ? r.over.filter(p=>p===so || (itemOn(p) && p.level<=lv)) : [];
   return ov.length ? ev.concat(ov).sort((a,b)=>a.y-b.y) : ev;
 }
 /* the rows a region shows, top to bottom */
@@ -2328,10 +2491,18 @@ function agoText(n){
   return (n<10 ? `${n} year${n===1?"":"s"} ago.` : `About ${r.toLocaleString()} years ago.`) + (g>=2 ? ` That is roughly ${g.toLocaleString()} generations back.` : "");
 }
 const inYrs = n => { const r=roundYrs(n); return n<1 ? "this year" : `in ${r.toLocaleString()} year${r===1?"":"s"}`; };
+/* a person's face: the pixel portrait where one was drawn, else their picture from Wikipedia, else the plain figure.
+   The panel is drawn again with every year, so a picture found once is put in at once the next time, and none is asked for while the years run past */
+const FACEPIC = new Map();
 function faceOf(p){
   const P=portraitOf(p), f=el("span","face");
   if (P){ const h=headIcon(P); h.classList.add("face"); return h; }
-  f.append(icon("person")); return f;
+  const t=wikiTitle(p), put=src=>{ const im=el("img","ph"); im.alt=""; im.decoding="async"; im.src=src; im.addEventListener("error",()=>{ FACEPIC.set(t,null); f.textContent=""; f.append(icon("person")); }); f.textContent=""; f.append(im); };
+  if (FACEPIC.get(t)) put(FACEPIC.get(t));
+  else { f.append(icon("person"));
+    if (!FACEPIC.has(t) && t) setTimeout(()=>{ if (!f.isConnected) return;
+      wikiPic(t).then(pic=>{ FACEPIC.set(t, pic ? pic.src : null); if (pic && f.isConnected) put(pic.src); }); }, 350); }
+  return f;
 }
 function drawMoment(){
   if (state.sel) return;
@@ -2409,7 +2580,7 @@ function drawMoment(){
     const u=el("div","ups");
     for (const p of ups.slice(0,3)){
       const b=el("button","up"); b.type="button";
-      if (p.kind) b.append(icon(p.kind)); else { const i=el("i"); i.style.setProperty("--c",`var(--c-${p.reg})`); b.append(i); }
+      if (p.ov) b.append(listIcon(p)); else if (p.kind) b.append(icon(p.kind)); else { const i=el("i"); i.style.setProperty("--c",`var(--c-${p.reg})`); b.append(i); }   /* the topic icon, as in a card's lists */
       b.append(el("span",null,p.name), el("small",null,inYrs(p.y-y)));
       b.title=`${fmt(p.y)}, ${regName(p.reg)}`; b.addEventListener("click",()=>goTo(p)); u.append(b);
     }
@@ -2445,8 +2616,21 @@ function neighbours(obj){
   if (W && (!a[0] || !a[1])){ const b=nb(W); return [a[0]||b[0], a[1]||b[1]]; }
   return a;
 }
+/* a small picture of an item: its pixel portrait or drawing, else its picture from Wikipedia, else its icon or its region's colour */
+function thumbOf(o){
+  const f=el("i","nthumb"), P=portraitOf(o), S=ovPicOf(o); if (o.ov && o.layer==="people") f.classList.add("o");
+  if (P){ f.append(headIcon(P)); return f; }
+  if (S){ const im=el("img","px"); im.alt=""; im.src=S; f.append(im); return f; }
+  const plain=()=>{ f.textContent=""; const k = o.lk ? LINKKIND[o.kind].icon : o.n ? kindOf(o.n)||"event" : o.ov || o.pt ? o.kind||"event" : null;
+    if (k) f.append(icon(k)); else if (o.reg){ f.classList.add("sw"); f.style.setProperty("--c",`var(--c-${o.reg})`); } };
+  const t = o.lk ? o.w||o.name : wikiTitle(o), put=src=>{ const im=el("img","ph"); im.alt=""; im.decoding="async"; im.src=src; im.addEventListener("error",()=>{ FACEPIC.set(t,null); plain(); }); f.classList.remove("sw"); f.textContent=""; f.append(im); };
+  if (FACEPIC.get(t)) put(FACEPIC.get(t));
+  else { plain(); if (!FACEPIC.has(t) && t) wikiPic(t).then(pic=>{ FACEPIC.set(t, pic ? pic.src : null); if (pic && f.isConnected) put(pic.src); }); }
+  return f;
+}
 function navBtn(label,o){
-  const b=el("button","navb"); b.type="button"; b.append(el("small",null,label), el("span",null,o?(o.n||o.name):"None"));
+  const b=el("button","navb"); b.type="button"; const tx=el("span","nt"); tx.append(el("small",null,label), el("span",null,o?(o.n||o.name):"None"));
+  if (o) b.append(thumbOf(o)); b.append(tx);
   if (o){ b.title=o.n||o.name; b.addEventListener("click",()=>goTo(o)); } else b.disabled=true;
   return b;
 }
@@ -2484,6 +2668,19 @@ async function insideOf(obj){
   pool.sort((p,q)=>p.level-q.level || (Y!=null ? Math.abs(p.y-Y)-Math.abs(q.y-Y) : 0));
   return {list:pool.slice(0,12).sort((p,q)=>p.y-q.y), more:Math.max(0,pool.length-12), byMap, a, b};
 }
+/* the icon by an item in a card's lists: the small icon of its topic, as on the Topics rows (pix/*.png, 22 px, shown 1:1).
+   The map's own art is too busy beside text. Custom art stays: a person with a portrait shows the head, and a building with
+   a model of its own (overlays/) shows that model, cut to the drawing */
+function listIcon(it){
+  const P=portraitOf(it); if (P){ const h=headIcon(P); h.classList.add("lh"); return h; }
+  const own = it.ov && it.layer==="infra" ? ovPicOf(it) : null;
+  if (own){ const S=24, bb=(typeof ARTBOX!=="undefined" && ARTBOX[own]) || [0,0,96,96], z=S/Math.max(bb[2],bb[3]), sp=el("span","ico art");
+    sp.style.backgroundImage=`url(${own})`; sp.style.backgroundSize=`${96*z}px ${96*z}px`;
+    sp.style.backgroundPosition=`${(S-bb[2]*z)/2-bb[0]*z}px ${(S-bb[3]*z)/2-bb[1]*z}px`; return sp; }
+  const k = it.ov && LAYER[it.layer] ? LAYER[it.layer].icon : null;
+  if (k && typeof pixIcon==="function" && PIX.has(k)) return pixIcon(k);
+  return icon(k || it.kind || "event");
+}
 function insideBox(obj){
   const box=el("div","inside");
   insideOf(obj).then(I=>{
@@ -2491,7 +2688,7 @@ function insideBox(obj){
     box.append(el("h3",null, I.byMap ? "Inside its borders, across time" : "In its part of the chart"));
     for (const it of I.list){
       const b=el("button","insb"); b.type="button";
-      b.append(icon(it.kind||"event"), el("span",null,it.name), el("small",null,(it.approx?"c. ":"")+fmt(it.y)));
+      b.append(listIcon(it), el("span",null,it.name), el("small",null,(it.approx?"c. ":"")+fmt(it.y)));
       b.title=it.name; b.addEventListener("click",()=>goTo(it)); box.append(b);
     }
     if (I.more) box.append(el("p","insmore",`and ${I.more} more`));
@@ -2503,7 +2700,7 @@ function nearbyBox(obj){
   const Y=MAP.year, r=REG.find(q=>q.id===obj.reg), box=el("div","inside"); if (!r) return box;
   const c=obj.terr.lab, far = it => { const f=featOf(it); return f ? Math.hypot(f.lab.cx-c.cx, f.lab.cy-c.cy) : 999; };
   const states=r.items.filter(it=>it.s<=Y && Y<=it.e).sort((p,q)=>far(p)-far(q) || (q.e-q.s)-(p.e-p.s)).slice(0,6);
-  const evs=[...r.points, ...r.over.filter(p=>p.layer==="war")].filter(p=>p.level<=2 && Math.abs(p.y-Y)<=150).sort((p,q)=>Math.abs(p.y-Y)-Math.abs(q.y-Y)).slice(0,5).sort((p,q)=>p.y-q.y);
+  const evs=[...r.points, ...r.over.filter(p=>p.pick || p.layer==="war")].filter(p=>p.level<=2 && Math.abs(p.y-Y)<=150).sort((p,q)=>Math.abs(p.y-Y)-Math.abs(q.y-Y)).slice(0,5).sort((p,q)=>p.y-q.y);
   if (!states.length && !evs.length) return box;
   box.append(el("h3",null,`Nearby on the chart, around ${fmt(Y)}`));
   for (const it of states){
@@ -2513,27 +2710,29 @@ function nearbyBox(obj){
   }
   for (const it of evs){
     const b=el("button","insb"); b.type="button";
-    b.append(icon(it.kind||"event"), el("span",null,it.name), el("small",null,(it.approx?"c. ":"")+fmt(it.y)));
+    b.append(listIcon(it), el("span",null,it.name), el("small",null,(it.approx?"c. ":"")+fmt(it.y)));
     b.title=it.name; b.addEventListener("click",()=>goTo(it)); box.append(b);
   }
   return box;
 }
+/* the foot of a card is one block, Explore: before and after, the same time elsewhere, and the pages that link here, as plain lists of links */
+function linkList(label){ const d=el("div","xl"); d.append(el("h4",null,label), el("div","xlinks")); return d; }
+function xLink(text, c, round){ const b=el("button","xlk"); b.type="button"; const i=el("i"); if (c) i.style.setProperty("--c",c); if (round) i.classList.add("o"); b.append(i, text); return b; }
 function context(obj){
-  if (obj.kb) return kbContext(obj.kb);
-  const c=el("div","ctx");
+  const c=el("div","ctx"), X=el("div","xpl"); X.append(el("h3",null,"Explore"));
+  if (obj.kb){ kbContext(obj.kb, X); c.append(X); return c; }
   if (obj.terr) c.append(nearbyBox(obj));
   if (!obj.pt && !obj.n && !obj.lk) c.append(insideBox(obj));
+  c.append(X);
   if (obj.terr) return c;
   const [pv,nx]=neighbours(obj);
   const where = obj.n ? "Shared events" : obj.lk ? "Links" : obj.ov ? LAYER[obj.layer].name+", "+regName(obj.reg) : obj.pt ? "Events in "+regName(obj.reg) : regName(obj.reg);
-  c.append(el("h3",null,"Before and after: "+where));
-  const n=el("div","nav2"); n.append(navBtn("Before",pv), navBtn("After",nx)); c.append(n);
+  const nv=el("div","xl"), n=el("div","nav2"); n.append(navBtn("Before",pv), navBtn("After",nx)); nv.append(el("h4",null,"Before and after: "+where), n); X.append(nv);
   const st=sameTime(obj);
   if (st.length){
-    c.append(el("h3",null,"At the same time elsewhere"));
-    const p=el("div","pills");
-    for (const it of st){ const b=el("button","pill"); b.type="button"; b.style.setProperty("--c",`var(--c-${it.reg})`); b.append(el("i"), it.name); b.title=`${it.name}, ${regName(it.reg)}`; b.addEventListener("click",()=>goTo(it)); hoverLoad(b,it); p.append(b); }
-    c.append(p);
+    const L=linkList("At the same time elsewhere");
+    for (const it of st){ const b=xLink(it.name,`var(--c-${it.reg})`); b.title=`${it.name}, ${regName(it.reg)}`; b.addEventListener("click",()=>goTo(it)); hoverLoad(b,it); L.lastChild.append(b); }
+    X.append(L);
   }
   return c;
 }
@@ -2628,22 +2827,49 @@ function select(obj){
   }
   const kid = obj.kb || KBOF.get(obj) || (obj.terr && kbOfTerr(obj.name,obj.reg)); if (kid) kbFill(left, kid, obj);
   const V=vidOf(obj); if (V && meta.parentNode) meta.after(videoBox(V));       /* the item's video sits under its title, above the text */
-  const acts=el("div","acts"); if (wiki) acts.append(wikiLink(wiki));
-  if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","srcl","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; acts.append(a); }
+  const acts=el("div","acts"); if (wiki){ const a=wikiLink(wiki); a.className="btn actb"; a.textContent=""; a.append(el("b","wmark","W"), el("span",null,"Wikipedia")); a.title="Read on Wikipedia, in a new tab"; acts.append(a); }
+  if (obj.src && !/wikipedia\.org/.test(obj.src)){ const a=el("a","btn actb","Source"); a.href=obj.src; a.target="_blank"; a.rel="noopener"; a.title="The source, in a new tab"; acts.append(a); }
   /* Ask about this: a chat with Claude on this item (ask.js) */
   let chat=null, xc=null;
   if (window.itemChat){ chat=itemChat(obj, kid||null);
     const cb=el("button","btn chatb"); cb.type="button"; cb.innerHTML=CHATSVG+"<span>Ask about this</span>"; cb.addEventListener("click",()=>openItemChat()); acts.prepend(cb);
-    xc=el("button","x xchat"); xc.type="button"; xc.innerHTML=CHATSVG; xc.setAttribute("aria-label","Ask about this"); xc.title="Ask Claude a follow-up question about this"; xc.addEventListener("click",()=>openItemChat()); }
+    cb.title="Ask Claude a follow-up question about this"; }
   if (typeof pinOfObj==="function" && (obj.kb || KBOF.get(obj))){   /* the visible way into the sidebar; Shift and click on a link is the quick one */
     const pb=el("button","btn pinb"); pb.type="button"; pb.title="Keep this page open in the sidebar while you read on. Shift and click on any link does the same.";
     pb.innerHTML='<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2.5 3.5h11v9h-11zM10 3.5v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><span>Keep open</span>';
     pb.addEventListener("click",()=>pinOfObj(obj)); acts.insertBefore(pb, acts.querySelector("a")); }
-  left.append(acts, ...(chat?[chat]:[]), context(obj));
+  /* the actions come first, under the title, and stay in view while the card scrolls */
+  if (acts.firstChild && meta.parentNode) meta.after(acts);
+  left.append(...(chat?[chat]:[]), context(obj));
   left.className="txt";
-  row.append(...(obj.terr || (obj.kb && !KBX[obj.kb].wiki) ? [] : [picFigure(obj)]), left, x, ...(xc?[xc]:[])); detail.append(row);   /* a territory gets no photo: Wikipedia's is often of today */
+  if (chat && chat.classList.contains("carry") && (acts.parentNode || meta.parentNode)) (acts.parentNode ? acts : meta).after(chat);   /* a conversation that came along from another card sits at the top */
+  row.append(...(obj.terr || (obj.kb && !KBX[obj.kb].wiki) ? [] : [picFigure(obj)]), left, x, ...(xc?[xc]:[])); detail.append(row); if (window.fitWatch) fitWatch(row);   /* a territory gets no photo: Wikipedia's is often of today */
   detail.scrollTop=0;
 }
+/* a long page shows as many paragraphs as leave the whole card in view, down to the end of Explore, with no scrolling; never fewer than two.
+   The picture, the voices and the links arrive late and the pane can be resized, so the cut is made again whenever the card's height changes */
+function fitText(){
+  const xp=detail.querySelector(".row .xpl"); if (xp) xp.style.marginTop="";
+  const box=detail.querySelector(".kbt[data-fit]"), nx=box && box.nextElementSibling, mb = nx && nx.classList.contains("morebt") ? nx : null, open = !!mb && box.dataset.fit==="open";
+  if (mb){
+    const kids=[...box.children]; for (const k of kids) k.hidden=false;
+    box.classList.remove("clip"); mb.hidden=!open;
+    if (!open && detail.scrollHeight>detail.clientHeight+1){
+      mb.hidden=false; let n=kids.length;
+      while (n>2 && detail.scrollHeight>detail.clientHeight+1) kids[--n].hidden=true;
+      while (n>2 && n<kids.length && /^H\d$/.test(kids[n-1].tagName)) kids[--n].hidden=true;   /* no heading left with nothing under it */
+      if (n===kids.length) mb.hidden=true; else box.classList.add("clip");
+    }
+  }
+  /* Explore stands at the foot of the pane: the room a short card leaves goes above it, not under it. Not once the whole text is opened */
+  if (xp && !open && xp.offsetParent){
+    const row=detail.querySelector(".row"), spare=detail.getBoundingClientRect().bottom-parseFloat(getComputedStyle(detail).paddingBottom)-row.getBoundingClientRect().bottom;
+    if (spare>1) xp.style.marginTop=(parseFloat(getComputedStyle(xp).marginTop)+Math.floor(spare))+"px";
+  }
+}
+{ let t=0; const ro=new ResizeObserver(()=>{ cancelAnimationFrame(t); t=requestAnimationFrame(fitText); });
+  window.fitWatch = row => { ro.disconnect(); ro.observe(detail); ro.observe(row); }; }
+detail.addEventListener("scroll",()=>{ const a=detail.querySelector(".acts"); if (a) a.classList.toggle("stuck", a.getBoundingClientRect().top-detail.getBoundingClientRect().top<1); },{passive:true});
 
 /* ---------- videos on items (videos.js): a video names its item, the card shows it, and the item's marker gets a second ring ---------- */
 const ITEMVID = new Map();
@@ -2689,7 +2915,7 @@ function kbFill(left, id, obj){
       if (tx.url){ const a=el("a",null,"Read it there"); a.href=tx.url; a.target="_blank"; a.rel="noopener"; line.append(". ", a); }
       extra.append(line); }
     { const vb=kbVoiceBox(tx.back, id); if (vb) extra.append(vb); }   /* what people who were there said about it */
-    { const bb=kbBackBox(tx.back); if (bb) left.append(bb); }      /* last on the card, under Before and after */
+    { const bb=kbBackBox(tx.back); if (bb) (left.querySelector(".xpl")||left).append(bb); }      /* last in Explore, under Before and after */
     if (!tx.html) return;
     const box=el("div","kbt"); box.innerHTML=tx.html; box.querySelectorAll("a.kbl").forEach(kbDress);
     if (note) note.replaceWith(box); else extra.before(box);
@@ -2701,17 +2927,36 @@ function kbFill(left, id, obj){
       if (q && "speechSynthesis" in window){ const rb=el("button","btn vread","Read aloud"); rb.type="button"; rb.addEventListener("click",()=>voiceRead(q,rb)); box.after(rb); }
     }
     (voice ? extra : box).after(el("p","kbai", voice ? (P.kind==="reconstructed" ? "This voice was written today from the evidence. It is not a quotation." : "The quoted words are copied from the source named above. The introduction was written with Claude and is not fact-checked.") : "Written with Claude from general knowledge and not fact-checked. Check it before you rely on it."));
+    /* short first: a long page is cut to what fits the card (fitText); the rest is one press away */
+    if (!voice && box.children.length>2){
+      box.dataset.fit="fit";
+      const mb=el("button","linkb morebt","Read more"); mb.type="button"; mb.hidden=true; mb.setAttribute("aria-expanded","false");
+      mb.addEventListener("click",()=>{ const open=box.dataset.fit!=="open"; box.dataset.fit = open ? "open" : "fit"; mb.textContent = open ? "Show less" : "Read more"; mb.setAttribute("aria-expanded",String(open)); fitText(); if (!open) detail.scrollTop=0; });
+      box.after(mb);
+    }
+    fitText();
   });
 }
 /* voices: whose words a voice page holds, the voices that mention a page, and reading one aloud */
 const VOICEKIND = {"own words":"In their own words", witness:"A witness's account", traveller:"A traveller's account", reconstructed:"Reconstructed"};
 const VOICES = Object.keys(KBX).filter(k=>KBX[k].t==="voice").sort((a,b)=>(KBX[a].y??0)-(KBX[b].y??0));
+/* one sentence of a quotation for a card: the one that names what the card is about, else the first; a long one is cut short */
+function voiceLine(t, about){
+  const S=(t.replace(/\s+/g," ").match(/[^.!?…]+(?:[.!?]+|$)/g)||[t]).map(x=>x.trim()).filter(x=>x.length>20); if (!S.length) return t.trim();
+  const W=String(about||"").toLowerCase().split(/[^a-z\u00e0-\u024f]+/).filter(w=>w.length>3).map(w=>w.replace(/s$/,""));
+  const score=x=>{ const l=x.toLowerCase(); return W.reduce((n,w)=>n+(l.includes(w)?1:0),0); };
+  let best=S[0], top=score(S[0]); for (const x of S){ const k=score(x); if (k>top){ best=x; top=k; } }
+  return best.length<=210 ? best : best.slice(0,190).replace(/\s+\S*$/,"").replace(/[,;:]$/,"")+" …";
+}
 function kbVoiceBox(back, self){
   const ids=(back||[]).filter(b=>b!==self && KBX[b] && KBX[b].t==="voice"); if (!ids.length) return null;
   const box=el("div","kbvoices"); box.append(el("h3",null,ids.length===1 ? "A voice from the time" : "Voices from the time"));
-  for (const b of ids){ const P=KBX[b], bt=el("button","sitem kbp"); bt.type="button"; bt.dataset.k=b;
-    bt.append(el("b",null,P.name), el("span",null,[VOICEKIND[P.kind], P.y!=null ? fmt(P.y) : ""].filter(Boolean).join(", ")));
-    bt.addEventListener("click",()=>kbGo(b)); box.append(bt); }
+  ids.forEach((b,i)=>{ const P=KBX[b], bt=el("button","vq kbp"); bt.type="button"; bt.dataset.k=b;
+    const made=P.kind==="reconstructed", q=el("span","vqq");
+    bt.append(q, el("b",null,P.name), el("span","vqby",[made ? "Written today from the evidence, not a quotation" : VOICEKIND[P.kind], P.y!=null ? fmt(P.y) : ""].filter(Boolean).join(", ")));
+    bt.addEventListener("click",()=>kbGo(b)); box.append(bt);
+    if (i<3) kbText(b).then(tx=>{ if (!tx || !tx.html) return; const d=el("div"); d.innerHTML=tx.html;
+      const t=[...d.querySelectorAll("blockquote")].map(x=>x.textContent).join(" ").trim(); if (t) q.textContent="“"+voiceLine(t, KBX[self] && KBX[self].name)+"”"; }); });
   return box;
 }
 let voiceBtn=null;
@@ -2723,8 +2968,8 @@ function voiceRead(text, btn){
   u.onend=end; u.onerror=end; voiceBtn=btn; btn.textContent="Stop reading"; voiceRead.u=u; speechSynthesis.speak(u);
 }
 /* a page with no chart item: the chart items it links to, in time order */
-function kbContext(id){
-  const c=el("div","ctx"), yr=o=>o.y ?? o.s ?? o.a;
+function kbContext(id, X){
+  const yr=o=>o.y ?? o.s ?? o.a;
   kbText(id).then(tx=>{
     const seen=new Set(), items=[];
     for (const k of [...(tx&&tx.links||[]), ...Object.values(tx&&tx.rel||{}).flat()]){
@@ -2732,12 +2977,10 @@ function kbContext(id){
     }
     if (!items.length) return;
     items.sort((a,b)=>yr(a)-yr(b));
-    c.append(el("h3",null,"On the chart"));
-    const pl=el("div","pills");
-    for (const o of items){ const b=el("button","pill"); b.type="button"; b.style.setProperty("--c", o.reg ? `var(--c-${o.reg})` : "var(--muted)"); b.append(el("i"), `${o.name||o.n}, ${fmt(yr(o))}`); b.addEventListener("click",()=>goTo(o)); pl.append(b); }
-    c.append(pl);
+    const L=linkList("On the chart");
+    for (const o of items){ const b=xLink(`${o.name||o.n}, ${fmt(yr(o))}`, o.reg ? `var(--c-${o.reg})` : "var(--muted)"); b.addEventListener("click",()=>goTo(o)); L.lastChild.append(b); }
+    X.querySelector("h3").after(L);
   });
-  return c;
 }
 /* links in a page: click or Enter goes there; hovering shows the dates and the first lines */
 const kbTip=el("div","kbtip"); document.body.append(kbTip);
@@ -2780,10 +3023,10 @@ function goTo(obj){
   else if (obj.n){ if (!state.links){ state.links=true; changed=true; } if (!obj.r.some(id=>state.active.has(id))) obj.r.forEach(need); }
   else {
     need(obj.reg);
-    if (obj.ov && !state.layers.has(obj.layer) && state.solo!==obj){ state.solo=obj; changed=true; }   /* the one item, not its whole layer */
+    if (obj.ov && !itemOn(obj) && state.solo!==obj){ state.solo=obj; changed=true; }   /* the one item, not its whole layer */
     if (obj.pt && !obj.ov && !state.events){ state.events=true; changed=true; }
   }
-  if (obj.pt && obj.level>state.detail){ state.detail=Math.min(3,obj.level); state.detailAuto=false; changed=true; }
+  if (obj.pt && obj.level>state.detail){ if (state.detailAuto && obj.ov){ if (state.solo!==obj){ state.solo=obj; changed=true; } } else { state.detail=Math.min(3,obj.level); state.detailAuto=false; changed=true; } }
   /* fine detail needs the chart zoomed in: open about 120 years around it */
   if (obj.pt && obj.level===4 && zoomK()<DEEPK){ if (changed) refresh(); changed=false; zoomToRange(obj.y-60, obj.y+60); setYear(obj.y); }
   if (obj.lk && state.lens!=="geo"){ state.lens="geo"; changed=true; }
@@ -2921,7 +3164,7 @@ function pickResult(i,side){
   qIn.value=""; qHits=[]; drawResults(); qIn.blur();
   if (h.year!=null){ select(null); setYear(h.year,{scroll:true}); }
   else if (h.range){ select(null); pickRange(h.range[0],h.range[1]); }
-  else goTo(h.obj);
+  else { goTo(h.obj); if (typeof focusOn==="function") focusOn(h.obj); }   /* the map shows only what was found, and its own */
 }
 qIn.addEventListener("input",()=>{ qHits=runSearch(qIn.value); qPos=0; drawResults(); });
 qIn.addEventListener("keydown",e=>{
@@ -2939,16 +3182,24 @@ const RSHORT={ca:["Central Asia","Central Asia","C Asia"], sa:["South Asia","Sou
 function fitRows(){
   for (const bar of [$("regBar"),$("lensBar")]){ if (!bar) continue;
     bar.classList.remove("t1","t2");
+    if (innerWidth>=760) continue;   /* a wide screen has the filters as a column */
     if (bar.scrollWidth>bar.clientWidth+1) bar.classList.add("t1");
     if (bar.scrollWidth>bar.clientWidth+1) bar.classList.add("t2");
   }
 }
 addEventListener("resize",()=>requestAnimationFrame(fitRows));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>requestAnimationFrame(fitRows));
+/* the filters column: full, or folded to a rail of icons. The choice is kept; a narrow laptop starts folded */
+const fsBtn=$("fsideBtn");
+function setFside(small){ document.body.classList.toggle("fsmall",small); fsBtn.setAttribute("aria-expanded",!small); fsBtn.title = small ? "Show the filter names" : "Fold the filters to icons"; fsBtn.setAttribute("aria-label",fsBtn.title); }
+fsBtn.innerHTML='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+fsBtn.addEventListener("click",()=>{ const sm=!document.body.classList.contains("fsmall"); setFside(sm); saveLS("wh8-fside",sm?"small":"full"); });
+setFside(LS("wh8-fside") ? LS("wh8-fside")==="small" : innerWidth<1200);
 let regClickT=0;
 function drawPanel(){
   const lensOn=!!soloLens();
   /* regions: a row of chips. Click shows or hides one; double-click shows only that one */
-  const box=$("regBar"); box.textContent=""; box.append(el("span","rlab","Regions"));
+  const box=$("regBar"), rh=el("span","thead"); box.textContent=""; rh.append(el("span","rlab","Regions")); box.append(rh);
   for (const r of REG){
     const on=state.active.has(r.id), b=el("button","lens rchip"); b.type="button";
     b.style.setProperty("--lc",`var(--c-${r.id})`); b.setAttribute("aria-pressed",on);
@@ -2962,7 +3213,7 @@ function drawPanel(){
     b.addEventListener("dblclick",()=>{ clearTimeout(regClickT); state.active=new Set([r.id]); refresh(); });
     box.append(b);
   }
-  if (state.active.size<REG.length){ const all=el("button","lclear","Show all"); all.type="button"; all.addEventListener("click",()=>{ state.active=new Set(REG.map(r=>r.id)); refresh(); }); box.append(all); }
+  if (state.active.size<REG.length){ const all=el("button","lclear","Show all"); all.type="button"; all.addEventListener("click",()=>{ state.active=new Set(REG.map(r=>r.id)); refresh(); }); rh.append(all); }
   const open = REG.some(r=>state.active.has(r.id) && state.open.has(r.id)), u=$("unfoldAll");
   u.textContent = open ? "Fold all" : "Unfold all"; u.disabled = lensOn || !anyFoldable();
   const solo = state.active.size===1, gb=$("groupBy");
@@ -2972,16 +3223,18 @@ function drawPanel(){
   /* view */
   $("orientH").setAttribute("aria-pressed",state.horiz); $("orientV").setAttribute("aria-pressed",!state.horiz);
   $("scaleEven").setAttribute("aria-pressed",!state.stretch); $("scaleStretch").setAttribute("aria-pressed",state.stretch);
-  for (const d of [1,2,3]) $("det"+d).setAttribute("aria-pressed",state.detail===d);
-  $("detHint").textContent = (state.detailAuto ? "Detail follows the zoom until you pick one." : "Detail stays where you set it. Zoom no longer changes it.")+" All adds fine detail for Greece, Rome and Byzantium once 200 years or less are on screen.";
+  $("det0").setAttribute("aria-pressed",state.detailAuto); for (const d of [1,2,3]) $("det"+d).setAttribute("aria-pressed",!state.detailAuto && state.detail===d);
+  $("detHint").textContent = (state.detailAuto ? "Auto: zoom in to see more." : "Detail stays where you set it. Auto lets the zoom decide again.")+" All adds fine detail for Greece, Rome and Byzantium once 200 years or less are on screen.";
 }
 /* ---------- the lens bar: events, shared events, links and the twelve overlays ---------- */
 const SHORT = {people:["People","Who lived then?"], war:["Battles","Who fought whom?"], religion:["Faith","What did people believe?"], society:["Law","How were people ruled and treated?"],
   arts:["Arts","What did they make and enjoy?"], ideas:["Ideas","What did they figure out?"], infra:["Buildings","What did they build?"],
   trade:["Trade","What did they buy and sell?"], disaster:["Disasters","What went wrong?"], food:["Food","What did they eat and grow?"], migration:["Journeys","Who moved where?"], voices:["Voices","What did people who were there say?"]};
+const PIX = new Set(["person","war","flame","gavel","palette","bulb","bridge","scales","storm","wheat","steps","voice","calendar","globe","arrow"]);   /* pix/<kind>.png, drawn as one PixelLab sheet */
+function pixIcon(kind){ const sp=el("span","ico pix"), im=document.createElement("img"); im.src="pix/"+kind+".png"; im.alt=""; im.width=22; im.height=22; im.draggable=false; sp.appendChild(im); return sp; }
 function lensChip(o){
   const b=el("button","lens"); b.type="button"; b.style.setProperty("--lc",o.c); b.setAttribute("aria-pressed",!!o.on); b.disabled=!!o.disabled;
-  if (o.ico) b.append(icon(o.ico)); else { const m=el("span","mk"); m.innerHTML=o.mark; b.append(m); }
+  if (o.ico) b.append(PIX.has(o.ico) ? pixIcon(o.ico) : icon(o.ico)); else { const m=el("span","mk"); m.innerHTML=o.mark; b.append(m); }
   b.append(el("span","lt",o.label)); const n=el("span","n"); n.dataset.k=o.key; b.append(n);
   b.title=o.title; b.addEventListener("click",o.onclick); return b;
 }
@@ -2990,47 +3243,48 @@ function drawLenses(){
   const bar=$("lensBar"), lensOn=!!soloLens(), onMap=mapView(); bar.textContent="";
   const many=state.layers.size>1, clear=cls=>{ const c=el("button",cls,"Clear all"); c.type="button"; c.title="Turn off all the overlays"; c.addEventListener("click",()=>setLayers([])); return c; };
   bar.append(el("span","rlab",onMap ? "On the map" : "On the chart"));
-  bar.append(lensChip({key:"ev", on:state.events, label:"Events", mark:'<i class="key dia"></i>', c:"#5b6b7b", title:"Dated events: voyages, buildings, rulers, revolutions", onclick:()=>{
-    state.events=!state.events; if (!state.events && state.sel && state.sel.pt && !state.sel.ov && !state.sel.lk) select(null); render(topYear()); drawLenses(); }}));
-  bar.append(lensChip({key:"band", on:state.links && !onMap, disabled:onMap, label:"Shared", mark:'<i class="key link"></i>', c:"#c8410b", title: onMap ? "Shared events show on the chart" : "Plagues, conquests, trade routes and climate shocks that crossed regions", onclick:()=>{
+  bar.append(lensChip({key:"ev", on:state.events, label:"Events", ico:"calendar", mark:'<i class="key dia"></i>', c:"#5b6b7b", title:"The moments that matter most, picked from every topic", onclick:()=>{
+    state.events=!state.events; if (!state.events && state.sel && state.sel.pt && !state.sel.lk && !state.sel.n && !itemOn(state.sel) && state.sel!==state.solo) select(null); render(topYear()); drawLenses(); }}));
+  bar.append(lensChip({key:"band", on:state.links && !onMap, disabled:onMap, label:"Shared", ico:"globe", mark:'<i class="key link"></i>', c:"#c8410b", title: onMap ? "Shared events show on the chart" : "Plagues, conquests, trade routes and climate shocks that crossed regions", onclick:()=>{
     state.links=!state.links; if (!state.links && state.sel && state.sel.n) select(null); render(topYear()); drawMoment(); drawLenses(); }}));
-  if (XLINKS.length) bar.append(lensChip({key:"lk", on:state.xlinks && !lensOn && !onMap, disabled:lensOn||onMap, label:"Links", mark:LINKSVG, c:"#2b8db3", title: onMap ? "Links show on the chart" : lensOn ? "Links show when Group by is off" : "Arrows for things that travelled between regions: faiths, crops, inventions, people", onclick:()=>{
+  if (XLINKS.length) bar.append(lensChip({key:"lk", on:state.xlinks && !lensOn && !onMap, disabled:lensOn||onMap, label:"Links", ico:"arrow", mark:LINKSVG, c:"#2b8db3", title: onMap ? "Links show on the chart" : lensOn ? "Links show when Group by is off" : "Arrows for things that travelled between regions: faiths, crops, inventions, people", onclick:()=>{
     state.xlinks=!state.xlinks; saveLS("wh8-links",state.xlinks?"on":"off"); if (!state.xlinks && state.sel && state.sel.lk) select(null); render(topYear()); drawLenses(); }}));
-  bar.append(el("span","lsep"));
+  const th=el("span","thead"); th.append(el("span","rlab2","Topics")); if (many) th.append(clear("lclear"));
+  bar.append(el("span","lsep"), th);
   for (const L of LAYERS){
     bar.append(lensChip({key:L.id, on:state.layers.has(L.id), label:SHORT[L.id][0], ico:L.icon, c:L.c, title:`${L.name}: ${SHORT[L.id][1]}`, onclick:()=>{
       setLayers(state.layers.has(L.id) ? [...state.layers].filter(id=>id!==L.id) : [...state.layers, L.id]); }}));
   }
-  if (many) bar.append(clear("lclear"));
   lensCounts(); requestAnimationFrame(fitRows);
 }
 /* how many of each are in the years on screen */
 function lensCounts(){
   const bar=$("lensBar"); if (!bar.firstChild || typeof Y!=="function") return;
-  const lv=shownLevel(), act=r=>state.active.has(r.id), C={ev:0,band:0,lk:0};
+  const lv = mapView() && typeof mapLevel==="function" ? mapLevel() : shownLevel(), act=r=>state.active.has(r.id), C={ev:0,band:0,lk:0};
   for (const L of LAYERS) C[L.id]=0;
   if (mapView()){
     /* on the map: what the map can show in its window of years, placed items only */
-    const y=MAP.year, W=winYears(y);
-    for (const r of REG) if (act(r)){
-      for (const p of r.points) if (p.level<=lv && Math.abs(p.y-y)<=W && geoOf(p)) C.ev++;
-      for (const p of r.over) if (p.level<=lv && geoOf(p) && onMapAt(p,y,W)) C[p.layer]++;
+    const y=MAP.year, [wa,wb]=shownAB(y);
+    if (MAP.focus){ for (const p of mapItems()) if (geoOf(p)){ if (p.layer) C[p.layer]++; if (p.pick || !p.layer) C.ev++; } }   /* a search's focus: count what it shows */
+    else for (const r of REG) if (act(r)){
+      for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb && geoOf(p)) C.ev++;
+      for (const p of r.over) if (p.level<=lv && geoOf(p) && onMapAt(p,y,wa,wb)){ C[p.layer]++; if (p.pick) C.ev++; }
     }
-    for (const n of bar.querySelectorAll(".n")) n.textContent=C[n.dataset.k]||"";
+    for (const n of bar.querySelectorAll(".n")) n.textContent=C[n.dataset.k]||0;
     return;
   }
   const [a,b]=visibleYears();
   for (const r of REG) if (act(r)){
     for (const p of r.points) if (p.level<=lv && p.y>=a && p.y<=b) C.ev++;
-    for (const p of r.over) if (p.level<=lv && p.y>=a && p.y<=b) C[p.layer]++;
+    for (const p of r.over) if (p.level<=lv && p.y>=a && p.y<=b){ C[p.layer]++; if (p.pick) C.ev++; }
   }
   for (const e of EVENTS) if (e.a<=b && e.b>=a && e.r.some(id=>state.active.has(id))) C.band++;
   for (const L of XLINKS) if (L.level<=lv && L.y>=a && L.y<=b) C.lk++;
-  for (const n of bar.querySelectorAll(".n")) n.textContent=C[n.dataset.k]||"";
+  for (const n of bar.querySelectorAll(".n")) n.textContent=C[n.dataset.k]||0;
 }
 function setLayers(ids){
   const y=topYear(); state.layers=new Set(ids); saveLS("wh8-layers",JSON.stringify([...state.layers]));
-  if (state.sel && state.sel.ov && !state.layers.has(state.sel.layer) && state.sel!==state.solo) select(null);
+  if (state.sel && state.sel.ov && !itemOn(state.sel) && state.sel!==state.solo) select(null);
   drawPanel(); render(y); if (!state.sel) drawMoment();
 }
 $("unfoldAll").addEventListener("click",()=>{ const y=topYear();
@@ -3057,7 +3311,7 @@ function applyZoom(z, kx, at){
   if (at){ [mid,frac]=at; }
   else { mid=Math.min(NOW,Math.max(START,(MAP.year>=a && MAP.year<=b) ? MAP.year : (a+b)/2)); frac=(Y(mid)-(state.horiz?scroller.scrollLeft:scroller.scrollTop))/Math.max(1,len); }
   state.zoom=z; state.kx=kx||0; if (state.detailAuto) state.detail=zoomDetail();
-  if (state.sel && state.sel.pt && !state.sel.n && state.sel.level>shownLevel()) select(null);
+  if (state.sel && state.sel.pt && !state.sel.n && state.sel!==state.solo && state.sel.level>shownLevel()) select(null);
   render(null);
   const pos=Math.max(0,Y(mid)-frac*len), sb=scroller.style.scrollBehavior; scroller.style.scrollBehavior="auto"; holdSync();
   if (state.horiz) scroller.scrollLeft=pos; else scroller.scrollTop=pos;
@@ -3086,7 +3340,7 @@ function zoomToRange(a,b){
   applyZoom(z, exact?0:kk, [y, Math.max(0,Math.min(1,frac))]);
   if (y!==MAP.year) setYear(y);
 }
-function setDetail(d){ const y=topYear(); state.detail=d; state.detailAuto=false; if (state.sel && state.sel.pt && !state.sel.n && state.sel.level>d) select(null); render(y); drawPanel(); if (!state.sel) drawMoment(); }
+function setDetail(d){ const y=topYear(); state.detailAuto = d===0; state.detail = d===0 ? zoomDetail() : d; if (state.sel && state.sel.pt && !state.sel.n && state.sel!==state.solo && state.sel.level>shownLevel()) select(null); render(y); drawPanel(); if (!state.sel) drawMoment(); }
 function drawSpan(){
   const [a,b]=visibleYears(), span=Math.max(1,b-a);
   const r = span>=2000 ? Math.round(span/100)*100 : span>=200 ? Math.round(span/10)*10 : Math.round(span);
@@ -3123,7 +3377,7 @@ $("zoomIn").addEventListener("click",()=>zoomStep(1));
   },{passive:false});
 }
 $("zoomOut").addEventListener("click",()=>zoomStep(-1));
-for (const d of [1,2,3]) $("det"+d).addEventListener("click",()=>setDetail(d));
+for (const d of [0,1,2,3]) $("det"+d).addEventListener("click",()=>setDetail(d));
 $("scaleEven").addEventListener("click",()=>setScale(false));
 $("scaleStretch").addEventListener("click",()=>setScale(true));
 function setScale(v){ if (state.stretch===v) return; const y=topYear(); state.stretch=v; drawPanel(); render(y); }
@@ -3158,9 +3412,10 @@ function stepYears(){
   return [...ys].sort((a,b)=>a-b);
 }
 function stepEvent(dir){
-  const ys=stepYears(), y=MAP.year;
-  const t = dir>0 ? ys.find(v=>v>y) : [...ys].reverse().find(v=>v<y);
-  if (t!=null){ setPlay(false); select(null); setYear(t,{scroll:true}); }
+  /* in a window the reader has set, the step goes to the next event inside it and the window stays; at the last one there, the button does nothing */
+  const ys=stepYears(), y=MAP.year, own = typeof ownWin==="function" && ownWin(), a = own ? y-MAP.win[0] : -Infinity, b = own ? y+MAP.win[1] : Infinity;
+  const t = dir>0 ? ys.find(v=>v>y && v<=b) : [...ys].reverse().find(v=>v<y && v>=a);
+  if (t!=null){ setPlay(false); select(null); if (own) needleTo(t,true); else setYear(t,{scroll:true}); }
 }
 $("prevEv").addEventListener("click",()=> story ? gotoStop(story.i-1) : stepEvent(-1));
 $("nextEv").addEventListener("click",()=> story ? gotoStop(story.i+1) : stepEvent(1));
@@ -3170,14 +3425,19 @@ function setPlay(on){
   $("mapYear").setAttribute("aria-live", on ? "off" : "polite");   /* a screen reader is not read every year while time plays */
   const b=$("playBtn");
   if (on){
-    if (stopIndex(MAP.stops,MAP.year)>=MAP.stops.length-1) setYear(MAP.stops[0],{scroll:true});
+    /* in a window the reader has set, time plays inside it: the red line runs to the window's end and stops there, and the window stays. From the end, Play starts again at the window's start */
+    const inWin = () => typeof ownWin==="function" && ownWin(), winEnd = () => MAP.win[1]<=0 || MAP.year>=MAP.hi;
+    if (inWin()){ if (winEnd()) needleTo(MAP.year-MAP.win[0]); }
+    else if (stopIndex(MAP.stops,MAP.year)>=MAP.stops.length-1) setYear(MAP.stops[0],{scroll:true});
+    /* inside that window, items come on as the red line reaches their year, so the map fills in the order things happened */
+    MAP.upto=inWin(); if (MAP.upto){ drawMap(); lensCounts(); }
     /* one stop every 160 ms at 1x. Stops sit closer where events are dense, so play slows down where more happened */
     let last=performance.now(), acc=0;
     const tick=now=>{ if (!playT) return;
       acc += Math.min(250,now-last)*playSpeed()/160; last=now;      /* a tab left in the background does not jump centuries when it returns */
       if (acc>=1){ const st=MAP.stops, i=stopIndex(st,MAP.year), n=Math.floor(acc); acc-=n;
-        if (i>=st.length-1){ setPlay(false); return; }
-        setYear(st[Math.min(st.length-1,i+n)],{scroll:true}); }
+        if (inWin() ? winEnd() : i>=st.length-1){ setPlay(false); return; }
+        if (inWin()) needleTo(st[Math.min(st.length-1,i+n)]); else setYear(st[Math.min(st.length-1,i+n)],{scroll:true}); }
       playT=requestAnimationFrame(tick); };
     playT=requestAnimationFrame(tick);
   } else { cancelAnimationFrame(playT); playT=null; }
@@ -3263,11 +3523,9 @@ document.addEventListener("keydown",e=>{
   if (story && (e.key==="ArrowLeft" || e.key==="ArrowRight")){ e.preventDefault(); gotoStop(story.i+(e.key==="ArrowRight"?1:-1)); return; }
   if ((e.key==="ArrowLeft" || e.key==="ArrowRight") && ddOpen()) return;   /* a menu is open: the arrows are its own */
   if (e.key==="ArrowLeft" || e.key==="ArrowRight"){
-    e.preventDefault(); setPlay(false);
-    const st=MAP.stops, i=stopIndex(st,MAP.year), j=Math.max(0,Math.min(st.length-1,i+(e.key==="ArrowRight"?1:-1)));
-    setYear(st[j],{scroll:true}); return;
+    e.preventDefault(); setPlay(false); stepYear((e.key==="ArrowRight"?1:-1)*(e.shiftKey?10:1)); return;
   }
-  if (e.key==="1" || e.key==="2" || e.key==="3") setDetail(+e.key);
+  if (e.key==="0" || e.key==="1" || e.key==="2" || e.key==="3") setDetail(+e.key);
   if (e.key==="s" || e.key==="S"){ e.preventDefault(); setStories(!storyPop.classList.contains("open")); }
 });
 
@@ -3319,7 +3577,11 @@ function setStories(open){
   if (vids.length){
     const VV=sec("videos","Videos",vids.length);
     VV.append(el("p","spint","Short films of single battles. Each one opens on the battle's own page."));
-    for (const V of vids){
+    /* each film sits under the topic of the item it is about: Battles first */
+    const vidTopic = V => { const o=kbTarget(V.item); return o && o.ov && SHORT[o.layer] ? SHORT[o.layer][0] : "Other"; }, vkey = V => vidTopic(V)==="Battles" ? "" : vidTopic(V);
+    let vlast=null;
+    for (const V of vids.slice().sort((p,q)=>vkey(p).localeCompare(vkey(q)))){
+      if (vidTopic(V)!==vlast){ vlast=vidTopic(V); VV.append(el("div","sbook",vlast)); }
       const b=el("button","sitem"); b.type="button"; const o=kbTarget(V.item), y=o && (o.pt ? o.y : o.s!=null ? o.s : o.a);
       b.append(el("b",null,V.title||kbName(V.item)), el("span",null,kbName(V.item)+(y!=null && isFinite(y) ? ", "+fmt(y) : "")));
       b.addEventListener("click",()=>{ setStories(false); kbGo(V.item); }); VV.append(b);
@@ -3486,10 +3748,10 @@ function drawStoryVideo(st){
 function kbBackBox(back){
   const ids=(back||[]).filter(b=>KBX[b]); if (!ids.length) return null;
   ids.sort((a,b)=>(KBOBJ.has(b)?1:0)-(KBOBJ.has(a)?1:0));
-  const box=el("div","kbback"), pl=el("div","pills"); box.append(el("h3",null,"Linked from"), pl);
-  const add=b=>{ const bt=el("button","pill kbp"); bt.type="button"; bt.dataset.k=b; bt.append(el("i"), KBX[b].name); bt.title=[KBTYPE[KBX[b].t], kbWhen(KBX[b])].filter(Boolean).join(", "); bt.addEventListener("click",()=>kbGo(b)); pl.append(bt); };
+  const box=linkList("Linked from"), pl=box.lastChild; box.classList.add("kbback");
+  const add=b=>{ const bt=xLink(KBX[b].name,null,true); bt.classList.add("kbp"); bt.dataset.k=b; bt.title=[KBTYPE[KBX[b].t], kbWhen(KBX[b])].filter(Boolean).join(", "); bt.addEventListener("click",()=>kbGo(b)); pl.append(bt); };
   const N=8; ids.slice(0, ids.length<=N+2 ? ids.length : N).forEach(add);
-  if (ids.length>N+2){ const m=el("button","more",`and ${ids.length-N} more`); m.type="button"; m.addEventListener("click",()=>{ m.remove(); ids.slice(N).forEach(add); }); pl.append(m); }
+  if (ids.length>N+2){ const m=el("button","linkb xmore",`and ${ids.length-N} more`); m.type="button"; m.addEventListener("click",()=>{ m.remove(); ids.slice(N).forEach(add); }); pl.append(m); }
   return box;
 }
 /* the level word on a card, with what it means */
@@ -3538,7 +3800,7 @@ function drawStoryCard(){
   /* top left of the plot, clear of the region names: the year line sits right of centre, the small map bottom right */
   const hw = state.horiz ? (parseFloat(sheet.style.getPropertyValue("--headw"))||150) : AXIS_W;
   const hh = state.horiz ? 30 : (parseFloat(sheet.style.getPropertyValue("--headh"))||46);
-  storyCard.style.setProperty("--stop",($("lensBar").offsetHeight+hh+10)+"px");
+  storyCard.style.setProperty("--stop",(hh+10)+"px");   /* measured from the chart column, which starts under the filters on a phone and beside them on a wide screen */
   storyCard.style.setProperty("--sleft",(hw+12)+"px");
   storyCard.hidden=false; syncTransport();
 }
@@ -3558,6 +3820,7 @@ function writeURL(){
   if (!state.stretch) p.set("s","0");
   if (state.kx) p.set("k",state.kx.toFixed(2)); else if (state.zoom!==2) p.set("z",state.zoom);
   if (MAP.lo>START || MAP.hi<NOW) p.set("t",MAP.lo+","+MAP.hi);
+  if (MAP.win) p.set("w",MAP.win[0]+","+MAP.win[1]);
   if (story) p.set("st",story.s.id+"."+(story.i+1));
   if (!state.detailAuto) p.set("d",state.detail);
   if (state.open.size) p.set("u",[...state.open].join(","));
@@ -3590,8 +3853,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=1243fec879"></script>
-<script src="map.js?v=1243fec879"></script>
+<script src="geo.js?v=00536ac26b"></script>
+<script src="routes.js?v=00536ac26b"></script>
+<script src="map.js?v=00536ac26b"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3635,8 +3899,8 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=1243fec879"></script>
-<script src="sidebar.js?v=1243fec879"></script>
+<script src="ask.js?v=00536ac26b"></script>
+<script src="sidebar.js?v=00536ac26b"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

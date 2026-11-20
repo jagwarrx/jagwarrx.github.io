@@ -7,7 +7,9 @@ const SDK = new URL("vendor/anthropic-sdk-1.11.0.js", document.baseURI).href;   
 const MODEL = "claude-opus-5-5";
 const KEY = "history.claudekey", MINE = "history.mystories";
 const REGIDS = REG.map(r => r.id), LAYIDS = LAYERS.map(l => l.id);
-const keyGet = () => { try { return localStorage.getItem(KEY) || ""; } catch (e) { return ""; } };
+/* the local preview (serve.py) can hand the page a key from the HISTORY_CLAUDE_KEY environment variable, so none need be typed there */
+const ENVKEY = typeof window.HISTORY_ENV_KEY === "string" ? window.HISTORY_ENV_KEY : "";
+const keyGet = () => { try { return localStorage.getItem(KEY) || ENVKEY; } catch (e) { return ENVKEY; } };
 window.askHasKey = () => !!keyGet();
 /* Forget key, in either key row: takes the key out of this browser */
 document.addEventListener("click", e => { const b = e.target.closest(".keyforget"); if (!b) return;
@@ -280,11 +282,67 @@ How to answer:
 - Answer the question directly, in organic prose, the way a well-read friend would explain it in conversation: 2 to 4 short paragraphs, about 80 to 220 words. No headings, no bullet lists unless the reader asks for a list, no preamble ("Great question"), no summary at the end.
 - Go beyond the card: add the context, causes, consequences, comparisons and telling details that make the answer worth reading. Don't repeat the card back.
 - Link pages of the app inline as [[page-id|words in your sentence]] whenever you mention a person, place, state, event or thing that has a page. Use ids from the card's list of linked pages, or from search results; never make up an id. Link each page once per answer, and don't link the item itself.
+- The reader's map follows your links in the order you write them: the year line, the map and the open card move to each linked page in turn. So link the people, places, states and events the answer turns on, at the point where each comes up, and leave out links that would send the map off the point.
 - Before you write, call the search tool for the names you plan to mention that are not in the card's list (several searches in one turn is fine). Don't write anything before the searches.
 - Facts: only well-established ones. Say "about" for approximate dates, and say so when historians disagree or a claim rests on one source. If the question's premise is wrong, say so kindly and give what happened.
 - Style: plain words, short sentences, active voice. Never use em dashes, en dashes, middle dots or arrow characters. No "testament to", "rich tapestry", "pivotal", "Moreover", "Furthermore".`;
 const CHATTOOLS = [TOOLS[0]];
 const THREADS = new Map();
+/* ---------- the answer drives the map ----------
+   While an answer is written, each page it links is opened in turn: the year line, the map and the card move to it, and the
+   conversation goes along, at the top of each card. A click on a link in the answer does the same. Any click, key or scroll
+   ends the tour. Opening a card some other way leaves the conversation on the card it was asked on. */
+const FOLLOW = "history.askfollow", DWELL = 3500;
+const followOn = () => { try { return localStorage.getItem(FOLLOW) !== "off"; } catch (e) { return true; } };
+let CARRY = null, carryNext = null;                /* the conversation that travels with the reader; the one the next card is to take */
+const tour = { th: null, turn: null, q: [], got: new Set(), t: 0, last: 0, done: false };
+const cardName = (obj, kid) => (kid && KBX[kid] && KBX[kid].name) || (obj && (obj.name || obj.n)) || "this";
+function markNow(th, show) {
+  if (!th.box) return; const last = th.box.querySelector(".chlog .cha:last-child"); let first = null;
+  for (const a of th.box.querySelectorAll(".cha a.kbl")) { const on = CARRY === th && !!th.now && a.dataset.k === th.now; a.classList.toggle("now", on);
+    if (on && (!first || (last && last.contains(a) && !last.contains(first)))) first = a; }
+  if (show && first) first.scrollIntoView({ block: "nearest" });
+}
+function visit(th, id) {
+  const o = kbTarget(id); if (!o) return;
+  carryNext = th; th.now = id;
+  try { goTo(o); } finally { carryNext = null; }
+  markNow(th, true);
+}
+function tourStop() { clearTimeout(tour.t); tour.t = 0; tour.th = tour.turn = null; tour.q = []; tour.done = false; }
+function tourStart(th, turn) { tourStop(); if (!followOn() || story) return; tour.th = th; tour.turn = turn; tour.got = new Set(); tour.last = 0; }
+function tourReset(th) { if (tour.th !== th) return; for (const id of tour.q) tour.got.delete(id); tour.q = []; }   /* text written before a search is thrown away, and its links with it */
+function tourFeed(th, turn, done) {
+  if (tour.th !== th || tour.turn !== turn) return;
+  for (const m of turn.a.matchAll(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g)) { const id = m[1].trim(); if (tour.got.has(id) || id === th.kid || !kbTarget(id)) continue; tour.got.add(id); tour.q.push(id); }
+  if (done) tour.done = true;
+  tourStep();
+}
+function tourStep() {
+  if (!tour.th || tour.t) return;
+  if (!tour.q.length) { if (tour.done) tourStop(); return; }
+  tour.t = setTimeout(() => { tour.t = 0; const th = tour.th; if (!th) return;
+    if (story || !document.body.contains(th.box)) { tourStop(); return; }   /* a story took the screen, or the card was closed */
+    tour.last = performance.now(); visit(th, tour.q.shift()); tourStep(); }, Math.max(0, tour.last + DWELL - performance.now()));
+}
+for (const ev of ["pointerdown", "keydown", "wheel", "touchmove"]) document.addEventListener(ev, () => { if (tour.th) tourStop(); }, { capture: true, passive: true });
+/* a link in an answer takes the conversation along to the card it opens */
+const chatLink = e => { const a = e.target.closest && e.target.closest(".ichat .cha a.kbl:not(.miss)"), th = a && a.closest(".ichat").__th; return th && !e.shiftKey ? { a, th } : null; };
+const takeAlong = e => { const c = chatLink(e); if (!c) return; carryNext = c.th; c.th.now = c.a.dataset.k; setTimeout(() => { carryNext = null; markNow(c.th); }, 0); };
+document.addEventListener("click", takeAlong, true);
+document.addEventListener("keydown", e => { if (e.key === "Enter") takeAlong(e); }, true);
+function dropCarry(th, chat) {
+  tourStop(); CARRY = null; th.box.classList.remove("carry");
+  if (state.sel) { MAP.keepYear = true; try { select(state.sel); } finally { MAP.keepYear = false; } if (chat) openItemChat(); }
+}
+function fromDraw(th) {
+  const p = th.box.querySelector(".chfrom"), away = CARRY === th && th.at !== th.obj; p.hidden = !away; p.textContent = ""; if (!away) return;
+  const b = el("button", "asklink", cardName(th.obj, th.kid)); b.type = "button"; b.title = "Back to the card this was asked on";
+  b.addEventListener("click", () => { carryNext = th; th.now = th.kid; try { (th.obj.terr ? select : goTo)(th.obj); } finally { carryNext = null; } });
+  const x = el("button", "asklink", "Hide"); x.type = "button"; x.title = "Take this conversation off the card";
+  x.addEventListener("click", () => dropCarry(th));
+  const s = el("span"); s.append("Asked about ", b); p.append(s, x);
+}
 const stripHtml = h => { const d = document.createElement("div"); d.innerHTML = h || ""; return d.textContent.replace(/\s+\n/g, "\n").trim(); };
 async function cardContext(obj, kid) {
   const P = kid && KBX[kid], name = (P && P.name) || obj.name || obj.n;
@@ -332,26 +390,29 @@ function drawThread(th) {
   }
   box.querySelector(".chnew").hidden = !th.turns.length || th.busy;
   box.querySelector(".chsend").disabled = th.busy;
+  box.querySelector(".chfollow").textContent = "Follow on the map: " + (followOn() ? "on" : "off");
+  markNow(th);
 }
 async function askItem(th, q) {
   if (!keyGet()) { th.box.querySelector(".chkey").hidden = false; th.box.querySelector(".chkey input").focus(); th.pending = q; return; }
-  const turn = { q, a: "", status: "Reading the card" }; th.turns.push(turn); th.busy = true; drawThread(th);
+  const turn = { q, a: "", status: "Reading the card" }; th.turns.push(turn); th.busy = true; drawThread(th); tourStart(th, turn);
   const n0 = th.messages.length;                   /* a turn that fails is taken out whole, so the next question starts from a sound thread */
   try {
     if (!th.messages.length) { const c = await cardContext(th.obj, th.kid); th.messages.push({ role: "user", content: "Here is the card the reader is looking at.\n\n" + c.text + "\n\nThe reader asks: " + q }); }
-    else th.messages.push({ role: "user", content: q });
+    else { const moved = CARRY === th && th.at !== (th.told || th.obj); th.told = th.at;   /* the reader may have followed the answer to another card */
+      th.messages.push({ role: "user", content: (moved ? `(The reader has moved on and now has the card of ${cardName(th.at, th.atKid)} open${th.atKid ? ", page id " + th.atKid : ""}.)\n\n` : "") + q }); }
     const { default: Anthropic } = await import(SDK);
     const client = new Anthropic({ apiKey: keyGet(), dangerouslyAllowBrowser: true });
     for (let n = 0; n < 6; n++) {
-      turn.a = ""; turn.status = n ? "Writing" : "Thinking"; drawThread(th);
+      tourReset(th); turn.a = ""; turn.status = n ? "Writing" : "Thinking"; drawThread(th);
       const st = client.beta.messages.stream({ model: MODEL, max_tokens: 8000, system: CHATSYS, tools: CHATTOOLS, messages: th.messages,
         output_config: { effort: "low" }, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" });
-      st.on("text", d => { turn.a += d; drawThread(th); });
+      st.on("text", d => { turn.a += d; drawThread(th); tourFeed(th, turn); });
       const msg = await st.finalMessage();
       th.messages.push({ role: "assistant", content: msg.content });
       if (msg.stop_reason === "refusal") throw new Error("Claude declined this one. Try asking it differently.");
       const uses = msg.content.filter(b => b.type === "tool_use");
-      if (!uses.length) { turn.a = msg.content.filter(b => b.type === "text").map(b => b.text).join(""); turn.status = ""; if (msg.stop_reason === "max_tokens") turn.a += "\n\n(The answer was cut off here. Ask for the rest.)"; break; }
+      if (!uses.length) { turn.a = msg.content.filter(b => b.type === "text").map(b => b.text).join(""); turn.status = ""; if (msg.stop_reason === "max_tokens") turn.a += "\n\n(The answer was cut off here. Ask for the rest.)"; tourFeed(th, turn, true); break; }
       turn.a = ""; turn.status = "Looking up " + uses.map(u => (u.input && u.input.query) || "").filter(Boolean).join(", ");
       drawThread(th);
       const results = [];
@@ -361,27 +422,40 @@ async function askItem(th, q) {
     }
     if (!turn.a) throw new Error("No answer came back. Try again.");
   } catch (e) {
-    turn.status = ""; turn.err = errText(e);
+    turn.status = ""; turn.err = errText(e); if (tour.th === th) tourStop();
     th.messages.length = n0;
   } finally { th.busy = false; drawThread(th); }
 }
 window.itemChat = (obj, kid) => {
+  /* a card opened from an answer (the tour, a link in it, or Back and Forward between such cards) keeps that conversation, at its top */
+  const nav = typeof hxNav !== "undefined" && hxNav;
+  const c = carryNext || (CARRY && (obj === CARRY.at || (nav && CARRY.seen.has(obj))) ? CARRY : null); carryNext = null;
+  if (c && c.box && c.turns.length) {
+    CARRY = c; c.at = obj; c.atKid = kid; c.seen.add(obj); if (nav) c.now = kid;
+    c.box.classList.add("carry"); c.box.hidden = false; fromDraw(c); drawThread(c);
+    return c.box;
+  }
+  if (CARRY) { tourStop(); if (CARRY.box) CARRY.box.classList.remove("carry"); CARRY = null; }
   const key = kid || obj; let th = THREADS.get(key);
-  if (!th) { th = { obj, kid, turns: [], messages: [], busy: false }; THREADS.set(key, th); }
+  if (!th) { th = { obj, kid, turns: [], messages: [], busy: false, seen: new Set([obj]), now: null }; THREADS.set(key, th); }
+  th.at = obj; th.atKid = kid;
   const name = (kid && KBX[kid] && KBX[kid].name) || obj.name || obj.n || "this";
   const box = el("section", "ichat"); box.hidden = !th.turns.length;
-  box.innerHTML = `<h3 class="sronly">Ask about this</h3><div class="chlog"></div>
+  box.innerHTML = `<h3 class="sronly">Ask about this</h3><p class="chfrom" hidden></p><div class="chlog"></div>
 <div class="chin"><textarea rows="1" placeholder="Ask a follow-up question"></textarea><button type="button" class="btn pri chsend">Ask</button></div>
 <div class="chkey" hidden><input type="password" autocomplete="off" placeholder="Your Anthropic API key"><button type="button" class="btn">Save</button>
 <p class="askhint">This part needs your own Anthropic API key, from a paid developer account (<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">get one here</a>). It is kept only in this browser and sent only to Anthropic. An answer costs about 2 to 5 cents on your account. <button type="button" class="asklink keyforget">Forget key</button></p><p class="askhint keymsg" hidden></p></div>
-<div class="chfoot"><button type="button" class="asklink chnew">New chat</button><button type="button" class="asklink chkeyb">API key</button></div>`;
+<div class="chfoot"><button type="button" class="asklink chnew">New chat</button><button type="button" class="asklink chkeyb">API key</button><button type="button" class="asklink chfollow" title="While Claude answers, the year, the map and the card move to each thing the answer links"></button></div>`;
   box.querySelector("textarea").setAttribute("aria-label", "Ask a follow-up question about " + name);
-  th.box = box;
+  th.box = box; box.__th = th;
+  box.querySelector(".chfollow").addEventListener("click", () => { const on = !followOn(); try { localStorage.setItem(FOLLOW, on ? "on" : "off"); } catch (e) {} if (!on) tourStop(); drawThread(th); });
   const ta = box.querySelector("textarea"), send = () => { const q = ta.value.trim(); if (!q || th.busy) return; if (keyGet()) { ta.value = ""; ta.style.height = ""; } askItem(th, q); };   /* with no key yet the question stays in the box */
   ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
   ta.addEventListener("input", () => { ta.style.height = ""; ta.style.height = Math.min(160, ta.scrollHeight) + "px"; });
   box.querySelector(".chsend").addEventListener("click", send);
-  box.querySelector(".chnew").addEventListener("click", () => { th.turns = []; th.messages = []; drawThread(th); ta.focus(); });
+  box.querySelector(".chnew").addEventListener("click", () => { th.turns = []; th.messages = []; th.told = null; th.now = null;
+    if (CARRY === th) { dropCarry(th, true); return; }   /* the next question belongs to the card that is open now */
+    drawThread(th); ta.focus(); });
   const kr = box.querySelector(".chkey");
   box.querySelector(".chkeyb").addEventListener("click", () => { kr.hidden = !kr.hidden; if (!kr.hidden) { kr.querySelector("input").value = keyGet(); kr.querySelector("input").focus(); } });
   kr.querySelector("button").addEventListener("click", () => { if (!keySave(kr)) return; kr.hidden = true; if (th.pending && keyGet()) { const q = th.pending; th.pending = null; ta.value = ""; ta.style.height = ""; askItem(th, q); } });

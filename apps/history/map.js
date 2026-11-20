@@ -26,7 +26,7 @@ const sliderEl=$("slider"), thumbEl=$("thumb"), ticksEl=$("sliderTicks"), ovEl=$
 let mapW=0, mapH=0, dpr=1;
 
 /* ---------- time stops: small steps where events are dense, big steps where they are sparse ---------- */
-const EV_YEARS = (()=>{ const ys=[]; for (const r of REG){ for (const p of r.points) ys.push(p.y); for (const p of r.over) if (p.layer==="war") ys.push(p.y); } for (const e of EVENTS) ys.push(e.a,e.b); return ys.sort((a,b)=>a-b); })();
+const EV_YEARS = (()=>{ const ys=[]; for (const r of REG){ for (const p of r.points) ys.push(p.y); for (const p of r.over) if (p.pick || p.layer==="war") ys.push(p.y); } for (const e of EVENTS) ys.push(e.a,e.b); return ys.sort((a,b)=>a-b); })();
 const NICE = [1,2,5,10,20,25,50,100,200,250,500,1000];
 function niceFloor(v){ let n=1; for (const s of NICE) if (s<=v) n=s; return n; }
 function buildStops(lo,hi){
@@ -183,7 +183,9 @@ function fitBox(b){
   const k=Math.min(mapW/(x1-x0), mapH/(y1-y0))*0.94;
   MAP.view={x:(x0+x1)/2, y:(y0+y1)/2, k:clampK(k)};
 }
-function clampK(k){ return Math.max(Math.max(mapW,1)/400, Math.min(80,k)); }
+/* how far in the map goes: 400 px to a degree, about a city and its surroundings across the pane. The borders are drawn coarsely, so past that there is nothing more to see */
+const KMAX=400;
+function clampK(k){ return Math.max(Math.max(mapW,1)/400, Math.min(KMAX,k)); }
 function fitSelected(){
   const ids=[...state.active]; let b=null;
   if (ids.length===REG.length) b=WORLD;
@@ -227,6 +229,7 @@ function inland(landP, coast, d){
 }
 function paint(){
   if (!MAP.on || !mapW || !MAP.view) return;
+  { const ml=mapLevel(); if (ml!==MAP.lastLv){ MAP.lastLv=ml; if (typeof lensCounts==="function") lensCounts(); } }   /* a zoom that brings in another level changes the counts on the topics */
   const cs=getComputedStyle(document.documentElement), dark=isDark();
   const ink=cs.getPropertyValue("--ink").trim(), surf=cs.getPropertyValue("--surface").trim();
   const sea=cs.getPropertyValue("--sea").trim(), land=cs.getPropertyValue("--land").trim();
@@ -341,23 +344,97 @@ function paint(){
 const GEOD = typeof GEO!=="undefined" ? GEO : {};
 const geoOf = o => { const g=o.ll||GEOD[wikiTitle(o)]; return g ? [g[1],g[0]] : null; };   /* [lon, lat] */
 /* how many years either side of the map's year it shows items for; zoomed in to fine detail, it narrows with the chart */
+/* how far the map is zoomed in: 0 with the whole world across it, 2 at about a continent, 3.3 at about a country */
+function mapZoom(){ return MAP.view && mapW ? Math.log2(MAP.view.k/Math.max(1e-6, mapW/360)) : 0; }
+/* the most detailed level the map shows. Items are marked by impact (1 world scale, 2 a country's turning points, 3 notable, 4 fine detail);
+   while Detail follows the zoom, zooming the map into a region brings in level 3, and into a country level 4 */
+function mapLevel(){ const s=shownLevel(); if (!state.detailAuto || !MAP.on || MAP.small) return s; const z=mapZoom(); return Math.max(s, z>=3.3 ? 4 : z>=2 ? 3 : 1); }
 function winYears(y){ const W=niceFloor(Math.max(10,(NOW-y)/20)); return shownLevel()===4 ? Math.min(W, niceFloor(Math.max(5,300/zoomK()))) : W; }
 /* people show in their adult life (from 20, or birth if they died young) to death; other items within W years of their dates */
-function onMapAt(p,y,W){
+/* the years shown round the red marker, [from, to]: worked out by winYears, or set by hand with the two handles on the time line
+   (MAP.win: the years before and after the marker, which the window keeps as the marker moves) */
+MAP.win=null;
+/* while time plays inside a window the reader has set, items come on in the order they happened: the map shows the window only as far as the red line.
+   A pause keeps that, and so does a step with the arrow keys or the next-event buttons; dragging the line or changing the window shows the whole window again */
+MAP.upto=false;
+function shownAB(y){ const [a,b]=winAB(y); return MAP.upto && MAP.win ? [a,Math.min(b,y)] : [a,b]; }
+function winAB(y){ const W=winYears(y); let a = y-(MAP.win ? MAP.win[0] : W), b = y+(MAP.win ? MAP.win[1] : W); if (a===0) a=-1; if (b===0) b=1; return [a,b]; }
+/* what happened shows when it falls in the window; who was alive, like the borders, is told for the marker's own year */
+function onMapAt(p,y,a,b){
   if (p.layer==="people"){ const end=p.e||NOW; return Math.min(p.y+20,end)<=y && y<=end; }
-  return p.e ? p.y-W<=y && y<=p.e+W : Math.abs(p.y-y)<=W;
+  return p.e ? p.y<=b && p.e>=a : p.y>=a && p.y<=b;
 }
 /* the place a click opened: {g:[lon,lat], on}; away: the items shown there that are outside the years on the map */
 MAP.open=null; MAP.away=new Set();
 const atPlace=(o,g)=>{ const q=geoOf(o); return !!q && Math.abs(q[0]-g[0])<=.1 && Math.abs(q[1]-g[1])<=.1; };
+/* a search's focus: the map shows the item found, its own events and a few big items near it, from any year, not the whole crowd.
+   A click on the item opens it out to everything it links to. "Show everything", or a card outside the focus, ends it */
+MAP.focus=null;                                   /* {obj, own:[...], all:[...], near:[...], on} */
+const focusYr = o => o.y ?? o.s ?? o.a;
+function focusOn(obj){
+  MAP.focus=null;
+  const id = obj && typeof KBOF!=="undefined" ? (KBOF.get(obj)||obj.kb) : null;
+  if (obj){
+    const F={obj, own:[], all:[], near:[], on:false}; MAP.focus=F;
+    const fill=tx=>{
+      if (MAP.focus!==F) return;
+      const S=new Set(); for (const r of REG) for (const p of [...r.points, ...r.over]) S.add(p);
+      const seen=new Set([obj]), a=focusYr(obj), b=obj.e ?? obj.b ?? a;
+      for (const k of [...(tx&&tx.links||[]), ...(tx&&tx.back||[]), ...Object.values(tx&&tx.rel||{}).flat()]){
+        const o=KBOBJ.get(k); if (!o || seen.has(o) || !S.has(o) || !geoOf(o)) continue; seen.add(o); F.all.push(o); }
+      const inYears=o=>a!=null && focusYr(o)!=null && focusYr(o)<=b+10 && (o.e ?? o.b ?? focusYr(o))>=a-10;   /* overlaps its years: a life counts from birth to death */
+      F.S=S; F.seen=seen; F.inYears=inYears;
+      F.all.sort((p,q)=>inYears(q)-inYears(p) || (p.level||0)-(q.level||0) || Math.abs(focusYr(p)-a)-Math.abs(focusYr(q)-a));
+      F.all=F.all.slice(0,30); F.own=(F.all.some(inYears) ? F.all.filter(inYears) : F.all).slice(0,8);   /* its own: from its years, when it has any */
+      /* near it: up to 4 of the most important items on the map in these years, inside the box round the item, its events and its path */
+      let bx=null; const add=(lon,lat)=>{ bx = bx ? [Math.min(bx[0],lon),Math.min(bx[1],lat),Math.max(bx[2],lon),Math.max(bx[3],lat)] : [lon,lat,lon,lat]; };
+      for (const o of [obj, ...F.own]){ const g=geoOf(o); if (g) add(g[0],g[1]); }
+      for (const r of routesOf(obj)||[]) for (const [la,lo] of r.p) add(lo,la);
+      if (bx){ const y=MAP.year, [wa,wb]=shownAB(y), lv=shownLevel(), near=[];
+        for (const r of REG){ if (!state.active.has(r.id)) continue;
+          for (const p of r.over){ const g=geoOf(p); if (seen.has(p) || !g || !itemOn(p) || p.level>Math.min(1,lv) || !onMapAt(p,y,wa,wb)) continue;
+            if (g[0]>=bx[0]-2 && g[0]<=bx[2]+2 && g[1]>=bx[1]-2 && g[1]<=bx[3]+2){ seen.add(p); near.push(p); } } }
+        near.sort((p,q)=>(p.level||0)-(q.level||0) || Math.abs(focusYr(p)-y)-Math.abs(focusYr(q)-y)); F.near=near.slice(0,4); }
+      focusBar(); drawMap();
+    };
+    if (id && typeof kbText==="function") kbText(id).then(fill); else fill(null);
+  }
+  focusBar(); drawMap();
+}
+/* opened out: everything the item links to, and the events its own events link to in its years (a conquest's campaigns, their battles) */
+function focusOpen(){
+  const F=MAP.focus; if (!F) return; F.on=!F.on;
+  if (F.on && !F.deep && F.S && typeof kbText==="function"){ F.deep=true;
+    Promise.all(F.own.map(o=>KBOF.get(o)).filter(Boolean).map(kbText)).then(txs=>{
+      if (MAP.focus!==F) return;
+      for (const tx of txs) for (const k of [...(tx&&tx.links||[]), ...Object.values(tx&&tx.rel||{}).flat()]){
+        const o=KBOBJ.get(k); if (!o || F.seen.has(o) || !F.S.has(o) || !geoOf(o) || !F.inYears(o)) continue; F.seen.add(o); F.all.push(o); }
+      F.all=F.all.slice(0,30); focusBar(); drawMap();
+    });
+  }
+  focusBar(); drawMap();
+}
+function focusItems(){ const F=MAP.focus, out=[]; if (geoOf(F.obj)) out.push(F.obj); for (const p of [...(F.on ? F.all : F.own), ...F.near]) if (!out.includes(p)) out.push(p); return out; }
+function focusBar(){
+  const bar=$("mapFocus"); if (!bar) return;
+  const F=MAP.focus; bar.hidden=!F; bar.textContent="";
+  if (F){
+    const nm=F.obj.n||F.obj.name, n=(F.on ? F.all : F.own).length;
+    bar.append(el("span",null, n ? `${nm} and ${n} linked ${n===1?"item":"items"}` : `Only ${nm}`));
+    if (F.on || F.all.length){ const m=el("button",null, F.on ? "Show fewer" : "Show more"); m.type="button"; m.addEventListener("click",focusOpen); bar.append(m); }
+    const x=el("button",null,"Show everything"); x.type="button"; x.addEventListener("click",()=>{ MAP.focus=null; focusBar(); drawMap(); }); bar.append(x);
+  }
+  if (typeof lensCounts==="function") lensCounts();
+}
 function mapItems(){
-  const y=MAP.year, W=winYears(y), lv=shownLevel(), out=[];
+  if (MAP.focus){ MAP.away=new Set(); return focusItems(); }   /* a search's focus: only the item and its own */
+  const y=MAP.year, [wa,wb]=shownAB(y), lv=mapLevel(), out=[];
   for (const r of REG){
     if (!state.active.has(r.id)) continue;
-    if (state.events) for (const p of r.points) if (p.level<=lv && Math.abs(p.y-y)<=W) out.push(p);
+    if (state.events) for (const p of r.points) if (p.level<=lv && p.y>=wa && p.y<=wb) out.push(p);
     for (const p of r.over){
-      if (p!==state.solo && (!state.layers.has(p.layer) || p.level>lv)) continue;
-      if (onMapAt(p,y,W) || (p===state.sel && p.layer==="people" && p.y<=y && y<=(p.e||NOW))) out.push(p);
+      if (p!==state.solo && (!itemOn(p) || p.level>lv)) continue;
+      if (onMapAt(p,y,wa,wb) || (p===state.sel && p.layer==="people" && p.y<=y && y<=(p.e||NOW))) out.push(p);
     }
   }
   /* an open place (a click on a marker opens its place, a second click folds it): what else stands there, from any time,
@@ -367,7 +444,7 @@ function mapItems(){
     for (const r of REG){
       if (!state.active.has(r.id)) continue;
       if (state.events) for (const p of r.points) if (p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
-      for (const p of r.over) if (state.layers.has(p.layer) && p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
+      for (const p of r.over) if (itemOn(p) && p.level<=lv && !has.has(p) && atPlace(p,g)) more.push(p);
     }
     more.sort((a,b)=>(b===state.sel)-(a===state.sel) || a.level-b.level || Math.abs(a.y-y)-Math.abs(b.y-y));
     for (const p of (MAP.open.on ? more.slice(0,16) : more.filter(p=>p===state.sel))){ out.push(p); MAP.away.add(p); }
@@ -378,12 +455,42 @@ const IMG=new Map();
 function img(src){ let im=IMG.get(src); if (!im){ im=new Image(); im.onload=()=>drawMap(); im.src=src; IMG.set(src,im); } return im.complete && im.naturalWidth ? im : null; }
 /* a story step's arrows: routes through waypoints, curved, labelled, drawn in once the map has arrived */
 MAP.routes=null;                                  /* {list:[{p:[[lat,lon],...], t}], t0} */
+/* an open card's arrows: what moved, and where. Drawn by hand for the shared events (approximate paths, simplified);
+   any other item borrows the arrows of the story step that is about it. Each: {p:[[lat,lon],...], t:label} */
+const ITEMROUTES = {
+ "Late Bronze Age collapse":[{p:[[37.5,24.5],[35.2,29.5],[32.8,34.6]],t:"Sea raids on the Levant coast"},{p:[[36.2,27.5],[33.2,29.5],[31.2,31.4]],t:"Raids on the Nile delta"}],
+ "Alexander's conquests":[{p:[[40.76,22.52],[40.2,27.2],[36.84,36.2],[33.27,35.2],[31.2,29.9],[36.36,43.25],[32.54,44.42],[29.93,52.89],[36.76,66.9],[39.65,66.96],[32.8,73.6]],t:"Alexander's march east"},
+   {p:[[32.8,73.6],[24.8,67.8],[26.2,62],[32.19,48.25],[32.54,44.42]],t:"Return to Babylon"}],
+ "Silk Road opens":[{p:[[34.3,108.9],[40.14,94.66],[39.47,75.99],[39.65,66.96],[37.66,62.19],[33.09,44.58],[36.2,36.16]],t:"Overland route west"},{p:[[34.3,108.9],[38.5,100.5],[40.4,71.8],[36.76,66.9]],t:"Zhang Qian's mission"}],
+ "Plague of Justinian":[{p:[[31.04,32.55],[34.5,28.2],[38,26],[41.01,28.98]],t:"From Egypt to Constantinople"},{p:[[41.01,28.98],[37.5,20],[41.9,12.5],[43.3,5.37]],t:"West by sea"}],
+ "Arab conquests":[{p:[[24.47,39.61],[31.78,35.22],[30,31.23],[35.68,10.1],[35.76,-5.83],[39.86,-4.02]],t:"West to Spain"},{p:[[24.47,39.61],[33.09,44.58],[34.2,48.37],[37.66,62.19],[39.65,66.96]],t:"East to the Oxus"},
+   {p:[[33.09,44.58],[29.6,52.5],[26.2,62],[30.2,71.47]],t:"To the Indus"}],
+ "Indian Ocean trade at full reach":[{p:[[-8.96,39.5],[2.04,45.34],[12.8,45.03],[8.89,76.6],[3,100.5],[-2.99,104.76],[23.13,113.26]],t:"Monsoon sea route"},{p:[[27.67,52.34],[21.5,61.5],[8.89,76.6]],t:"Gulf route to India"}],
+ "Mongol conquests":[{p:[[47.2,102.83],[39.65,66.96],[48.5,45.5],[50.45,30.52],[47.9,20.9]],t:"West to Hungary"},{p:[[39.65,66.96],[35.7,51.4],[33.34,44.4],[32.55,35.35]],t:"To Baghdad and Syria"},
+   {p:[[47.2,102.83],[39.9,116.4],[30.25,120.17]],t:"Conquest of China"},{p:[[35.1,129.04],[33.6,130.4]],t:"Japan, two failed invasions"}],
+ "Black Death":[{p:[[42.4,77.2],[48.5,45.5],[45.03,35.38]],t:"From Central Asia"},{p:[[45.03,35.38],[41.01,28.98],[38.19,15.55],[43.3,5.37]],t:"By ship from Caffa"},
+   {p:[[43.3,5.37],[48.86,2.35],[51.5,-0.12],[60.39,5.32]],t:"North across Europe"},{p:[[41.01,28.98],[34.5,28.5],[31.2,29.9]],t:"To Egypt"}],
+ "Zheng He's voyages":[{p:[[32.06,118.8],[13.77,109.22],[2.2,102.25],[6.03,80.22],[11.25,75.78],[27.1,56.45]],t:"To Calicut and Hormuz"},{p:[[6.03,80.22],[4,62],[2.04,45.34],[-3.22,40.12]],t:"To East Africa"}],
+ "Columbian Exchange":[{p:[[37.39,-5.98],[28.1,-15.4],[18.5,-69.9]],t:"Horses, wheat, sugar cane, smallpox"},{p:[[19.2,-96.13],[23.13,-82.38],[35,-60],[38.7,-27.2],[37.39,-5.98]],t:"Maize, potatoes, tomatoes, silver"}],
+ "Atlantic slave trade":[{p:[[53.4,-2.99],[36,-15],[5.08,-1.35]],t:"Cloth, guns and metal goods"},{p:[[5.08,-1.35],[8,-35],[18,-76.8]],t:"Middle Passage to the Caribbean"},
+   {p:[[-8.84,13.23],[-12.97,-38.5]],t:"Angola to Brazil"},{p:[[18,-76.8],[38,-50],[53.4,-2.99]],t:"Sugar, tobacco, cotton"}],
+ "Industrialisation begins":[{p:[[53.48,-2.24],[50.63,5.57],[51.45,7.01]],t:"To Belgium and the Ruhr"},{p:[[53.48,-2.24],[48,-40],[42.63,-71.32]],t:"To New England"}],
+};
+let STEPROUTES=null;
+function routesOf(obj){
+  if (!obj) return null;
+  const more=nm=>nm && (ITEMROUTES[nm] || (typeof MOREROUTES!=="undefined" && (MOREROUTES[nm] || ITEMROUTES[SAMEROUTE[nm]] || MOREROUTES[SAMEROUTE[nm]])));
+  const own=more(obj.n||obj.name) || (obj.kb && typeof KBX!=="undefined" && KBX[obj.kb] && more(KBX[obj.kb].chart)); if (own) return own;   /* routes.js: more paths, and cards that reuse one */
+  if (!STEPROUTES){ STEPROUTES=new Map();
+    if (typeof STORYS!=="undefined" && typeof findItem==="function") for (const s of STORYS) for (const st of s.stops||[]) if (st.item && st.m && st.m.length){ const it=findItem(st.item); if (it && !STEPROUTES.has(it)) STEPROUTES.set(it, st.m); } }
+  return STEPROUTES.get(obj)||null;
+}
 function routeView(list, extra, L=0){
   let b=null; const add=(lon,lat)=>{ b = b ? [Math.min(b[0],lon),Math.min(b[1],lat),Math.max(b[2],lon),Math.max(b[3],lat)] : [lon,lat,lon,lat]; };
   for (const r of list) for (const [la,lo] of r.p) add(lo,la);
   if (extra) add(extra[0],extra[1]);
   if (!b) return null;
-  const px=(b[2]-b[0])*.12+2, py=(b[3]-b[1])*.12+2;
+  const px=Math.max((b[2]-b[0])*.12+2, (16-(b[2]-b[0]))/2), py=Math.max((b[3]-b[1])*.12+2, (10-(b[3]-b[1]))/2);   /* at least 16 by 10 degrees, so a short path keeps the places round it */
   const x0=b[0]-px, x1=b[2]+px, y0=b[1]-py, y1=b[3]+py;
   /* L: pixels on the left covered by the story card; fit the box in the rest */
   const k=clampK(Math.min((mapW-L)/Math.max(1e-3,x1-x0), mapH/Math.max(1e-3,y1-y0))*0.92);
@@ -416,7 +523,7 @@ function paintRoutes(ink, surf){
   if (prog<=0){ requestAnimationFrame(drawMap); return; }
   const C = isDark() ? "#ff9a5c" : "#c8410b";
   mctx.save(); mctx.lineCap="round"; mctx.lineJoin="round";
-  const labels=[];
+  const labels=[], ends=new Set();
   for (const r of R.list){
     const P=r.p.map(([la,lo])=>[sx(lo),sy(la)]); if (P.length<2) continue;
     const path=new Path2D(); let len=0;
@@ -435,14 +542,20 @@ function paintRoutes(ink, surf){
     mctx.strokeStyle=surf; mctx.globalAlpha=.85; mctx.lineWidth=5.5; mctx.stroke(path);
     mctx.strokeStyle=C; mctx.globalAlpha=1; mctx.lineWidth=2.6; mctx.stroke(path);
     mctx.setLineDash([]);
+    /* where it starts (and, for a line with no direction, where it ends): a dot, and the place's name (ROUTEFROM in routes.js) once drawn */
+    for (const i of r.line ? [0, P.length-1] : [0]){
+      const q=r.p[i], k=q[0].toFixed(2)+","+q[1].toFixed(2); if (Math.abs(q[1])>=179.8 || ends.has(k)) continue; ends.add(k);
+      mctx.beginPath(); mctx.arc(P[i][0],P[i][1],4.6,0,7); mctx.fillStyle=C; mctx.fill(); mctx.strokeStyle=surf; mctx.lineWidth=2; mctx.stroke();
+      const nm=typeof ROUTEFROM!=="undefined" && ROUTEFROM[k]; if (nm && prog>=1) labels.push({t:nm, cands:[P[i]]});
+    }
     if (prog>=1){
       const E=P[P.length-1], ang=Math.atan2(E[1]-endFrom[1],E[0]-endFrom[0]), h=11;
       const head=new Path2D(); head.moveTo(E[0],E[1]);
       head.lineTo(E[0]-h*Math.cos(ang-.45),E[1]-h*Math.sin(ang-.45)); head.lineTo(E[0]-h*Math.cos(ang+.45),E[1]-h*Math.sin(ang+.45)); head.closePath();
-      mctx.strokeStyle=surf; mctx.lineWidth=3; mctx.stroke(head); mctx.fillStyle=C; mctx.fill(head);
+      if (!r.line){ mctx.strokeStyle=surf; mctx.lineWidth=3; mctx.stroke(head); mctx.fillStyle=C; mctx.fill(head); }   /* a line (a railway, a road) has no direction */
       if (r.t){                                     /* places for the label along the route, middle first */
         const cands=[];
-        if (P.length===2){ for (const f of [.5,.35,.65,.2,.8]){ const a=P[0], b=P[1], dx=b[0]-a[0], dy=b[1]-a[1], bul=4*f*(1-f)*.18;
+        if (P.length===2){ for (const f of [.5,.35,.65,.2,.8]){ const a=P[0], b=P[1], dx=b[0]-a[0], dy=b[1]-a[1], bul=2*f*(1-f)*.18;   /* where the arc is at f: half the control point's pull at the middle */
           cands.push([a[0]+dx*f-dy*bul, a[1]+dy*f+dx*bul]); } }
         else { const pts=[]; for (let i=1;i<P.length;i++){ pts.push([(P[i-1][0]+P[i][0])/2,(P[i-1][1]+P[i][1])/2]); if (i<P.length-1) pts.push(P[i]); }
           const m=(pts.length-1)/2; pts.map((q,i)=>[q,Math.abs(i-m)]).sort((x,y)=>x[1]-y[1]).forEach(([q])=>cands.push(q)); }
@@ -456,38 +569,43 @@ function paintRoutes(ink, surf){
 }
 function paintMarks(cs, ink, surf){
   MAP.marks=[];
-  const y=MAP.year, W=winYears(y), items=mapItems().map(o=>({o, g:geoOf(o)})).filter(m=>m.g);
-  $("mapWin").textContent = (state.events||state.layers.size) && !MAP.small ? `Showing ${fmt(Math.max(START,y-W))} to ${fmt(Math.min(NOW,y+W))}` : "";
+  const y=MAP.year, W=winYears(y), [wa,wb]=shownAB(y), items=mapItems().map(o=>({o, g:geoOf(o)})).filter(m=>m.g);
+  $("mapWin").textContent = (state.events||state.layers.size) && !MAP.small ? `Showing ${fmt(Math.max(START,wa))} to ${fmt(Math.min(NOW,wb))}` : "";
+  placeWin();
   if (!items.length) return;
-  /* most important first, so they keep their place; the rest step aside when they would cover one */
-  items.sort((a,b)=>(b.o===state.sel)-(a.o===state.sel) || MAP.away.has(a.o)-MAP.away.has(b.o) || a.o.level-b.o.level || Math.abs(a.o.y-y)-Math.abs(b.o.y-y));
+  /* most important first, so they keep their place; the rest step aside when they would cover one.
+     Choosing an item changes none of this: every marker stays where it was, the chosen one only gains its red ring */
+  items.sort((a,b)=>MAP.away.has(a.o)-MAP.away.has(b.o) || a.o.level-b.o.level || Math.abs(a.o.y-y)-Math.abs(b.o.y-y));
   /* markers grow as the map zooms in, so they stay readable against big territories: up to 2.2 times at 8 times the world view */
   const zf = Math.max(1, Math.min(MAP.small ? 1.6 : 2.2, 1 + 0.45*Math.log2(MAP.view.k/Math.max(1e-6, mapW/360))));
   /* What stands on the map for an item: its own model or portrait, else the shared icon for its kind (levels 1 and 2), else a dot.
      A piece stands on a small base in its topic colour, and the base sits on the place. */
   const KD = typeof KINDS!=="undefined" ? KINDS : {}, KDEF = typeof KIND_DEFAULT!=="undefined" ? KIND_DEFAULT : {}, BOX = typeof ARTBOX!=="undefined" ? ARTBOX : {};
-  const grow = Math.min(1,(zf-1)/1.2), sz = (MAP.small ? .85 : 1)*(.62+.38*grow), placed=[];
+  /* past that, deep in, the land keeps growing under them, so the pieces and their names grow on too: up to twice the size, the names up to half as big again */
+  const deep = MAP.small ? 0 : Math.max(0, Math.log2(MAP.view.k/Math.max(1e-6, mapW/360))-2.67), big = Math.min(2, 1+.3*deep), fs = 1+(big-1)*.5;
+  const grow = Math.min(1,(zf-1)/1.2), sz = (MAP.small ? .85 : 1)*(.62+.38*grow)*big, placed=[];
   const picOf = o => { const P=portraitOf(o), own = ovPicOf(o) || (P ? "people/"+P.f : null); if (own) return [own, o.level===1 ? 60 : 54, 1];
-    if (o.level>2) return null; const k = KD[o.name] || KDEF[o.ov ? o.layer : "event"]; return k ? ["kinds/"+k+".png", o.level===1 ? 50 : 44] : null; };
+    if (o.level>(deep>.6 ? 3 : 2)) return null; const k = KD[o.name] || KDEF[o.ov ? o.layer : "event"]; return k ? ["kinds/"+k+".png", o.level===1 ? 50 : o.level===2 ? 44 : 38] : null; };   /* zoomed into a country, level 3 gets its icon too */
   const hit = (a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1], held=[];
-  const labFont = o => (o.level===1 ? '600 13px' : '600 12px')+' "Barlow Condensed","Arial Narrow",Arial,sans-serif';
+  const labFont = o => `600 ${((o.level===1 ? 13 : 12)*fs).toFixed(1)}px "Barlow Condensed","Arial Narrow",Arial,sans-serif`, lh=8*fs;
   /* where a name can go by its marker: right, left, under */
   const labAt = (m,fx,fy,tw) => { const hw=m.w/2, ty = m.dot ? fy : fy-m.h*.34, under = fy+(m.dot ? m.dot+3 : m.s*.13+4);
-    return [[fx+hw+3, ty-8, fx+hw+7+tw, ty+8], [fx-hw-7-tw, ty-8, fx-hw-3, ty+8], [fx-tw/2-2, under, fx+tw/2+2, under+16]]; };
+    return [[fx+hw+3, ty-lh, fx+hw+7+tw, ty+lh], [fx-hw-7-tw, ty-lh, fx-hw-3, ty+lh], [fx-tw/2-2, under, fx+tw/2+2, under+2*lh]]; };
   /* an item listed under two regions (the same name at the same place) stands once: the chosen one, else the more important */
-  const once=new Set();
+  const okey = m => m.o.name+"|"+m.g[0].toFixed(2)+"|"+m.g[1].toFixed(2), once=new Map();
+  for (const m of items){ const k=okey(m), c=once.get(k); if (!c || m.o===state.sel) once.set(k,m); }
   for (const m of items){
-    const ok=m.o.name+"|"+m.g[0].toFixed(2)+"|"+m.g[1].toFixed(2); if (once.has(ok)) continue; once.add(ok);
+    if (once.get(okey(m))!==m) continue;
     const x0=sx(m.g[0]), y0=sy(m.g[1]); if (x0<-20||x0>mapW+20||y0<-20||y0>mapH+20) continue;
     let P=picOf(m.o); const sel=m.o===state.sel; let mk;
     /* seen from far, a level 2 item with a shared icon keeps it only where its own place is free; in a crowd it is a dot */
-    if (P && !P[2] && m.o.level===2 && !sel && !MAP.away.has(m.o) && grow<.5){ const s=P[1]*sz, b=[x0-s*.5, y0-s*.86, x0+s*.5, y0+s*.1]; if (placed.some(q=>hit(b,q.b))) P=null; }
+    if (P && !P[2] && m.o.level===2 && !MAP.away.has(m.o) && grow<.5){ const s=P[1]*sz, b=[x0-s*.5, y0-s*.86, x0+s*.5, y0+s*.1]; if (placed.some(q=>hit(b,q.b))) P=null; }
     if (P){ const s=P[1]*sz, bb=BOX[P[0]]||[0,0,96,96], k=s/Math.max(bb[2],bb[3]), w=bb[2]*k, h=bb[3]*k;
       mk={o:m.o, x0, y0, pic:P[0], bb, w, h, s, r:Math.max(w,h)*.5, box:(fx,fy)=>[fx-w*.5, fy-h*.86, fx+w*.5, fy+s*.1]}; }
     else { const r = (m.o.level<=2 ? 5 : m.o.level===3 ? 4 : 3.2) + 1.2*grow; mk={o:m.o, x0, y0, dot:r, w:2*r, h:2*r, s:2*r, r:r+3, box:(fx,fy)=>[fx-r-1, fy-r-1, fx+r+1, fy+r+1]}; }
     /* the true place first, then a step aside on a ring; two markers may not cover each other.
        An item from another time stands further out and needs room for its name and year, which it then holds */
-    const aw=MAP.away.has(m.o) && !sel, holds = aw || (sel && !!MAP.open && MAP.open.on), kMax = aw ? 3 : 2; let tw=0;      /* the chosen one holds its name's room too, while its place is open */
+    const aw=MAP.away.has(m.o) && !sel, holds = aw, kMax = aw ? 3 : 2; let tw=0;
     if (holds){ mctx.font=labFont(m.o); tw=mctx.measureText(MAP.away.has(m.o) ? m.o.name+", "+fmt(m.o.y) : m.o.name).width; }
     const st=Math.max(11, mk.w*.9)*(aw ? 1.5 : 1); let pos=null;
     for (let k=0; k<=kMax && !pos; k++){ const n=Math.max(1,6*k); for (let i=0;i<n;i++){ const a=i/n*Math.PI*2, fx=x0+Math.cos(a)*k*st, fy=y0+Math.sin(a)*k*st*.8, b=mk.box(fx,fy);
@@ -525,17 +643,16 @@ function paintMarks(cs, ink, surf){
   mctx.textAlign="left"; mctx.textBaseline="middle"; mctx.lineJoin="round";
   const boxes=MAP.marks.map(m=>m.b).concat(held), maxL = MAP.small ? 6 : 24; let nL=0;
   for (const m of MAP.marks){
-    if (nL>=maxL) break;
     const isSel = m.o===state.sel;
+    if (nL>=maxL && !isSel) continue;
     const away=MAP.away.has(m.o), txt = away ? m.o.name+", "+fmt(m.o.y) : m.o.name;
-    if (!isSel && !away && m.o.level>(MAP.small?1:2)) continue;
-    mctx.font=(m.o.level===1 ? '600 13px' : '600 12px')+' "Barlow Condensed","Arial Narrow",Arial,sans-serif';
-    const tw=mctx.measureText(txt).width, hw=m.w/2, ty = m.dot ? m.fy : m.fy-m.h*.34, under = m.fy+(m.dot ? m.dot+3 : m.s*.13+4);
-    const tries=[[m.fx+hw+3, ty-8, m.fx+hw+7+tw, ty+8], [m.fx-hw-7-tw, ty-8, m.fx-hw-3, ty+8], [m.fx-tw/2-2, under, m.fx+tw/2+2, under+16]];
+    if (!isSel && !away && m.o.level>(MAP.small ? 1 : deep>.6 ? 3 : 2)) continue;
+    mctx.font=labFont(m.o);
+    const tw=mctx.measureText(txt).width, tries=labAt(m,m.fx,m.fy,tw);
     let b = m.lab || tries.find(t=>t[0]>2 && t[2]<mapW-2 && !boxes.some(q=>hit(t,q)));
     if (!b){ if (!isSel) continue; b=tries[0]; }
     boxes.push(b); nL++;
-    mctx.lineWidth=3.5; mctx.strokeStyle=surf; mctx.strokeText(txt,b[0]+2,(b[1]+b[3])/2); mctx.fillStyle=isSel?RED:ink; mctx.fillText(txt,b[0]+2,(b[1]+b[3])/2);
+    mctx.lineWidth=3.5*fs; mctx.strokeStyle=surf; mctx.strokeText(txt,b[0]+2,(b[1]+b[3])/2); mctx.fillStyle=isSel?RED:ink; mctx.fillText(txt,b[0]+2,(b[1]+b[3])/2);
   }
 }
 /* every territory on the map now that a bar stands for, in any region (an empire can span two) */
@@ -586,6 +703,7 @@ function boxView(b){ const [x0,y0,x1,y1]=b; return {x:(x0+x1)/2, y:(y0+y1)/2, k:
 const normN = t => (t||"").toLowerCase().replace(/[^a-z ]/g,"").replace(/\b(the|empire|kingdom|of|dynasty|sultanate|khanate|state|states)\b/g,"").trim();
 function viewFor(obj){
   if (!mapW) return null;
+  const R=routesOf(obj); if (R){ const v=routeView(R, obj.n ? null : geoOf(obj)); if (v) return v; }   /* a card with arrows: frame the arrows */
   if (obj.n){ let b=null; for (const id of obj.r||[]){ const r=REGBOX[id]; if (r) b = b ? [Math.min(b[0],r[0]),Math.min(b[1],r[1]),Math.max(b[2],r[2]),Math.max(b[3],r[3])] : r.slice(); } return b ? boxView(b) : null; }
   if (!obj.pt && MAP.feats){
     /* a state: its own territory on the map when the names match */
@@ -596,9 +714,10 @@ function viewFor(obj){
   if (g){ const span = obj.pt ? 28 : 40; return {x:g[0], y:g[1], k:clampK(Math.max(MAP.view.k, Math.min(mapW,mapH)/span))}; }
   const r=REGBOX[obj.reg]; return r ? boxView(r) : null;
 }
-function followSel(obj){ if (obj && obj.terr) return; if (!MAP.on || !obj || Date.now()<(MAP.noFollow||0)) return; const v=viewFor(obj); if (v) flyTo(v); }
+function followSel(obj){ if (obj && obj.terr) return; if (!MAP.on || !obj || Date.now()<(MAP.noFollow||0)) return; const v=viewFor(obj); if (!v) return;
+  if (MAP.view && mapW) flyArc({...MAP.view}, v, 800, 550, 1000, 480); else flyTo(v); }   /* far: out slowly, across, in; near: a quick glide */
 /* a long move for stories: zoom out slowly until both places are in view, move across quickly, zoom in slowly */
-function flyArc(a, v, T1=800, T2=550, T3=1000){
+function flyArc(a, v, T1=800, T2=550, T3=1000, glide=1300){
   if (!mapW){ MAP.view=v; return; }
   cancelAnimationFrame(flyT);
   if (CALM.matches){ MAP.view=v; paint(); return; }
@@ -608,7 +727,7 @@ function flyArc(a, v, T1=800, T2=550, T3=1000){
   const kMid=Math.min(a.k, v.k, kFit);
   const t0=performance.now();
   if (kMid > .8*Math.min(a.k,v.k)){                  /* close by: one slow glide */
-    const T=1300, step=t=>{ const f=Math.min(1,(t-t0)/T), e=ez(f);
+    const T=glide, step=t=>{ const f=Math.min(1,(t-t0)/T), e=ez(f);
       MAP.view={x:a.x+(v.x-a.x)*e, y:a.y+(v.y-a.y)*e, k:lk(a.k,v.k,e)}; paint(); if (f<1) flyT=requestAnimationFrame(step); };
     flyT=requestAnimationFrame(step); return;
   }
@@ -626,6 +745,7 @@ function setYear(y, opt={}){
   if (!isFinite(y)) return;
   y=Math.max(START,Math.min(NOW,Math.round(y))); if (y===0) y=1;
   if (y<MAP.lo || y>MAP.hi){ MAP.lo=START; MAP.hi=NOW; MAP.stops=MAP.full; drawTicks(); }
+  if (MAP.upto && !opt.keep && !(typeof playT!=="undefined" && playT)) MAP.upto=false;   /* the red line dragged or a year typed: the whole window shows again. A step keeps the order */
   MAP.year=y;
   $("mapYear").textContent = y>=NOW ? "Today" : fmt(y);
   placeThumb(); placeYearLine(); if (opt.scroll) revealYear();
@@ -672,9 +792,54 @@ function placeViewWin(){
   const x0=yearX(a), x1=yearX(b);
   w.style.display="block"; w.style.left=x0+"px"; w.style.width=Math.max(4,x1-x0)+"px";
 }
+/* the lens on the track: the window of years, never narrower than its two ends and the needle need */
+const WGAP=16, WSIZES=[50,100,250,500,1000];
+function winX(){ const [a,b]=winAB(MAP.year), x=yearX(MAP.year);
+  return [Math.min(yearX(Math.max(MAP.lo,a)), x-WGAP), Math.max(yearX(Math.min(MAP.hi,b)), x+WGAP)]; }
+const lensOn = () => MAP.on && MAP.mode!=="off" && typeof state!=="undefined" && (state.events || state.layers.size>0) && sliderEl.clientWidth>0;
+let winKey="";
+function placeWin(){
+  const lens=$("tWin"); if (!lens) return;
+  const on=lensOn(), [a,b] = on ? winAB(MAP.year) : [0,0], [xa,xb] = on ? winX() : [0,0];
+  const key = on ? [xa.toFixed(1),xb.toFixed(1),a,b,!!MAP.win,MAP.upto ? MAP.year : ""].join() : "off";
+  if (key===winKey) return; winKey=key;
+  lens.style.display = on ? "block" : "none"; sliderEl.classList.toggle("haslens",on);
+  const sel=$("winSel"), show=$("tShow"); sel.hidden=!on; show.hidden=!on;
+  if (!on){ sliderEl.classList.remove("lenson"); return; }
+  lens.style.left=xa+"px"; lens.style.width=(xb-xa)+"px";
+  /* the two years, over the ends; one label for both when they would run into each other */
+  const A=Math.max(START,a), B=Math.min(NOW,b), ta=$("tTa"), tb=$("tTb"), W=sliderEl.clientWidth;
+  ta.textContent=fmt(A); tb.textContent = B>=NOW ? "today" : fmt(B);
+  const wa=ta.offsetWidth, wb=tb.offsetWidth, one = xb-xa < (wa+wb)/2+6;
+  if (one){ ta.textContent=spanText(A,B); const w=ta.offsetWidth; ta.style.left=Math.max(w/2,Math.min(W-w/2,(xa+xb)/2))+"px"; }
+  else { ta.style.left=Math.max(wa/2,xa)+"px"; tb.style.left=Math.min(W-wb/2,xb)+"px"; }
+  ta.classList.add("show"); tb.classList.toggle("show",!one);
+  show.textContent=""; show.append("Showing ", el("b",null,spanText(A,Math.min(B,shownAB(MAP.year)[1]))));
+  /* the menu: the app's own choice, a round number of years, or the size the window was dragged to */
+  const n = MAP.win ? MAP.win[0]+MAP.win[1] : 0, even = MAP.win && MAP.win[0]===MAP.win[1], v = !MAP.win ? "auto" : even && WSIZES.includes(n) ? String(n) : "own";
+  if (sel.dataset.v!==v+n){ sel.dataset.v=v+n; sel.textContent="";
+    const opt=(val,t)=>{ const o=el("option",null,t); o.value=val; sel.append(o); };
+    opt("auto","Window: auto"); if (v==="own") opt("own","Window: "+n.toLocaleString("en-US")+" years");
+    for (const k of WSIZES) opt(String(k),"Window: "+k.toLocaleString("en-US")+" years");
+    sel.value=v; }
+}
+/* inside a window the reader has set, the red line moves alone: the window stays where it is and the line stops at its ends */
+function needleTo(y,keep){   /* keep: a step (an arrow key, the next-event buttons) leaves the map showing only as far as the red line, if play left it so */
+  const a=MAP.year-MAP.win[0], b=MAP.year+MAP.win[1];
+  y=Math.round(Math.max(a,MAP.lo,Math.min(b,MAP.hi,y))); if (y===0) y = a>=0 ? 1 : -1;
+  MAP.win=[Math.max(0,y-a),Math.max(0,b-y)]; setYear(y,{scroll:true,keep});
+}
+const ownWin = () => !!MAP.win && lensOn();
+/* an arrow key: one stop along the track, or as far as the end of the reader's window */
+function stepYear(d){
+  const st=MAP.stops, n=st.length-1, y=st[Math.max(0,Math.min(n,stopIndex(st,MAP.year)+d))];
+  if (ownWin()) needleTo(y,true); else setYear(y,{scroll:true});
+}
+function setWin(w){ MAP.win=w; MAP.upto=false; placeWin(); drawMap(); if (typeof lensCounts==="function") lensCounts(); if (typeof saveURL==="function") saveURL(); }
+$("winSel").addEventListener("change",e=>{ const v=e.target.value; if (v==="own") return; setWin(v==="auto" ? null : [v/2,v/2]); e.target.blur(); });
 function placeThumb(){
   const x=yearX(MAP.year);
-  thumbEl.style.left = x+"px"; $("tFill").style.width = Math.max(0,x-PADX)+"px"; placeViewWin();
+  thumbEl.style.left = x+"px"; $("tFill").style.width = Math.max(0,x-PADX)+"px"; placeViewWin(); placeWin();
   const z=zoomedIn();
   ovEl.hidden=!z; $("rangeWrap").classList.toggle("on",z); $("rangeAll").hidden=!z;
   $("rangeLab").textContent = z ? spanText(MAP.lo,MAP.hi) : "Years: all time";
@@ -739,6 +904,19 @@ sliderEl.addEventListener("pointerdown",e=>{
   const r=sliderEl.getBoundingClientRect(), x0=e.clientX-r.left;
   const hold=(mv,up)=>{ const done=ev=>{ sliderEl.removeEventListener("pointermove",mv); sliderEl.removeEventListener("pointerup",done); sliderEl.removeEventListener("pointercancel",done); up(ev); };
     sliderEl.addEventListener("pointermove",mv); sliderEl.addEventListener("pointerup",done); sliderEl.addEventListener("pointercancel",done); };
+  const wh = e.target.closest ? e.target.closest(".twh") : null;
+  if (wh){                                        /* an end of the lens: the years shown on the map start or stop where it is let go */
+    const lo=wh.id==="tWa", W=winYears(MAP.year), w = MAP.win ? MAP.win.slice() : [W,W]; let moved=false;
+    /* time stands still while an end is held, or the lens would slide out from under the pointer */
+    const playing = typeof playT!=="undefined" && !!playT; if (playing) setPlay(false);
+    sliderEl.classList.add("lenson"); wh.classList.add("on");
+    hold(ev=>{ const x=ev.clientX-r.left; if (Math.abs(x-x0)>3) moved=true; if (!moved) return;
+        const y=MAP.year, yy=yearAtFrac(MAP.stops,sliderFrac(x)); if (lo) w[0]=Math.max(0,y-yy); else w[1]=Math.max(0,yy-y);
+        MAP.win=w.slice(); MAP.upto=false; placeWin(); drawMap(); if (typeof lensCounts==="function") lensCounts(); },
+      ev=>{ wh.classList.remove("on"); if (!ev || ev.pointerType!=="mouse") sliderEl.classList.remove("lenson");
+        if (moved && typeof saveURL==="function") saveURL(); if (playing) setPlay(true); });
+    return;
+  }
   if (e.shiftKey){                                /* Shift and drag: pick the years the line covers */
     const band=$("tBand"); let x1=x0; sliderEl.classList.add("pick");
     const yr=x=>yearAtFrac(MAP.stops,sliderFrac(x));
@@ -748,17 +926,41 @@ sliderEl.addEventListener("pointerdown",e=>{
         const ya=yr(Math.min(x0,x1)), yb=yr(Math.max(x0,x1)); if (Math.abs(x1-x0)>6 && yb-ya>=5) pickRange(ya,yb); });
     return;
   }
+  if (e.target===thumbEl && lensOn()){               /* the red line, held: in the reader's own window it moves alone, as far as the ends; in the app's window it carries the window along */
+    const off=x0-yearX(MAP.year), playing = typeof playT!=="undefined" && !!playT; if (playing) setPlay(false);
+    sliderEl.classList.add("drag","needle","lenson");
+    hold(ev=>{ const y=yearAtFrac(MAP.stops,sliderFrac(ev.clientX-r.left-off)); if (MAP.win) needleTo(y); else setYear(y,{scroll:true}); },
+      ev=>{ sliderEl.classList.remove("drag","needle"); if (!ev || ev.pointerType!=="mouse") sliderEl.classList.remove("lenson");
+        if (typeof saveURL==="function") saveURL(); if (playing) setPlay(true); });
+    return;
+  }
   const k=dotNear(x0);
   if (k!=null && typeof gotoStop==="function"){ gotoStop(k); return; }
+  if (e.target.closest && e.target.closest(".tlens")){   /* the body of the lens: a drag carries it through time from where it is, a plain click brings the year to the pointer */
+    const off=x0-yearX(MAP.year); let moved=false; sliderEl.classList.add("drag","lenson");
+    hold(ev=>{ const x=ev.clientX-r.left; if (Math.abs(x-x0)>3) moved=true; if (moved) setYear(yearAtFrac(MAP.stops,sliderFrac(x-off)),{scroll:true}); },
+      ev=>{ sliderEl.classList.remove("drag"); if (!ev || ev.pointerType!=="mouse") sliderEl.classList.remove("lenson"); if (!moved) onSlide(e); });
+    return;
+  }
   sliderEl.classList.add("drag"); onSlide(e); tipAt(e.clientX);
   hold(ev=>{ onSlide(ev); tipAt(ev.clientX); }, ev=>{ sliderEl.classList.remove("drag"); if (!ev || ev.pointerType!=="mouse") sliderEl.classList.remove("tipon"); });
 });
-sliderEl.addEventListener("pointermove",e=>{ if (!e.buttons && e.pointerType==="mouse") tipAt(e.clientX); });
-sliderEl.addEventListener("pointerleave",()=>{ if (!sliderEl.classList.contains("drag")) sliderEl.classList.remove("tipon"); });
+/* over the lens the two labels are its ends; anywhere else the one label is the year under the pointer */
+sliderEl.addEventListener("pointermove",e=>{ if (e.buttons || e.pointerType!=="mouse") return;
+  const inLens = !!(e.target.closest && e.target.closest(".tlens")) || (e.target===thumbEl && lensOn()); sliderEl.classList.toggle("lenson",inLens);
+  if (!inLens) tipAt(e.clientX); });
+/* a double click on an end of the lens gives the window back to the app (the press is held by the track, so the end is told by where it was) */
+sliderEl.addEventListener("dblclick",e=>{ if (!MAP.win || !lensOn()) return;
+  const x=e.clientX-sliderEl.getBoundingClientRect().left, X=winX(); if (!(x>=X[0]-7 && x<=X[0]+10) && !(x>=X[1]-10 && x<=X[1]+7)) return;
+  setWin(null); });
+sliderEl.addEventListener("pointerleave",()=>{ if (!sliderEl.classList.contains("drag")) sliderEl.classList.remove("tipon","lenson"); });
 sliderEl.addEventListener("keydown",e=>{
   const i=stopIndex(MAP.stops,MAP.year), n=MAP.stops.length-1;
   const to = {ArrowRight:i+1,ArrowUp:i+1,ArrowLeft:i-1,ArrowDown:i-1,PageUp:i+10,PageDown:i-10,Home:0,End:n}[e.key];
-  if (to==null) return; e.preventDefault(); setYear(MAP.stops[Math.max(0,Math.min(n,to))],{scroll:true});
+  if (to==null) return; e.preventDefault();
+  if (e.key.startsWith("Arrow")) stepYear((to>i ? 1 : -1)*(e.shiftKey ? 10 : 1));
+  else if (ownWin()) needleTo(MAP.stops[Math.max(0,Math.min(n,to))]);      /* Home and End are then the ends of the window */
+  else setYear(MAP.stops[Math.max(0,Math.min(n,to))],{scroll:true});
 });
 
 /* the year, typed: click the year, type 1453 or 500 BCE, Enter */
@@ -941,13 +1143,32 @@ function endPtr(e){
     }
     setBoxMode(false);
   }
-  if (drag && !drag.box && !drag.pinch && MAP.down && Math.hypot(x-MAP.down[0],y-MAP.down[1])<5){ const mk=markAt(x,y); if (mk){ const g=geoOf(mk.o), fold = mk.o===state.sel && MAP.open && MAP.open.on; MAP.keepYear=true; select(mk.o); MAP.keepYear=false; MAP.open = g ? {g, on:!fold} : null; drawMap(); } else { const t=terrAt(x,y); if (t) clickTerr(t); else if (state.sel) select(null); } }   /* sea or empty land: clear the selection */
+  if (drag && !drag.box && !drag.pinch && MAP.down && Math.hypot(x-MAP.down[0],y-MAP.down[1])<5){ const mk=markAt(x,y); if (mk && MAP.focus && mk.o===MAP.focus.obj) focusOpen(); else if (mk){ const g=geoOf(mk.o), fold = mk.o===state.sel && MAP.open && MAP.open.on; MAP.keepYear=true; select(mk.o); MAP.keepYear=false; MAP.open = g ? {g, on:!fold} : null; drawMap(); } else { const t=terrAt(x,y); if (t) clickTerr(t); else if (state.sel) select(null); } }   /* sea or empty land: clear the selection */
   ptrs.delete(e.pointerId); if (ptrs.size<2 && drag && drag.pinch) drag=null;
   if (!ptrs.size){ drag=null; mapWrap.classList.remove("panning"); }
 }
 mapCanvas.addEventListener("pointerup",endPtr); mapCanvas.addEventListener("pointercancel",endPtr);
 mapCanvas.addEventListener("pointerleave",()=>{ if (!drag) tip.style.display="none"; });
-mapCanvas.addEventListener("wheel",e=>{ e.preventDefault(); const [x,y]=local(e); zoomAt(Math.exp(-e.deltaY*0.0018),x,y); },{passive:false});
+/* the wheel zooms around the pointer. A mouse wheel sends few steps, and on a Mac very small ones (about 4 a notch), so each of its
+   steps counts as a full notch; a trackpad sends a stream of small steps, taken as they come; a pinch arrives as Ctrl and wheel.
+   The two are told apart the way Mapbox GL does it: by the step's size, and by how soon the next one follows */
+{ let type=null, last=0, lastV=0, tm=null, pos=[0,0];
+  const NOTCH=4.000244140625;                     /* Chrome on a Mac: every mouse wheel step is a multiple of this */
+  const go=(v,how)=>{ const z = how==="pinch" ? -v*0.01 : how==="notch" ? -Math.sign(v)*Math.max(Math.abs(v),70)*0.002 : -v*0.0018;
+    zoomAt(Math.exp(Math.max(-.6,Math.min(.6,z))),pos[0],pos[1]); };
+  mapCanvas.addEventListener("wheel",e=>{ e.preventDefault();
+    let v = e.deltaMode===1 ? e.deltaY*40 : e.deltaMode===2 ? e.deltaY*400 : e.deltaY; if (!v) return;
+    pos=local(e);
+    if (e.ctrlKey){ go(v,"pinch"); return; }
+    const now=performance.now(), dt=now-last, sure = e.deltaMode===1 || v%NOTCH===0; last=now;
+    if (sure) type="mouse";
+    else if (Math.abs(v)<4) type="pad";
+    else if (dt>400){                             /* a new move, kind unknown: if nothing follows within 40 ms it was one notch of a wheel */
+      type=null; lastV=v; clearTimeout(tm); tm=setTimeout(()=>{ tm=null; type="mouse"; go(lastV,"notch"); },40); return; }
+    else if (!type){ type = Math.abs(dt*v)<200 ? "pad" : "mouse"; if (tm){ clearTimeout(tm); tm=null; v+=lastV; } }
+    /* a guessed mouse gets the full notch only when its steps come apart, so a trackpad taken for one does not race */
+    go(v, type==="mouse" ? (sure || dt>45 ? "notch" : "mouse") : "pad");
+  },{passive:false}); }
 mapCanvas.addEventListener("dblclick",e=>{ const [x,y]=local(e); zoomAt(e.shiftKey?0.5:2,x,y); });
 function setBoxMode(on){ MAP.boxMode=on; $("mapBox").setAttribute("aria-pressed",on); mapWrap.classList.toggle("boxing",on); }
 $("mapBox").addEventListener("click",()=>setBoxMode(!MAP.boxMode));
@@ -1006,8 +1227,11 @@ function cardBack(){
 const chartSelect = select;
 select = function(obj){
   MAP.open=null;
+  if (MAP.focus && obj!==MAP.focus.obj && !MAP.focus.all.includes(obj) && !MAP.focus.near.includes(obj)){ MAP.focus=null; focusBar(); }   /* a card outside the focus ends it */
   hxPush(obj);
   chartSelect(obj);
+  /* the open card's arrows go on the map and leave with it. A story draws its own, step by step */
+  if (!(typeof story!=="undefined" && story)){ const R=routesOf(obj); MAP.routes = R ? {list:R, t0:performance.now()+900} : null; if (!obj) drawMap(); }
   if (obj){ cardBack(); const h=$("detail").querySelector("h2"); $("liveSay").textContent = h ? h.textContent+", card open" : ""; }
   if (!obj){ saveURL(); return; }
   if (MAP.keepYear || obj.terr){ saveURL(); drawMap(); return; }
@@ -1065,4 +1289,5 @@ if (Q.get("i")){ const h=itemByKey(Q.get("i")), y0=MAP.year;
   if (h){ goTo(h); if (Q.get("y") && MAP.year!==y0){ holdSync(); setYear(y0,{scroll:true}); } } }   /* a link gives its year back, not the item's own */
 drawSpan();
 /* the picked years come back from the address bar */
+{ const m=(Q.get("w")||"").match(/^(\d+),(\d+)$/); if (m){ MAP.win=[Math.min(6000,+m[1]),Math.min(6000,+m[2])]; placeWin(); drawMap(); } }
 { const m=(Q.get("t")||"").match(/^(-?\d+),(-?\d+)$/); if (m){ const a=Math.max(START,+m[1]), b=Math.min(NOW,+m[2]); if (b-a>=5 && MAP.year>=a && MAP.year<=b) setRange(a,b); } }
