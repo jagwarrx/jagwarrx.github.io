@@ -22,6 +22,7 @@
 - [Change the Environment to Change the Actions](https://hmeyy.com/essays/change-the-environment.html): Change the environment and the situation, which changes the constraints, which changes the actions. The levers work on different time scales: minutes, days, months, years.
 - [Coach Wooden](https://hmeyy.com/essays/coach-wooden.html): John Wooden's seven rules for living, and why they still hold.
 - [Constraints Drive Actions](https://hmeyy.com/essays/constraints-drive-actions.html): What you do is mostly decided by the limits you work inside. Treat your traits as constraints to design around, not failings to fix with effort.
+- [Culture, Entertainment and the Need](https://hmeyy.com/essays/culture-entertainment-need.html): We pay not to know what comes next. Entertainment sells safe uncertainty with an ending guaranteed, culture answers it for everyone at once, the feed removes the ending, and improv answers it differently.
 - [Design the Data and the Features Together](https://hmeyy.com/essays/design-together.html): Designing the data is designing what the app can do. Like a language and a program in Lisp, data and features should be designed together, with the interface as a surface on top.
 - [Aim to Be Directionally Correct](https://hmeyy.com/essays/directionally-correct.html): Precision is expensive. Direction is what compounds.
 - [I built my personal system eighteen times](https://hmeyy.com/essays/eighteen-systems.html): Eighteen attempts in a year at a system to run my life. The median lasted four days. What survived had no schema at all.
