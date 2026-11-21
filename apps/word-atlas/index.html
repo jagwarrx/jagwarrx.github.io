@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Atlas · Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/apps/word-atlas/">
+<meta name="description" content="One word across 24 major languages, drawn as a map: the closest word in each, where it came from, when people use it, and the nearby words other languages lack. Runs on Claude with your own key.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Word Atlas · Hari Meyyappan">
+<meta property="og:description" content="One word across 24 major languages, drawn as a map: the closest word in each, where it came from and the nearby words other languages lack.">
+<meta property="og:url" content="https://hmeyy.com/apps/word-atlas/">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../img/logo.png">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../tool.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../../index.html#about">About</a>
+<a href="../../index.html#work">Work</a>
+<a class="on" aria-current="page" href="../../index.html#tools">Tools</a>
+<a class="page" href="../../essays/index.html">Essays</a>
+<a href="../../concepts/index.html">Concepts</a>
+<a href="../../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<main class="main">
+<div class="col app-page chess-page">
+<header class="head">
+<h1>Word Atlas</h1>
+<p class="lede">One word across 24 major languages, drawn as a map. Click any word for where it came from and when people use it.</p>
+</header>
+<div class="wide-frame"><iframe src="app.html" title="Word Atlas"></iframe></div>
+<p class="more"><a href="app.html" data-nostack>Open full screen</a> <span class="meta">(best on a laptop)</span></p>
+<div class="app-side">
+<h2>What it shows</h2>
+<ul class="rb">
+<li><strong>The closest word in each language.</strong> The word you type sits in the middle and each language holds one spoke. Words in other scripts carry a transliteration, so 家 reads jiā.</li>
+<li><strong>Nearby words.</strong> Past each word sit the phrases and near matches that language has. A diamond marks the ones with no match in most other languages.</li>
+<li><strong>Origin and use.</strong> Click a word for where it came from and the context people use it in. From there you can open the related words in that language.</li>
+<li><strong>Language families.</strong> The outer ring names the family each language belongs to.</li>
+</ul>
+<h2>How to use it</h2>
+<ul class="rb">
+<li>The example word, home, opens without a key. Click around it first.</li>
+<li>A new word needs your own Claude API key. The key stays in your browser and goes only to Anthropic.</li>
+<li>Under the search box you can pick the languages and choose faster or more careful answers.</li>
+</ul>
+<h2>What it gets wrong</h2>
+<ul class="rb">
+<li>Claude writes the entries from memory. Etymologies, examples and claims that a word has no match elsewhere can be wrong, so check a dictionary before you quote one.</li>
+</ul>
+<p class="meta">Nov 2026 · HTML · Claude API</p>
+</div>
+<footer>Plain HTML. No tracking.</footer>
+</div>
+</main>
+</div>
+<script src="../../js/stack.js" defer></script>
+</body>
+</html>

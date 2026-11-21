@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#13294b">
+<title>What is the tradeoff?</title>
+<link rel="canonical" href="https://hmeyy.com/apps/tradeoff/app.html">
+<link rel="stylesheet" href="../fonts/plex-sans.css">
+<link rel="icon" href="../../img/logo.png">
+<style>
+/* Layout idea: a ledger for one decision. A navy bar on top, the question in a card, then the two sides
+   in one card (gain under a green band, give up under an orange band), and the verdict last in a navy
+   card with a balance. On a phone a bottom bar jumps between the parts, since the verdict sits at the end. */
+:root {
+  color-scheme: light;
+  --bg: #edf0f4;
+  --card: #ffffff;
+  --field: #ffffff;
+  --ink: #0f172a;
+  --ink-2: #334155;
+  --mut: #5b6678;
+  --line: #c8cfda;
+  --soft: #e4e8ee;
+  --tint: #eef2f7;
+  --bar: #13294b;
+  --bar-ink: #ffffff;
+  --bar-mut: #b7c4da;
+  --gain: #0a6e44;
+  --gain-t: #dcf2e6;
+  --gain-l: #58d39b;
+  --cost: #b03a0a;
+  --cost-t: #fde7da;
+  --cost-l: #ff9b6a;
+  --hero: #101d36;
+  --hero-ink: #ffffff;
+  --hero-mut: #b7c4da;
+  --hero-line: #2b3b5c;
+  --btn: #1d4e9e;
+  --on-btn: #ffffff;
+  --focus: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0c1119;
+    --card: #151b26;
+    --field: #0f141d;
+    --ink: #e7ecf4;
+    --ink-2: #c3cbd8;
+    --mut: #8e99ad;
+    --line: #2b3445;
+    --soft: #212938;
+    --tint: #1b2331;
+    --gain: #58d39b;
+    --gain-t: #123324;
+    --cost: #ff9b6a;
+    --cost-t: #3a2015;
+    --hero: #16233f;
+    --hero-line: #2f4063;
+    --btn: #5b9bff;
+    --on-btn: #08111f;
+    --focus: #8ab4ff;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c1119;
+  --card: #151b26;
+  --field: #0f141d;
+  --ink: #e7ecf4;
+  --ink-2: #c3cbd8;
+  --mut: #8e99ad;
+  --line: #2b3445;
+  --soft: #212938;
+  --tint: #1b2331;
+  --gain: #58d39b;
+  --gain-t: #123324;
+  --cost: #ff9b6a;
+  --cost-t: #3a2015;
+  --hero: #16233f;
+  --hero-line: #2f4063;
+  --btn: #5b9bff;
+  --on-btn: #08111f;
+  --focus: #8ab4ff;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+h1, h2, h3, p, ul { margin: 0; }
+ul { list-style: none; padding: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+button:active { opacity: 0.65; }
+button:disabled { opacity: 0.55; cursor: default; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* top bar */
+.bar { position: relative; background: var(--bar); color: var(--bar-ink); }
+.bar::after, .hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gain-l) 0 50%, var(--cost-l) 50% 100%);
+}
+.bar::after { bottom: 0; }
+.bar .in { max-width: 920px; margin: 0 auto; padding: 11px 14px 15px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 12px; }
+.bar h1 { font-size: 19px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; }
+.bar p { font-size: 13px; color: var(--bar-mut); }
+
+.app { max-width: 920px; margin: 0 auto; padding: 12px 14px 40px; display: flex; flex-direction: column; gap: 12px; }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; }
+
+/* the question */
+.ask { padding: 14px; }
+#form { display: grid; gap: 10px; }
+.fld { display: block; font-size: 12.5px; font-weight: 600; color: var(--mut); margin-bottom: 4px; }
+.fld span { font-weight: 400; margin-left: 4px; }
+#topic, #specifics {
+  display: block;
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+#topic { height: 48px; padding: 0 12px; font-weight: 600; }
+#specifics { min-height: 68px; padding: 9px 12px; line-height: 1.4; resize: vertical; }
+#topic::placeholder, #specifics::placeholder { color: var(--mut); opacity: 0.75; font-weight: 400; }
+#topic:focus-visible, #specifics:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent); }
+.help { font-size: 12.5px; color: var(--mut); margin-top: 4px; }
+.acts { display: flex; gap: 8px; }
+.prim { flex: 1; height: 50px; border: 0; border-radius: 8px; background: var(--btn); color: var(--on-btn); font-size: 16px; font-weight: 700; padding: 0 24px; }
+.ghost { height: 50px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--card); font-size: 15px; font-weight: 600; padding: 0 18px; }
+.ghost.small { height: 44px; font-size: 14px; }
+
+/* examples and recent ones */
+.picks { display: grid; gap: 8px; }
+.picks h2 { font-size: 12.5px; font-weight: 600; color: var(--mut); margin-bottom: 4px; }
+.strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin: 0 -14px; padding: 2px 14px; }
+.strip::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; max-width: 290px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--card); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.chip .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chip[aria-pressed="true"] { border-color: var(--btn); box-shadow: inset 0 0 0 1px var(--btn); background: var(--tint); }
+.chip small { flex: none; font-size: 11.5px; font-weight: 600; color: var(--mut); background: var(--soft); border-radius: 5px; padding: 3px 6px; }
+.linkbtn { flex: none; height: 40px; border: 0; background: transparent; padding: 0 6px; font-size: 12.5px; font-weight: 600; color: var(--mut); text-decoration: underline; text-underline-offset: 3px; }
+
+.status { display: flex; align-items: center; gap: 8px; min-height: 20px; font-size: 13.5px; color: var(--mut); scroll-margin-top: 10px; }
+.status:empty { min-height: 0; }
+.status.warn { color: var(--cost); font-weight: 500; }
+.status.busy::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--gain); animation: pulse 1s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: 0.25; } to { opacity: 1; } }
+
+/* the result */
+#sheet { display: flex; flex-direction: column; gap: 12px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; line-height: 1.2; border-radius: 5px; padding: 4px 8px; background: var(--soft); color: var(--ink-2); white-space: nowrap; }
+.title { display: grid; gap: 6px; justify-items: start; }
+.title h2 { font-size: 22px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; overflow-wrap: anywhere; text-wrap: balance; }
+.spec { font-size: 13.5px; color: var(--mut); border-left: 3px solid var(--line); padding-left: 10px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 4.4em; overflow: auto; }
+
+/* the two sides, as one ledger */
+.led { display: grid; overflow: hidden; scroll-margin-top: 10px; }
+.col { min-width: 0; }
+.col + .col { border-top: 1.5px solid var(--line); }
+.ch { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 12px; }
+.gain .ch { background: var(--gain-t); color: var(--gain); }
+.cost .ch { background: var(--cost-t); color: var(--cost); }
+.ch h3 { font-size: 14px; font-weight: 700; }
+.ch .n { font-size: 12.5px; font-weight: 700; }
+.rows { padding: 1px 12px 2px; }
+.rows li { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 0 8px; padding: 7px 0; border-bottom: 1px solid var(--soft); font-size: 14px; line-height: 1.4; }
+.rows li:last-child { border-bottom: 0; }
+.mk { font-weight: 700; text-align: center; }
+.gain .mk { color: var(--gain); }
+.cost .mk { color: var(--cost); }
+.rows p { color: var(--ink-2); }
+.rows b { font-weight: 600; color: var(--ink); }
+.rows li.plain p { color: var(--ink); }
+.rows li.wait p { color: var(--mut); }
+.rows li.wait .mk { opacity: 0.5; }
+.rows li.new, .note p.new { animation: arrive 0.35s ease-out; }
+@keyframes arrive { from { opacity: 0; transform: translateY(4px); } }
+
+.note { background: var(--tint); border: 1.5px solid var(--soft); border-radius: 10px; padding: 9px 12px 10px; }
+.note h3 { font-size: 12.5px; font-weight: 600; color: var(--mut); margin-bottom: 2px; }
+.note p { font-size: 14px; line-height: 1.4; }
+.note p + p { margin-top: 6px; }
+
+/* the verdict */
+.hero { position: relative; overflow: hidden; background: var(--hero); color: var(--hero-ink); border-radius: 10px; padding: 18px 14px 14px; display: grid; grid-template-columns: minmax(0, 1fr) 104px; grid-template-areas: "head scale" "body body" "more more"; gap: 10px 12px; align-items: center; scroll-margin-top: 10px; }
+.hero::before { top: 0; }
+.vh { grid-area: head; }
+.hero .lab { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 12.5px; font-weight: 700; color: var(--hero-mut); }
+.hero .pill { background: rgba(255, 255, 255, 0.14); color: var(--hero-ink); }
+.hero .pill.lean-gain { background: var(--gain-l); color: #06281a; }
+.hero .pill.lean-cost { background: var(--cost-l); color: #3a1505; }
+.hero .big { font-size: 22px; line-height: 1.18; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; margin-top: 8px; }
+.hero.pending .big { color: var(--hero-mut); font-weight: 500; }
+.hero .body { grid-area: body; font-size: 15px; line-height: 1.45; max-width: 70ch; }
+.hero .more { grid-area: more; display: grid; gap: 10px; border-top: 1.5px solid var(--hero-line); padding-top: 10px; }
+.undo { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; justify-items: start; }
+.undo .q { font-size: 12.5px; font-weight: 700; color: var(--hero-mut); }
+.undo p { grid-column: 1 / -1; font-size: 14px; line-height: 1.4; }
+.askrow { display: grid; gap: 8px; }
+.askrow p { font-size: 14px; line-height: 1.4; }
+.hbtn { height: 44px; padding: 0 16px; border-radius: 8px; border: 1.5px solid var(--hero-line); background: rgba(255, 255, 255, 0.06); color: var(--hero-ink); font-size: 14.5px; font-weight: 600; }
+
+.scale { grid-area: scale; margin: 0; }
+.scale svg { display: block; width: 100%; height: auto; }
+.scale .frame, .scale .string, .scale .bowl, .scale .pivot { vector-effect: non-scaling-stroke; }
+.scale .frame { stroke: var(--hero-ink); stroke-width: 2; stroke-linecap: round; fill: none; }
+.scale .string { stroke: var(--hero-mut); stroke-width: 1; }
+.scale .pivot { fill: var(--hero); stroke: var(--hero-ink); stroke-width: 2; }
+.scale .bowl { stroke-width: 1.5; stroke-linejoin: round; fill-opacity: 0.35; }
+.scale .bowl.gain { fill: var(--gain-l); stroke: var(--gain-l); }
+.scale .bowl.cost { fill: var(--cost-l); stroke: var(--cost-l); }
+.scale .lbl { display: none; font-size: 15px; font-weight: 600; }
+.scale .lbl.gain { fill: var(--gain-l); }
+.scale .lbl.cost { fill: var(--cost-l); }
+.scale .beam { transform-origin: 110px 38px; transform: rotate(var(--tilt, 0deg)); transition: transform 0.9s cubic-bezier(0.3, 1.45, 0.5, 1); }
+.scale .pan { transform: rotate(calc(-1 * var(--tilt, 0deg))); transition: transform 0.9s cubic-bezier(0.3, 1.45, 0.5, 1); }
+.scale.waiting .beam { animation: sway 2.6s ease-in-out infinite alternate; }
+.scale.waiting .pan { animation: unsway 2.6s ease-in-out infinite alternate; }
+@keyframes sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+@keyframes unsway { from { transform: rotate(3deg); } to { transform: rotate(-3deg); } }
+
+.s-actions { display: flex; }
+.s-actions .ghost { flex: 1; }
+.foot { font-size: 12.5px; color: var(--mut); line-height: 1.45; }
+.foot p + p { margin-top: 4px; }
+
+/* bottom bar, phones only */
+.tabs { display: none; }
+
+/* Key box: only on a page that asks for the visitor's own key. */
+.keybox { margin-top: 12px; padding-top: 12px; border-top: 1.5px solid var(--soft); font-size: 13.5px; }
+.kb-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--mut); margin-bottom: 4px; }
+.kb-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.kb-row input[type="password"] { flex: 1; min-width: 180px; height: 46px; border: 1.5px solid var(--line); border-radius: 8px; padding: 0 12px; background: var(--field); font-size: 16px; }
+.kb-check { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.kb-note { color: var(--mut); margin-top: 6px; font-size: 12.5px; line-height: 1.45; }
+.kb-dim { color: var(--mut); }
+.kb-ok { color: var(--gain); font-weight: 600; }
+.kb-err { color: var(--cost); margin-top: 6px; }
+.kb-link { background: none; border: 0; padding: 0; min-height: 44px; text-decoration: underline; color: var(--mut); }
+.kb-model { margin-top: 2px; }
+.kb-model select { height: 42px; padding: 0 10px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--field); }
+.keybox a { color: inherit; }
+.keybox .btn { height: 46px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--btn); color: var(--on-btn); font-weight: 700; }
+
+@media (min-width: 760px) {
+  .bar .in { padding: 14px 24px 18px; }
+  .bar h1 { font-size: 21px; }
+  .bar p { font-size: 14px; }
+  .app { padding: 16px 24px 48px; gap: 14px; }
+  .ask { padding: 16px; }
+  #form { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-areas: "a b" "c b"; gap: 10px 16px; }
+  .fa { grid-area: a; }
+  .fb { grid-area: b; display: flex; flex-direction: column; }
+  .fb #specifics { flex: 1; }
+  .acts { grid-area: c; align-self: end; }
+  .prim { flex: none; min-width: 200px; }
+  .picks > div { display: flex; align-items: center; gap: 10px; }
+  .picks h2 { flex: none; width: 116px; margin: 0; }
+  .strip { flex: 1; flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
+  #sheet { gap: 14px; }
+  .title h2 { font-size: 26px; }
+  .led { grid-template-columns: 1fr 1fr; }
+  .col + .col { border-top: 0; border-left: 1.5px solid var(--line); }
+  .ch { padding: 8px 14px; }
+  .rows { padding: 2px 14px 3px; }
+  .note { padding: 10px 14px 11px; }
+  .hero { padding: 22px 20px 16px; grid-template-columns: minmax(0, 1fr) 176px; grid-template-areas: "head scale" "body scale" "more more"; gap: 10px 28px; }
+  .vh { align-self: end; }
+  .hero .body { align-self: start; }
+  .hero .big { font-size: 28px; }
+  .scale .lbl { display: block; }
+  .askrow { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .s-actions .ghost { flex: none; }
+}
+@media (max-width: 759px) {
+  .app { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .tabs { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--card); border-top: 1.5px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .tabs div { max-width: 560px; margin: 0 auto; height: 56px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tabs button { position: relative; border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; font-weight: 600; color: var(--mut); padding: 0 2px; }
+  .tabs button.cur { color: var(--btn); }
+  .tabs button.cur::before { content: ""; position: absolute; top: -1.5px; left: 50%; width: 36px; height: 3px; margin-left: -18px; background: var(--btn); }
+  .tabs svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scale .beam, .scale .pan { transition: none; animation: none !important; }
+  .rows li.new, .note p.new, .status.busy::before { animation: none; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="in">
+    <h1>What is the tradeoff?</h1>
+    <p>Name a decision. See both sides, then a verdict.</p>
+  </div>
+</header>
+
+<main class="app">
+  <section class="card ask" id="sec-ask">
+    <form id="form" autocomplete="off" novalidate>
+      <div class="fa">
+        <label class="fld" for="topic">What are you weighing?</label>
+        <input id="topic" type="text" maxlength="200" placeholder="Leaving my job to freelance" enterkeyhint="go">
+      </div>
+      <div class="fb">
+        <label class="fld" for="specifics">Your specifics<span>optional</span></label>
+        <textarea id="specifics" rows="2" maxlength="2000" placeholder="Your savings, your goals, what you would be leaving, who depends on you"></textarea>
+        <p class="help">Empty gives a verdict about people in general. Filled in gives a verdict about you.</p>
+      </div>
+      <div class="acts">
+        <button class="prim" id="go" type="submit">Weigh it</button>
+        <button class="ghost" id="stop" type="button" hidden>Stop</button>
+      </div>
+    </form>
+    <div class="keybox" id="keybox" hidden></div>
+  </section>
+
+  <section class="picks">
+    <div>
+      <h2 id="ex-label">Worked examples</h2>
+      <div class="strip" id="examples" role="group" aria-labelledby="ex-label"></div>
+    </div>
+    <div id="recent-row" hidden>
+      <h2 id="re-label">Your recent ones</h2>
+      <div class="strip" id="recent" role="group" aria-labelledby="re-label"></div>
+    </div>
+  </section>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <div id="sheet"></div>
+
+  <footer class="foot">
+    <p>Claude writes this from general knowledge. It does not know your life beyond what you type. Use it to think, and check anything that matters with someone who knows your situation.</p>
+    <p id="privacy">Your recent ones are kept in this browser only.</p>
+  </footer>
+</main>
+
+<nav class="tabs" aria-label="Jump to a part">
+  <div id="tabs">
+    <button type="button" data-go="sec-ask"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M4 18h14M6.5 14.5l8-8 2.5 2.5-8 8H6.5z"/></svg>Decision</button>
+    <button type="button" data-go="sec-trade"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M3.5 7.5h7M7 4v7M11.5 15.5h7"/></svg>Tradeoff</button>
+    <button type="button" data-go="sec-when"><svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M7.5 11.3l2.4 2.4 4.6-5"/></svg>Worth it if</button>
+    <button type="button" data-go="sec-verdict"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 4v14M7 18h8M4 6.5h14M4 6.5l-2 5.5h4zM18 6.5l-2 5.5h4z"/></svg>Verdict</button>
+  </div>
+</nav>
+
+<script src="../claude.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- small helpers ---------- */
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function $(id) { return document.getElementById(id); }
+  function str(v) { return typeof v === "string" ? v.trim() : (typeof v === "number" ? String(v) : ""); }
+  function setAttrs(el, props) {
+    if (!props) return;
+    Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (v == null || v === false) return;
+      if (k === "class") el.setAttribute("class", v);
+      else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    });
+  }
+  function add(el, kid) {
+    if (kid == null || kid === false || kid === "") return;
+    if (Array.isArray(kid)) { kid.forEach(function (k) { add(el, k); }); return; }
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    setAttrs(el, props);
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function s(tag, props) {
+    var el = document.createElementNS(SVGNS, tag);
+    setAttrs(el, props);
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function load(key, fallback) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* storage may be off or full */ }
+  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  /* ---------- what a verdict can say ---------- */
+  var CALL = {
+    yes:     { tilt: -12, general: "Almost always worth it",  you: "Worth it for you" },
+    mostly:  { tilt: -7,  general: "Usually worth it",        you: "Probably worth it for you" },
+    depends: { tilt: 0,   general: "Depends on the person",   you: "Too close to call" },
+    rarely:  { tilt: 7,   general: "Usually not worth it",    you: "Probably not worth it for you" },
+    no:      { tilt: 12,  general: "Not worth it",            you: "Not worth it for you" }
+  };
+  var UNDO = { easy: "Yes.", partly: "Partly.", no: "No." };
+  var MAX_RECENT = 8;
+
+  /* ---------- worked examples, written by hand ---------- */
+  function G(label, text) { return { label: label, text: text }; }
+  function T(text) { return { text: text }; }
+  var EXAMPLES = [
+    {
+      topic: "Starting a company", specifics: "", title: "Starting a company", example: true, done: true,
+      gain: [
+        G("Uncapped upside", "Equity can be worth far more than salary, though rarely."),
+        G("Autonomy", "You choose the problem, the people and the pace."),
+        G("Compressed learning", "You do sales, hiring, product and finance within a couple of years."),
+        G("Meaning", "You build something that wouldn't exist otherwise."),
+        G("Career optionality", "Even failed founders often come out more employable.")
+      ],
+      cost: [
+        G("Reliable income", "Years of below-market pay, and most startups return nothing to founders."),
+        G("Stability", "Your income, identity and mood all hang on one fragile thing."),
+        G("Time and attention", "Relationships, health and hobbies often suffer."),
+        G("Peace of mind", "The responsibility for payroll, investors and customers doesn't switch off."),
+        G("Easier wealth", "A senior job at a good company often beats the typical founder outcome financially.")
+      ],
+      ifs: [
+        T("You have 12 to 18 months of runway, or low costs and no dependents relying on your pay."),
+        T("You have a specific problem you can't stop thinking about, not just \"I want to be a founder.\""),
+        T("You'd consider the time well spent even if it fails."),
+        T("Your fallback of going back to a job is realistic.")
+      ],
+      unless: [
+        T("Money is the main motive, because the typical outcome is worse than employment."),
+        T("Failing would be financially or personally catastrophic."),
+        T("You want freedom. Founders answer to customers, investors and employees.")
+      ],
+      notes: [],
+      undo: { level: "partly", text: "You can go back to a job, and often a better one. The years and the savings you spent do not come back." },
+      verdict: {
+        call: "depends",
+        headline: "Worth it for a minority of people.",
+        text: "It's a good trade if you can survive the likely failure and you'd value the attempt itself. It's a bad one if you need the money or are mainly escaping a job."
+      },
+      ask: "your savings, the idea, and what you'd be leaving"
+    },
+    {
+      topic: "Dropping out of college", specifics: "", title: "Dropping out of college", example: true, done: true,
+      gain: [
+        G("Time", "Up to several years back to work, build or earn."),
+        G("Money", "No more tuition or new debt, plus income sooner."),
+        G("Momentum", "You can go all in on an opportunity that may not wait."),
+        G("Real-world learning", "Some skills, like coding, trades, sales and creative work, grow faster on the job."),
+        G("Relief", "You stop spending energy on something that isn't a fit.")
+      ],
+      cost: [
+        G("The credential", "Many employers, grad schools and visas require a degree."),
+        G("Earnings on average", "Graduates earn noticeably more over a lifetime and are less likely to be unemployed."),
+        G("A safety net", "A degree is cheap insurance if plan A fails."),
+        G("The network", "You lose access to friends, mentors, recruiting pipelines and internships."),
+        G("Structured exploration", "College is a low-stakes time to try things and change direction."),
+        G("Sunk cost", "You keep the debt already taken on, with no degree to show for it.")
+      ],
+      ifs: [
+        T("You have concrete traction, such as a job offer, paying customers, or a field that hires on a portfolio."),
+        T("The debt is growing and the degree won't plausibly pay it back."),
+        T("You can take a leave instead of withdrawing, so the door stays open."),
+        T("College is harming your health and a break is needed.")
+      ],
+      unless: [
+        T("You have no plan beyond \"figure it out.\""),
+        T("You're close to finishing, since the last year carries most of the degree's value."),
+        T("Your target field requires the credential, like medicine, law, engineering or academia."),
+        T("The real problem is the major, the school or burnout, which a transfer, a switch or a gap semester could fix.")
+      ],
+      notes: [T("Famous dropouts mostly left for something already taking off, often from elite schools they could return to. Most dropouts aren't in that position.")],
+      undo: { level: "partly", text: "It is more reversible than it looks. You can often take a leave of absence instead of withdrawing, and many schools take students back." },
+      verdict: {
+        call: "rarely",
+        headline: "Usually not worth it.",
+        text: "It's a good trade only if you're leaving for something specific that's already working. It's a bad one if you're just leaving because college is hard or boring."
+      },
+      ask: ""
+    },
+    {
+      topic: "Publishing a blog", specifics: "", title: "Publishing a blog", example: true, done: true,
+      gain: [
+        G("Clearer thinking", "Writing for readers exposes gaps you'd never notice in your head."),
+        G("A public track record", "Proof of what you know, working for you while you sleep."),
+        G("Serendipity", "Job offers, collaborators and friends find you through posts."),
+        G("A compounding asset", "Old posts keep getting read for years."),
+        G("Ownership", "Unlike social media, the platform and the archive are yours.")
+      ],
+      cost: [
+        G("Time", "A good post takes hours, and consistency takes months."),
+        G("Quick feedback", "Most posts get little or no response, especially at first."),
+        G("Some privacy", "Your views are public, searchable and permanent."),
+        G("Comfort", "You risk criticism, being wrong in public, or cringing at old posts."),
+        G("Focus", "It can become a way to avoid your main work.")
+      ],
+      ifs: [
+        T("You'd value the writing even if nobody read it."),
+        T("You work in a field where demonstrated thinking matters, like tech, research, writing or consulting."),
+        T("You can commit to a sustainable pace, even one post a month."),
+        T("You have things you keep explaining to people over and over.")
+      ],
+      unless: [
+        T("You're counting on income, since ads and subscriptions pay off for very few."),
+        T("You'll measure success by traffic in the first six months."),
+        T("Your employer or field punishes public opinions."),
+        T("Perfectionism will keep you from ever publishing.")
+      ],
+      notes: [T("The most common failure is quitting after five posts, not bad writing. If you start, set the bar low enough that you'll keep going.")],
+      undo: { level: "easy", text: "You can stop at any time. What you already published stays public and searchable." },
+      verdict: {
+        call: "yes",
+        headline: "Almost always worth it.",
+        text: "The downside is small and capped, while the upside is open-ended. It's a bad trade only if you need it to make money or draw an audience quickly."
+      },
+      ask: ""
+    }
+  ];
+
+  /* ---------- state ---------- */
+  var recents = load("wit.recent", []);
+  if (!Array.isArray(recents)) recents = [];
+  var current = clone(EXAMPLES[0]);
+  var running = false;       // a call to Claude is open
+  var liveRes = null;        // the result that call is filling
+  var ctl = null;
+  var shown = null;          // counts already drawn for liveRes, so only new lines fade in
+  var tiltDrawn = "";        // the verdict the balance last settled on
+
+  function blank(topic, specifics) {
+    return { topic: topic, specifics: specifics, title: "", example: false, done: false,
+      gain: [], cost: [], ifs: [], unless: [], notes: [], undo: null, verdict: null, ask: "" };
+  }
+  function list(res, key) { return Array.isArray(res[key]) ? res[key].filter(function (x) { return x && str(x.text); }) : []; }
+  function nameOf(res) { return str(res.title) || str(res.topic); }
+  function sameRun(a, b) { return str(a.topic).toLowerCase() === str(b.topic).toLowerCase() && str(a.specifics) === str(b.specifics); }
+
+  /* ---------- status ---------- */
+  function setStatus(text, warn) {
+    var el = $("status");
+    el.textContent = text || "";
+    el.className = "status" + (warn ? " warn" : "") + (running && !warn ? " busy" : "");
+  }
+  function setBusy(on) {
+    running = on;
+    $("go").disabled = on;
+    $("go").textContent = on ? "Weighing" : "Weigh it";
+    $("stop").hidden = !on;
+  }
+
+  /* ---------- chips ---------- */
+  function renderChips() {
+    var ex = $("examples");
+    ex.textContent = "";
+    EXAMPLES.forEach(function (e) {
+      ex.append(h("button", { type: "button", class: "chip", "aria-pressed": current.example && current.topic === e.topic ? "true" : "false",
+        onclick: function () {
+          show(clone(e));
+          $("topic").value = "";
+          setStatus("A worked example, written by hand. Type your own decision and choose Weigh it.");
+        } }, h("span", { class: "nm" }, e.topic)));
+    });
+    var re = $("recent");
+    re.textContent = "";
+    $("recent-row").hidden = !recents.length;
+    recents.forEach(function (r) {
+      re.append(h("button", { type: "button", class: "chip", title: nameOf(r), "aria-pressed": !current.example && sameRun(current, r) ? "true" : "false",
+        onclick: function () { show(clone(r)); setStatus(""); } }, h("span", { class: "nm" }, nameOf(r)), str(r.specifics) && h("small", null, "for you")));
+    });
+    if (recents.length) {
+      re.append(h("button", { type: "button", class: "linkbtn", onclick: function () {
+        recents = [];
+        save("wit.recent", recents);
+        renderChips();
+      } }, "Forget these"));
+    }
+  }
+  function show(res) {
+    if (running) stop(true);
+    current = res;
+    $("topic").value = str(res.topic);
+    $("specifics").value = str(res.specifics);
+    renderAll();
+    reveal();
+  }
+  function remember(res) {
+    var copy = clone(res);
+    copy.example = false;
+    recents = [copy].concat(recents.filter(function (r) { return !sameRun(r, copy); })).slice(0, MAX_RECENT);
+    save("wit.recent", recents);
+  }
+
+  /* ---------- moving around the page ---------- */
+  function calm() {
+    try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
+  }
+  function jump(el) {
+    if (!el) return;
+    try { el.scrollIntoView({ block: "start", behavior: calm() ? "auto" : "smooth" }); } catch (e) { el.scrollIntoView(); }
+  }
+  // Bring the result into view when it sits below the fold, as it does on a phone.
+  function reveal() {
+    var top = $("status").getBoundingClientRect().top;
+    if (top < 0 || top > window.innerHeight * 0.55) jump($("status"));
+  }
+  var PARTS = ["sec-ask", "sec-trade", "sec-when", "sec-verdict"];
+  var spyQueued = false;
+  function spy() {
+    spyQueued = false;
+    var cur = PARTS[0];
+    var line = window.innerHeight * 0.4;
+    PARTS.forEach(function (id) { var el = $(id); if (el && el.getBoundingClientRect().top <= line) cur = id; });
+    var doc = document.documentElement;
+    if (window.innerHeight + window.scrollY >= doc.scrollHeight - 4 && $("sec-verdict")) cur = "sec-verdict";
+    $("tabs").querySelectorAll("button").forEach(function (b) {
+      var on = b.getAttribute("data-go") === cur;
+      b.classList.toggle("cur", on);
+      if (on) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+    });
+  }
+  function queueSpy() {
+    if (spyQueued) return;
+    spyQueued = true;
+    (window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); })(spy);
+  }
+
+  /* ---------- the result ---------- */
+  // A label runs into its sentence on the same line, so it ends like one.
+  function runIn(label) {
+    var t = str(label).trim();
+    return !t || /[.!?:]$/.test(t) ? t : t + ".";
+  }
+  function column(res, key, cls, mark, title, before) {
+    var items = list(res, key);
+    var live = running && res === liveRes;
+    var ul = h("ul", { class: "rows" });
+    items.forEach(function (it, i) {
+      var lab = runIn(it.label);
+      var cl = (lab ? "" : "plain") + (before && i >= (before[key] || 0) ? " new" : "");
+      ul.append(h("li", { class: cl.trim() || null },
+        h("span", { class: "mk", "aria-hidden": "true" }, mark),
+        h("p", null, lab && h("b", null, lab), lab && " ", str(it.text))));
+    });
+    if (!items.length) {
+      ul.append(h("li", { class: "wait" }, h("span", { class: "mk", "aria-hidden": "true" }, mark),
+        h("p", null, live ? "Waiting for Claude" : "Nothing arrived for this part")));
+    }
+    return h("div", { class: "col " + cls },
+      h("header", { class: "ch" }, h("h3", null, title),
+        items.length ? h("span", { class: "n", "aria-label": items.length + " items" }, String(items.length)) : null),
+      ul);
+  }
+  function ledger(res, id, label, a, b, before) {
+    return h("section", { class: "card led", id: id, "aria-label": label },
+      column(res, a[0], "gain", a[1], a[2], before),
+      column(res, b[0], "cost", b[1], b[2], before));
+  }
+  function pan(x, side) {
+    var g = s("g", { class: "pan" },
+      s("line", { class: "string", x1: x, y1: 38, x2: x - 20, y2: 86 }),
+      s("line", { class: "string", x1: x, y1: 38, x2: x + 20, y2: 86 }),
+      s("path", { class: "bowl " + side, d: "M" + (x - 24) + " 86 H" + (x + 24) + " Q" + x + " 110 " + (x - 24) + " 86 Z" }));
+    g.style.transformOrigin = x + "px 38px";
+    return g;
+  }
+  function callLabel(res) {
+    var call = res.verdict ? (CALL[str(res.verdict.call)] || CALL.depends) : null;
+    return call ? (str(res.specifics) ? call.you : call.general) : "";
+  }
+  function balance(res) {
+    var v = res.verdict;
+    var live = running && res === liveRes;
+    var call = v ? (CALL[str(v.call)] || CALL.depends) : null;
+    var label = callLabel(res) || (live ? "Still weighing" : "No verdict");
+    var svg = s("svg", { viewBox: "0 0 220 152", role: "img", "aria-label": "A balance with gain on the left and give up on the right. " + label + "." },
+      s("line", { class: "frame", x1: 84, y1: 132, x2: 136, y2: 132 }),
+      s("line", { class: "frame", x1: 110, y1: 132, x2: 110, y2: 38 }),
+      s("g", { class: "beam" },
+        s("line", { class: "frame", x1: 34, y1: 38, x2: 186, y2: 38 }),
+        pan(34, "gain"), pan(186, "cost")),
+      s("circle", { class: "pivot", cx: 110, cy: 38, r: 4 }),
+      s("text", { class: "lbl gain", x: 34, y: 148, "text-anchor": "middle" }, "gain"),
+      s("text", { class: "lbl cost", x: 186, y: 148, "text-anchor": "middle" }, "give up"));
+    if (call) {
+      var key = nameOf(res) + "|" + str(res.specifics) + "|" + str(v.call);
+      var tilt = call.tilt + "deg";
+      if (key === tiltDrawn) svg.style.setProperty("--tilt", tilt);
+      else {
+        // Start level, then let the beam settle to where the verdict puts it.
+        tiltDrawn = key;
+        svg.style.setProperty("--tilt", "0deg");
+        var raf = window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); };
+        raf(function () { raf(function () { svg.style.setProperty("--tilt", tilt); }); });
+      }
+    }
+    return h("figure", { class: "scale" + (!v && live ? " waiting" : "") }, svg);
+  }
+  function verdictBlock(res) {
+    var v = res.verdict;
+    var live = running && res === liveRes;
+    var personal = !!str(res.specifics);
+    var call = v ? (CALL[str(v.call)] || CALL.depends) : null;
+    var lean = call ? (call.tilt < 0 ? " lean-gain" : (call.tilt > 0 ? " lean-cost" : "")) : "";
+    var head = h("div", { class: "vh" },
+      h("p", { class: "lab" }, h("span", { id: "v-title" }, personal ? "Verdict, for you" : "Verdict"),
+        call && h("span", { class: "pill" + lean }, callLabel(res))),
+      h("p", { class: "big" }, v ? (str(v.headline) || callLabel(res) + ".") : (live ? "Weighing it up" : "No verdict arrived")));
+    var more = h("div", { class: "more" });
+    if (res.undo && str(res.undo.text)) {
+      add(more, h("div", { class: "undo" },
+        h("span", { class: "q" }, "Can you undo it?"),
+        h("span", { class: "pill" }, (UNDO[str(res.undo.level)] || UNDO.partly).replace(".", "")),
+        h("p", null, str(res.undo.text))));
+    }
+    if (v && str(res.ask) && !live) {
+      add(more, h("div", { class: "askrow" },
+        h("p", null, "A sharper verdict needs " + str(res.ask) + "."),
+        h("button", { type: "button", class: "hbtn", onclick: function () {
+          $("topic").value = str(res.topic);
+          jump($("sec-ask"));
+          try { $("specifics").focus({ preventScroll: true }); } catch (e) { $("specifics").focus(); }
+        } }, personal ? "Change your specifics" : "Add your specifics")));
+    }
+    return h("section", { class: "hero" + (v ? "" : " pending"), id: "sec-verdict", "aria-labelledby": "v-title" },
+      head, balance(res), v && str(v.text) && h("p", { class: "body" }, str(v.text)), more.childNodes.length ? more : null);
+  }
+  function renderSheet() {
+    var res = current;
+    var live = running && res === liveRes;
+    var before = live ? (shown || {}) : null;
+    var el = $("sheet");
+    var kind = res.example ? "Worked example, written by hand"
+      : (str(res.specifics) ? "Weighed for you" : "Weighed for people in general");
+    el.textContent = "";
+    add(el, h("header", { class: "title" },
+      h("span", { class: "pill" }, kind),
+      h("h2", null, nameOf(res)),
+      str(res.specifics) && h("p", { class: "spec" }, str(res.specifics))));
+    add(el, ledger(res, "sec-trade", "The tradeoff",
+      ["gain", "+", "What you gain"], ["cost", "−", "What you give up"], before));
+    add(el, ledger(res, "sec-when", "When it is worth it",
+      ["ifs", "✓", "Worth it if"], ["unless", "✗", "Not worth it if"], before));
+    var notes = list(res, "notes");
+    if (notes.length) {
+      add(el, h("section", { class: "note" }, h("h3", null, "Worth knowing"),
+        notes.map(function (n, i) { return h("p", { class: before && i >= (before.notes || 0) ? "new" : null }, str(n.text)); })));
+    }
+    add(el, verdictBlock(res));
+    if (!live) {
+      add(el, h("div", { class: "s-actions" },
+        h("button", { type: "button", class: "ghost small", id: "copy", onclick: copyMarkdown }, "Copy as Markdown")));
+    }
+    if (live) {
+      shown = { gain: list(res, "gain").length, cost: list(res, "cost").length, ifs: list(res, "ifs").length,
+        unless: list(res, "unless").length, notes: notes.length };
+    }
+    queueSpy();
+  }
+  function renderAll() {
+    renderChips();
+    renderSheet();
+  }
+
+  /* ---------- copy ---------- */
+  function toMarkdown(res) {
+    var out = ["# What is the tradeoff: " + nameOf(res), ""];
+    if (str(res.specifics)) out.push("My specifics: " + str(res.specifics).replace(/\s*\n\s*/g, " "), "");
+    var part = function (title, key, labelled) {
+      var items = list(res, key);
+      if (!items.length) return;
+      out.push("## " + title);
+      items.forEach(function (it) { out.push("- " + (labelled && str(it.label) ? "**" + str(it.label) + ":** " : "") + str(it.text)); });
+      out.push("");
+    };
+    part("What you gain", "gain", true);
+    part("What you give up", "cost", true);
+    part("It is worth it if", "ifs", false);
+    part("It is not worth it if", "unless", false);
+    var notes = list(res, "notes");
+    if (notes.length) { out.push("## Worth knowing"); notes.forEach(function (n) { out.push(str(n.text)); }); out.push(""); }
+    if (res.undo && str(res.undo.text)) out.push("## Can you undo it?", (UNDO[str(res.undo.level)] || UNDO.partly) + " " + str(res.undo.text), "");
+    if (res.verdict) {
+      out.push("## Verdict", "**" + str(res.verdict.headline) + "** " + str(res.verdict.text), "");
+      if (str(res.ask)) out.push("A sharper verdict needs " + str(res.ask) + ".", "");
+    }
+    return out.join("\n").trim() + "\n";
+  }
+  function copyMarkdown() {
+    var btn = $("copy");
+    var done = function (label) {
+      if (!btn) return;
+      btn.textContent = label;
+      setTimeout(function () { if (btn.isConnected) btn.textContent = "Copy as Markdown"; }, 1800);
+    };
+    try {
+      navigator.clipboard.writeText(toMarkdown(current)).then(function () { done("Copied"); }, function () { done("Copy was blocked"); });
+    } catch (e) { done("Copy was blocked"); }
+  }
+
+  /* ---------- asking Claude ---------- */
+  // On a page that carries the visitor's own key (window.Claude from claude.js) the call goes straight
+  // to Anthropic. Everywhere else it goes through the host page's sample capability.
+  var SITE = !!(window.Claude && typeof window.Claude.stream === "function");
+  var ERR = {
+    not_granted: "Claude is not allowed on this page, so new decisions are off. The examples and your recent ones still work.",
+    sampling_disabled: "Claude is not available for this account, so new decisions are off.",
+    not_declared: "This page is not set up to ask Claude yet.",
+    capability_disabled: "This does not work in this view. Open the page in Claude and try again.",
+    capability_removed: "This does not work in this view. Open the page in Claude and try again.",
+    rate_limited: "Too many requests for now. Wait a minute, then try again.",
+    session_expired: "You are signed out. Sign in to Claude again, then try again.",
+    refused: "Claude declined this one. Try wording the decision differently.",
+    empty_completion: "Claude sent nothing back. Try again.",
+    prompt_too_large: "That is too long. Shorten the decision or your specifics.",
+    invalid_json: "Claude replied in a form this page could not read. Try again."
+  };
+  var DROPPED = "The connection to Claude dropped. Try again.";
+  var NO_CLAUDE = "This needs Claude, and it is not available in this view. Open the page in Claude to use it.";
+  var lastCost = 0;
+
+  function siteSample(input, opts) {
+    opts = opts || {};
+    return window.Claude.stream({
+      messages: [{ role: "user", content: input }],
+      maxTokens: 6000,
+      effort: "medium",
+      signal: opts.signal,
+      onText: function (delta, full) { if (opts.onText) opts.onText({ text: full, delta: delta }); }
+    }).then(function (r) {
+      lastCost = r.cost || 0;
+      return { text: r.text, truncated: r.stopReason === "max_tokens" };
+    }, function (e) {
+      if (e && e.name === "AbortError") throw { code: "cancelled" };
+      ERR.site = (e && e.message) || DROPPED;
+      throw { code: "site" };
+    });
+  }
+  var samplePromise = null;
+  function getSample() {
+    if (SITE) return Promise.resolve(siteSample);
+    if (!window.claude || typeof window.claude.use !== "function") return Promise.resolve(null);
+    if (!samplePromise) samplePromise = window.claude.use("sample").catch(function () { return null; });
+    return samplePromise;
+  }
+
+  function buildPrompt(topic, specifics) {
+    var lines = [
+      "You weigh tradeoffs. A person names a decision, a choice or a situation. You say what they gain, what they give up, when the trade is worth it, when it is not, and then you give a verdict.",
+      "",
+      "The decision: " + JSON.stringify(topic),
+      specifics
+        ? "The person's specifics: " + JSON.stringify(specifics)
+        : "The person gave no specifics, so write for people in general.",
+      "",
+      "Reply in JSON Lines only: one complete JSON object per line, no code fence, no text outside the objects. Write the lines in this order:",
+      '{"t":"title","text":"the decision as a short noun phrase, such as Starting a company"}',
+      '{"t":"gain","label":"2 to 4 words","text":"one sentence on what the person gets"}',
+      '{"t":"cost","label":"2 to 4 words","text":"one sentence on what the person gives up"}',
+      '{"t":"if","text":"a concrete condition under which the trade is worth it, as a full sentence that starts with You or Your"}',
+      '{"t":"unless","text":"a concrete condition under which it is not worth it, as a full sentence"}',
+      '{"t":"note","text":"one thing most people miss: a research finding, a base rate, the usual way it fails, or a cheaper option that gets most of the gain"}',
+      '{"t":"undo","level":"easy | partly | no","text":"one or two sentences on whether the choice can be reversed, and what does not come back"}',
+      '{"t":"verdict","call":"yes | mostly | depends | rarely | no","headline":"the verdict in under 10 words, ending with a full stop","text":"two or three sentences: who it is a good trade for, who it is a bad trade for, and why"}',
+      '{"t":"ask","text":"the two or three facts that would most sharpen the verdict, worded to finish the sentence A sharper verdict needs, such as: your savings, the idea, and what you would be leaving"}',
+      "",
+      "How many lines: 1 title, 4 to 6 gain, 4 to 6 cost, 3 to 5 if, 3 to 5 unless, 0 to 2 note, 1 undo, 1 verdict, 0 or 1 ask. Put the most important gain and cost first. The verdict comes after everything except ask.",
+      "",
+      "Rules:",
+      "- call says how the trade comes out: yes means almost always worth it, mostly means usually worth it, depends means worth it for some people and not for others, rarely means usually not worth it, no means not worth it.",
+      "- Take a position. Do not hedge every line. If the answer depends, say what it depends on.",
+      "- Costs are real costs: money, time, risk, relationships, health, options that close. Name the ones people underrate.",
+      "- Use typical outcomes and base rates, not the best case. If you cite research, say only what you are confident of.",
+      specifics
+        ? "- The person gave specifics, so every part is about them. Leave out gains and costs that do not apply to them. Use their numbers and facts. Write each condition as something that is true or not true of them, and say which. Start the verdict headline with For you. Leave out the ask line unless one decisive fact is still missing."
+        : "- Write for people in general, and include the ask line.",
+      "- Plain, concrete English. Short sentences. No em dashes and no semicolons. Do not repeat a label inside its own sentence.",
+      '- If the input is not a decision, a choice or a situation a person could weigh, reply with exactly one line: {"t":"error","text":"one sentence saying what to type instead"}',
+      '- If the input is about harming oneself or another person, do not weigh it. Reply with exactly one line: {"t":"error","text":"one kind sentence saying this is not something to weigh as a tradeoff, and that talking to someone they trust or a local crisis line can help"}'
+    ];
+    return lines.join("\n");
+  }
+  function parseLine(line) {
+    var t = line.trim().replace(/,$/, "");
+    if (t.charAt(0) !== "{") return null;
+    try { return JSON.parse(t); } catch (e) { return null; }
+  }
+  function take(res, o) {
+    if (!o || typeof o !== "object") return false;
+    var t = str(o.t), text = str(o.text);
+    if (t === "error") { res.error = text || "That is not something this page can weigh. Type a decision or a choice."; return true; }
+    if (t === "verdict") {
+      if (!text && !str(o.headline)) return false;
+      res.verdict = { call: CALL[str(o.call)] ? str(o.call) : "depends", headline: str(o.headline), text: text };
+      return true;
+    }
+    if (!text) return false;
+    if (t === "title") res.title = text.replace(/[.\s]+$/, "").slice(0, 120);
+    else if (t === "gain" || t === "cost") { if (res[t].length >= 8) return false; res[t].push({ label: str(o.label).replace(/[:.\s]+$/, ""), text: text }); }
+    else if (t === "if") { if (res.ifs.length >= 7) return false; res.ifs.push({ text: text }); }
+    else if (t === "unless") { if (res.unless.length >= 7) return false; res.unless.push({ text: text }); }
+    else if (t === "note") { if (res.notes.length >= 3) return false; res.notes.push({ text: text }); }
+    else if (t === "undo") res.undo = { level: UNDO[str(o.level)] ? str(o.level) : "partly", text: text };
+    else if (t === "ask") res.ask = text.replace(/^a sharper verdict needs\s*/i, "").replace(/[.\s]+$/, "");
+    else return false;
+    return true;
+  }
+
+  function run() {
+    if (running) return;
+    var topic = $("topic").value.trim(), specifics = $("specifics").value.trim();
+    if (!topic) { setStatus("Type what you are weighing first.", true); $("topic").focus(); return; }
+    if (SITE && !window.Claude.getKey()) {
+      setStatus("Add your Claude API key first. The box is under the Weigh it button.", true);
+      jump($("sec-ask"));
+      var keyIn = $("keybox").querySelector("input");
+      if (keyIn) keyIn.focus();
+      return;
+    }
+    setBusy(true);
+    setStatus("Getting Claude ready.");
+    getSample().then(function (sample) {
+      if (!sample) { setBusy(false); setStatus(NO_CLAUDE, true); return; }
+      var prev = current;
+      var res = blank(topic, specifics);
+      current = res;
+      liveRes = res;
+      shown = null;
+      lastCost = 0;
+      ctl = typeof AbortController === "function" ? new AbortController() : null;
+      renderAll();
+      setStatus("Asking Claude. The verdict comes last, at the bottom.");
+      reveal();
+      var seen = 0;
+      var eat = function (text, final) {
+        if (!text) return;
+        var lines = text.split("\n");
+        var upto = final ? lines.length : lines.length - 1;
+        var changed = false;
+        for (var i = seen; i < upto; i++) { if (take(res, parseLine(lines[i]))) changed = true; }
+        if (upto > seen) seen = upto;
+        if (changed && current === res && liveRes === res && !res.error) renderSheet();
+      };
+      sample(buildPrompt(topic, specifics), {
+        modelTier: "default",
+        signal: ctl ? ctl.signal : undefined,
+        onText: function (u) { if (liveRes === res) eat(u && u.text, false); }
+      }).then(function (r) {
+        eat(r && r.text, true);
+        return r && r.truncated ? "truncated" : "";
+      }, function (e) {
+        if (e && e.text) eat(e.text, true);
+        return (e && e.code) || "upstream_error";
+      }).then(function (code) {
+        var mine = liveRes === res;
+        if (mine) { liveRes = null; ctl = null; setBusy(false); }
+        var got = res.gain.length + res.cost.length + res.ifs.length + res.unless.length;
+        if (res.left) return;                       // the reader moved to another sheet while this ran
+        if (res.error || (!got && !res.verdict)) {
+          if (current === res) current = prev;
+          renderAll();
+          setStatus(res.error || (code === "cancelled" ? "Stopped." : (ERR[code] || DROPPED)), code !== "cancelled" || !!res.error);
+          return;
+        }
+        res.done = true;
+        remember(res);
+        renderAll();
+        if (code === "cancelled") setStatus("Stopped. Kept what had arrived.");
+        else if (code === "truncated") setStatus("The answer stopped early. Kept what had arrived.", true);
+        else if (code) setStatus((ERR[code] || DROPPED) + " Kept what had arrived.", true);
+        else if (!res.verdict) setStatus("Claude sent no verdict this time. Choose Weigh it to try again.", true);
+        else setStatus("Weighed. The verdict is at the bottom." + (SITE && lastCost ? " This run cost about " + window.Claude.money(lastCost).replace("<1", "under 1") + " on your key." : ""));
+      });
+    });
+  }
+  function stop(leaving) {
+    if (!running) return;
+    if (leaving && liveRes) liveRes.left = true;
+    var c = ctl;
+    liveRes = null;
+    ctl = null;
+    setBusy(false);
+    if (c) { try { c.abort(); } catch (e) { /* nothing to stop */ } }
+  }
+
+  /* ---------- wiring ---------- */
+  $("form").addEventListener("submit", function (ev) { ev.preventDefault(); run(); });
+  $("specifics").addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); run(); }
+  });
+  $("stop").addEventListener("click", function () {
+    var res = liveRes;
+    if (!res) return;
+    var got = res.gain.length + res.cost.length + res.ifs.length + res.unless.length;
+    // With nothing on the sheet yet there is nothing to keep, so the call's own ending puts the old sheet back.
+    if (ctl) { try { ctl.abort(); } catch (e) { /* nothing to stop */ } }
+    else { stop(false); if (!got) setStatus("Stopped."); }
+  });
+
+  $("tabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("button[data-go]") : null;
+    if (b) jump($(b.getAttribute("data-go")));
+  });
+  window.addEventListener("scroll", queueSpy, { passive: true });
+  window.addEventListener("resize", queueSpy);
+
+  if (SITE) {
+    $("keybox").hidden = false;
+    window.Claude.keyBox($("keybox"));
+    $("privacy").textContent = "Your key and what you type go only to Anthropic. Your recent ones are kept in this browser only.";
+  }
+
+  function start(data) {
+    if (data && data.current && Array.isArray(data.current.gain) && Array.isArray(data.current.cost)) {
+      current = data.current;
+      $("topic").value = str(data.topic);
+      $("specifics").value = str(data.specifics);
+    }
+    renderAll();
+    $("topic").value = current.example ? "" : $("topic").value;
+  }
+  var hot = window.claude && window.claude.hot;
+  if (hot && typeof hot.snapshot === "function") {
+    try {
+      hot.snapshot(function () {
+        return { current: running ? null : current, topic: $("topic").value, specifics: $("specifics").value };
+      });
+    } catch (e) { /* optional */ }
+  }
+  if (hot && typeof hot.ready === "function") hot.ready(start);
+  else start((hot && hot.data) || {});
+})();
+</script>
+</body>
+</html>

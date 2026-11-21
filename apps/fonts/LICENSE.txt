@@ -1,0 +1,7 @@
+Fonts in this folder, served from this site so pages make no request to a font service.
+
+IBM Plex Sans. Copyright 2017 IBM Corp., with Reserved Font Name "Plex".
+Gentium Book Plus. Copyright 2003-2023 SIL International, with Reserved Font Names "Gentium" and "SIL".
+
+Both are licensed under the SIL Open Font License, Version 1.1.
+The licence text is at https://openfontlicense.org/open-font-license-official-text/

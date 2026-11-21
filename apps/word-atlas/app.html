@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Atlas</title>
+<link rel="canonical" href="https://hmeyy.com/apps/word-atlas/app.html">
+<link rel="stylesheet" href="../fonts/plex-sans.css">
+<link rel="stylesheet" href="../fonts/gentium-book-plus.css">
+<link rel="icon" href="../../img/logo.png">
+<style>
+/* Layout idea: a wheel of words. The word you type sits in the middle, each major language holds one
+   spoke, nearby words fan out past it, and an outer ring names the language families. Click a word for its notes. */
+:root {
+  --paper: #f1f3ee;
+  --surface: #fafbf7;
+  --ink: #1a2227;
+  --muted: #58636b;
+  --line: #d3d8cf;
+  --accent: #1c5f6d;
+  --accent-soft: #dbe9ea;
+  --on-accent: #ffffff;
+  --mark: #94590a;
+  --mark-soft: #f3e6cf;
+  --shadow: rgba(20, 30, 35, 0.18);
+  --display: "Gentium Book Plus", "Noto Serif", "Noto Serif Tamil", "Tamil Sangam MN", "Kohinoor Devanagari", "Geeza Pro", "Hiragino Mincho ProN", "Songti SC", Georgia, serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #13181b;
+    --surface: #1a2024;
+    --ink: #e5e8e2;
+    --muted: #97a2a9;
+    --line: #2f393e;
+    --accent: #7dc1cd;
+    --accent-soft: #1f3338;
+    --on-accent: #0e1518;
+    --mark: #dba64f;
+    --mark-soft: #33291a;
+    --shadow: rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #13181b;
+  --surface: #1a2024;
+  --ink: #e5e8e2;
+  --muted: #97a2a9;
+  --line: #2f393e;
+  --accent: #7dc1cd;
+  --accent-soft: #1f3338;
+  --on-accent: #0e1518;
+  --mark: #dba64f;
+  --mark-soft: #33291a;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 72px; }
+h1, h2, h3, h4, p { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.mast { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 26px; }
+.mast h1 { font-family: var(--display); font-size: 1.5rem; font-weight: 700; }
+.mast p { color: var(--muted); font-size: 0.95rem; }
+
+/* Lookup form */
+.lookup { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto; gap: 20px; align-items: end; max-width: 900px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label, .label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.field input {
+  width: 100%; background: transparent; border: 0; border-bottom: 2px solid var(--ink);
+  border-radius: 0; padding: 2px 0 6px;
+}
+.field input::placeholder { color: var(--muted); opacity: 0.7; }
+.field input:focus-visible { outline: none; border-bottom-color: var(--accent); }
+#word { font-family: var(--display); font-size: 2.4rem; line-height: 1.15; }
+#sense { font-size: 1rem; padding-bottom: 12px; border-bottom-width: 1px; border-bottom-color: var(--muted); }
+.btn {
+  border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent);
+  font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.quiet { background: transparent; color: var(--ink); border-color: var(--line); font-weight: 500; padding: 5px 12px; font-size: 0.875rem; }
+.btn.quiet:hover { border-color: var(--muted); filter: none; }
+.btn[hidden] { display: none; }
+.btn[disabled] { opacity: 0.5; cursor: default; }
+
+/* Options */
+.options { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.row > .label { width: 86px; flex: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 3px 12px; font-size: 0.875rem; cursor: pointer; }
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.chip .tag { color: var(--muted); margin-left: 6px; font-size: 0.8rem; }
+details.opts > summary { cursor: pointer; font-size: 0.875rem; color: var(--muted); width: fit-content; }
+details.opts > summary:hover { color: var(--ink); }
+details.opts .inner { display: flex; flex-direction: column; gap: 12px; padding: 12px 0 4px; }
+.addlang { display: flex; gap: 6px; align-items: center; }
+.addlang input { width: 150px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 0.875rem; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg label { padding: 4px 12px; font-size: 0.875rem; cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--accent-soft); font-weight: 500; }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+.hint { color: var(--muted); font-size: 0.85rem; }
+
+.status { min-height: 1.5em; margin-top: 16px; font-size: 0.9rem; color: var(--muted); }
+.status.warn { color: var(--mark); }
+
+/* Graph */
+.graphbox { margin-top: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.gbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; flex: 1; min-width: 0; list-style: none; margin: 0; padding: 0; }
+.legend li { display: flex; align-items: center; gap: 7px; }
+.key { width: 11px; height: 11px; flex: none; }
+.key.k-main { border-radius: 50%; background: var(--accent); }
+.key.k-loose { border-radius: 50%; border: 2px solid var(--mark); }
+.key.k-near { border-radius: 50%; border: 1.5px solid var(--muted); width: 9px; height: 9px; }
+.key.k-only { background: var(--mark); transform: rotate(45deg); width: 9px; height: 9px; }
+.zoom { display: flex; gap: 6px; }
+.scroller { overflow-x: auto; }
+.canvas { position: relative; width: max(100%, 880px); margin: 0 auto; }
+.canvas svg { display: block; width: 100%; height: auto; font-family: var(--display); user-select: none; -webkit-user-select: none; }
+
+.g-edge { stroke: var(--line); stroke-width: 1.3; fill: none; }
+.g-edge.hot { stroke: var(--accent); stroke-width: 1.6; }
+.node { cursor: pointer; outline: none; }
+.node .hit { fill: transparent; }
+.node:hover .hit, .node:focus-visible .hit { fill: var(--accent-soft); }
+.node.sel .hit { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.3; }
+.t-lang { fill: var(--muted); font-family: var(--body); font-size: 11px; }
+.t-word { fill: var(--ink); }
+.t-near { fill: var(--ink); }
+.t-near .rom { fill: var(--muted); font-style: italic; }
+.t-word .rom { fill: var(--muted); font-style: italic; font-size: 0.8em; }
+.c-rom { fill: var(--muted); font-style: italic; }
+.dot { fill: var(--accent); }
+.lang.loose .dot { fill: var(--surface); stroke: var(--mark); stroke-width: 2.2; }
+.lang.pending .dot { fill: var(--line); }
+.lang.pending .t-lang { opacity: 0.65; }
+.nmark { fill: var(--surface); stroke: var(--muted); stroke-width: 1.3; }
+.near.only .nmark { fill: var(--mark); stroke: var(--mark); }
+.near.only .t-near { fill: var(--mark); }
+.near.only .t-near .rom { fill: var(--mark); opacity: 0.8; }
+.fam-arc { stroke: var(--line); stroke-width: 1.6; fill: none; }
+.fam-label { fill: var(--muted); font-family: var(--body); font-size: 11px; }
+.c-disc { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; }
+.center:hover .c-disc, .center:focus-visible .c-disc, .center.sel .c-disc { fill: var(--accent-soft); stroke: var(--accent); }
+.c-word { fill: var(--ink); font-weight: 700; }
+.f-lang { fill: var(--muted); font-family: var(--body); font-size: 11px; }
+.rel .nmark { fill: var(--accent); stroke: var(--accent); }
+.rel.pending .nmark { fill: var(--line); stroke: var(--line); }
+.legend[hidden], .crumbs[hidden] { display: none; }
+.crumbs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; flex: 1; min-width: 0; font-size: 0.9rem; }
+.crumbs button { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.crumbs .here { color: var(--ink); font-weight: 600; font-family: var(--display); font-size: 1.05rem; }
+.crumbs .sep { color: var(--muted); }
+.crumbs .what { color: var(--muted); }
+.pop .btn:not(.quiet) { padding: 7px 14px; font-size: 0.875rem; }
+
+/* Word card */
+.pop {
+  position: absolute; z-index: 3; width: 340px; max-height: 540px; overflow-y: auto;
+  background: var(--paper); border: 1px solid var(--muted); border-radius: 10px;
+  box-shadow: 0 14px 36px var(--shadow); padding: 16px 18px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.pop[hidden] { display: none; }
+.p-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.p-lang { font-weight: 600; font-size: 0.9rem; }
+.p-lang span { font-weight: 400; color: var(--muted); margin-left: 8px; font-size: 0.85rem; }
+.p-word { font-family: var(--display); font-size: 2.2rem; line-height: 1.25; overflow-wrap: anywhere; }
+.p-say { display: flex; flex-wrap: wrap; gap: 2px 12px; font-family: var(--display); margin-top: -8px; }
+.p-say .r { font-style: italic; font-size: 1.15rem; }
+.p-say .i { color: var(--muted); }
+.p-gloss { font-size: 0.95rem; }
+.only-tag { align-self: flex-start; font-size: 0.78rem; font-weight: 600; color: var(--mark); background: var(--mark-soft); border-radius: 4px; padding: 2px 8px; }
+.fit { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--accent); }
+.fit.loose { color: var(--mark); }
+.meter { display: inline-flex; gap: 3px; }
+.meter i { width: 14px; height: 6px; border-radius: 2px; background: var(--line); }
+.meter i.on { background: currentColor; }
+.fit-note { font-size: 0.875rem; color: var(--muted); margin-top: -8px; }
+.block h4 { font-size: 0.78rem; font-weight: 600; color: var(--muted); margin-bottom: 2px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.block p { font-size: 0.925rem; }
+.cert { font-weight: 500; font-size: 0.72rem; color: var(--mark); background: var(--mark-soft); border-radius: 4px; padding: 1px 7px; }
+.p-near { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.p-near button {
+  width: 100%; text-align: left; background: transparent; border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; display: flex; flex-direction: column;
+}
+.p-near button:hover { border-color: var(--accent); }
+.p-near .w { font-family: var(--display); font-size: 1.1rem; }
+.p-near .w i { color: var(--muted); font-size: 0.95rem; margin-left: 8px; }
+.p-near .g { font-size: 0.82rem; color: var(--muted); }
+.p-near .only .w { color: var(--mark); }
+.ex { border-left: 3px solid var(--line); padding-left: 10px; margin-top: 6px; }
+.ex .n { font-family: var(--display); font-size: 1.15rem; line-height: 1.4; }
+.ex .r { font-family: var(--display); font-style: italic; color: var(--muted); }
+.ex p { font-size: 0.9rem; }
+.more { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font-size: 0.875rem; text-align: left; }
+
+/* Overview under the graph */
+.overview { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px 36px; }
+.overview .block h4 { font-size: 0.8rem; }
+.overview .block p { font-size: 1rem; max-width: 62ch; }
+.kin { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.kin li { border-left: 3px solid var(--accent); padding-left: 12px; }
+.kin .root { font-family: var(--display); font-style: italic; font-size: 1.08rem; }
+.kin .who { font-size: 0.85rem; color: var(--muted); margin-left: 8px; }
+.kin p { font-size: 0.925rem; }
+.tools { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.foot { margin-top: 24px; color: var(--muted); font-size: 0.85rem; max-width: 70ch; }
+
+.foot + .foot { margin-top: 6px; }
+* { -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; }
+
+/* Key box: only on a page that asks for the visitor's own key. */
+.keybox { margin-top: 18px; max-width: 900px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 0.9rem; }
+.keybox p { margin: 0; }
+.kb-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.kb-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.kb-row input[type="password"] { flex: 1; min-width: 200px; height: 44px; border: 1px solid var(--line); border-radius: 6px; padding: 0 12px; background: var(--paper); font-size: 1rem; }
+.kb-check { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.keybox .kb-note { color: var(--muted); margin-top: 8px; font-size: 0.82rem; }
+.kb-dim { color: var(--muted); }
+.kb-ok { color: var(--accent); font-weight: 600; }
+.keybox .kb-err { color: var(--mark); margin-top: 6px; }
+.kb-link { background: none; border: 0; padding: 0; min-height: 44px; text-decoration: underline; color: var(--muted); cursor: pointer; }
+.kb-model { margin-top: 4px; }
+.kb-model select { font: inherit; color: inherit; height: 40px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); }
+.keybox a { color: inherit; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 20px 16px 56px; }
+  .lookup { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .row > .label { width: 100%; }
+  #word { font-size: 2rem; }
+  .btn { min-height: 48px; }
+  .btn.quiet { min-height: 44px; padding: 5px 14px; }
+  .lookup .row .btn:not(.quiet) { flex: 1; }
+  .chip { min-height: 40px; padding: 6px 14px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <h1>Word Atlas</h1>
+    <p>Type a word. See it across the major languages as a map, then click any word for its origin and use.</p>
+  </header>
+
+  <form class="lookup" id="lookup" autocomplete="off">
+    <div class="field">
+      <label for="word">Word, in any language</label>
+      <input id="word" name="word" type="text" maxlength="60" value="home" spellcheck="false" autocapitalize="off">
+    </div>
+    <div class="field">
+      <label for="sense">Which sense (optional)</label>
+      <input id="sense" name="sense" type="text" maxlength="120" placeholder="e.g. the season, not the coil">
+    </div>
+    <div class="row">
+      <button class="btn" id="go" type="submit">Look up</button>
+      <button class="btn quiet" id="stop" type="button" hidden>Stop</button>
+    </div>
+  </form>
+  <div class="keybox" id="keybox" hidden></div>
+
+  <section class="options" aria-label="Options">
+    <div class="row" id="recentrow">
+      <span class="label" id="recentlabel">Recent</span>
+      <div class="chips" id="recent" role="group" aria-labelledby="recentlabel"></div>
+    </div>
+    <details class="opts">
+      <summary id="optsummary">Languages and answer speed</summary>
+      <div class="inner">
+        <div class="row">
+          <span class="label" id="langlabel">Languages</span>
+          <div class="chips" id="langs" role="group" aria-labelledby="langlabel"></div>
+        </div>
+        <div class="row">
+          <span class="label">Add one</span>
+          <div class="addlang">
+            <input id="newlang" type="text" maxlength="30" placeholder="e.g. Old Norse" aria-label="Language to add">
+            <button class="btn quiet" id="addlang" type="button">Add</button>
+          </div>
+          <button class="btn quiet" id="resetlangs" type="button">Back to the major 24</button>
+        </div>
+        <div class="row">
+          <span class="label" id="speedlabel">Answer</span>
+          <div class="seg" role="radiogroup" aria-labelledby="speedlabel">
+            <label><input type="radio" name="speed" id="speed-careful" value="default" checked>Careful</label>
+            <label><input type="radio" name="speed" id="speed-fast" value="quick">Fast</label>
+          </div>
+          <span class="hint">Careful thinks first and can take a minute or two. Fast starts at once and makes more mistakes.</span>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section class="graphbox" aria-label="Word map">
+    <div class="gbar">
+      <nav class="crumbs" id="crumbs" hidden aria-label="Where you are"></nav>
+      <ul class="legend" id="legend">
+        <li><span class="key k-main"></span>Closest word in each language</li>
+        <li><span class="key k-loose"></span>Only a rough match</li>
+        <li><span class="key k-near"></span>Nearby word or phrase</li>
+        <li><span class="key k-only"></span>No match in most other languages</li>
+      </ul>
+      <div class="zoom">
+        <button class="btn quiet" id="zoomout" type="button">Smaller</button>
+        <button class="btn quiet" id="zoomin" type="button">Larger</button>
+      </div>
+    </div>
+    <div class="scroller" id="scroller">
+      <div class="canvas" id="canvas">
+        <div id="svgmount"></div>
+        <aside class="pop" id="pop" hidden aria-label="Word notes"></aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="overview"></section>
+
+  <p class="foot">Claude writes these entries from memory. Etymologies, examples and claims that a word has no match elsewhere can be wrong, so check a dictionary before you quote one. Entries marked as probable or disputed are the ones to check first.</p>
+  <p class="foot" id="sitenote" hidden></p>
+</div>
+
+<script src="../claude.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var GROUPS = [
+    ["Germanic", ["English", "German", "Dutch"]],
+    ["Romance and Latin", ["Spanish", "French", "Portuguese", "Italian", "Latin"]],
+    ["Hellenic", ["Ancient Greek"]],
+    ["Slavic", ["Russian", "Polish"]],
+    ["Indo-Aryan", ["Hindi", "Urdu", "Bengali", "Marathi", "Punjabi", "Sanskrit"]],
+    ["Iranian", ["Persian"]],
+    ["Dravidian", ["Tamil", "Telugu", "Malayalam", "Kannada"]],
+    ["Semitic", ["Arabic", "Hebrew"]],
+    ["Turkic", ["Turkish"]],
+    ["Sino-Tibetan", ["Mandarin", "Cantonese"]],
+    ["Japonic", ["Japanese"]],
+    ["Koreanic", ["Korean"]],
+    ["Austroasiatic", ["Vietnamese"]],
+    ["Tai", ["Thai"]],
+    ["Austronesian", ["Indonesian", "Tagalog"]],
+    ["Bantu", ["Swahili"]]
+  ];
+  var FAMILY = {};
+  var LANGS = [];
+  GROUPS.forEach(function (g) { g[1].forEach(function (l) { FAMILY[l] = g[0]; LANGS.push(l); }); });
+  var DEFAULTS = ["English", "German", "Spanish", "French", "Portuguese", "Italian", "Latin", "Ancient Greek",
+    "Russian", "Hindi", "Bengali", "Sanskrit", "Persian", "Tamil", "Telugu", "Arabic", "Hebrew", "Turkish",
+    "Mandarin", "Japanese", "Korean", "Vietnamese", "Indonesian", "Swahili"];
+  var MAX_LANGS = 30;
+  var MAX_RECENT = 8;
+
+  var FIT = {
+    exact: { label: "Same meaning", bars: 3, loose: false },
+    close: { label: "Close", bars: 2, loose: false },
+    approximate: { label: "Rough match", bars: 1, loose: true },
+    none: { label: "No single word", bars: 0, loose: true }
+  };
+  var CERT = { likely: "Probable, not certain", disputed: "Scholars disagree" };
+
+  function N(word, roman, kind, gloss, note, only) {
+    return { word: word, roman: roman, kind: kind, gloss: gloss, note: note, only_here: !!only };
+  }
+  function Rl(group, word, roman, kind, gloss, note) {
+    return { group: group, word: word, roman: roman, kind: kind, gloss: gloss, note: note };
+  }
+  var EXAMPLE = {
+    word: "home", sense: "", example: true, langs: DEFAULTS.slice(),
+    overview: {
+      word: "home", language: "English", pos: "noun",
+      sense: "the place where you live and belong",
+      origin: "From Old English hām, which meant a village or estate as much as a single dwelling. That older sense survives in place names like Birmingham and Nottingham. It goes back to Proto-Germanic *haimaz, which also gave German Heim and Old Norse heimr, a word that could mean the whole world.",
+      pattern: "English splits the building (house) from the belonging (home). Most languages here use one word for both and let context decide. French has no noun for it and says at the house or at mine. Others name home after what is inside it: the fire in Spanish, the inside itself in Japanese, the family in Mandarin and Vietnamese. Several keep a separate word for the home a married woman came from.",
+      kin: [
+        { root: "Proto-Germanic *haimaz", languages: ["English", "German"], note: "English home and German Heim are the same word. German now prefers Zuhause for the everyday sense." },
+        { root: "Indo-European *dem-, house", languages: ["Latin", "Russian"], note: "Latin domus and Russian dom are the same inherited word." },
+        { root: "Latin casa, hut", languages: ["Italian", "Spanish", "Portuguese", "French"], note: "The everyday casa of three languages, and the preposition chez in French." },
+        { root: "Latin focus, hearth", languages: ["Spanish", "French", "Italian"], note: "Spanish hogar, French foyer and Italian focolare all name the home after its fire." },
+        { root: "Proto-Semitic *bayt-", languages: ["Arabic", "Hebrew"], note: "Arabic bayt and Hebrew bayit are the same word." },
+        { root: "Dravidian *il", languages: ["Telugu", "Tamil"], note: "Telugu illu, and Tamil il and illam." },
+        { root: "Chinese 家", languages: ["Mandarin", "Japanese", "Korean", "Vietnamese"], note: "Mandarin jiā travelled with the script: it is ie and ka in Japanese, ga in Korean gajeong, and gia in Vietnamese gia đình." }
+      ]
+    },
+    entries: [
+      {
+        language: "English", word: "home", roman: "", ipa: "/hoʊm/",
+        gloss: "the place where you live and belong", fit: "exact", fit_note: "This is the word you typed.",
+        origin: "From Old English hām, a village or estate as much as a single dwelling, from Proto-Germanic *haimaz. The old sense survives in place names such as Birmingham and Nottingham.",
+        certainty: "settled",
+        usage: "Home is the belonging and house is the building, a split many languages do not make. It also works as an adverb with no preposition: you go home, not to home.",
+        near: [
+          N("hearth", "", "word", "the floor of a fireplace", "Stands for the household in the phrase hearth and home. Spanish and French built their word for home on the same image.", false),
+          N("homely", "", "word", "plain and simple, like home", "It split in two: in Britain it means cosy and unpretentious, in America it means plain-looking.", true),
+          N("home is where the heart is", "", "phrase", "home is the people, not the building", "A proverb in use since the nineteenth century.", false)
+        ]
+      },
+      {
+        language: "German", word: "Zuhause", roman: "", ipa: "/tsuˈhaʊ̯zə/",
+        gloss: "home, the place where you are at home", fit: "exact", fit_note: "Matches the personal sense of home well. It does not stretch to homeland.",
+        origin: "A noun made from the phrase zu Hause, at the house. Haus goes back to Proto-Germanic *hūsą, the source of English house. The phrase is old; writing it as one noun, das Zuhause, is recent.",
+        certainty: "settled",
+        usage: "Everyday and neutral. Ich bin zu Hause is I am at home, and mein Zuhause is my home. In southern Germany, Austria and Switzerland people often say daheim.",
+        near: [
+          N("Heimat", "", "word", "the place or region you belong to", "Carries more feeling and history than homeland, and is famously hard to translate.", true),
+          N("Heim", "", "word", "home, in compounds and institutions", "The direct cognate of English home. Now mostly in words like Altersheim, an old people's home.", false),
+          N("Heimweh", "", "word", "homesickness", "A Swiss German word. In 1688 a doctor put it into Greek to name the illness, which gave the world nostalgia.", false)
+        ]
+      },
+      {
+        language: "Spanish", word: "hogar", roman: "", ipa: "/oˈɣaɾ/",
+        gloss: "home; originally hearth, fireplace", fit: "close", fit_note: "Warmer and less everyday than home. For going home, people say casa.",
+        origin: "From Late Latin focaris, of the hearth, from Latin focus, the fireplace. Latin f became a silent h in Spanish, as in hijo from filius. The same focus gives fuego, fire.",
+        certainty: "settled",
+        usage: "Home as a place of warmth and family: hogar dulce hogar is home sweet home. It also appears in official language, as in tareas del hogar (housework) and sin hogar (homeless).",
+        near: [
+          N("casa", "", "word", "house, home", "The everyday word. Voy a casa is I am going home. From Latin casa, a hut.", false),
+          N("querencia", "", "word", "the place where you feel safe and strong", "From querer, to want or love. In bullfighting it is the spot in the ring where the bull goes back to gather itself.", true),
+          N("morada", "", "word", "dwelling", "Literary and a little old-fashioned.", false)
+        ]
+      },
+      {
+        language: "French", word: "maison", roman: "", ipa: "/mɛ.zɔ̃/",
+        gloss: "house; à la maison is at home", fit: "approximate", fit_note: "French has no single noun for home. It says à la maison, at the house, or chez moi, at mine.",
+        origin: "From Latin mansio, a stay or stopping place, from manere, to remain. English mansion is the same word.",
+        certainty: "settled",
+        usage: "Je rentre à la maison is I am going home. Maison also names a firm, as in a fashion house, and fait maison on a menu means made here.",
+        near: [
+          N("chez", "", "word", "at the home of", "A preposition worn down from Latin casa. Chez moi is my place, and un chez-soi is a home of one's own.", true),
+          N("foyer", "", "word", "hearth; household", "From Latin focus, the fireplace. Official French counts households in foyers. It also names a hostel and a theatre lobby.", false),
+          N("pied-à-terre", "", "phrase", "a small second lodging in town", "Literally foot on the ground. English borrowed it whole.", true)
+        ]
+      },
+      {
+        language: "Portuguese", word: "lar", roman: "", ipa: "/laɾ/",
+        gloss: "home, in the warm sense", fit: "close", fit_note: "Warm and a little formal, like Spanish hogar. For going home, people say casa.",
+        origin: "From Latin Lar, the guardian spirit of a Roman household, whose shrine stood by the hearth. Lareira, fireplace, comes from the same word.",
+        certainty: "settled",
+        usage: "Lar doce lar is home sweet home. It also names care institutions, as in lar de idosos, a home for the elderly. Everyday speech uses casa: vou para casa.",
+        near: [
+          N("casa", "", "word", "house, home", "The everyday word. From Latin casa, a hut.", false),
+          N("saudade", "", "word", "longing for what is absent", "Saudades de casa is homesickness. The word is treated as a national emblem and has no neat equivalent elsewhere.", true),
+          N("lareira", "", "word", "fireplace", "Built on lar: the fireplace is named after the household spirit.", false)
+        ]
+      },
+      {
+        language: "Italian", word: "casa", roman: "", ipa: "/ˈkaːsa/",
+        gloss: "house and home", fit: "close", fit_note: "One word for house and home.",
+        origin: "From Latin casa, a hut or cottage. The proper Roman word for a house was domus. The humble one won out in Italian, Spanish and Portuguese.",
+        certainty: "settled",
+        usage: "Vado a casa is I am going home, and a casa mia is at my place. Fatto in casa on a menu means home-made.",
+        near: [
+          N("campanilismo", "", "word", "fierce loyalty to your home town", "From campanile, bell tower: your world ends where your own church bell can be heard.", true),
+          N("focolare", "", "word", "hearth; the family home", "From Latin focus. Formal or literary, as in tornare al focolare, to return to the family hearth.", false),
+          N("casa dolce casa", "", "phrase", "home sweet home", "The set phrase, a straight match for the English one.", false)
+        ]
+      },
+      {
+        language: "Latin", word: "domus", roman: "", ipa: "/ˈdo.mus/",
+        gloss: "house, household, family", fit: "close", fit_note: "Covers the building, the family in it, and home as a place to return to.",
+        origin: "From the Indo-European word *dem-, house, the same word as Russian dom and Greek dómos. English has it in domestic, domain and dome.",
+        certainty: "settled",
+        usage: "The town house of a Roman family, as against the insula, an apartment block. It is one of the few nouns that kept the old locative case: domi means at home, and domum means homeward.",
+        near: [
+          N("Lares", "", "word", "guardian spirits of a household", "Each house kept a shrine to them. Portuguese lar, home, comes from the name.", true),
+          N("focus", "", "word", "hearth", "The fireplace at the centre of the house. It gives Spanish hogar and fuego, French foyer and feu, and the English word focus.", false),
+          N("patria", "", "word", "fatherland", "From pater, father. Home on the scale of a country.", false)
+        ]
+      },
+      {
+        language: "Ancient Greek", word: "οἶκος", roman: "oîkos", ipa: "/ôi̯kos/",
+        gloss: "house, household, family estate", fit: "close", fit_note: "Means the whole household, with its people, land and goods, more than a feeling of home.",
+        origin: "From Indo-European *weyḱ-, a settlement. Latin vicus, village, is the same word. English has it in economy, which first meant running a household, and in ecology.",
+        certainty: "settled",
+        usage: "The basic unit of Greek society in Homer and in Aristotle's Politics. Homeward is οἴκαδε (oíkade), the direction Odysseus sails for ten years.",
+        near: [
+          N("νόστος", "nóstos", "word", "homecoming", "The theme of the Odyssey. Joined with álgos, pain, it makes nostalgia, a word coined in 1688 for homesickness.", true),
+          N("ἑστία", "hestía", "word", "hearth", "The fire at the centre of the house, and the goddess Hestia who guards it.", false),
+          N("οἰκουμένη", "oikouménē", "word", "the inhabited world", "Literally the lived-in land, from the verb built on oîkos. It gives English ecumenical.", false)
+        ]
+      },
+      {
+        language: "Russian", word: "дом", roman: "dom", ipa: "/dom/",
+        gloss: "house, home, building", fit: "close", fit_note: "One word for house, home and apartment block.",
+        origin: "From Proto-Slavic *domъ, the same Indo-European word as Latin domus.",
+        certainty: "settled",
+        usage: "Adverbs do the work of home: дома (dóma) is at home and домой (domóy) is homeward. Я иду домой is I am going home.",
+        near: [
+          N("уют", "uyút", "word", "the cosiness of a lived-in home", "Often named as hard to translate: warmth, order and safety in one word.", true),
+          N("родина", "ródina", "word", "motherland", "From род (rod), kin or birth. The country as the place you were born to.", false),
+          N("будьте как дома", "búd'te kak dóma", "phrase", "make yourself at home", "Literally be as if at home. Said to a guest at the door.", false)
+        ]
+      },
+      {
+        language: "Hindi", word: "घर", roman: "ghar", ipa: "/ɡʱər/",
+        gloss: "house, home, household", fit: "close", fit_note: "One word for house and home. Family is often called घरवाले (gharvāle), the people of the house.",
+        origin: "Inherited from Prakrit ghara. It is a sister form of Sanskrit gṛha, not a simple worn-down version of it, and the exact link between the two is still debated.",
+        certainty: "likely",
+        usage: "Used by everyone, in every register. घर का खाना (ghar kā khānā) is home food, and घर जाना (ghar jānā) is to go home, whether that means your flat or your native town.",
+        near: [
+          N("मायका", "māykā", "word", "a married woman's parents' home", "Built on mā, mother. Her married home is ससुराल (sasurāl), so a woman has two homes with two names.", true),
+          N("मकान", "makān", "word", "the building", "From Arabic makān, place. You rent a makān and live in a ghar.", false),
+          N("गृह", "gṛh", "word", "house, in formal terms", "The Sanskrit form, kept for official words such as गृह मंत्रालय, the Home Ministry.", false)
+        ]
+      },
+      {
+        language: "Bengali", word: "বাড়ি", roman: "bāṛi", ipa: "/baɽi/",
+        gloss: "house; the family home", fit: "close", fit_note: "The home you come from, often the family house, more than the flat you rent.",
+        origin: "From Sanskrit vāṭī, an enclosure or fenced plot, by way of Prakrit.",
+        certainty: "likely",
+        usage: "বাড়ি যাচ্ছি (bāṛi jācchi) is I am going home. Asking where someone's bāṛi is asks where their family is from, not their current address.",
+        near: [
+          N("বাসা", "bāsā", "word", "the place you live now", "Often rented and in the city, set against bāṛi, the family home. It also means a bird's nest.", true),
+          N("দেশের বাড়ি", "desher bāṛi", "phrase", "the ancestral home in the village", "Literally home in the country. City families keep one in mind even after generations away.", true),
+          N("ঘর", "ghôr", "word", "room; household", "The same word as Hindi ghar, but in Bengali it is mostly a room.", false)
+        ]
+      },
+      {
+        language: "Sanskrit", word: "गृह", roman: "gṛha", ipa: "/ɡr̩ɦɐ/",
+        gloss: "house, household, domestic life", fit: "close", fit_note: "Leans toward the household as an institution more than a feeling of belonging.",
+        origin: "Usually traced to the Indo-European root *gʰerdʰ-, to enclose. On that account it is a distant relative of English yard and garden and Russian gorod, town.",
+        certainty: "likely",
+        usage: "Found from the Vedas onward. The Gṛhya Sūtras are the manuals of domestic ritual. गृहं गच्छामि (gṛhaṃ gacchāmi) is I am going home.",
+        near: [
+          N("गृहस्थ", "gṛhastha", "word", "householder", "Literally one who stays in the house: the second of the four stages of life, between student and forest-dweller.", true),
+          N("आलय", "ālaya", "word", "abode, resting place", "Himālaya is the abode of snow.", false),
+          N("सदन", "sadana", "word", "seat, dwelling", "From sad, to sit.", false)
+        ]
+      },
+      {
+        language: "Persian", word: "خانه", roman: "khāne", ipa: "/xɒːˈne/",
+        gloss: "house, home", fit: "close", fit_note: "House and home in one word.",
+        origin: "From Middle Persian xānag, house. Its older roots are uncertain. Hindi and Urdu borrowed it as the ending -khānā, a place for something, as in davākhānā, a pharmacy.",
+        certainty: "likely",
+        usage: "The everyday word, said khune in speech. It forms many compounds: کتابخانه (ketābkhāne), book-house, is a library, and آشپزخانه (āshpazkhāne) is a kitchen.",
+        near: [
+          N("خانه‌به‌دوش", "khāne-be-dush", "phrase", "house on the shoulder", "A wanderer or nomad, someone who carries home with them.", true),
+          N("کاشانه", "kāshāne", "word", "home, nest", "Poetic. The home as a small sheltered place.", false),
+          N("وطن", "vatan", "word", "homeland", "Borrowed from Arabic. The home you belong to as a people.", false)
+        ]
+      },
+      {
+        language: "Tamil", word: "வீடு", roman: "vīṭu", ipa: "/ʋiːɖɯ/",
+        gloss: "house, home; also release, liberation", fit: "close", fit_note: "It covers the building and the feeling, so it is also the word for house.",
+        origin: "A native Dravidian word, built on the verb விடு (viṭu), to leave or let go. That is why vīṭu also means release: in the classical list of life's four aims, aṟam, poruḷ, iṉpam and vīṭu, it stands for liberation. How the sense of a dwelling grew from it is not agreed.",
+        certainty: "likely",
+        usage: "The everyday word, in speech and in writing. நான் வீட்டுக்குப் போகிறேன் (nāṉ vīṭṭukkup pōkiṟēṉ) is I am going home. வீட்டுக்காரர் (vīṭṭukkārar), the person of the house, is a common way to say husband or landlord.",
+        near: [
+          N("அகம்", "akam", "word", "inside, heart, home", "Sangam poetry is split into akam, the inner world of love, and puṟam, the outer world of war and public life.", true),
+          N("வீடுபேறு", "vīṭupēṟu", "word", "attaining release", "Liberation from rebirth. It uses vīṭu in its older sense of letting go.", true),
+          N("இல்லம்", "illam", "word", "home, formal", "Literary and formal. You see it on wedding invitations and house nameplates.", false)
+        ],
+        related: [
+          Rl("root", "விடு", "viṭu", "word", "to leave, let go", "The verb vīṭu is built on. Lengthening its vowel makes the noun."),
+          Rl("root", "விடுதலை", "viṭutalai", "word", "freedom, release", "The modern word for liberation and independence, from the same verb."),
+          Rl("root", "விடுமுறை", "viṭumuṟai", "word", "holiday, leave", "Literally a turn of being let off."),
+          Rl("root", "விடுதி", "viṭuti", "word", "lodging, hostel", "A place to stay when you are away from home, from the same root."),
+          Rl("built", "வீட்டுக்காரர்", "vīṭṭukkārar", "word", "husband; landlord", "Literally the person of the house."),
+          Rl("built", "வீட்டுப்பாடம்", "vīṭṭuppāṭam", "word", "homework", "House plus lesson."),
+          Rl("built", "வீட்டுவேலை", "vīṭṭuvēlai", "word", "housework", "House plus work. Also used for domestic service."),
+          Rl("built", "வீடுபேறு", "vīṭupēṟu", "word", "attaining release", "Liberation from rebirth, using vīṭu in its older sense of letting go."),
+          Rl("near", "இல்லம்", "illam", "word", "home, formal", "Literary and formal. Seen on invitations and nameplates."),
+          Rl("near", "அகம்", "akam", "word", "inside, heart, home", "The inner world, as in the akam poems of the Sangam age."),
+          Rl("near", "மனை", "maṉai", "word", "house, house plot", "Also a building plot. மனைவி (maṉaivi), wife, is formed from it."),
+          Rl("near", "குடில்", "kuṭil", "word", "hut", "A small thatched dwelling. Also used for a hermitage."),
+          Rl("phrase", "பிறந்த வீடு", "piṟanta vīṭu", "phrase", "the home she was born in", "A married woman's parents' home."),
+          Rl("phrase", "புகுந்த வீடு", "pukunta vīṭu", "phrase", "the home she entered", "The home a woman marries into, paired with piṟanta vīṭu."),
+          Rl("phrase", "வீடு வாசல்", "vīṭu vācal", "phrase", "house and doorway", "A pair word for a person's home and property, all that a settled life has."),
+          Rl("phrase", "வீட்டுக்கு வீடு வாசப்படி", "vīṭṭukku vīṭu vācappaṭi", "phrase", "every house has a doorstep", "A proverb: every home has its own troubles."),
+          Rl("against", "காடு", "kāṭu", "word", "forest, the wild", "The classic opposite. In the saying about old age, the house says go and the kāṭu says come, where kāṭu stands for the burning ground."),
+          Rl("against", "வெளி", "veḷi", "word", "outside, open space", "Where you are when you are not in the vīṭu.")
+        ]
+      },
+      {
+        language: "Telugu", word: "ఇల్లు", roman: "illu", ipa: "/ilːu/",
+        gloss: "house, home", fit: "close", fit_note: "One word for house and home.",
+        origin: "From the old Dravidian root *il, house. Tamil keeps the same root in இல் (il) and இல்லம் (illam).",
+        certainty: "settled",
+        usage: "The everyday word. ఇంటికి వెళ్తున్నాను (iṇṭiki veḷtunnānu) is I am going home. The stem changes to iṇṭi, as in ఇంటి పేరు (iṇṭi pēru), house name, which means surname.",
+        near: [
+          N("పుట్టినిల్లు", "puṭṭinillu", "word", "birth house", "A married woman's parents' home.", true),
+          N("మెట్టినిల్లు", "meṭṭinillu", "word", "the house stepped into", "The home a woman marries into, paired with puṭṭinillu.", true),
+          N("గృహం", "gṛhaṁ", "word", "house, residence", "The Sanskrit loan, used in formal and written Telugu.", false)
+        ]
+      },
+      {
+        language: "Arabic", word: "بيت", roman: "bayt", ipa: "/bajt/",
+        gloss: "house, home; also a line of verse", fit: "close", fit_note: "House and home together. It can also mean a family line, as in a royal house.",
+        origin: "From the Proto-Semitic word *bayt-, house. The letter b in the Semitic alphabets is named after the word and began as a drawing of a house.",
+        certainty: "settled",
+        usage: "The plain everyday word across the Arab world. البيت بيتك (al-bayt baytak), the house is your house, is a standard welcome to a guest.",
+        near: [
+          N("بيت شعر", "bayt shaʿr, bayt shiʿr", "phrase", "a tent of hair, or a line of verse", "Without vowel marks the two are spelled alike: a Bedouin tent woven of goat hair, and a line of poetry.", true),
+          N("منزل", "manzil", "word", "residence", "From the verb for dismounting or stopping for the night. More formal than bayt.", false),
+          N("دار", "dār", "word", "house, abode", "Often a large house or an institution. Dar es Salaam is the abode of peace.", false)
+        ]
+      },
+      {
+        language: "Hebrew", word: "בית", roman: "báyit", ipa: "/ˈbajit/",
+        gloss: "house, home", fit: "close", fit_note: "House and home together, and the first half of many institutions.",
+        origin: "From Proto-Semitic *bayt-, the same word as Arabic bayt. It is in Bethlehem, house of bread, and Bethel, house of God.",
+        certainty: "settled",
+        usage: "אני הולך הביתה (aní holéch habáyta) is I am going home. In compounds it means a house of something, as in a house of the sick for a hospital.",
+        near: [
+          N("הביתה", "habáyta", "word", "homeward", "Keeps an old ending -a that marks direction, rare elsewhere in modern Hebrew.", false),
+          N("בית ספר", "bet séfer", "phrase", "school", "Literally house of the book.", false),
+          N("מולדת", "molédet", "word", "homeland", "From the root for birth: the land you were born in.", false)
+        ]
+      },
+      {
+        language: "Turkish", word: "ev", roman: "", ipa: "/ev/",
+        gloss: "house, home", fit: "close", fit_note: "One word for house and home.",
+        origin: "From Old Turkic eb, a tent or dwelling. Evlenmek, to marry, is literally to get a house.",
+        certainty: "settled",
+        usage: "Eve gidiyorum is I am going home. Ev yemeği is home cooking, and ev hanımı, lady of the house, is a housewife.",
+        near: [
+          N("sıla", "", "word", "the home you are parted from", "Used for the home place and for reunion with it. Sıla hasreti is the longing of those who left for the city or abroad.", true),
+          N("yuva", "", "word", "nest", "The warm word for a home and family. It also names a nursery school.", false),
+          N("memleket", "", "word", "home town, home country", "Memleket nere, where is your memleket, is how strangers ask where you are from.", false)
+        ]
+      },
+      {
+        language: "Mandarin", word: "家", roman: "jiā", ipa: "/tɕja˥/",
+        gloss: "home, family, household", fit: "close", fit_note: "Home and family are the same word, so going home and going back to your family are one idea.",
+        origin: "An Old Chinese word, already written on oracle bones more than three thousand years ago. The character shows a pig 豕 under a roof 宀. Why a pig is debated; livestock kept in the house is the usual explanation.",
+        certainty: "likely",
+        usage: "Everyday and warm. 回家 (huí jiā) is to go home, and 大家 (dàjiā), big family, means everyone. As a suffix it names a specialist: 科学家 (kēxuéjiā) is a scientist.",
+        near: [
+          N("老家", "lǎojiā", "word", "the old home", "The place your family comes from, even if you never lived there. Millions travel back to it at New Year.", true),
+          N("房子", "fángzi", "word", "house, the building", "You buy a fángzi and make it a jiā.", false),
+          N("故乡", "gùxiāng", "word", "native place", "Where you grew up. Literary and nostalgic.", false)
+        ]
+      },
+      {
+        language: "Japanese", word: "うち", roman: "uchi", ipa: "/ɯtɕi/",
+        gloss: "inside; my home, my family, my group", fit: "close", fit_note: "Home as the inside. It means our place, never someone else's.",
+        origin: "A native Japanese word meaning inside, written 内 or 家. Home is the inner side, set against 外 (soto), the outside. The same pair sorts people into in-group and out-group.",
+        certainty: "settled",
+        usage: "Casual and spoken. うちに帰る (uchi ni kaeru) is to go home, and うちの会社 is our company. In writing, and for other people's homes, 家 (ie) or お宅 (otaku) is used.",
+        near: [
+          N("ただいま", "tadaima", "phrase", "I'm home", "Literally just now. Called out as you walk in. Whoever is home answers okaeri, welcome back.", true),
+          N("実家", "jikka", "word", "your parents' home", "The house you grew up in and go back to at New Year, even decades after leaving.", true),
+          N("ふるさと", "furusato", "word", "home town", "The place you grew up. Strongly nostalgic, common in songs.", false)
+        ]
+      },
+      {
+        language: "Korean", word: "집", roman: "jip", ipa: "/tɕip̚/",
+        gloss: "house, home", fit: "close", fit_note: "One word for house and home.",
+        origin: "A native Korean word, found in the same form in the earliest Hangul texts. Its history before that is unknown.",
+        certainty: "settled",
+        usage: "집에 가요 (jibe gayo) is I am going home. Added to a noun it means a shop that sells it: 빵집 (ppangjip), bread house, is a bakery.",
+        near: [
+          N("우리 집", "uri jip", "phrase", "our house", "The normal way to say my home. Korean says our, not my, for home, family and country.", true),
+          N("친정", "chinjeong", "word", "a married woman's parents' home", "Her own family's house, as against 시댁 (sidaek), her husband's.", true),
+          N("고향", "gohyang", "word", "home town", "From Chinese 故鄕. The place you were born and raised.", false)
+        ]
+      },
+      {
+        language: "Vietnamese", word: "nhà", roman: "", ipa: "/ɲaː˨˩/",
+        gloss: "house, home, family", fit: "close", fit_note: "House, home and family at once, much like Mandarin jiā.",
+        origin: "A native Vietnamese word, not one of the many borrowed from Chinese.",
+        certainty: "likely",
+        usage: "Về nhà is to go home. Before a noun it names a specialist: nhà văn is a writer, the same pattern Chinese has with 家.",
+        near: [
+          N("quê", "", "word", "the home village", "Where your family comes from. Về quê, going back to it, is what people do at Tết.", true),
+          N("nhà tôi", "", "phrase", "my house", "A modest way to speak of your own husband or wife.", true),
+          N("tổ ấm", "", "phrase", "warm nest", "A loving family home.", false)
+        ]
+      },
+      {
+        language: "Indonesian", word: "rumah", roman: "", ipa: "/ˈrumah/",
+        gloss: "house, home", fit: "close", fit_note: "The noun is house. The idea of home lives more in the verb pulang.",
+        origin: "From Proto-Austronesian *Rumaq, house. Javanese omah and Sundanese imah are the same word.",
+        certainty: "settled",
+        usage: "Di rumah is at home. It names institutions too: rumah sakit, sick house, is a hospital, and rumah makan, eating house, is a restaurant.",
+        near: [
+          N("pulang", "", "word", "to go home", "A verb that means only this. You can pulang to your house, your village or your country, and nowhere else.", true),
+          N("mudik", "", "word", "the journey back to the home village", "The mass trip before Eid, when cities empty out. It first meant to travel upriver.", true),
+          N("kampung halaman", "", "phrase", "home village", "Literally village yard. The place you grew up.", false)
+        ]
+      },
+      {
+        language: "Swahili", word: "nyumbani", roman: "", ipa: "/ɲumˈbani/",
+        gloss: "at home, home", fit: "close", fit_note: "Home is house plus a place ending, so it always carries the sense of at or to.",
+        origin: "Nyumba, house, with the place suffix -ni. Nyumba goes back to a Bantu root shared across eastern and southern Africa.",
+        certainty: "settled",
+        usage: "Ninaenda nyumbani is I am going home, and karibu nyumbani is welcome home.",
+        near: [
+          N("kwetu", "", "word", "at our place", "Home as the place of our people, said in one word. Kwangu is my place and kwao is theirs.", true),
+          N("nyumba", "", "word", "house", "The building. Add -ni and it becomes home.", false),
+          N("nyumbani ni nyumbani", "", "phrase", "home is home", "A proverb: there is no place like it.", false)
+        ]
+      }
+    ]
+  };
+
+  /* ---------- small helpers ---------- */
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function $(id) { return document.getElementById(id); }
+  function str(v) { return typeof v === "string" ? v.trim() : (typeof v === "number" ? String(v) : ""); }
+  function setAttrs(el, props) {
+    if (!props) return;
+    Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (v == null || v === false) return;
+      if (k === "class") el.setAttribute("class", v);
+      else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    });
+  }
+  function add(el, kid) {
+    if (kid == null || kid === false || kid === "") return;
+    if (Array.isArray(kid)) { kid.forEach(function (k) { add(el, k); }); return; }
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    setAttrs(el, props);
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function s(tag, props) {
+    var el = document.createElementNS(SVGNS, tag);
+    setAttrs(el, props);
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function load(key, fallback) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* storage may be off or full */ }
+  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function rad(a) { return a * Math.PI / 180; }
+  function pt(r, a) { return [r * Math.cos(rad(a)), r * Math.sin(rad(a))]; }
+  function f1(n) { return n.toFixed(1); }
+
+  /* ---------- state ---------- */
+  var custom = load("wa2.custom", []).filter(function (x) { return typeof x === "string"; });
+  var chosen = load("wa2.langs", DEFAULTS.slice()).filter(function (x) { return typeof x === "string"; });
+  if (!chosen.length) chosen = DEFAULTS.slice();
+  var recent = load("wa2.recent", []).filter(function (r) { return r && typeof r.word === "string" && Array.isArray(r.entries) && Array.isArray(r.langs); });
+  var current = clone(EXAMPLE);
+  var running = false;
+  var runId = 0;
+  var ctls = [];
+  var selKey = "";
+  var zoom = 1;
+  var geo = null;          // layout of the graph now on screen
+  var moreState = new WeakMap();   // word -> {loading, error} for the fuller note
+  var relState = new WeakMap();    // word -> {loading, error} for its related words
+  var path = [];                   // trail of related-word maps opened from the main map
+
+  function allLangs() { return LANGS.concat(custom.filter(function (c) { return LANGS.indexOf(c) < 0; })); }
+  function orderedChosen() { return allLangs().filter(function (l) { return chosen.indexOf(l) >= 0; }); }
+  function entryFor(lang) {
+    for (var i = 0; i < current.entries.length; i++) if (str(current.entries[i].language) === lang) return current.entries[i];
+    return null;
+  }
+  function nearOf(e) { return Array.isArray(e.near) ? e.near.filter(function (n) { return n && str(n.word); }).slice(0, 3) : []; }
+
+  /* ---------- status ---------- */
+  function setStatus(text, warn) {
+    var el = $("status");
+    el.textContent = text || "";
+    el.className = "status" + (warn ? " warn" : "");
+  }
+
+  /* ---------- language chips ---------- */
+  function renderLangs() {
+    var box = $("langs");
+    box.textContent = "";
+    allLangs().forEach(function (name) {
+      box.append(h("button", {
+        type: "button", class: "chip", "aria-pressed": chosen.indexOf(name) >= 0 ? "true" : "false",
+        onclick: function () { toggleLang(name); }
+      }, name));
+    });
+    $("optsummary").textContent = "Languages and answer speed (" + chosen.length + " languages chosen)";
+  }
+  function toggleLang(name) {
+    var i = chosen.indexOf(name);
+    if (i >= 0) {
+      if (chosen.length === 1) { setStatus("Keep at least one language.", true); return; }
+      chosen.splice(i, 1);
+    } else {
+      if (chosen.length >= MAX_LANGS) { setStatus("Thirty languages is the limit. Remove one first.", true); return; }
+      chosen.push(name);
+    }
+    save("wa2.langs", chosen);
+    setStatus("");
+    renderLangs();
+  }
+  function addLang() {
+    var input = $("newlang");
+    var name = input.value.trim().replace(/\s+/g, " ");
+    if (!name) return;
+    var existing = allLangs().filter(function (l) { return l.toLowerCase() === name.toLowerCase(); })[0];
+    if (existing) name = existing;
+    else { custom.push(name); save("wa2.custom", custom); }
+    input.value = "";
+    if (chosen.indexOf(name) < 0) {
+      if (chosen.length >= MAX_LANGS) { setStatus("Added " + name + " to the list. Thirty languages is the limit, so remove one to choose it.", true); renderLangs(); return; }
+      chosen.push(name);
+      save("wa2.langs", chosen);
+    }
+    setStatus("");
+    renderLangs();
+  }
+
+  /* ---------- recent ---------- */
+  function renderRecent() {
+    var box = $("recent");
+    box.textContent = "";
+    box.append(h("button", { type: "button", class: "chip", onclick: function () { show(clone(EXAMPLE)); } },
+      "home", h("span", { class: "tag" }, "example")));
+    recent.forEach(function (r) {
+      box.append(h("button", { type: "button", class: "chip", title: r.sense || null, onclick: function () { show(clone(r)); } }, r.word));
+    });
+    if (recent.length) {
+      box.append(h("button", { type: "button", class: "chip", onclick: function () { recent = []; save("wa2.recent", recent); renderRecent(); } }, "Clear list"));
+    }
+  }
+  function remember(result) {
+    var key = (result.word + "|" + (result.sense || "")).toLowerCase();
+    recent = recent.filter(function (r) { return (r.word + "|" + (r.sense || "")).toLowerCase() !== key; });
+    recent.unshift({ word: result.word, sense: result.sense || "", langs: result.langs, overview: result.overview, entries: result.entries });
+    if (recent.length > MAX_RECENT) recent.length = MAX_RECENT;
+    save("wa2.recent", recent);
+    renderRecent();
+  }
+  function show(result) {
+    if (running) return;
+    current = result;
+    selKey = "";
+    path = [];
+    $("word").value = result.word;
+    $("sense").value = result.sense || "";
+    setStatus("");
+    renderAll();
+  }
+
+  /* ---------- graph layout ---------- */
+  var R = 548;                       // half the drawing of the main map
+  var R_EDGE0 = 74, R_EDGE1 = 116;   // spoke from the centre
+  var R_LANG = 124, R_WORD = 320, R_DOT = 330;
+  var R_NEAR = 368, R_NTEXT = 379, R_NEND = 506;
+  var R_ARC = 514;
+  var RF = 400;                      // half the drawing of a related-words map
+
+  function layout(langs) {
+    var groups = [];
+    GROUPS.forEach(function (g) {
+      var ls = g[1].filter(function (l) { return langs.indexOf(l) >= 0; });
+      if (ls.length) groups.push({ name: g[0], langs: ls });
+    });
+    var other = langs.filter(function (l) { return !FAMILY[l]; });
+    if (other.length) groups.push({ name: "Other languages", langs: other });
+    var gap = groups.length > 1 ? 0.35 : 0;
+    var total = langs.length + groups.length * gap;
+    var step = 360 / total;
+    var pos = -90 + gap * step / 2;
+    var angle = {};
+    groups.forEach(function (g) {
+      g.a0 = pos;
+      g.langs.forEach(function (l) { angle[l] = pos + step / 2; pos += step; });
+      g.a1 = pos;
+      pos += gap * step;
+    });
+    return { groups: groups, angle: angle, step: step, fan: Math.min(step * 0.31, 7), R: R, centerR: 68, anchor: atlasAnchor };
+  }
+  function nearAngle(lang, k, n) { return geo.angle[lang] + (k - (n - 1) / 2) * geo.fan; }
+  function atlasAnchor(key) {
+    if (key === "c") return [0, 0];
+    var parts = key.split(":");
+    if (parts[0] === "l") return pt(225, geo.angle[parts[1]]);
+    var e = entryFor(parts[1]);
+    return pt(445, nearAngle(parts[1], Number(parts[2]), e ? nearOf(e).length : 1));
+  }
+
+  function rtext(r, startsAtR, flip, cls, size) {
+    var anchor = startsAtR ? (flip ? "end" : "start") : (flip ? "start" : "end");
+    var t = s("text", { x: r, y: 0, dy: "0.35em", "text-anchor": anchor, class: cls });
+    if (flip) t.setAttribute("transform", "rotate(180 " + r + " 0)");
+    if (size) t.style.fontSize = size + "px";
+    return t;
+  }
+  /* Shrinks a label to fit. With keepRom the transliteration stays until shrinking alone cannot fit it. */
+  function fitText(el, max, min, keepRom) {
+    var len = el.getComputedTextLength();
+    if (!len || len <= max) return;
+    var rom = el.querySelector(".rom");
+    if (rom && !keepRom) { rom.remove(); rom = null; len = el.getComputedTextLength(); if (len <= max) return; }
+    var size = parseFloat(el.style.fontSize) || 14;
+    var next = Math.max(min, size * max / len);
+    el.style.fontSize = f1(next) + "px";
+    len = el.getComputedTextLength();
+    if (len > max && rom) { el.style.fontSize = size + "px"; fitText(el, max, min, false); return; }
+    if (len > max) {
+      var target = el.querySelector("tspan") || el;
+      var chars = Array.from(target.textContent);
+      var keep = Math.max(3, Math.floor(chars.length * max / len) - 1);
+      target.textContent = chars.slice(0, keep).join("") + "…";
+    }
+  }
+  function activate(el, key) {
+    el.setAttribute("data-key", key);
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", "button");
+    el.addEventListener("click", function (ev) { ev.stopPropagation(); select(key); });
+    el.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(key); }
+    });
+  }
+  function drawArc(layer, fits, id, a0raw, a1raw, name, radius, step) {
+    var pad = Math.min(1.2, step * 0.12);
+    var a0 = a0raw + pad, a1 = a1raw - pad;
+    var p0 = pt(radius, a0), p1 = pt(radius, a1);
+    var large = (a1 - a0) > 180 ? 1 : 0;
+    layer.append(s("path", { class: "fam-arc", d: "M" + f1(p0[0]) + " " + f1(p0[1]) + " A" + radius + " " + radius + " 0 " + large + " 1 " + f1(p1[0]) + " " + f1(p1[1]) }));
+    var bottom = Math.sin(rad((a0 + a1) / 2)) > 0;
+    var lr = bottom ? radius + 18 : radius + 8;
+    var q0 = pt(lr, bottom ? a1 : a0), q1 = pt(lr, bottom ? a0 : a1);
+    layer.append(s("path", { id: id, fill: "none", d: "M" + f1(q0[0]) + " " + f1(q0[1]) + " A" + lr + " " + lr + " 0 " + large + " " + (bottom ? 0 : 1) + " " + f1(q1[0]) + " " + f1(q1[1]) }));
+    var label = s("text", { class: "fam-label", "text-anchor": "middle" }, s("textPath", { href: "#" + id, startOffset: "50%" }, name));
+    layer.append(label);
+    fits.push(function () {
+      var room = rad(a1 - a0) * lr - 8;
+      var len = label.getComputedTextLength();
+      if (len && len > room) label.remove();
+    });
+  }
+  function mountSvg(svg, fits) {
+    var mount = $("svgmount");
+    mount.textContent = "";
+    mount.append(svg);
+    fits.forEach(function (fn) { try { fn(); } catch (e) { /* measuring is best effort */ } });
+  }
+
+  function renderAtlas() {
+    var langs = current.langs;
+    geo = layout(langs);
+    var svg = s("svg", { viewBox: [-R, -R, 2 * R, 2 * R].join(" "), role: "group", "aria-label": "Map of words for " + current.word });
+    svg.addEventListener("click", function () { select(""); });
+    var edges = s("g", null), arcs = s("g", null), nodes = s("g", null);
+    svg.append(arcs, edges, nodes);
+    var fits = [];
+
+    geo.groups.forEach(function (g, i) { drawArc(arcs, fits, "fam" + i, g.a0, g.a1, g.name, R_ARC, geo.step); });
+
+    var cw = str(current.overview && current.overview.word) || current.word;
+    var cn = Array.from(cw).length;
+    var cg = s("g", { class: "node center" + (selKey === "c" ? " sel" : "") },
+      s("title", null, "About the word " + cw),
+      s("circle", { class: "c-disc", r: 68 }));
+    var crom = str(current.overview && current.overview.roman);
+    var ct = s("text", { class: "c-word", "text-anchor": "middle", y: crom ? -9 : 0, dy: "0.35em" }, cw);
+    ct.style.fontSize = (cn <= 5 ? 38 : cn <= 8 ? 30 : cn <= 12 ? 22 : 17) + "px";
+    cg.append(ct);
+    var cr = null;
+    if (crom) { cr = s("text", { class: "c-rom", "text-anchor": "middle", y: 26 }, crom); cr.style.fontSize = "15px"; cg.append(cr); }
+    fits.push(function () { if (cr) fitText(cr, 104, 9); });
+    activate(cg, "c");
+    cg.setAttribute("aria-label", "About the word " + cw);
+    nodes.append(cg);
+    fits.push(function () { fitText(ct, 122, 10); });
+
+    langs.forEach(function (lang) {
+      var a = geo.angle[lang];
+      var flip = Math.cos(rad(a)) < 0;
+      var e = entryFor(lang);
+      var key = "l:" + lang;
+      var fit = e ? (FIT[str(e.fit)] || FIT.close) : null;
+      var g = s("g", {
+        transform: "rotate(" + f1(a) + ")",
+        class: "node lang" + (e ? "" : " pending") + (fit && fit.loose ? " loose" : "") + (selKey === key ? " sel" : "")
+      });
+      g.append(s("rect", { class: "hit", x: 119, y: -12, width: R_DOT - 108, height: 24, rx: 12 }));
+      var lt = rtext(R_LANG, true, flip, "t-lang");
+      lt.textContent = lang;
+      g.append(lt);
+      g.append(s("circle", { class: "dot", cx: R_DOT, cy: 0, r: e ? 5 : 3.5 }));
+      var p0 = pt(R_EDGE0, a), p1 = pt(R_EDGE1, a);
+      edges.append(s("line", { class: "g-edge", "data-lang": lang, x1: f1(p0[0]), y1: f1(p0[1]), x2: f1(p1[0]), y2: f1(p1[1]) }));
+      if (e) {
+        var wt = rtext(R_WORD, false, flip, "t-word", 18);
+        wt.append(s("tspan", null, str(e.word)));
+        if (str(e.roman)) wt.append(s("tspan", { class: "rom", dx: 6 }, str(e.roman)));
+        g.append(wt);
+        g.append(s("title", null, lang + ": " + str(e.word) + (str(e.roman) ? " (" + str(e.roman) + ")" : "") + (str(e.gloss) ? ", " + str(e.gloss) : "")));
+        g.setAttribute("aria-label", lang + ": " + str(e.word) + " " + str(e.roman));
+        activate(g, key);
+        fits.push(function () {
+          var used = lt.getComputedTextLength() || 60;
+          fitText(wt, Math.max(40, R_WORD - R_LANG - used - 10), 12, true);
+        });
+        var near = nearOf(e);
+        near.forEach(function (n, k) {
+          var na = nearAngle(lang, k, near.length);
+          var nflip = Math.cos(rad(na)) < 0;
+          var nkey = "n:" + lang + ":" + k;
+          var q0 = pt(R_DOT + 6, a), q1 = pt(R_NEAR - 5, na);
+          edges.append(s("line", { class: "g-edge", "data-lang": lang, x1: f1(q0[0]), y1: f1(q0[1]), x2: f1(q1[0]), y2: f1(q1[1]) }));
+          var ng = s("g", { transform: "rotate(" + f1(na) + ")", class: "node near" + (n.only_here ? " only" : "") + (selKey === nkey ? " sel" : "") });
+          ng.append(s("rect", { class: "hit", x: R_NEAR - 8, y: -10, width: R_NEND - R_NEAR + 12, height: 20, rx: 10 }));
+          if (n.only_here) ng.append(s("rect", { class: "nmark", x: R_NEAR - 4, y: -4, width: 8, height: 8, transform: "rotate(45 " + R_NEAR + " 0)" }));
+          else ng.append(s("circle", { class: "nmark", cx: R_NEAR, cy: 0, r: 3.4 }));
+          var nt = rtext(R_NTEXT, true, nflip, "t-near", 13.5);
+          nt.append(s("tspan", null, str(n.word)));
+          if (str(n.roman)) nt.append(s("tspan", { class: "rom", dx: 7 }, str(n.roman)));
+          ng.append(nt);
+          ng.append(s("title", null, str(n.word) + (str(n.roman) ? " (" + str(n.roman) + ")" : "") + (str(n.gloss) ? ", " + str(n.gloss) : "")));
+          ng.setAttribute("aria-label", lang + ", nearby: " + str(n.word) + " " + str(n.roman));
+          activate(ng, nkey);
+          nodes.append(ng);
+          fits.push(function () { fitText(nt, R_NEND - R_NTEXT, 10.5, true); });
+        });
+      }
+      nodes.append(g);
+    });
+    mountSvg(svg, fits);
+  }
+
+  /* One word in the middle, its related words in the same language around it. */
+  function renderFocus() {
+    var f = focus();
+    var items = relatedOf(f.node);
+    var st = relState.get(f.node) || {};
+    var slots = st.loading ? Math.max(16, items.length) : Math.max(items.length, 1);
+    var step = 360 / slots;
+    var angles = [];
+    for (var i = 0; i < slots; i++) angles.push(-90 + (i + 0.5) * step);
+    geo = { R: RF, centerR: 78, angles: angles, anchor: function (key) { return key === "f" ? [0, 0] : pt(250, angles[Number(key.split(":")[1])] || 0); } };
+    var fw = str(f.node.word);
+    var svg = s("svg", { viewBox: [-RF, -RF, 2 * RF, 2 * RF].join(" "), role: "group", "aria-label": "Words related to " + fw + " in " + f.lang });
+    svg.addEventListener("click", function () { select(""); });
+    var edges = s("g", null), arcs = s("g", null), nodes = s("g", null);
+    svg.append(arcs, edges, nodes);
+    var fits = [];
+
+    var runStart = 0;
+    for (var j = 1; j <= items.length; j++) {
+      if (j === items.length || str(items[j].group) !== str(items[runStart].group)) {
+        drawArc(arcs, fits, "rel" + runStart, -90 + runStart * step, -90 + j * step, relLabel(items[runStart].group), 372, step);
+        runStart = j;
+      }
+    }
+
+    var cn = Array.from(fw).length;
+    var cg = s("g", { class: "node center" + (selKey === "f" ? " sel" : "") },
+      s("title", null, fw + ", " + f.lang),
+      s("circle", { class: "c-disc", r: 78 }));
+    var from = str(f.node.roman);
+    var ct = s("text", { class: "c-word", "text-anchor": "middle", y: from ? -16 : -6, dy: "0.35em" }, fw);
+    ct.style.fontSize = (cn <= 4 ? 40 : cn <= 7 ? 30 : cn <= 12 ? 22 : 16) + "px";
+    cg.append(ct);
+    var fr = null;
+    if (from) { fr = s("text", { class: "c-rom", "text-anchor": "middle", y: 22 }, from); fr.style.fontSize = "16px"; cg.append(fr); }
+    cg.append(s("text", { class: "f-lang", "text-anchor": "middle", y: from ? 46 : 40 }, f.lang));
+    fits.push(function () { if (fr) fitText(fr, 128, 9); });
+    activate(cg, "f");
+    cg.setAttribute("aria-label", fw + ", " + f.lang);
+    nodes.append(cg);
+    fits.push(function () { fitText(ct, 138, 9); });
+
+    angles.forEach(function (a, k) {
+      var it = items[k];
+      var flip = Math.cos(rad(a)) < 0;
+      var key = "r:" + k;
+      var p0 = pt(86, a), p1 = pt(150, a);
+      edges.append(s("line", { class: "g-edge", x1: f1(p0[0]), y1: f1(p0[1]), x2: f1(p1[0]), y2: f1(p1[1]) }));
+      var g = s("g", { transform: "rotate(" + f1(a) + ")", class: "node rel" + (it ? "" : " pending") + (selKey === key ? " sel" : "") });
+      if (it) g.append(s("rect", { class: "hit", x: 147, y: -13, width: 218, height: 26, rx: 13 }));
+      g.append(s("circle", { class: "nmark", cx: 158, cy: 0, r: it ? 4.5 : 3 }));
+      if (it) {
+        var nt = rtext(170, true, flip, "t-near", 17);
+        nt.append(s("tspan", null, str(it.word)));
+        if (str(it.roman)) nt.append(s("tspan", { class: "rom", dx: 8 }, str(it.roman)));
+        g.append(nt);
+        g.append(s("title", null, str(it.word) + (str(it.roman) ? " (" + str(it.roman) + ")" : "") + (str(it.gloss) ? ", " + str(it.gloss) : "")));
+        g.setAttribute("aria-label", relLabel(it.group) + ": " + str(it.word) + " " + str(it.roman));
+        activate(g, key);
+        fits.push(function () { fitText(nt, 190, 11, true); });
+      }
+      nodes.append(g);
+    });
+    mountSvg(svg, fits);
+  }
+
+  function renderCrumbs() {
+    var nav = $("crumbs"), legend = $("legend");
+    nav.textContent = "";
+    if (!path.length) { nav.hidden = true; legend.hidden = false; return; }
+    nav.hidden = false;
+    legend.hidden = true;
+    nav.append(h("button", { type: "button", onclick: function () { goTo(0); } }, "Map of " + current.word));
+    path.forEach(function (f, i) {
+      nav.append(h("span", { class: "sep", "aria-hidden": "true" }, "/"));
+      var label = str(f.node.word) + (str(f.node.roman) ? " (" + str(f.node.roman) + ")" : "");
+      if (i === path.length - 1) nav.append(h("span", { class: "here", dir: "auto" }, label), h("span", { class: "what" }, "and the " + f.lang + " words related to it"));
+      else nav.append(h("button", { type: "button", onclick: function () { goTo(i + 1); } }, label));
+    });
+  }
+  function goTo(depth) {
+    path.length = depth;
+    selKey = "";
+    setStatus("");
+    renderAll();
+  }
+  function renderGraph() {
+    if (path.length) renderFocus(); else renderAtlas();
+    renderCrumbs();
+    markHot();
+  }
+  function markHot() {
+    var lang = selKey.charAt(0) === "l" ? selKey.slice(2) : (selKey.charAt(0) === "n" ? selKey.split(":")[1] : "");
+    $("svgmount").querySelectorAll(".g-edge").forEach(function (el) {
+      el.classList.toggle("hot", !!lang && el.getAttribute("data-lang") === lang);
+    });
+  }
+  function select(key) {
+    if (key === selKey && key) key = "";
+    selKey = key;
+    $("svgmount").querySelectorAll(".node").forEach(function (el) {
+      el.classList.toggle("sel", !!key && el.getAttribute("data-key") === key);
+    });
+    markHot();
+    renderPop(true);
+  }
+
+  /* ---------- word card ---------- */
+  var REL = { root: "Same root", built: "Built from it", near: "Near in meaning", phrase: "Phrases and sayings", against: "Set against it" };
+  var REL_ORDER = ["root", "built", "near", "phrase", "against"];
+  function relLabel(g) { return REL[str(g)] || "Related"; }
+  function focus() { return path.length ? path[path.length - 1] : null; }
+  function relatedOf(node) { return Array.isArray(node.related) ? node.related : []; }
+  function resolve(key) {
+    var parts = key.split(":");
+    var f = focus();
+    if (f) {
+      if (key === "f") return { lang: f.lang, node: f.node, kind: f.kind, parent: f.parent, center: true };
+      var it = parts[0] === "r" ? relatedOf(f.node)[Number(parts[1])] : null;
+      return it ? { lang: f.lang, node: it, kind: "related", parent: f.node } : null;
+    }
+    var e = parts[1] ? entryFor(parts[1]) : null;
+    if (!e) return null;
+    if (parts[0] === "l") return { lang: parts[1], node: e, kind: "entry", parent: null };
+    var n = parts[0] === "n" ? nearOf(e)[Number(parts[2])] : null;
+    return n ? { lang: parts[1], node: n, kind: "near", parent: e } : null;
+  }
+  function block(title, text, extra) {
+    if (!text) return null;
+    return h("div", { class: "block" }, h("h4", null, title, extra), h("p", null, text));
+  }
+  function fitRow(e) {
+    var fit = FIT[str(e.fit)] || FIT.close;
+    var bars = [0, 1, 2].map(function (i) { return h("i", { class: i < fit.bars ? "on" : null }); });
+    return h("p", { class: "fit" + (fit.loose ? " loose" : "") }, h("span", { class: "meter", "aria-hidden": "true" }, bars), fit.label);
+  }
+  function examples(list) {
+    var ok = Array.isArray(list) ? list.filter(function (x) { return x && str(x.text); }) : [];
+    if (!ok.length) return null;
+    return h("div", { class: "block" }, h("h4", null, "In a sentence"), ok.map(function (x) {
+      return h("div", { class: "ex" },
+        h("p", { class: "n", dir: "auto" }, str(x.text)),
+        str(x.roman) && h("p", { class: "r" }, str(x.roman)),
+        str(x.english) && h("p", null, str(x.english)));
+    }));
+  }
+  function actions(ref) {
+    var node = ref.node, m = node.more;
+    var ms = moreState.get(node) || {}, rs = relState.get(node) || {};
+    var box = h("div", { class: "more" });
+    if (!ref.center) {
+      if (rs.loading) add(box, h("p", { class: "hint" }, "Asking Claude for related words."));
+      else {
+        add(box, rs.error && h("p", { class: "hint" }, rs.error));
+        add(box, h("button", { type: "button", class: "btn", onclick: function () { drill(ref); } }, "Show related words in " + ref.lang));
+      }
+    }
+    if (m && typeof m === "object") {
+      var cert = CERT[str(m.certainty)];
+      add(box, [
+        block("Word for word", str(m.literal)),
+        block("More on its history", str(m.origin), cert && h("span", { class: "cert" }, cert)),
+        block("More on its use", str(m.usage)),
+        examples(m.examples),
+        block("In other languages", str(m.elsewhere))]);
+    } else if (ms.loading) {
+      add(box, h("p", { class: "hint" }, "Asking Claude. This can take up to a minute."));
+    } else {
+      add(box, ms.error && h("p", { class: "hint" }, ms.error));
+      add(box, h("button", { type: "button", class: "btn quiet", onclick: function () { askMore(ref); } }, "Ask Claude for more on this word"));
+    }
+    return box;
+  }
+  function closeBtn() {
+    return h("button", { type: "button", class: "btn quiet", onclick: function () { select(""); } }, "Close");
+  }
+  function popContent(key) {
+    var out = [];
+    if (key === "c") {
+      var o = current.overview || {};
+      var meta = [str(o.language), str(o.pos)].filter(Boolean).join(", ");
+      out.push(h("div", { class: "p-top" }, h("p", { class: "p-lang" }, "The word you typed", meta && h("span", null, meta)), closeBtn()));
+      out.push(h("h3", { class: "p-word", dir: "auto" }, str(o.word) || current.word));
+      if (str(o.roman)) out.push(h("p", { class: "p-say" }, h("span", { class: "r" }, str(o.roman))));
+      if (str(o.sense)) out.push(h("p", { class: "p-gloss" }, str(o.sense)));
+      out.push(block("Where it comes from", str(o.origin)));
+      out.push(block("How languages divide the idea", str(o.pattern)));
+      return out;
+    }
+    var ref = resolve(key);
+    if (!ref) return null;
+    var lang = ref.lang, n = ref.node;
+    if (ref.kind === "entry") {
+      var cert = CERT[str(n.certainty)];
+      var near = focus() ? [] : nearOf(n);
+      out.push(h("div", { class: "p-top" }, h("p", { class: "p-lang" }, lang, h("span", null, FAMILY[lang] || str(n.family))), closeBtn()));
+      out.push(h("h3", { class: "p-word", dir: "auto" }, str(n.word)));
+      if (str(n.roman) || str(n.ipa)) out.push(h("p", { class: "p-say" }, str(n.roman) && h("span", { class: "r" }, str(n.roman)), str(n.ipa) && h("span", { class: "i" }, str(n.ipa))));
+      if (str(n.gloss)) out.push(h("p", { class: "p-gloss" }, str(n.gloss)));
+      out.push(fitRow(n));
+      if (str(n.fit_note)) out.push(h("p", { class: "fit-note" }, str(n.fit_note)));
+      out.push(block("Where it comes from", str(n.origin), cert && h("span", { class: "cert" }, cert)));
+      out.push(block("When people use it", str(n.usage)));
+      if (near.length) {
+        out.push(h("div", { class: "block" }, h("h4", null, "Words and phrases near it"),
+          h("ul", { class: "p-near" }, near.map(function (x, k) {
+            return h("li", { class: x.only_here ? "only" : null },
+              h("button", { type: "button", onclick: function () { select("n:" + lang + ":" + k); } },
+                h("span", { class: "w", dir: "auto" }, str(x.word), str(x.roman) && h("i", null, str(x.roman))),
+                h("span", { class: "g" }, str(x.gloss))));
+          }))));
+      }
+      out.push(actions(ref));
+      return out;
+    }
+    var role = ref.kind === "related" && !ref.center ? relLabel(n.group) : (n.kind === "phrase" ? "Phrase" : (ref.kind === "near" ? "Nearby word" : "Word"));
+    out.push(h("div", { class: "p-top" }, h("p", { class: "p-lang" }, lang, h("span", null, role)), closeBtn()));
+    out.push(h("h3", { class: "p-word", dir: "auto" }, str(n.word)));
+    if (str(n.roman)) out.push(h("p", { class: "p-say" }, h("span", { class: "r" }, str(n.roman))));
+    if (n.only_here) out.push(h("p", { class: "only-tag" }, "No match in most other languages"));
+    if (str(n.gloss)) out.push(h("p", { class: "p-gloss" }, str(n.gloss)));
+    out.push(block(ref.kind === "related" ? "How it relates" : "What sets it apart", str(n.note)));
+    if (ref.kind === "near" && !focus()) {
+      out.push(h("button", { type: "button", class: "linkbtn", onclick: function () { select("l:" + lang); } },
+        "Back to " + str(ref.parent.word) + (str(ref.parent.roman) ? " (" + str(ref.parent.roman) + ")" : "") + ", the " + lang + " word for " + current.word));
+    }
+    out.push(actions(ref));
+    return out;
+  }
+  function placePop(scroll) {
+    var pop = $("pop");
+    if (pop.hidden || !geo) return;
+    var canvas = $("canvas"), scroller = $("scroller");
+    var W = canvas.clientWidth, H = canvas.clientHeight, scale = W / (2 * geo.R);
+    var at = geo.anchor(selKey);
+    var middle = selKey === "c" || selKey === "f";
+    var px = (at[0] + geo.R) * scale, py = (at[1] + geo.R) * scale;
+    var view = scroller.clientWidth;
+    var left, top, width;
+    if (view < 700) {
+      width = Math.min(340, view - 24);
+      left = scroller.scrollLeft + (view - width) / 2;
+      top = py + 28;
+    } else {
+      width = 340;
+      left = middle ? W / 2 + (geo.centerR + 16) * scale : (px >= W / 2 ? W / 2 - width - 60 * scale : W / 2 + 60 * scale);
+      top = py - 90;
+    }
+    pop.style.width = width + "px";
+    pop.style.left = Math.max(8, Math.min(left, W - width - 8)) + "px";
+    pop.style.top = "0px";
+    var ph = pop.offsetHeight;
+    pop.style.top = Math.max(8, Math.min(top, H - ph - 8)) + "px";
+    if (scroll) { try { pop.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (e) { /* older browsers */ } }
+  }
+  function renderPop(scroll) {
+    var pop = $("pop");
+    var content = selKey ? popContent(selKey) : null;
+    pop.textContent = "";
+    if (!content) { pop.hidden = true; if (selKey) selKey = ""; return; }
+    content.forEach(function (c) { add(pop, c); });
+    pop.hidden = false;
+    pop.scrollTop = 0;
+    placePop(scroll);
+  }
+  function refreshCard(node) {
+    var ref = selKey && selKey !== "c" ? resolve(selKey) : null;
+    if (ref && ref.node === node) renderPop(false);
+  }
+
+  /* ---------- overview under the graph ---------- */
+  function renderOverview() {
+    var box = $("overview");
+    box.textContent = "";
+    var o = current.overview || {};
+    var kin = Array.isArray(o.kin) ? o.kin.filter(function (k) { return k && str(k.root); }) : [];
+    var grid = h("div", { class: "overview" },
+      h("div", null,
+        block("Where the word comes from", str(o.origin)),
+        h("div", { style: "height:16px" }),
+        block("How languages divide the idea", str(o.pattern))),
+      kin.length ? h("div", { class: "block" }, h("h4", null, "Shared roots"),
+        h("ul", { class: "kin" }, kin.map(function (k) {
+          var who = Array.isArray(k.languages) ? k.languages.map(str).filter(Boolean).join(", ") : "";
+          return h("li", null, h("span", { class: "root" }, str(k.root)), who && h("span", { class: "who" }, who), str(k.note) && h("p", null, str(k.note)));
+        }))) : null);
+    if (str(o.origin) || str(o.pattern) || kin.length) box.append(grid);
+    box.append(h("div", { class: "tools" },
+      current.entries.length ? h("button", { type: "button", class: "btn quiet", id: "copy", onclick: copyMarkdown }, "Copy everything as Markdown") : null,
+      current.example ? h("span", { class: "hint" }, "This map is a worked example, written by hand. Click வீடு on the Tamil spoke and choose Show related words to go one level in. Type any word above and choose Look up to make your own.") : null));
+  }
+  function renderAll() {
+    renderGraph();
+    renderPop(false);
+    renderOverview();
+  }
+
+  /* ---------- copy ---------- */
+  function toMarkdown(res) {
+    var o = res.overview || {};
+    var out = [];
+    var meta = [str(o.language), str(o.pos)].filter(Boolean).join(", ");
+    out.push("# " + (str(o.word) || res.word) + (meta ? " (" + meta + ")" : ""));
+    if (str(o.sense)) out.push("Sense: " + str(o.sense));
+    if (str(o.origin)) out.push("", "Origin: " + str(o.origin));
+    if (str(o.pattern)) out.push("", "Across languages: " + str(o.pattern));
+    (Array.isArray(o.kin) ? o.kin : []).forEach(function (k) {
+      if (!k || !str(k.root)) return;
+      var who = Array.isArray(k.languages) ? k.languages.map(str).filter(Boolean).join(", ") : "";
+      out.push("- Shared root " + str(k.root) + (who ? " (" + who + ")" : "") + (str(k.note) ? ": " + str(k.note) : ""));
+    });
+    res.langs.forEach(function (lang) {
+      var e = null;
+      res.entries.forEach(function (x) { if (str(x.language) === lang) e = x; });
+      if (!e) return;
+      var fit = FIT[str(e.fit)] || FIT.close;
+      var say = [str(e.roman), str(e.ipa)].filter(Boolean).join(" ");
+      out.push("", "## " + lang + ": " + str(e.word) + (say ? " (" + say + ")" : ""));
+      if (str(e.gloss)) out.push("- Meaning: " + str(e.gloss));
+      out.push("- Fit: " + fit.label + (str(e.fit_note) ? ". " + str(e.fit_note) : ""));
+      if (str(e.origin)) out.push("- Origin" + (CERT[str(e.certainty)] ? " (" + CERT[str(e.certainty)].toLowerCase() + ")" : "") + ": " + str(e.origin));
+      if (str(e.usage)) out.push("- Use: " + str(e.usage));
+      nearOf(e).forEach(function (n) {
+        out.push("- Near" + (n.only_here ? " (no match elsewhere)" : "") + ": " + str(n.word) + (str(n.roman) ? " (" + str(n.roman) + ")" : "") +
+          (str(n.gloss) ? ", " + str(n.gloss) : "") + (str(n.note) ? ". " + str(n.note) : ""));
+      });
+      if (Array.isArray(e.related) && e.related.length) {
+        out.push("- Related in " + lang + ": " + e.related.map(function (x) {
+          return str(x.word) + (str(x.roman) ? " (" + str(x.roman) + ")" : "") + (str(x.gloss) ? ", " + str(x.gloss) : "");
+        }).join("; "));
+      }
+    });
+    return out.join("\n");
+  }
+  function copyMarkdown() {
+    var btn = $("copy");
+    var done = function (label) {
+      if (!btn) return;
+      btn.textContent = label;
+      setTimeout(function () { if (btn.isConnected) btn.textContent = "Copy everything as Markdown"; }, 1800);
+    };
+    try {
+      navigator.clipboard.writeText(toMarkdown(current)).then(function () { done("Copied"); }, function () { done("Copy was blocked"); });
+    } catch (e) { done("Copy was blocked"); }
+  }
+
+  /* ---------- asking Claude ---------- */
+  // On my site the page loads a helper that calls Claude with the visitor's own key. In Claude, the page asks Claude directly.
+  var SITE = !!(window.Claude && typeof window.Claude.stream === "function");
+  function siteSample(input, opts) {
+    opts = opts || {};
+    return window.Claude.stream({
+      messages: [{ role: "user", content: input }],
+      maxTokens: 16000,
+      effort: opts.modelTier === "quick" ? "low" : "medium",
+      signal: opts.signal,
+      onText: function (delta, full) { if (opts.onText) opts.onText({ text: full, delta: delta }); }
+    }).then(function (r) {
+      return { text: r.text, truncated: r.stopReason === "max_tokens" };
+    }, function (e) {
+      if (e && e.name === "AbortError") throw { code: "cancelled" };
+      ERR.site = (e && e.message) || "The connection to Claude dropped. Try again.";
+      throw { code: "site" };
+    });
+  }
+  siteSample.json = function (input, opts) {
+    return siteSample(input + "\n\nReply with one JSON value only: no code fence and no text around it.", opts).then(function (r) {
+      var t = String(r.text || "").replace(/^\s*```[a-z]*\s*/i, "").replace(/\s*```\s*$/, "");
+      var a = t.search(/[\[{]/);
+      var b = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+      try { return JSON.parse(a >= 0 && b > a ? t.slice(a, b + 1) : t); } catch (e) { throw { code: "invalid_json" }; }
+    });
+  };
+  var samplePromise = null;
+  function getSample() {
+    if (SITE) return Promise.resolve(siteSample);
+    if (!window.claude || typeof window.claude.use !== "function") return Promise.resolve(null);
+    if (!samplePromise) samplePromise = window.claude.use("sample").catch(function () { return null; });
+    return samplePromise;
+  }
+  function tier() { return $("speed-fast").checked ? "quick" : "default"; }
+  var ERR = {
+    not_granted: "Claude is not allowed on this page, so lookups are off. The example and your recent words still work.",
+    sampling_disabled: "Claude is not available for this account, so lookups are off.",
+    not_declared: "This page is not set up to ask Claude yet.",
+    capability_disabled: "Lookups do not work in this view. Open the page in Claude and try again.",
+    capability_removed: "Lookups do not work in this view. Open the page in Claude and try again.",
+    rate_limited: "Too many requests for now. Wait a minute, then try again.",
+    session_expired: "You are signed out. Sign in to Claude again, then try again.",
+    refused: "Claude declined this word. Try a different word or sense.",
+    empty_completion: "Claude sent nothing back. Try again with fewer languages.",
+    prompt_too_large: "That request is too long. Shorten the word or the sense.",
+    invalid_json: "Claude replied in a form this page could not read. Try again."
+  };
+  var NO_CLAUDE = "This needs Claude, and it is not available in this view. Open the page in Claude to use it.";
+
+  function buildPrompt(word, sense, langs, withOverview, allLangNames) {
+    var lines = [
+      "You are writing entries for a comparative dictionary. The reader wants to see one word across languages: the closest word in each, where it came from, when people use it, and the nearby words and phrases that each language has and others lack.",
+      "",
+      "Source word: " + JSON.stringify(word),
+      "Sense to translate: " + (sense ? JSON.stringify(sense) : "the most common sense. If the word has several, choose the main one."),
+      "The source word may be in any language. Write every explanation in English.",
+      "Target languages, in this order: " + langs.join(", ") + ".",
+      "",
+      "Reply in JSON Lines only: one complete JSON object per line, no code fence, no text outside the objects, no line breaks inside an object.",
+      ""
+    ];
+    if (withOverview) {
+      lines.push(
+        "Line 1 is the overview:",
+        '{"type":"overview","word":"the source word","roman":"its romanization if the script is not Latin, else empty string","language":"its language","pos":"part of speech","sense":"the sense you are translating, under 12 words","origin":"2 to 3 sentences on where the source word comes from: earliest form, root, and a cognate or place name the reader may know","pattern":"3 to 4 sentences on how languages divide this idea differently: what they merge, split or lack","kin":[{"root":"shared ancestor form","languages":["languages that share it"],"note":"one sentence"}]}',
+        "For the overview, consider this full list of languages: " + allLangNames.join(", ") + ". kin lists only real cognate groups among them, at most 7. Use [] when there are none.",
+        "",
+        "Then one line per target language, in the order given:"
+      );
+    } else {
+      lines.push("One line per target language, in the order given:");
+    }
+    lines.push(
+      '{"type":"entry","language":"name exactly as given","word":"the word in its native script","roman":"scholarly romanization with diacritics, or empty string if the script is Latin","ipa":"/IPA/","gloss":"what this word itself covers, under 10 words","fit":"exact | close | approximate | none","fit_note":"one sentence on how its meaning differs from the source word","origin":"1 to 2 sentences: the root or older form, the language it came from, the literal meaning if there is one","certainty":"settled | likely | disputed","usage":"1 to 2 sentences: who says it and when, with one common phrase or compound","near":[{"word":"native script, at most 4 words","roman":"romanization or empty string","kind":"word | phrase","gloss":"under 8 words","note":"one sentence on what sets it apart","only_here":true}]}',
+      "",
+      "Rules:",
+      "- Choose the word a native speaker would really use for this sense. If no single word fits, give the closest one and set fit to approximate or none.",
+      "- If a target language is the language of the source word, its entry is the source word itself with fit exact.",
+      "- near holds exactly 3 items: words, set phrases or idioms in the same language that sit close to the source word. Look first for ones that belong to this language or culture and that most of the other languages cannot say in one word or set phrase. Set only_here to true for those, and false for ordinary neighbours. Do not force it: all false is fine. Put only_here items first.",
+      "- State only etymology you are confident of. If scholars disagree or you are unsure, say so in origin and set certainty to likely or disputed. Never invent a root.",
+      "- For ancient languages, usage describes the texts and periods where the word appears.",
+      "- Plain, concrete English. Short sentences. No em dashes."
+    );
+    return lines.join("\n");
+  }
+  function parseLine(line) {
+    var t = line.trim().replace(/,$/, "");
+    if (t.charAt(0) !== "{") return null;
+    try { return JSON.parse(t); } catch (e) { return null; }
+  }
+  function takeObject(o, part) {
+    if (!o || typeof o !== "object") return false;
+    if (o.type === "overview" || (!o.type && o.pattern)) { current.overview = o; return true; }
+    if (!str(o.word) || !str(o.language)) return false;
+    var name = str(o.language).toLowerCase();
+    var match = part.filter(function (l) { return l.toLowerCase() === name; })[0] ||
+      part.filter(function (l) { return !entryFor(l); })[0];
+    if (!match || entryFor(match)) return false;
+    o.language = match;
+    current.entries.push(o);
+    return true;
+  }
+  function setRunning(on) {
+    running = on;
+    $("go").hidden = on;
+    $("stop").hidden = !on;
+  }
+  function lookup() {
+    if (running) return;
+    var word = $("word").value.trim();
+    var sense = $("sense").value.trim();
+    if (!word) { setStatus("Type a word first.", true); $("word").focus(); return; }
+    if (SITE && !window.Claude.getKey()) { setStatus("Add your Claude API key first. The box is under the Look up button.", true); return; }
+    var langs = orderedChosen();
+    var t = tier();
+    setRunning(true);
+    setStatus("Asking Claude.");
+    getSample().then(function (sample) {
+      if (!sample) { setRunning(false); setStatus(NO_CLAUDE, true); return; }
+      var run = ++runId;
+      current = { word: word, sense: sense, langs: langs, overview: null, entries: [], example: false };
+      selKey = "";
+      path = [];
+      renderAll();
+      setStatus(t === "quick" ? "Asking Claude." : "Asking Claude. Careful answers think first, so the first words can take a minute.");
+      var half = Math.ceil(langs.length / 2);
+      var parts = langs.length > 8 ? [langs.slice(0, half), langs.slice(half)] : [langs];
+      var left = parts.length;
+      var codes = [];
+      ctls = parts.map(function () { return new AbortController(); });
+      var done = function () {
+        if (run !== runId) return;
+        setRunning(false);
+        ctls = [];
+        if (!current.entries.length) {
+          var why = codes.filter(function (c) { return c !== "cancelled"; })[0];
+          current = clone(EXAMPLE);
+          path = [];
+          renderAll();
+          $("word").value = word;
+          setStatus(codes.indexOf("cancelled") >= 0 && !why ? "Stopped. Showing the example again." : (ERR[why] || "The connection to Claude dropped. Look the word up again."), true);
+          return;
+        }
+        renderAll();
+        remember(current);
+        var missing = langs.filter(function (l) { return !entryFor(l); });
+        var bad = codes.filter(function (c) { return c !== "cancelled" && c !== "truncated"; })[0];
+        if (codes.indexOf("cancelled") >= 0) setStatus("Stopped. Kept the " + current.entries.length + " languages that had arrived.");
+        else if (bad) setStatus((ERR[bad] || "The connection to Claude dropped part way.") + " Kept the " + current.entries.length + " languages that arrived.", true);
+        else if (missing.length) setStatus("Done, but nothing came back for " + missing.join(", ") + ". Look the word up again to retry.", true);
+        else setStatus("Done. " + current.entries.length + " languages. Click any word to open its notes.");
+      };
+      parts.forEach(function (part, idx) {
+        var seen = 0;
+        var eat = function (text, final) {
+          if (run !== runId || !text) return;
+          var lines = text.split("\n");
+          var upto = final ? lines.length : lines.length - 1;
+          var changed = false;
+          for (var i = seen; i < upto; i++) {
+            var o = parseLine(lines[i]);
+            if (o && takeObject(o, part)) changed = true;
+          }
+          if (upto > seen) seen = upto;
+          if (changed) {
+            renderGraph();
+            renderOverview();
+            if (running) setStatus(current.entries.length + " of " + langs.length + " languages done.");
+          }
+        };
+        sample(buildPrompt(word, sense, part, idx === 0, langs), {
+          modelTier: t,
+          signal: ctls[idx].signal,
+          onText: function (u) { eat(u.text, false); }
+        }).then(function (res) {
+          eat(res.text, true);
+          if (res.truncated) codes.push("truncated");
+        }, function (e) {
+          if (e && e.text) eat(e.text, true);
+          codes.push((e && e.code) || "upstream_error");
+        }).then(function () {
+          left -= 1;
+          if (left === 0) done();
+        });
+      });
+    });
+  }
+
+  function askMore(ref) {
+    var n = ref.node;
+    if ((moreState.get(n) || {}).loading) return;
+    var res = current;
+    moreState.set(n, { loading: true });
+    refreshCard(n);
+    getSample().then(function (sample) {
+      if (!sample) { moreState.set(n, { error: NO_CLAUDE }); if (res === current) refreshCard(n); return; }
+      var prompt = [
+        "You are writing a dictionary note in English.",
+        "Language: " + ref.lang,
+        "Word or phrase: " + JSON.stringify(str(n.word)) + (str(n.roman) ? " (" + str(n.roman) + ")" : ""),
+        "Short gloss: " + JSON.stringify(str(n.gloss)),
+        "It appears on a map of words for " + JSON.stringify(res.word) + (res.sense ? " in the sense " + JSON.stringify(res.sense) : "") +
+          (ref.parent ? ", as a neighbour of the " + ref.lang + " word " + JSON.stringify(str(ref.parent.word)) + "." : ", as the closest " + ref.lang + " word."),
+        "",
+        "Reply with only one JSON object:",
+        '{"literal":"word-for-word meaning if it is a compound, a phrase or has a transparent root, else empty string","origin":"3 to 4 sentences on its history: older forms, source language, how the meaning moved","certainty":"settled | likely | disputed","usage":"2 to 3 sentences: who says it, when, register and feeling","examples":[{"text":"a short natural sentence in native script","roman":"romanization, or empty string if Latin script","english":"translation"}],"elsewhere":"one sentence: the closest thing other languages have, or that they have none"}',
+        "Give 2 examples. State only etymology you are confident of. If you are unsure, say so and set certainty to likely or disputed. Plain, concrete English. No em dashes."
+      ].join("\n");
+      sample.json(prompt, { modelTier: tier() }).then(function (value) {
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          n.more = value;
+          moreState.set(n, {});
+          if (res === current && !res.example && !running) remember(res);
+        } else moreState.set(n, { error: ERR.invalid_json });
+      }, function (e) {
+        moreState.set(n, { error: ERR[e && e.code] || "The connection to Claude dropped. Try again." });
+      }).then(function () {
+        if (res === current) refreshCard(n);
+      });
+    });
+  }
+
+  /* Related words in the same language: open them as their own map. */
+  function relPrompt(ref, res) {
+    var n = ref.node, lang = ref.lang;
+    return [
+      "You are writing entries for a dictionary of " + lang + ". Explanations are in English.",
+      "Word or phrase: " + JSON.stringify(str(n.word)) + (str(n.roman) ? " (" + str(n.roman) + ")" : ""),
+      "Short gloss: " + JSON.stringify(str(n.gloss)),
+      "Context: it appears on a map of words for " + JSON.stringify(res.word) + (res.sense ? " in the sense " + JSON.stringify(res.sense) : "") + ".",
+      "",
+      "List the 14 to 16 words and set phrases in " + lang + " that are most closely related to it.",
+      "Reply in JSON Lines only: one complete JSON object per line, no code fence, no text outside the objects.",
+      '{"group":"root | built | near | phrase | against","word":"in native script, at most 5 words","roman":"romanization with diacritics, or empty string if the script is Latin","kind":"word | phrase","gloss":"under 8 words","note":"one sentence on how it relates to the word above"}',
+      "Groups: root = its source word and words that share its root. built = compounds and derived words that contain it. near = words close in meaning, with the difference. phrase = idioms, proverbs and set phrases that use it. against = its opposites and the words it is usually set against.",
+      "Write the lines in that group order. Use 2 to 5 items per group, and leave a group out if it has no real members.",
+      "Every item must be a real, attested " + lang + " word or phrase. Never invent one, and do not repeat the word itself. State only etymology you are confident of. Plain, concrete English. No em dashes."
+    ].join("\n");
+  }
+  function drill(ref) {
+    var node = ref.node, lang = ref.lang;
+    var enter = function () {
+      path.push({ lang: lang, node: node, kind: ref.kind, parent: ref.parent });
+      selKey = "";
+      renderAll();
+      try { $("scroller").scrollIntoView({ block: "nearest" }); } catch (e) { /* older browsers */ }
+    };
+    if (relatedOf(node).length) {
+      enter();
+      if (!(relState.get(node) || {}).loading) setStatus(node.related.length + " related words in " + lang + ". Click one to open its notes.");
+      return;
+    }
+    if ((relState.get(node) || {}).loading) return;
+    var res = current;
+    relState.set(node, { loading: true });
+    refreshCard(node);
+    getSample().then(function (sample) {
+      if (!sample) { relState.set(node, { error: NO_CLAUDE }); if (res === current) refreshCard(node); return; }
+      if (res !== current) { relState.set(node, {}); return; }
+      node.related = [];
+      enter();
+      setStatus("Asking Claude for words related to " + str(node.word) + " in " + lang + ".");
+      var seen = 0;
+      var here = function () { var f = focus(); return res === current && !!f && f.node === node; };
+      var eat = function (text, final) {
+        if (!text) return;
+        var lines = text.split("\n");
+        var upto = final ? lines.length : lines.length - 1;
+        var changed = false;
+        for (var i = seen; i < upto; i++) {
+          var o = parseLine(lines[i]);
+          if (!o || !str(o.word) || node.related.length >= 20) continue;
+          if (node.related.some(function (x) { return str(x.word) === str(o.word); })) continue;
+          node.related.push(o);
+          changed = true;
+        }
+        if (upto > seen) seen = upto;
+        if (changed && here()) renderGraph();
+      };
+      sample(relPrompt(ref, res), { modelTier: tier(), onText: function (u) { eat(u.text, false); } }).then(function (r) {
+        eat(r.text, true);
+        return r.truncated ? "truncated" : "";
+      }, function (e) {
+        if (e && e.text) eat(e.text, true);
+        return (e && e.code) || "upstream_error";
+      }).then(function (code) {
+        var ok = node.related.length > 0;
+        if (ok) {
+          var rank = function (x) { var k = REL_ORDER.indexOf(str(x.group)); return k < 0 ? REL_ORDER.length : k; };
+          var sorted = node.related.map(function (x, i) { return [x, i]; }).sort(function (p, q) { return rank(p[0]) - rank(q[0]) || p[1] - q[1]; }).map(function (p) { return p[0]; });
+          var moved = sorted.some(function (x, i) { return x !== node.related[i]; });
+          node.related = sorted;
+          relState.set(node, {});
+          if (moved && here()) selKey = "";
+        } else {
+          delete node.related;
+          relState.set(node, { error: ERR[code] || "The connection to Claude dropped. Try again." });
+        }
+        if (res !== current) return;
+        if (ok && !res.example && !running) remember(res);
+        if (!here()) return;
+        if (!ok) path.pop();
+        renderAll();
+        if (!ok) setStatus(ERR[code] || "The connection to Claude dropped. Try again.", true);
+        else if (code) setStatus("The answer stopped early. Kept the " + node.related.length + " related words that arrived.", true);
+        else setStatus(node.related.length + " related words in " + lang + ". Click one to open its notes.");
+      });
+    });
+  }
+
+  /* ---------- wiring ---------- */
+  $("lookup").addEventListener("submit", function (ev) { ev.preventDefault(); lookup(); });
+  $("stop").addEventListener("click", function () { ctls.forEach(function (c) { c.abort(); }); });
+  $("addlang").addEventListener("click", addLang);
+  $("newlang").addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); addLang(); } });
+  $("resetlangs").addEventListener("click", function () { chosen = DEFAULTS.slice(); save("wa2.langs", chosen); setStatus(""); renderLangs(); });
+  $("pop").addEventListener("click", function (ev) { ev.stopPropagation(); });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && selKey) select(""); });
+  window.addEventListener("resize", function () { placePop(false); });
+
+  var ZOOMS = [1, 1.35, 1.8];
+  function applyZoom(keep) {
+    var z = ZOOMS[zoom - 1];
+    var sc = $("scroller");
+    var mid = keep && sc.scrollWidth ? (sc.scrollLeft + sc.clientWidth / 2) / sc.scrollWidth : 0.5;
+    $("canvas").style.width = "max(" + (z * 100) + "%, " + Math.round(880 * z) + "px)";
+    sc.scrollLeft = Math.max(0, mid * sc.scrollWidth - sc.clientWidth / 2);
+    $("zoomout").disabled = zoom === 1;
+    $("zoomin").disabled = zoom === ZOOMS.length;
+    placePop(false);
+  }
+  $("zoomin").addEventListener("click", function () { if (zoom < ZOOMS.length) { zoom += 1; applyZoom(true); } });
+  $("zoomout").addEventListener("click", function () { if (zoom > 1) { zoom -= 1; applyZoom(true); } });
+
+  function start(data) {
+    if (data && data.current && Array.isArray(data.current.entries) && data.current.entries.length && Array.isArray(data.current.langs)) {
+      current = data.current;
+      $("word").value = str(data.word) || current.word;
+      $("sense").value = str(data.sense);
+    }
+    renderLangs();
+    renderRecent();
+    applyZoom();
+    renderAll();
+    applyZoom();
+    if (SITE) {
+      $("keybox").hidden = false;
+      window.Claude.keyBox($("keybox"));
+      $("sitenote").hidden = false;
+      $("sitenote").textContent = "Your key and the words you look up go only to Anthropic. Recent words are kept in this browser only.";
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { if (!running) renderGraph(); });
+    }
+  }
+  var hot = window.claude && window.claude.hot;
+  if (hot && typeof hot.snapshot === "function") {
+    try { hot.snapshot(function () { return { current: current, word: $("word").value, sense: $("sense").value }; }); } catch (e) { /* optional */ }
+  }
+  if (hot && typeof hot.ready === "function") hot.ready(start);
+  else start((hot && hot.data) || {});
+})();
+</script>
+</body>
+</html>
