@@ -29,6 +29,7 @@
 - [Free of Tools](https://hmeyy.com/essays/free-of-tools.html): Not the tool with all the features, but the freedom to be free of tools: plain text, picked up anywhere, anytime. For ADHD, the ritual gets done because it’s simple.
 - [How to Win Hackathons](https://hmeyy.com/essays/how-to-win-hackathons.html): A guide to winning hackathons: making marginal gains in ideation, team formation, prototyping and presentation.
 - [Peter Kaufman on Interdisciplinary Thinking](https://hmeyy.com/essays/interdisciplinary-thinking.html): Notes on the talk that made multidisciplinary thinking click.
+- [Know How You’ll Meet It](https://hmeyy.com/essays/know-how-youll-meet-it.html): You can’t know what comes next, but you can know how you’ll meet it. That’s a different answer to the need: fix the response, not the forecast. The Stoics, the Gita, armies, pilots and improv all found it.
 - [Lessons In Crypto Markets](https://hmeyy.com/essays/lessons-in-crypto-markets.html): What a year of trading taught me about risk, patience and myself.
 - [A List of Lists, One Item at a Time](https://hmeyy.com/essays/list-of-lists.html): My tradeoff: organize items in a list of lists, but look at them one at a time. Organizing wants to see everything. Doing, with an ADHD mind, wants to see one thing.
 - [Lists of Book Lists](https://hmeyy.com/essays/lists-of-book-lists.html): The reading lists I go back to when choosing what to read next.
