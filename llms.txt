@@ -25,6 +25,7 @@
 - [How to Win Hackathons](https://hmeyy.com/essays/how-to-win-hackathons.html): A guide to winning hackathons: making marginal gains in ideation, team formation, prototyping and presentation.
 - [Peter Kaufman on Interdisciplinary Thinking](https://hmeyy.com/essays/interdisciplinary-thinking.html): Notes on the talk that made multidisciplinary thinking click.
 - [Lessons In Crypto Markets](https://hmeyy.com/essays/lessons-in-crypto-markets.html): What a year of trading taught me about risk, patience and myself.
+- [A List of Lists, One Item at a Time](https://hmeyy.com/essays/list-of-lists.html): My tradeoff: organize items in a list of lists, but look at them one at a time. Organizing wants to see everything. Doing, with an ADHD mind, wants to see one thing.
 - [Lists of Book Lists](https://hmeyy.com/essays/lists-of-book-lists.html): The reading lists I go back to when choosing what to read next.
 - [Ode to Systems Thinking](https://hmeyy.com/essays/ode-to-systems-thinking.html): Consumers, creators and investors, and what it means to see the whole.
 - [One Thing at a Time](https://hmeyy.com/essays/one-thing-at-a-time.html): A constraint worth adding: do one thing at a time, picked from a short menu, and don't drop it once it's started. The start is where neurospicy minds get tripped.
