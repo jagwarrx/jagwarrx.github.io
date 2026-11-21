@@ -7,6 +7,13 @@
   <updated>2026-11-21T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
   <entry>
+    <title>Bottom-Up Programming for Enlightenment</title>
+    <link href="https://hmeyy.com/essays/bottom-up-enlightenment.html"/>
+    <id>https://hmeyy.com/essays/bottom-up-enlightenment.html</id>
+    <updated>2026-11-21T00:00:00Z</updated>
+    <summary>Shinzen Young’s See Hear Feel read as a programmer would: six primitives and a null, three compiler flags, resistance as a spinlock, and three tiny programs, including the empty loop.</summary>
+  </entry>
+  <entry>
     <title>Suffering = Pain × Resistance</title>
     <link href="https://hmeyy.com/essays/pain-times-resistance.html"/>
     <id>https://hmeyy.com/essays/pain-times-resistance.html</id>
