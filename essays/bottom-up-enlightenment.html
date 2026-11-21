@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bottom-Up Programming for Enlightenment — Hari Meyyappan</title>
 <link rel="canonical" href="https://hmeyy.com/essays/bottom-up-enlightenment.html">
-<meta name="description" content="Shinzen Young&rsquo;s See Hear Feel read as a programmer would: six primitives and a null, three compiler flags, resistance as a spinlock, and three tiny programs, including the empty loop.">
+<meta name="description" content="Paul Graham said to build the language up toward the program. Shinzen Young did that for the mind: six small words for experience, and practices short enough to fit in a sentence.">
 <meta property="og:title" content="Bottom-Up Programming for Enlightenment — Hari Meyyappan">
-<meta property="og:description" content="Shinzen Young&rsquo;s See Hear Feel read as a programmer would: six primitives and a null, three compiler flags, resistance as a spinlock, and three tiny programs, including the empty loop.">
+<meta property="og:description" content="Paul Graham said to build the language up toward the program. Shinzen Young did that for the mind: six small words for experience, and practices short enough to fit in a sentence.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hmeyy.com/essays/bottom-up-enlightenment.html">
 <meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
@@ -20,7 +20,7 @@ if (self !== top) {
   addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
 }
 </script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Bottom-Up Programming for Enlightenment", "description": "Shinzen Young’s See Hear Feel read as a programmer would: six primitives and a null, three compiler flags, resistance as a spinlock, and three tiny programs, including the empty loop.", "url": "https://hmeyy.com/essays/bottom-up-enlightenment.html", "mainEntityOfPage": "https://hmeyy.com/essays/bottom-up-enlightenment.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-21"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Bottom-Up Programming for Enlightenment", "description": "Paul Graham said to build the language up toward the program. Shinzen Young did that for the mind: six small words for experience, and practices short enough to fit in a sentence.", "url": "https://hmeyy.com/essays/bottom-up-enlightenment.html", "mainEntityOfPage": "https://hmeyy.com/essays/bottom-up-enlightenment.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-21"}</script>
 </head>
 <body class="doc">
 <div class="layout">
@@ -48,76 +48,49 @@ if (self !== top) {
 
 <main class="essay">
   <h1>Bottom-Up Programming for Enlightenment</h1>
-  <p class="meta">November 2026. 1,370 words.</p>
+  <p class="meta">November 2026. 950 words.</p>
 
-<p>Paul Graham has a line about Lisp that I&rsquo;ve loved for years. In Lisp, he wrote, you don&rsquo;t just write your program down toward the language, you also build the language up toward your program. You grow a small vocabulary that fits the problem, and then the program becomes short, because the words do most of the work.</p>
-<p>Reading Shinzen Young&rsquo;s <i>The Science of Enlightenment</i>, I had the odd feeling of reading a Lisp book. Shinzen doesn&rsquo;t describe the mind in grand words like soul, ego or enlightenment. He builds a tiny language for experience, from the bottom, and then writes a handful of very short programs in it.</p>
-<p>So this is an attempt to read meditation as a programmer would. It&rsquo;s a metaphor, and I&rsquo;ll push it further than it wants to go. But it&rsquo;s a surprisingly good one.</p>
+<p>Paul Graham has a line about Lisp. In Lisp, he wrote, you don&rsquo;t just write your program down toward the language, you also build the language up toward your program. You grow a small vocabulary that fits the problem, and then the program gets short, because the words do most of the work.</p>
+<p>Reading Shinzen Young&rsquo;s <i>The Science of Enlightenment</i>, I kept thinking of that line. Shinzen doesn&rsquo;t start from the big words people usually bring to the mind: ego, soul, enlightenment. He builds a small language for experience, from the bottom up. And once the language exists, the practices written in it are so short they fit in a sentence.</p>
 
-<h2>The primitives</h2>
-<p>Every good language starts with a small set of primitives. Lisp has atoms and lists. Shinzen has three, and each comes in two flavors.</p>
-<p>See, hear and feel. Each can be outer or inner. See outer is the room in front of you. See inner is a mental image: the face of the person you&rsquo;re annoyed with. Hear outer is the traffic. Hear inner is mental talk: the voice saying you&rsquo;ll never finish this essay. Feel outer is a body sensation: the chair, the itch. Feel inner is an emotional body sensation: the squeeze in the chest that comes with dread.</p>
-<p>That&rsquo;s it. Six bins. Everything you will ever experience goes in one of them, or several at once. It&rsquo;s the &ldquo;everything is a list&rdquo; of the mind.</p>
-<p>There&rsquo;s also a value for nothing. Each bin has a rest state: a blank visual field, a quiet mind, a relaxed body. Any language needs a null, and in this one null is pleasant.</p>
+<h2>The words</h2>
+<p>Shinzen&rsquo;s language has three words: see, hear and feel. Each comes in two kinds, outer and inner.</p>
+<p>See outer is what&rsquo;s in front of your eyes. See inner is a mental image, like the face of someone you&rsquo;re annoyed with. Hear outer is sound: traffic, a fan, a voice. Hear inner is mental talk, the voice that says you&rsquo;ll never finish. Feel outer is physical sensation: the chair, an itch, a sore shoulder. Feel inner is emotional sensation in the body: the squeeze in the chest that comes with dread, the warmth that comes with relief.</p>
+<p>That&rsquo;s the whole vocabulary. Everything you experience fits in one of those six places, or several at once. And each place has a resting state: a blank visual field, a quiet mind, a relaxed body. Even nothing gets a word.</p>
+<p>It feels almost too small to be useful. Lisp gets the same reaction.</p>
 
-<h2>Why primitives matter</h2>
-<p>The point of bottom-up design is that big, scary problems turn out to be made of small, boring parts.</p>
-<p>Take anxiety. Anxiety is a top-down word. It arrives as one huge thing, with your name on it, about your whole future. Now decompose it. There&rsquo;s an image: you, failing, in front of someone. There&rsquo;s some talk: &ldquo;this is going to go badly.&rdquo; And there&rsquo;s a feeling: a tight band around the chest. Three streams. Each of them, on its own, is manageable. An image is just an image. A sentence is just a sentence. A squeeze is just a squeeze.</p>
-<p>Programmers call this divide and conquer. A problem you can&rsquo;t solve becomes several you can. The monster was never one thing. It was three small processes running at once, and it only looked like a monster because nobody had looked at the process list.</p>
+<h2>Why small words help</h2>
+<p>The trouble with the big words is that you can&rsquo;t do anything with them. Anxiety arrives as one huge thing, about your whole life, all at once. There&rsquo;s no handle on it.</p>
+<p>In Shinzen&rsquo;s words, it comes apart. There&rsquo;s an image: you, failing, in front of someone. There&rsquo;s some talk: &ldquo;this is going to go badly.&rdquo; And there&rsquo;s a feeling: a tight band across the chest. Three things, each of them small. An image is just an image. A sentence is just a sentence. A squeeze is just a squeeze.</p>
+<p>This is the oldest trick in programming. A problem you can&rsquo;t solve gets split into problems you can. The monster was never one thing. It was three ordinary things happening at the same time.</p>
 
-<h2>The compiler flags</h2>
-<p>Shinzen&rsquo;s three core skills read naturally as settings you turn up.</p>
-<p>Concentration is keeping the process on the CPU: staying with what you chose to look at instead of being preempted by every interrupt.</p>
-<p>Sensory clarity is the logging level. At low verbosity, all you get is &ldquo;bad feeling.&rdquo; At high verbosity, you get exactly which bin, how big, where, and changing how. Most of the benefit of debugging is just turning the logging up.</p>
-<p>Equanimity is the interesting one. It&rsquo;s not interfering with the process while it runs. No killing it, no wrapping it in try-catch to hide the error, no blocking on it. Just letting it execute.</p>
+<h2>Three skills</h2>
+<p>With the words in place, Shinzen trains three skills. Concentration: staying with what you chose to attend to. Sensory clarity: seeing exactly which of the six places something is in, and how it&rsquo;s changing. And equanimity: letting it happen without pushing it away or holding on.</p>
+<p>The third is where the suffering goes. In <a href="pain-times-resistance.html">Suffering = Pain &times; Resistance</a> I wrote about his formula. The words make resistance easier to drop, because it&rsquo;s much easier to stop fighting a squeeze in the chest than to stop fighting your future.</p>
 
-<h2>The bug</h2>
-<p>Every program has a famous bug, and this one is resistance.</p>
-<p>In <a href="pain-times-resistance.html">Suffering = Pain &times; Resistance</a> I wrote about Shinzen&rsquo;s formula. In programming terms, resistance is a spinlock. The process wants a lock, can&rsquo;t get it, and instead of sleeping it sits in a tight loop asking, again and again: is it free yet? Is it free yet? It burns the whole CPU doing nothing useful.</p>
-<p>That&rsquo;s exactly what the need to know what comes next feels like from the inside. The mind spins on the open question. Is it going to be okay? Is it okay now? Pain is the wait. Resistance is the spinning. And suffering, as any profiler would tell you, is mostly the spinning.</p>
+<h2>Programs that fit in a sentence</h2>
+<p>Here is where the bottom-up payoff shows. Once you have the vocabulary, the practices are tiny.</p>
+<p>Noting: every few seconds, notice what&rsquo;s most prominent and name where it is. See. Hear. Feel. That&rsquo;s the whole instruction. After a few minutes, experience stops being a blur and becomes a stream of small, named events.</p>
+<p>Note gone: whenever something vanishes, a sound stopping, a thought ending, a twinge fading, notice it and say &ldquo;gone.&rdquo; Do it for a while and you collect hundreds of small proofs that nothing stays. That&rsquo;s impermanence, the teaching I wrote about in <a href="buddhism-and-the-need.html">Buddhism Through the Lens of the Need</a>, turned from an idea into something you can check.</p>
+<p>Do nothing: let attention go wherever it wants, and don&rsquo;t steer. Whenever you notice you&rsquo;ve started steering, stop. That&rsquo;s it. It&rsquo;s the shortest instruction of the three and by far the hardest, which is another thing it has in common with Lisp.</p>
+<p>None of these needs a belief, a ritual or a teacher in the room to get started. They need the words, and a few minutes.</p>
 
-<h2>Program one: the noting loop</h2>
-<p>The first program is noting, and it&rsquo;s a read-eval-print loop. Attend to whatever&rsquo;s most prominent, classify it, say the label, repeat, every few seconds.</p>
-<pre><code>(loop
-  (let ((x (attend)))
-    (label (bin x))))   ; see, hear, feel</code></pre>
-<p>That&rsquo;s the whole thing. It looks too simple to do anything, which is also what people say about Lisp. What it does is turn the logging up and keep it up. After a few minutes, experience stops being a blur and starts being a stream of tokens.</p>
+<h2>Why it suits some brains</h2>
+<p>The classic instruction, watch the breath, asks you to keep looking at one thing and wait for it to be interesting. For an ADHD brain, that&rsquo;s close to impossible.</p>
+<p>Noting asks for something different. Whatever shows up, you name it, and then the next thing. There&rsquo;s a small task every few seconds and nothing to wait for. My guess is that this suits restless minds unusually well. That&rsquo;s a guess, not a trial result, but it&rsquo;s the first meditation instruction I&rsquo;ve read that seems written for a mind that won&rsquo;t sit still.</p>
 
-<h2>Program two: note gone</h2>
-<p>The second program watches for deallocation. Whenever something you were experiencing vanishes, a sound stops, a thought ends, a twinge fades, you note it: gone.</p>
-<pre><code>(loop
-  (when (vanished-p (attend))
-    (label 'gone)))</code></pre>
-<p>This is a garbage collector you can watch. And watching it changes something. Do it for an hour and you have hundreds of pieces of evidence that nothing stays allocated. Buddhism calls this impermanence, and in <a href="buddhism-and-the-need.html">Buddhism Through the Lens of the Need</a> I argued it&rsquo;s the most direct reply to the need there is. Note gone is the unit test for it.</p>
-
-<h2>Program three: do nothing</h2>
-<p>The third program is my favorite, because it&rsquo;s the shortest program that does anything at all.</p>
-<pre><code>(loop)</code></pre>
-<p>Shinzen calls it Do Nothing. Let attention go wherever it goes. Don&rsquo;t steer. And whenever you notice you&rsquo;ve started steering, you&rsquo;ve written a line inside the loop, so delete it. That&rsquo;s the only instruction.</p>
-<p>It&rsquo;s much harder than it looks, which is the other thing people say about Lisp.</p>
-
-<h2>What compiles</h2>
-<p>So what happens when you run these long enough? Here the metaphor gets a little cosmic, so I&rsquo;ll keep it short and honest.</p>
-<p>Every program I&rsquo;ve ever written has had a global variable named something like <code>self</code> or <code>me</code>, holding the state, read by everything. The claim of the tradition, put in these terms, is that after enough debugging you discover the global was never declared. Every function ran fine without it. The processes were reading from each other the whole time, and the sense of someone in charge was a log message written afterward. Michael Gazzaniga&rsquo;s split-brain patients, confidently explaining actions the other half of their brain had caused, are a small, strange piece of evidence for that.</p>
-<p>I haven&rsquo;t run the program to completion, and I don&rsquo;t have anyone&rsquo;s logs. Shinzen describes the result as a stable shift in how the self is perceived. That&rsquo;s a report, not a measurement. Treat it as the release notes, not the test suite.</p>
-
-<h2>A note for ADHD brains</h2>
-<p>The usual meditation instruction, watch the breath, is a polling loop. You check the same register, over and over, and wait for it to be interesting. For an ADHD brain that&rsquo;s close to torture.</p>
-<p>Noting is different. It&rsquo;s interrupt-driven. Whatever fires, you handle. A new token every few seconds, a tiny task each time, no waiting. I suspect that&rsquo;s why it suits brains that are interrupt-driven already. That&rsquo;s my guess, not a trial result. But it&rsquo;s the first meditation instruction I&rsquo;ve read that was written for the hardware I actually have.</p>
-
-<h2>Known issues</h2>
-<p>Every release needs a known-issues section.</p>
-<p>It&rsquo;s a metaphor. The mind isn&rsquo;t a computer, and stretching the analogy too far gets you nonsense. The evidence for meditation is real but modest, and for Shinzen&rsquo;s system specifically it&rsquo;s thin. And as I noted in the last essay, intensive practice can sometimes bring up things that are hard to handle, so run it in small batches, and with a teacher if the pain is large.</p>
+<h2>What the language leaves out</h2>
+<p>A small language is powerful because of what it leaves out, and it&rsquo;s worth knowing what that is. Shinzen&rsquo;s vocabulary has no words for meaning, purpose or other people. It describes experience, not what to do with a life. That&rsquo;s fine for a practice, but it isn&rsquo;t the whole answer to the need, which, as I argued in <a href="meeting-the-need-yourself.html">Meeting the Need Yourself</a>, includes parts that can&rsquo;t be made alone.</p>
+<p>The evidence for meditation is real but modest, and for Shinzen&rsquo;s system specifically it&rsquo;s thin. And intensive practice can sometimes stir up hard things, so it&rsquo;s worth starting small.</p>
 
 <h2>The short version</h2>
-<p>Build the language up toward the program. Shinzen&rsquo;s language has six primitives, see, hear and feel, inner and outer, plus a null for rest. Big feelings decompose into small streams. Three settings, concentration, clarity and equanimity, decide how well the programs run. The famous bug is resistance, a spinlock on the open question. And the three main programs are short: label what fires, note what&rsquo;s gone, and the empty loop.</p>
-<p>Graham was right that the right language makes the program short. It may also make it a lot less painful to run.</p>
+<p>Graham&rsquo;s advice was to build the language up toward the program. Shinzen did that for the mind. Six small words, see, hear and feel, inner and outer, plus a word for rest. Big feelings come apart into small ones. And the practices written in that language are short enough to remember: name it, notice it&rsquo;s gone, stop steering.</p>
+<p>The right words make the program short. In this case they may also make it a lot less painful.</p>
 
 <h2>Notes</h2>
 <ol class="notes">
 <li>Graham, &ldquo;Programming Bottom-Up,&rdquo; 1993, and <i>On Lisp</i>, 1993.</li>
 <li>Young, <i>The Science of Enlightenment: How Meditation Works</i>, 2016, for See Hear Feel, the rest states, the three core skills, noting, Note Gone and Do Nothing.</li>
-<li>Gazzaniga, <i>Who&rsquo;s in Charge?</i>, 2011.</li>
 <li>Lindahl, Britton et al., &ldquo;The varieties of contemplative experience,&rdquo; <i>PLoS ONE</i>, 2017.</li>
 </ol>
 
