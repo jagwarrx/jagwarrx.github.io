@@ -12,9 +12,12 @@
 ## Essays
 
 - [What Difference Does ADHD Medication Make?](https://hmeyy.com/essays/adhd-medication.html): It turns the noise down. It doesn't choose what to focus on, and it doesn't pick itself up from the pharmacy. A practical answer, not medical advice.
+- [The ADHD Version of the Need](https://hmeyy.com/essays/adhd-version-of-the-need.html): The need for meaning under uncertainty is the same in ADHD, but its time horizon isn't: the far future pulls less and the next ten minutes pull more. How that works, why the traits survive, and what follows.
 - [Your agent will say it sent the email](https://hmeyy.com/essays/agent-said-it-sent-the-email.html): What it takes to let an AI agent act on real systems: the rules I ended up writing into every agent that can change a record.
+- [Dealing with Anxiety When You Have ADHD](https://hmeyy.com/essays/anxiety-and-adhd.html): About half of adults with ADHD have had an anxiety disorder, and much of it grows out of the traits. Where it comes from, how to calm it in the moment, and how to make the alarm go off less.
 - [Artificial Intelligence: Where to dig](https://hmeyy.com/essays/artificial-intelligence-where-to-dig.html): Improve features, create features, create products. The easier problems first.
 - [Ask a Better Question](https://hmeyy.com/essays/ask-a-better-question.html): Before I build a tool, I stop and ask what I'm trying to achieve and whether there's an easier, quicker or better way. Often that way is to run the thing through a prompt first.
+- [Avoid, Detect, Remove Bullshit with ADHD](https://hmeyy.com/essays/avoid-detect-remove-bullshit.html): Bullshit in claims and in systems both come from the need for meaning. ADHD can’t keep up vigilance, so the defense has to be fast, written down, run at a calm time, and removal has to happen by default.
 - [Is There a Best Possible Study Plan for a Subject?](https://hmeyy.com/essays/best-study-plan.html): No single one, but there is a best plan for a given goal and person, and good plans share a structure: an end test, a map, concepts with cases, retrieval, tacit practice and a changing surface.
 - [Change the Environment to Change the Actions](https://hmeyy.com/essays/change-the-environment.html): Change the environment and the situation, which changes the constraints, which changes the actions. The levers work on different time scales: minutes, days, months, years.
 - [Coach Wooden](https://hmeyy.com/essays/coach-wooden.html): John Wooden's seven rules for living, and why they still hold.
@@ -22,15 +25,17 @@
 - [Design the Data and the Features Together](https://hmeyy.com/essays/design-together.html): Designing the data is designing what the app can do. Like a language and a program in Lisp, data and features should be designed together, with the interface as a surface on top.
 - [Aim to Be Directionally Correct](https://hmeyy.com/essays/directionally-correct.html): Precision is expensive. Direction is what compounds.
 - [I built my personal system eighteen times](https://hmeyy.com/essays/eighteen-systems.html): Eighteen attempts in a year at a system to run my life. The median lasted four days. What survived had no schema at all.
+- [Free of Tools](https://hmeyy.com/essays/free-of-tools.html): Not the tool with all the features, but the freedom to be free of tools: plain text, picked up anywhere, anytime. For ADHD, the ritual gets done because it’s simple.
 - [How to Win Hackathons](https://hmeyy.com/essays/how-to-win-hackathons.html): A guide to winning hackathons: making marginal gains in ideation, team formation, prototyping and presentation.
 - [Peter Kaufman on Interdisciplinary Thinking](https://hmeyy.com/essays/interdisciplinary-thinking.html): Notes on the talk that made multidisciplinary thinking click.
 - [Lessons In Crypto Markets](https://hmeyy.com/essays/lessons-in-crypto-markets.html): What a year of trading taught me about risk, patience and myself.
-- [Traditional To-Do Lists Don't Work for ADHD Brains](https://hmeyy.com/essays/todo-lists-adhd.html): Traditional to-do lists don't work for ADHD brains. We need focus and structure, not endless tasks.
 - [A List of Lists, One Item at a Time](https://hmeyy.com/essays/list-of-lists.html): My tradeoff: organize items in a list of lists, but look at them one at a time. Organizing wants to see everything. Doing, with an ADHD mind, wants to see one thing.
 - [Lists of Book Lists](https://hmeyy.com/essays/lists-of-book-lists.html): The reading lists I go back to when choosing what to read next.
+- [Meeting the Need with ADHD](https://hmeyy.com/essays/meeting-the-need-adhd.html): Four parts of the need, four fixes. Not knowing what to do: decide the night before. Faint time: make it visible. Waiting hurts: bring the reward close. Can’t keep a ritual going: automate it.
 - [The Minimum System for ADHD](https://hmeyy.com/essays/minimum-system-adhd.html): Two lists. One with everything. One with what is important now, three items at most.
 - [The Automated Morning Brief](https://hmeyy.com/essays/morning-brief.html): One short message every morning, without my asking: the three things for today, the first step, and the fixed times. Why that would help an ADHD brain.
-- [The goal is not a well-organized life](https://hmeyy.com/essays/work-not-organize.html): Organizing feels like work, and for a brain like mine it beats the real task every time. So it gets one place, set times, and nothing more.
+- [What I Need, Not What I Can](https://hmeyy.com/essays/need-not-can.html): Obsidian, or any tool like it, is too flexible. Trying to do everything with it, you don’t do what you need. So start with the few jobs you need it for.
+- [Not Tools, but Automation](https://hmeyy.com/essays/not-tools-but-automation.html): For managing attention, a tool is the wrong shape: it waits for me to remember it. Automation runs on the days I forget.
 - [Ode to Systems Thinking](https://hmeyy.com/essays/ode-to-systems-thinking.html): Consumers, creators and investors, and what it means to see the whole.
 - [One Thing at a Time](https://hmeyy.com/essays/one-thing-at-a-time.html): A constraint worth adding: do one thing at a time, picked from a short menu, and don't drop it once it's started. The start is where neurospicy minds get tripped.
 - [Principles, Experiments & Serendipity](https://hmeyy.com/essays/principles-experiments-serendipity.html): Turning 23. Lessons, professional and personal, and what comes next.
@@ -39,7 +44,11 @@
 - [The Spine and the Surface](https://hmeyy.com/essays/spine-and-surface.html): Why I kept losing things when I switched to-do apps, and the fix: keep a small, permanent spine and make everything around it disposable.
 - [How to Build and Test the Best Study Plan](https://hmeyy.com/essays/test-study-plan.html): Model memory as chunks with states, model each format by the state change it is good at, treat the plan as a schedule, and test it by splitting the subject, not the learner.
 - [The Chupacabra](https://hmeyy.com/essays/the-chupacabra.html): A short story.
+- [The Need Is Built In](https://hmeyy.com/essays/the-need-is-built-in.html): Why the need for meaning under uncertainty is so strong: how it works in the brain, why evolution built it, and what follows. The need is built in; sellers don't create it, they sell into it.
 - [Own the list, rent the app](https://hmeyy.com/essays/the-same-list.html): Any data structure can be a list, so every task manager can hold what any other can. What differs is the surface. Keep the data in one plain format and change the surface instead.
+- [Traditional To-Do Lists Don't Work for ADHD Brains](https://hmeyy.com/essays/todo-lists-adhd.html): Traditional to-do lists don't work for ADHD brains. We need focus and structure, not endless tasks.
+- [Why Belief Systems Survive](https://hmeyy.com/essays/why-belief-systems-survive.html): Hindu chants, kalasams and mudras have a clear internal logic. Most of it was written after the practice, and the whole system grew the way a reef does: no architect, shaped by what survived.
+- [The goal is not a well-organized life](https://hmeyy.com/essays/work-not-organize.html): Organizing feels like work, and for a brain like mine it beats the real task every time. So it gets one place, set times, and nothing more.
 
 ## Projects
 
