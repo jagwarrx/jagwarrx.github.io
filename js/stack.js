@@ -13,7 +13,8 @@
 
   function siteRoot() {
     var css = document.querySelector('link[href$="css/site.css"]');
-    return new URL(css.getAttribute('href').replace(/css\/site\.css$/, ''), location.href);
+    // css.href is absolute, so a page at the root (archive.html) still gives the folder, not the page
+    return new URL(css.href.replace(/css\/site\.css(\?.*)?$/, ''));
   }
   var ROOT = siteRoot();
   function rel(u) { return u.pathname.slice(ROOT.pathname.length) || 'index.html'; }
