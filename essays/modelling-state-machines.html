@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modelling State Machines — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/modelling-state-machines.html">
+<meta name="description" content="Most of a syllabus for software systems is one idea: state plus rules, and machines sending messages. One pattern, many substrates, each with its own physics; where the lens stops working; and why AI systems feel different.">
+<meta property="og:title" content="Modelling State Machines — Hari Meyyappan">
+<meta property="og:description" content="Most of a syllabus for software systems is one idea: state plus rules, and machines sending messages. One pattern, many substrates, each with its own physics; where the lens stops working; and why AI systems feel different.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/modelling-state-machines.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Modelling State Machines", "description": "Most of a syllabus for software systems is one idea: state plus rules, and machines sending messages. One pattern, many substrates, each with its own physics; where the lens stops working; and why AI systems feel different.", "url": "https://hmeyy.com/essays/modelling-state-machines.html", "mainEntityOfPage": "https://hmeyy.com/essays/modelling-state-machines.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-22"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page on" href="index.html" aria-current="page">Essays</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>Modelling State Machines</h1>
+  <p class="meta">November 2026. 1,760 words.</p>
+
+<p>A syllabus for learning how software systems work has about a hundred topics in it. The one in front of me starts with memory and processes, goes through HTTP, databases and queues, and ends with agents built on language models. DNS, transactions, containers, caching, sharding, retries, migrations, embeddings. Each comes with its own vocabulary, and each looks like a separate thing to learn.</p>
+<p>A list that long makes you want to know what&rsquo;s underneath it. If a hundred topics really are a hundred topics, all you can do is grind through them. But long lists usually aren&rsquo;t what they look like. Usually there&rsquo;s a small idea that most of the items are instances of, and if you can find it, you learn the idea once and then learn what&rsquo;s different about each case.</p>
+<p>My first guess at the idea was &ldquo;a machine.&rdquo; That&rsquo;s close, but too vague to do any work. The better answer is to model everything as a state machine, and then, right behind it, as many state machines sending messages to each other.</p>
+<p>A state machine is state plus rules. Input arrives, the rules decide how the state changes, and output leaves. That&rsquo;s the whole thing.</p>
+<p>Which moves the question to what state is. State is whatever a system remembers right now that affects what it does next. There&rsquo;s a simple test for it: if the same input can give different outputs at different times, there&rsquo;s state in there somewhere.<sup><a href="#n1">1</a></sup> Press a light switch and the light comes on. Press it again, the identical press, and it goes off. What the press does depends on whether the light is on, and that &ldquo;is on&rdquo; is the state. A calculator adding 2 and 3 has none. It says 5 every time. A bank balance is nothing but state. It depends on every deposit and withdrawal that came before.</p>
+<p>This sounds too simple to be useful. But look at what follows from it. The rules don&rsquo;t change while a system runs. The state does. So state is the only part with a history. When a bug depends on what happened earlier, it&rsquo;s a state bug. When two things interfere with each other, it&rsquo;s because both can change the same state. When two parts of a system disagree, each is holding a copy of some state and the copies have drifted apart. And when a crash loses something, the something is state that wasn&rsquo;t saved anywhere durable. A surprising amount of what&rsquo;s hard about software is one of those four.</p>
+<p>That&rsquo;s why so much of system design is about where state lives. Stateless servers push it out into a database. Caches hold copies of it somewhere faster. Transactions change several pieces of it together or not at all. The old database advice to <a href="../concepts/relational.html">store each fact once</a> is advice about copies. And the standard shape, logic with no state wrapped around one well-guarded store, exists because the parts with no state are the easy ones. You can copy them, restart them and test them freely, since they have nothing to lose.</p>
+<p>What surprised me is how far the pattern reaches. A memory cell holding one bit is a state machine: the state is a charge, and the input is an electrical signal. A CPU is one, with registers and memory for state and instructions for input. A program is one: variables, changed by function calls. A database is one: rows on a disk, changed by queries. A web service is one. An agent is one, where the state is the conversation so far and the files it has written. A company is one, where the state is documents and what people know, and the inputs are emails and meetings.</p>
+<p>It&rsquo;s the same pattern each time, made of something different. I started calling the something the substrate. And the levels are stacked. Each machine&rsquo;s state is built out of the machines below it. A row in a database is really bytes on a disk, which are really charges in a chip. Each level hides the one beneath it, and that hiding is all abstraction is.</p>
+<p>If that were the whole story, you could learn one level and skip the rest. You can&rsquo;t, and the reason is the most useful thing I&rsquo;ve got out of this so far. The pattern is the same at every level, but each substrate has its own physics. State held as charge in memory can be read in nanoseconds and is gone when the power goes. State on a disk is thousands of times slower to reach, and survives. State in someone&rsquo;s head is slow, forgetful, and can&rsquo;t be copied exactly. State in an institution, its rules and contracts and habits, lasts for decades and takes about as long to change.</p>
+<p>So there&rsquo;s a short list of things to ask of any substrate. How fast is it? How long does it last? How much does it hold, and what does that cost? How does it fail? Who can change it? The answers are its physics, and the physics leaks upward.<sup><a href="#n2">2</a></sup> The speed of light becomes network delay, and network delay becomes a slow page. A lot of engineering is dealing with the properties of a lower level showing up in a higher one. One pattern, many substrates, and each substrate brings its own physics.</p>
+<p>This is what made language models easier for me to think about. A model has three substrates. Its weights hold what it learned in training, and can only be read while it runs. Its context window is working memory, gone when the call ends. And outside it are files and databases, which last. In older terms: ROM, RAM and disk. A model on its own is close to stateless. Text goes in, text comes out, and nothing is remembered. An agent is what you get when you wrap a model in a loop, give it tools, and give it somewhere to keep things. So the main job of all the code around the model is to give a stateless thing state.</p>
+<p>Once you see that, a lot of agent vocabulary is about state and messages too. Retrieval is moving state from disk into working memory. Memory is state that outlives the call. Prompt injection is a message that gets treated as rules. I once wrote about <a href="agent-said-it-sent-the-email.html">an agent that says it sent the email</a> when it didn&rsquo;t. In these terms, the model reported a change of state that never happened. Part of the fix was to make the tool return a confirmation: state you can check, instead of a claim you have to believe.</p>
+<p>One machine isn&rsquo;t enough, though. Real systems are many machines, and the hard problems tend to live between them, not inside them. Inside a machine, a step happens or it doesn&rsquo;t. Between machines, a message can arrive late, get lost, or arrive twice. The other side can be down. And what arrives may not be something you should trust.</p>
+<p>Many of the topics on the syllabus are answers to one of those. Retries are for messages that get lost. Idempotency is for messages that arrive twice. A queue holds messages until someone is ready to read them. Authentication is rules about who may send which messages. Telemetry is a machine sending messages about its own state. A migration changes the shape of state while it&rsquo;s in use, and an API version changes the contract for messages while people are still sending them.</p>
+<p>So can every topic on the list be explained this way? Most of them. The ones that can&rsquo;t are more interesting. The lens tells you what a system does. It doesn&rsquo;t tell you what that costs, which is the business of algorithms and trade-offs. It doesn&rsquo;t tell you why one design is easier to live with than another, which depends on the limits and incentives of the people building it.<sup><a href="#n3">3</a></sup> And it treats a language model as a black box. Why a model makes things up is a question about probability and learning, because its rules were learned and not written.</p>
+<p>So there are four lenses, not one. Mechanics, which is state, messages and substrates. Cost. People. Uncertainty. And that gives a test for anything new. If I can&rsquo;t explain it as state and messages, either I haven&rsquo;t understood it yet or it belongs to one of the other three. Either answer is worth having.</p>
+<p>All four apply at every level, but the mix changes as you go up. At the bottom it&rsquo;s nearly all mechanics and cost. That isn&rsquo;t how the bottom naturally is. A transistor is a noisy analog device. Digital logic exists to turn noisy voltages into dependable 0s and 1s, and engineers worked very hard so that everyone above could forget about the noise.<sup><a href="#n4">4</a></sup> Each level tries to hide the uncertainty of the level below. When it fails, you get what programmers call a leaky abstraction.</p>
+<p>Going up, the people and the uncertainty come back. Networks lose messages. Traffic is unpredictable. Organizations are mostly people. By the top, mechanics is the small part.</p>
+<p>This is the best explanation I know for why AI systems feel different from ordinary software. In ordinary software the uncertainty is at the edges: the network, the users. The part in the middle does exactly what it was told. A language model puts the uncertain part in the middle. Evals, guardrails and human approval are all ways of managing uncertainty there, where there used to be none. But everything around the model is the old kind of thing. An agent is a distributed system with an unreliable, untrusted component at its center, and what you know about state and messages still applies to it. I think that&rsquo;s why the syllabus puts AI last.</p>
+<p>One caution. &ldquo;State machine&rdquo; has a formal meaning too: a small set of states you can list in full, like a traffic light or a checkout flow. Real systems have far too many states to list, so I don&rsquo;t mean it that way. I mean it as a way of asking questions. Where does the state live, and who can change it? What are the parts, and what are the contracts between them? What crosses each boundary, and can it be trusted? What happens when a part is slow, or fails, or gets a hundred times the load?</p>
+<p>I still have to learn the hundred topics. But they arrive differently now. Each one shows up as an answer to a question I already have, and that&rsquo;s a much easier way to learn anything.</p>
+
+<h2>Notes</h2>
+<ol class="notes">
+<li id="n1">The test has one exception, which is randomness. A language model can give different answers to the same prompt because its output is sampled, not because it remembers anything. Chance isn&rsquo;t state.</li>
+<li id="n2">Joel Spolsky called this the law of leaky abstractions: &ldquo;All non-trivial abstractions, to some degree, are leaky.&rdquo; &ldquo;The Law of Leaky Abstractions,&rdquo; 2002.</li>
+<li id="n3">The best known case is Conway&rsquo;s law: organizations design systems that copy their own communication structures. Melvin Conway, &ldquo;How Do Committees Invent?&rdquo;, 1968. In the terms of this essay, how people send messages to each other shapes how the parts of their system do.</li>
+<li id="n4">They never quite finished. Cosmic rays still flip a bit in memory now and then, which is why servers use memory that checks and corrects itself.</li>
+</ol>
+
+<ul class="related">
+<li><a href="agent-said-it-sent-the-email.html">Your agent will say it sent the email</a></li>
+<li><a href="../concepts/relational.html">The relational model: store each fact once</a></li>
+<li><a href="../concepts/index.html">Concepts</a></li>
+<li><a href="index.html">All essays</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>
