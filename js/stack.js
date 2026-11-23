@@ -4,7 +4,7 @@
 // so a stack can be shared and the back button pops panes. Phones and narrow windows navigate normally.
 (function () {
   if (self !== top) return;
-  var WIDE = '(min-width: 1000px)', SPINE = 40;
+  var WIDE = '(min-width: 1000px)', SPINE = 40, KEEP = 3;   // with more than KEEP panes, the older ones fold into spines
   var layout = document.querySelector('.layout');
   if (!layout) return;
   var first = layout.querySelector(':scope > .wrap, :scope > main');
@@ -69,16 +69,22 @@
     panes = [p];
     document.body.classList.add('stacked');
     stack.addEventListener('scroll', spines, { passive: true });
+    stack.addEventListener('transitionend', spines);
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   function trim(n) { while (panes.length > n) panes.pop().remove(); }
 
+  // fold every pane but the last KEEP into a 40px spine; a spine that was clicked stays open until the next pane opens
+  function fold() {
+    panes.forEach(function (p, i) { p.classList.toggle('folded', i < panes.length - KEEP && !p.dataset.open); });
+  }
+
   function addPane(u, data) {
     var p = document.createElement('div');
     p.className = 'pane';
     p.dataset.path = rel(u);
-    p.innerHTML = '<div class="spine">' + esc(data.title) + '</div><div class="pane-scroll' + (data.isDoc ? ' doc' : '') + '">' +
+    p.innerHTML = '<div class="spine" title="' + esc(data.title) + '">' + esc(data.title) + '</div><div class="pane-scroll' + (data.isDoc ? ' doc' : '') + '">' +
       '<div class="pane-bar"><button class="pane-x" type="button" aria-label="Close this pane">×</button>' +
       '<a class="pane-open" href="' + u.href + '" data-nostack>Open as page</a></div>' +
       '<main class="pane-body ' + esc(data.cls || '') + '">' + data.html + '</main></div>';
@@ -116,6 +122,8 @@
       ensureStack();
       trim(fromIndex + 1);
       var p = addPane(u, data);
+      panes.forEach(function (q) { delete q.dataset.open; });
+      fold();
       if (push !== false) history.pushState({ stacked: true }, '', urlState());
       show(p, push === false);
       return p;
@@ -125,10 +133,22 @@
   document.addEventListener('click', function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (!matchMedia(WIDE).matches) return;
+    var sp = e.target.closest && e.target.closest('.pane.folded > .spine');
+    if (sp) {   // a folded pane opens again where it is
+      var fp = sp.parentNode;
+      fp.dataset.open = '1';
+      fold();
+      show(fp);
+      return;
+    }
     var x = e.target.closest && e.target.closest('.pane-x');
     if (x) {
       var i = panes.indexOf(x.closest('.pane'));
-      trim(i);
+      if (i > 0) {   // close only this pane: the ones after it stay and move left
+        panes.splice(i, 1)[0].remove();
+        panes.forEach(function (p, j) { p.style.setProperty('--i', j); });
+        fold();
+      }
       history.pushState({ stacked: true }, '', urlState());
       spines();
       return;

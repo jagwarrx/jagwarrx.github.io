@@ -236,6 +236,11 @@ body.stacked .layout{height:100vh;overflow:hidden}
   color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .15s}
 .pane.covered .spine{opacity:1}
 .pane.covered .pane-scroll{opacity:0;pointer-events:none}
+.pane{transition:width .2s}
+.pane.folded{width:40px}
+.pane.folded .spine{opacity:1;pointer-events:auto;cursor:pointer}
+.pane.folded .spine:hover{color:var(--ink);background:var(--tint)}
+.pane.folded .pane-scroll{visibility:hidden}
 
 /* ---- Plain pass, 18 Nov 2026 (after paulgraham.com) ----------------------------------------
    Same shell on every page: a narrow column of small links on the left, one narrow text column
@@ -291,6 +296,7 @@ footer{border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
 .toc-side{display:none!important}
 .app-page{max-width:880px}
 .pane{width:620px}
+.pane.folded{width:40px}
 .pane .wrap,.pane .main,.pane-body{padding-left:32px;padding-right:32px}
 .pane-body{font-size:14px;line-height:22px}
 
