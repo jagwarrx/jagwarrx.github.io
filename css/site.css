@@ -345,3 +345,9 @@ footer{border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
 .doc main .zk-panel ul.zk li a::after{content:"";position:absolute;inset:0}
 .doc main .zk-panel ul.zk .meta{margin-top:auto}
 .doc main table{margin:4px 0 16px}
+
+/* Quotes page */
+.quotes{display:flex;flex-direction:column;gap:22px;margin:8px 0 24px}
+.doc main .quote{margin:0}
+.doc main .quote blockquote{margin:0 0 6px;padding:0 0 0 14px;border-left:2px solid var(--title);font-size:15px;line-height:23px;color:var(--ink)}
+.doc main .quote figcaption{padding-left:16px;font-size:12.5px;line-height:19px;color:var(--muted)}
