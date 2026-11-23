@@ -3,13 +3,14 @@
 > AI Practice Lead at qBotica (since 2023). Builds AI agents for production: voice agents, document extraction, banking and recruiting agents. Before that, 3 years at Amazon (Alexa Shopping routing, AWS). MS CS, Arizona State; B.Tech, NIT Trichy. Writes notes on building AI agents, personal apps, and tools for thought.
 
 - Home: https://hmeyy.com/
+- Zettelkasten (short notes): https://hmeyy.com/zettelkasten/
 - Archive of all writing: https://hmeyy.com/archive.html
 - Email: hari.m.subbiah@gmail.com
 - LinkedIn: https://www.linkedin.com/in/harimeyy/
 - GitHub: https://github.com/jagwarrx
 - Feed: https://hmeyy.com/feed.xml
 
-## Essays
+## Writing
 
 - [What Difference Does ADHD Medication Make?](https://hmeyy.com/essays/adhd-medication.html): It turns the noise down. It doesn't choose what to focus on, and it doesn't pick itself up from the pharmacy. A practical answer, not medical advice.
 - [The ADHD Version of the Need](https://hmeyy.com/essays/adhd-version-of-the-need.html): The need for meaning under uncertainty is the same in ADHD, but its time horizon isn't: the far future pulls less and the next ten minutes pull more. How that works, why the traits survive, and what follows.
