@@ -314,3 +314,8 @@ footer{border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
 @media (max-width:560px){.strip{width:64px}}
 .rb li.src{font-size:12.5px;color:var(--muted)}
 .rb li.src::before{background:#aaa}
+#essays h3{font-size:inherit;line-height:20px;font-weight:700;margin:16px 0 6px}
+#essays h2+h3{margin-top:8px}
+.doc main ul.rb{padding-left:0;margin:0 0 14px}
+.doc main ul.rb li{margin:0 0 5px}
+.doc main ul.rb .meta{display:inline;font-size:12.5px;line-height:inherit;color:var(--muted);margin:0}
