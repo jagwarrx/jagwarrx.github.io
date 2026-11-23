@@ -7,6 +7,13 @@
   <updated>2026-11-22T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
   <entry>
+    <title>Mechanics of a System</title>
+    <link href="https://hmeyy.com/essays/mechanics-of-a-system.html"/>
+    <id>https://hmeyy.com/essays/mechanics-of-a-system.html</id>
+    <updated>2026-11-22T00:00:00Z</updated>
+    <summary>The state machine is one of six pictures that hold at every scale. The others are the function, the log, the graph, the queue and the loop. What each one answers, the six questions to ask of any system, and what they leave to cost, people and uncertainty.</summary>
+  </entry>
+  <entry>
     <title>Modelling State Machines</title>
     <link href="https://hmeyy.com/essays/modelling-state-machines.html"/>
     <id>https://hmeyy.com/essays/modelling-state-machines.html</id>

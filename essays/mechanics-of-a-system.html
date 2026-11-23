@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanics of a System — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/mechanics-of-a-system.html">
+<meta name="description" content="The state machine is one of six pictures that hold at every scale. The others are the function, the log, the graph, the queue and the loop. What each one answers, the six questions to ask of any system, and what they leave to cost, people and uncertainty.">
+<meta property="og:title" content="Mechanics of a System — Hari Meyyappan">
+<meta property="og:description" content="The state machine is one of six pictures that hold at every scale. The others are the function, the log, the graph, the queue and the loop. What each one answers, the six questions to ask of any system, and what they leave to cost, people and uncertainty.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/mechanics-of-a-system.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Mechanics of a System", "description": "The state machine is one of six pictures that hold at every scale. The others are the function, the log, the graph, the queue and the loop. What each one answers, the six questions to ask of any system, and what they leave to cost, people and uncertainty.", "url": "https://hmeyy.com/essays/mechanics-of-a-system.html", "mainEntityOfPage": "https://hmeyy.com/essays/mechanics-of-a-system.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-22"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page on" href="index.html" aria-current="page">Essays</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>Mechanics of a System</h1>
+  <p class="meta">November 2026. 1,490 words.</p>
+
+<p>In <a href="modelling-state-machines.html">the last essay</a> I said there are four ways to look at any system: its mechanics, its cost, its people and its uncertainty. And I said the mechanics came down to one picture, the state machine. State plus rules, the same at every scale, whether it&rsquo;s made of charges in a chip or documents in a company.</p>
+<p>That undersold mechanics. There are things you want to know about how a system works that a state machine won&rsquo;t tell you, however long you look at it. It tells you what a system remembers. It doesn&rsquo;t tell you how fast the system goes, or what happens to the rest of it when one part dies.</p>
+<p>So I went looking for other pictures, with a strict test. What made the state machine worth learning wasn&rsquo;t that it&rsquo;s true. Lots of ideas are true. It&rsquo;s that it holds at every scale and on every substrate, so you learn it once and keep using it. To get on the list, a picture had to pass the same test, and it had to answer a question the state machine can&rsquo;t.</p>
+<p>Five did.</p>
+<p>The first is the function. Input goes in, output comes out, and nothing is remembered. That sounds like a state machine with the interesting part removed, but it answers a different question: what gets turned into what? A logic gate is a function. So is a compiler, a data pipeline, and a single call to a language model. The function is the stateless half of every system, and it&rsquo;s the half you want to be large. Most good designs are pipelines of functions with the state pushed out to the edges.<sup><a href="#n1">1</a></sup></p>
+<p>The second is the log: an ordered list of everything that happened, which only ever gets added to. It answers the question of how the system got here. A database keeps one, writing each change down before making it. Git history is one. A <a href="../concepts/bookkeeping.html">bank ledger</a> is one. So is the transcript of an agent&rsquo;s conversation.</p>
+<p>What the log adds is time. A state machine shows you the present and nothing else. But state is only the running total of a log, the way a balance is the running total of a ledger. So if you keep the log, you can rebuild the state, copy it somewhere else, or check how it came to be what it is. If you keep only the state, you can&rsquo;t get the log back.<sup><a href="#n2">2</a></sup></p>
+<p>The third is the graph, which is boxes and arrows. It answers the question people ask first in an outage: what depends on what, and what breaks if this part fails? The wiring of a circuit is a graph. So are the calls between functions, the dependencies between packages, the calls between services, and an org chart. A state machine describes one box. The graph describes how the boxes are wired. It&rsquo;s also where the messages from the last essay live. Every arrow is a path a message can take, and so a place where one can get lost.</p>
+<p>The fourth is the queue: work arriving, waiting, and being served. How fast does it go, and where does work pile up? A CPU deciding which program runs next is managing a queue. So is a network buffer, a backlog of requests, a rate limit on a model, and a team&rsquo;s list of tickets.</p>
+<p>The queue adds rate. None of the pictures so far has a clock in it. And two facts about queues are worth more than their size suggests. Most slowness is a queue somewhere. And the slowest stage sets the speed of the whole, so speeding up any other stage does nothing.<sup><a href="#n3">3</a></sup></p>
+<p>The fifth is the loop: act, measure the result, adjust, repeat. How does the system correct itself, and can it spiral? A <a href="know-how-youll-meet-it.html">thermostat</a> is a loop. So is TCP, which slows down when the network is congested. So is autoscaling, which adds servers when load rises. An agent plans, acts and looks at what happened. A team steers by its metrics.</p>
+<p>The loop adds control, and it explains two things that look like opposites. A loop that pushes against a change heals the system. A loop that pushes the same way as the change runs away with it. Retries are the standard case. A service slows down, so its callers retry, and the retries add load, so it slows down more. The mechanism that was meant to handle a failure is now causing it.</p>
+<p>Put together, that&rsquo;s six questions. What does it remember? What does it transform? How did it get here? How is it wired? How fast does it move? How does it steer? State machine, function, log, graph, queue, loop. The order is roughly from one part to the whole: the first three are about a single box and its past, the fourth is about many boxes, and the last two are about the whole thing in motion.</p>
+<p>The pictures aren&rsquo;t independent, and the places where they meet are the most interesting. Take two logic gates and feed each one&rsquo;s output into the other, and the pair will hold a bit. That&rsquo;s the simplest memory circuit there is. So at the bottom, state is what you get when you wire functions into a loop. The same trick works at the top. A language model is a function. Feed what it wrote back in as part of what it reads next, and you have something that remembers.</p>
+<p>An agent is a good system to try the six questions on, since it&rsquo;s the one I work with most. What does it remember? Its context and the files it has written. What does it transform? Text into text, one model call at a time. How did it get here? The transcript, and here two of the pictures are the same object: an agent&rsquo;s state is its log, read again from the top on every call. That&rsquo;s why you can audit or resume an agent from its transcript. It&rsquo;s also why agents run out of room. A log only grows and a context window doesn&rsquo;t, so sooner or later something has to replace the log with a running total. How is it wired? Harness to model to tools and back. How fast does it move? No faster than the model produces tokens, and slower whenever it waits on a rate limit or a slow tool. How does it steer? By looking at the result of each action before choosing the next. And it can spiral, as anyone knows who has watched an agent call the same failing tool twenty times.</p>
+<p>I left some things off the list on purpose. Invariants, ownership, trust boundaries, information hiding. They matter at least as much as anything here. But they&rsquo;re rules for judging a design, not pictures of a system. A picture tells you what&rsquo;s there. A rule tells you whether it&rsquo;s any good.</p>
+<p>And all six pictures are still only one of the four lenses. They say nothing about what a system costs, why people built it this way, or what it does when its behavior isn&rsquo;t certain. How much that matters depends on how high up you are.</p>
+<p>At the bottom, mechanics is nearly everything. Voltages, gates, instructions. A circuit really is a graph, and a gate really is a function. Engineers worked hard to make it that way, by hiding the noise in the voltages and leaving only 0s and 1s. Even so it isn&rsquo;t quite pure. Whether your laptop runs ARM or x86 is partly history and economics.</p>
+<p>In the middle, where the mechanics is requests, queries and queues, all four lenses matter about equally. Latency and server bills. Team conventions and code review. Dropped packets and unpredictable traffic. That balance is more or less what software engineering is.</p>
+<p>At the top the same six pictures still fit, but they describe the smaller part of what&rsquo;s going on. A team&rsquo;s ticket backlog is a queue, but how fast it drains depends on what the people serving it want. A team steering by a metric is a loop, but the people being measured can learn to move the metric instead of the result.<sup><a href="#n4">4</a></sup> The mechanics of a company are its documents and meetings, and nobody thinks those explain a company.</p>
+<p>So the six questions are where I start with a system I haven&rsquo;t seen before, not where I finish. They take a few minutes, and they tell me what&rsquo;s there. Whether it&rsquo;s worth what it costs, whether the people around it can live with it, and how it behaves when it&rsquo;s unsure are separate questions, and further up they&rsquo;re the bigger ones.</p>
+<p>What I like about the six is that none of them is really about software. The ledger, the line at a shop, the org chart and the thermostat were all here first. Software is just the place where you run into all six in the same afternoon.</p>
+
+<h2>Notes</h2>
+<ol class="notes">
+<li id="n1">Gary Bernhardt&rsquo;s name for this shape is &ldquo;functional core, imperative shell,&rdquo; from his <i>Destroy All Software</i> screencasts, 2012.</li>
+<li id="n2">The best thing I know of on this is Jay Kreps, &ldquo;The Log: What every software engineer should know about real-time data&rsquo;s unifying abstraction,&rdquo; 2013.</li>
+<li id="n3">The second fact is the subject of Eliyahu Goldratt&rsquo;s <i>The Goal</i>, 1984. There&rsquo;s a third, which is that queues don&rsquo;t grow in proportion to load. In the simplest textbook model, a server that&rsquo;s busy 90% of the time has waits nine times as long as one that&rsquo;s busy half the time.</li>
+<li id="n4">This is Goodhart&rsquo;s law, usually given in Marilyn Strathern&rsquo;s words: &ldquo;When a measure becomes a target, it ceases to be a good measure.&rdquo;</li>
+</ol>
+
+<ul class="related">
+<li><a href="modelling-state-machines.html">Modelling State Machines</a></li>
+<li><a href="agent-said-it-sent-the-email.html">Your agent will say it sent the email</a></li>
+<li><a href="know-how-youll-meet-it.html">Know How You&rsquo;ll Meet It</a></li>
+<li><a href="../concepts/index.html">Concepts</a></li>
+<li><a href="index.html">All essays</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>
