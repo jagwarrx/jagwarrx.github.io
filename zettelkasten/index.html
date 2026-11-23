@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zettelkasten — Hari Meyyappan</title>
 <link rel="canonical" href="https://hmeyy.com/zettelkasten/">
-<meta name="description" content="Short notes from November 2026 on, in two groups: operations, on running a life and a mind, and technology, on building systems.">
+<meta name="description" content="Short notes from November 2026 on, in two groups: life, on running a life and a mind, and technology, on building systems.">
 <meta property="og:title" content="Zettelkasten — Hari Meyyappan">
-<meta property="og:description" content="Short notes from November 2026 on, in two groups: operations, on running a life and a mind, and technology, on building systems.">
+<meta property="og:description" content="Short notes from November 2026 on, in two groups: life, on running a life and a mind, and technology, on building systems.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hmeyy.com/zettelkasten/">
 <meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
@@ -48,10 +48,11 @@
   <div class="zk-view" role="group" aria-label="View">
     <button type="button" data-view="list" aria-pressed="true" title="List"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" stroke-width="1.6" fill="none"/></svg><span class="vh">List</span></button>
     <button type="button" data-view="panel" aria-pressed="false" title="Panel"><svg viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.7" y="1.7" width="5.3" height="5.3"/><rect x="9" y="1.7" width="5.3" height="5.3"/><rect x="1.7" y="9" width="5.3" height="5.3"/><rect x="9" y="9" width="5.3" height="5.3"/></g></svg><span class="vh">Panel</span></button>
+    <button type="button" data-view="graph" aria-pressed="false" title="Graph"><svg viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 11.5 8 4l4.5 6.5ZM8 4l5-1.5"/></g><g fill="currentColor"><circle cx="4" cy="11.5" r="2"/><circle cx="8" cy="4" r="2"/><circle cx="12.5" cy="10.5" r="2"/><circle cx="13.2" cy="2.6" r="1.4"/></g></svg><span class="vh">Graph</span></button>
   </div>
   </div>
 <div id="zk" class="zk-list">
-  <h2>Operations</h2>
+  <h2>Life</h2>
 <ul class="rb zk">
 <li><a href="../essays/good-strategy-bad-strategy.html">Good Strategy, Bad Strategy</a> <span class="meta"><span class="sep">· </span>Nov 2026</span><span class="zk-d">Rumelt&rsquo;s kernel: a diagnosis, a guiding policy, coherent actions. Bad strategy skips the problem and the choice. Pick the crux, the challenge that is critical and solvable, and use strategy only where something important is blocked and unclear.</span></li>
 <li><a href="../essays/structural-lens.html">The Structural Lens</a> <span class="meta"><span class="sep">· </span>Nov 2026</span><span class="zk-d">The tool for the diagnosis stage of a strategy. When the same bad result keeps coming back, look for the cause in the structure, not the person: categories, constraints and defaults decide which questions you can ask, and everything after.</span></li>
@@ -126,22 +127,27 @@
 <li><a href="../essays/spine-and-surface.html">The Spine and the Surface</a> <span class="meta"><span class="sep">· </span>Nov 2026</span><span class="zk-d">Why I kept losing things when I switched to-do apps, and the fix: keep a small, permanent spine and make everything around it disposable.</span></li>
 </ul>
 </div>
+<div id="zk-graph" class="zk-graph" hidden></div>
 
   <p class="meta">Short notes, from November 2026 on. Older writing is in the <a href="../archive.html">Archive</a>.</p>
   <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
 <script>
 (function () {
-  var box = document.getElementById('zk'), btns = document.querySelectorAll('.zk-view button');
+  var box = document.getElementById('zk'), graph = document.getElementById('zk-graph'), btns = document.querySelectorAll('.zk-view button');
   function set(v) {
-    box.className = v === 'panel' ? 'zk-panel' : 'zk-list';
+    box.hidden = v === 'graph'; graph.hidden = v !== 'graph';
+    if (v !== 'graph') box.className = v === 'panel' ? 'zk-panel' : 'zk-list';
     btns.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.view === v ? 'true' : 'false'); });
     try { localStorage.setItem('zk-view', v); } catch (e) {}
+    if (v === 'graph' && window.zkGraphShow) window.zkGraphShow();
   }
   btns.forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.view); }); });
   var saved = null; try { saved = localStorage.getItem('zk-view'); } catch (e) {}
-  if (saved === 'panel') set('panel');
+  if (saved === 'panel' || saved === 'graph') set(saved);
 })();
 </script>
+<script src="graph.js" defer></script>
+<script src="graph-view.js" defer></script>
 </main>
 
 </div>
