@@ -210,7 +210,7 @@ const TILT = { on: LS("history.maptilt")!=="0", st:0, at:0, key:"", N:0, F:null,
 function tiltSet(){
   let t=0, rho=0;
   if (TILT.on && !MAP.small && MAP.view && mapW){
-    const q=Math.max(0,Math.min(1,(mapZoom()-.9)/1.7)), w=q*q*(3-2*q), goal = typeof story!=="undefined" && story ? 1 : 0;
+    const q=Math.max(0,Math.min(1,(mapZoom()-.9)/1.7)), w=q*q*(3-2*q), goal = (typeof story!=="undefined" && story) || (typeof SS!=="undefined" && SS.s) ? 1 : 0;
     const now=performance.now(), d=Math.min(100,now-(TILT.at||now))/500; TILT.at=now;
     if (TILT.st!==goal){ TILT.st = goal>TILT.st ? Math.min(goal,TILT.st+d) : Math.max(goal,TILT.st-d); drawMap(); }   /* a story eases it in and out, over half a second */
     t = .30*w + .10*TILT.st; rho = (1-w)*(1-.5*TILT.st);
@@ -448,7 +448,7 @@ function onMapAt(p,y,a,b){
    2 each page links to the other; 3 its page links there; 4 only linked from there, or only the place it stands in.
    i: where in its text the link comes. s: how much the two share, from 0 to 1 (the pages both are tied to), worked out once their texts have loaded.
    away: the items on the map that are outside its years; linked: the links shown, which get a line from the chosen item */
-MAP.open=null; MAP.away=new Set(); MAP.linked=new Set();
+MAP.open=null; MAP.away=new Set(); MAP.linked=new Set(); MAP.ask=null;   /* ask: {th, set} the places an answer links */
 let CHARTSET=null;
 /* while time plays the map only brings items on in the order they happened: no links, and no lines. Links are for a paused map and a click */
 const playingNow=()=>typeof playT!=="undefined" && !!playT;
@@ -597,6 +597,12 @@ function mapItems(){
     if (!has.has(O.obj) && geoOf(O.obj)){ out.push(O.obj); MAP.away.add(O.obj); has.add(O.obj); }
     if (O.on && !playingNow()) for (const p of linksShown(O)){ MAP.linked.add(p); if (!has.has(p)){ out.push(p); if (!onMapAt(p,y,wa,wb)) MAP.away.add(p); } }
   }
+  /* an answer's links (ask.js): every place it names stands on the map, from any year, until the next question or the card is closed */
+  const A=MAP.ask;
+  if (A && !(A.th.box && document.body.contains(A.th.box))) MAP.ask=null;
+  else if (A){ const has=new Set(out);
+    for (const p of A.set){ if (!p.pt || p.lk || p.n || !geoOf(p)) continue; MAP.linked.add(p);
+      if (!has.has(p)){ out.push(p); has.add(p); if (!(p.ov ? onMapAt(p,y,wa,wb) : p.y>=wa && p.y<=wb)) MAP.away.add(p); } } }
   return out;
 }
 const IMG=new Map();

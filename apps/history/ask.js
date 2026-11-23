@@ -297,7 +297,7 @@ How to answer:
 - Answer the question directly, in organic prose, the way a well-read friend would explain it in conversation: 2 to 4 short paragraphs, about 80 to 220 words. No headings, no bullet lists unless the reader asks for a list, no preamble ("Great question"), no summary at the end.
 - Go beyond the card: add the context, causes, consequences, comparisons and telling details that make the answer worth reading. Don't repeat the card back.
 - Link pages of the app inline as [[page-id|words in your sentence]] whenever you mention a person, place, state, event or thing that has a page. Use ids from the card's list of linked pages, or from search results; never make up an id. Link each page once per answer, and don't link the item itself.
-- The reader's map follows your links in the order you write them: the year line, the map and the open card move to each linked page in turn. So link the people, places, states and events the answer turns on, at the point where each comes up, and leave out links that would send the map off the point.
+- The reader's map marks every place you link, each at its own spot, while the card stays open. So link the people, places, states and events the answer turns on, at the point where each comes up, and leave out links that are beside the point.
 - Before you write, call the search tool for the names you plan to mention that are not in the card's list (several searches in one turn is fine). Don't write anything before the searches.
 - Facts: only well-established ones. Say "about" for approximate dates, and say so when historians disagree or a claim rests on one source. If the question's premise is wrong, say so kindly and give what happened.
 - Style: plain words, short sentences, active voice. Never use em dashes, en dashes, middle dots or arrow characters. No "testament to", "rich tapestry", "pivotal", "Moreover", "Furthermore".`;
@@ -307,10 +307,10 @@ const THREADS = new Map();
    While an answer is written, each page it links is opened in turn: the year line, the map and the card move to it, and the
    conversation goes along, at the top of each card. A click on a link in the answer does the same. Any click, key or scroll
    ends the tour. Opening a card some other way leaves the conversation on the card it was asked on. */
-const FOLLOW = "history.askfollow", DWELL = 3500;
+const FOLLOW = "history.askfollow";
 const followOn = () => { try { return localStorage.getItem(FOLLOW) !== "off"; } catch (e) { return true; } };
 let CARRY = null, carryNext = null;                /* the conversation that travels with the reader; the one the next card is to take */
-const tour = { th: null, turn: null, q: [], got: new Set(), t: 0, last: 0, done: false };
+const tour = { th: null, turn: null, got: new Set() };
 const cardName = (obj, kid) => (kid && KBX[kid] && KBX[kid].name) || (obj && (obj.name || obj.n)) || "this";
 function markNow(th, show) {
   if (!th.box) return; const last = th.box.querySelector(".chlog .cha:last-child"); let first = null;
@@ -318,29 +318,18 @@ function markNow(th, show) {
     if (on && (!first || (last && last.contains(a) && !last.contains(first)))) first = a; }
   if (show && first) first.scrollIntoView({ block: "nearest" });
 }
-function visit(th, id) {
-  const o = kbTarget(id); if (!o) return;
-  carryNext = th; th.now = id;
-  try { goTo(o); } finally { carryNext = null; }
-  markNow(th, true);
-}
-function tourStop() { clearTimeout(tour.t); tour.t = 0; tour.th = tour.turn = null; tour.q = []; tour.done = false; }
-function tourStart(th, turn) { tourStop(); if (!followOn() || story) return; tour.th = th; tour.turn = turn; tour.got = new Set(); tour.last = 0; }
-function tourReset(th) { if (tour.th !== th) return; for (const id of tour.q) tour.got.delete(id); tour.q = []; }   /* text written before a search is thrown away, and its links with it */
+function tourStop() { tour.th = tour.turn = null; }
+/* the map marks every place an answer links, each at its own spot, as the answer is written. Nothing moves: the card, the year and the view stay where the reader left them */
+function askMarks(on) { if (typeof MAP === "undefined") return; MAP.ask = on || null; if (typeof drawMap === "function") drawMap(); }
+function tourStart(th, turn) { tourStop(); askMarks(null); if (!followOn() || story) return; tour.th = th; tour.turn = turn; tour.got = new Set(); askMarks({ th, set: new Set() }); }
+function tourReset(th) { if (tour.th !== th) return; tour.got.clear(); if (MAP.ask) MAP.ask.set.clear(); drawMap(); }   /* text written before a search is thrown away, and its links with it */
 function tourFeed(th, turn, done) {
   if (tour.th !== th || tour.turn !== turn) return;
-  for (const m of turn.a.matchAll(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g)) { const id = m[1].trim(); if (tour.got.has(id) || id === th.kid || !kbTarget(id)) continue; tour.got.add(id); tour.q.push(id); }
-  if (done) tour.done = true;
-  tourStep();
+  let n = 0;
+  for (const m of turn.a.matchAll(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g)) { const id = m[1].trim(), o = tour.got.has(id) || id === th.kid ? null : kbTarget(id); if (!o) continue; tour.got.add(id); if (MAP.ask) { MAP.ask.set.add(o); n++; } }
+  if (n) drawMap();
+  if (done) tourStop();
 }
-function tourStep() {
-  if (!tour.th || tour.t) return;
-  if (!tour.q.length) { if (tour.done) tourStop(); return; }
-  tour.t = setTimeout(() => { tour.t = 0; const th = tour.th; if (!th) return;
-    if (story || !document.body.contains(th.box)) { tourStop(); return; }   /* a story took the screen, or the card was closed */
-    tour.last = performance.now(); visit(th, tour.q.shift()); tourStep(); }, Math.max(0, tour.last + DWELL - performance.now()));
-}
-for (const ev of ["pointerdown", "keydown", "wheel", "touchmove"]) document.addEventListener(ev, () => { if (tour.th) tourStop(); }, { capture: true, passive: true });
 /* a link in an answer takes the conversation along to the card it opens */
 const chatLink = e => { const a = e.target.closest && e.target.closest(".ichat .cha a.kbl:not(.miss)"), th = a && a.closest(".ichat").__th; return th && !e.shiftKey ? { a, th } : null; };
 const takeAlong = e => { const c = chatLink(e); if (!c) return; carryNext = c.th; c.th.now = c.a.dataset.k; setTimeout(() => { carryNext = null; markNow(c.th); }, 0); };
@@ -405,7 +394,7 @@ function drawThread(th) {
   }
   box.querySelector(".chnew").hidden = !th.turns.length || th.busy;
   box.querySelector(".chsend").disabled = th.busy;
-  box.querySelector(".chfollow").textContent = "Follow on the map: " + (followOn() ? "on" : "off");
+  box.querySelector(".chfollow").textContent = "Show on the map: " + (followOn() ? "on" : "off");
   markNow(th);
 }
 async function askItem(th, q) {
@@ -460,15 +449,15 @@ window.itemChat = (obj, kid) => {
 <div class="chin"><textarea rows="1" placeholder="Ask a follow-up question"></textarea><button type="button" class="btn pri chsend">Ask</button></div>
 <div class="chkey" hidden><input type="password" autocomplete="off" placeholder="Your Anthropic API key"><button type="button" class="btn">Save</button>
 <p class="askhint">This part needs your own Anthropic API key, from a paid developer account (<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">get one here</a>). It is kept only in this browser and sent only to Anthropic. An answer costs about 2 to 5 cents on your account. <button type="button" class="asklink keyforget">Forget key</button></p><p class="askhint keymsg" hidden></p></div>
-<div class="chfoot"><button type="button" class="asklink chnew">New chat</button><button type="button" class="asklink chkeyb">API key</button><button type="button" class="asklink chfollow" title="While Claude answers, the year, the map and the card move to each thing the answer links"></button></div>`;
+<div class="chfoot"><button type="button" class="asklink chnew">New chat</button><button type="button" class="asklink chkeyb">API key</button><button type="button" class="asklink chfollow" title="The map marks each place the answer links. The card and the view stay where they are"></button></div>`;
   box.querySelector("textarea").setAttribute("aria-label", "Ask a follow-up question about " + name);
   th.box = box; box.__th = th;
-  box.querySelector(".chfollow").addEventListener("click", () => { const on = !followOn(); try { localStorage.setItem(FOLLOW, on ? "on" : "off"); } catch (e) {} if (!on) tourStop(); drawThread(th); });
+  box.querySelector(".chfollow").addEventListener("click", () => { const on = !followOn(); try { localStorage.setItem(FOLLOW, on ? "on" : "off"); } catch (e) {} if (!on) { tourStop(); askMarks(null); } drawThread(th); });
   const ta = box.querySelector("textarea"), send = () => { const q = ta.value.trim(); if (!q || th.busy) return; if (keyGet()) { ta.value = ""; ta.style.height = ""; } askItem(th, q); };   /* with no key yet the question stays in the box */
   ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
   ta.addEventListener("input", () => { ta.style.height = ""; ta.style.height = Math.min(160, ta.scrollHeight) + "px"; });
   box.querySelector(".chsend").addEventListener("click", send);
-  box.querySelector(".chnew").addEventListener("click", () => { th.turns = []; th.messages = []; th.told = null; th.now = null;
+  box.querySelector(".chnew").addEventListener("click", () => { th.turns = []; th.messages = []; th.told = null; th.now = null; askMarks(null);
     if (CARRY === th) { dropCarry(th, true); return; }   /* the next question belongs to the card that is open now */
     drawThread(th); ta.focus(); });
   const kr = box.querySelector(".chkey");
@@ -480,7 +469,7 @@ window.itemChat = (obj, kid) => {
 /* the chat button on a card opens its chat and puts the cursor in it */
 window.openItemChat = () => { const box = document.querySelector("#detail .ichat"); if (!box) return; box.hidden = false; box.scrollIntoView({ block: "nearest", behavior: "smooth" }); box.querySelector("textarea").focus(); };
 window.askTheMap = q => { setAsk(true); go(q); };
-window.__ask = { toolSearch, toolBrowse, toStory, TOOLS, SYSTEM };   /* for tests */
+window.__ask = { toolSearch, toolBrowse, toStory, TOOLS, SYSTEM, tourStart, tourFeed, tour };   /* for tests */
 
 /* Save, export and delete, shown on the story card of a story made here */
 window.storyOwnRow = s => {

@@ -139,7 +139,7 @@ select = function (obj) {
     startStory(s, +m[3] - 1, false); setTimeout(() => { if (story && story.s === s) showStop(); }, 900); }); }
 
 const css = document.createElement("style");
-css.textContent = `.cxfind{border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;margin:6px 0 10px;background:var(--bg)}
+css.textContent = `.cxfind{border:1px solid var(--line-strong);border-radius:var(--r);padding:10px 12px;margin:6px 0 10px;background:var(--bg)}
 .cxfind b{display:block;font-size:15px;font-weight:600;margin-bottom:4px}
 .cxfind p{margin:0 0 9px;font-size:13.5px;line-height:1.45}
 .cxrow{display:flex;gap:6px;flex-wrap:wrap}

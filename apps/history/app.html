@@ -43,8 +43,10 @@
    scrolling chart (time runs down, regions run across) with sticky axis and
    region heads, and a detail strip at the bottom. */
 :root{
-  --bg:#e7ecf1; --surface:#f8fafc; --ink:#15202c; --muted:#566575;
-  --line:#ccd5de; --line-strong:#9aa9b8; --accent:#c8410b;
+  --bg:#e2e7ed; --surface:#fcfdfe; --ink:#15202c; --muted:#566575;
+  --line:#bcc6d0; --line-strong:#46586a; --accent:#c8410b;
+  --bar:#eff2f6; --rule:#15202c; --shade:rgba(21,32,44,.28);   /* the drafting-sheet look: title strips, the dark hairline round each panel, and a hard shadow with no blur */
+  --r:2px; --shadow:3px 3px 0 var(--shade);
   --c-am:#12897b; --c-af:#b97a08; --c-eu:#4a5fd0; --c-me:#bf4a34;
   --c-ca:#7a6a52; --c-sa:#a83d88; --c-ea:#1583b8; --c-se:#3b9148;
   --sea:#cfdfe9; --land:#f3f0e8;
@@ -56,7 +58,8 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#0e141b; --surface:#172029; --ink:#e7eef5; --muted:#93a2b2;
-    --line:#293542; --line-strong:#465668; --accent:#ff8b4d;
+    --line:#2b3846; --line-strong:#5b6e82; --accent:#ff8b4d;
+    --bar:#121a22; --rule:#7f92a6; --shade:rgba(0,0,0,.6);
     --c-am:#35bfae; --c-af:#e3a52f; --c-eu:#8494f2; --c-me:#ec7a63;
     --c-ca:#b39f84; --c-sa:#dc75bd; --c-ea:#4db4e6; --c-se:#69c276;
     --sea:#0c1620; --land:#26313c;
@@ -65,7 +68,8 @@
 }
 :root[data-theme="dark"]{
   --bg:#0e141b; --surface:#172029; --ink:#e7eef5; --muted:#93a2b2;
-  --line:#293542; --line-strong:#465668; --accent:#ff8b4d;
+  --line:#2b3846; --line-strong:#5b6e82; --accent:#ff8b4d;
+  --bar:#121a22; --rule:#7f92a6; --shade:rgba(0,0,0,.6);
   --c-am:#35bfae; --c-af:#e3a52f; --c-eu:#8494f2; --c-me:#ec7a63;
   --c-ca:#b39f84; --c-sa:#dc75bd; --c-ea:#4db4e6; --c-se:#69c276;
   --sea:#0c1620; --land:#26313c;
@@ -79,19 +83,19 @@ button,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* ---------- top bar ---------- */
-.top{flex:none;height:52px;background:var(--surface);border-bottom:1px solid var(--line-strong);padding:0 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:25}
+.top{flex:none;height:52px;background:var(--surface);border-bottom:2px solid var(--rule);padding:0 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:25}
 .brand{flex:none;min-width:0;width:194px}   /* the search box starts just past the filters column (214px), in line with the map column, and does not move when the column folds */
 .brand h1{padding-left:12px;display:flex;align-items:center;gap:6px}
 /* the mark: a head and eight arms of dots, the eight regions with their events, near to far; the name is Optima Bold, drawn as outlines, to match the weight of the mark */
 .brand h1 .mk{width:30px;height:30px;flex:none} .brand h1 .nm{height:20px;width:auto;flex:none}
 h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;margin:0;letter-spacing:0;white-space:nowrap}   /* 33.333px: one font pixel per screen pixel */
 .sub{font-size:12px;color:var(--muted);margin:1px 0 0;white-space:nowrap}
-.btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:0 12px;height:36px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:0 12px;height:36px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
 .btn svg{width:16px;height:16px}
 .btn:hover{border-color:var(--ink)}
 .btn[aria-pressed="true"],.btn[aria-expanded="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 /* quiet text buttons: the top bar's tools and the two dropdowns */
-.tb{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:0;border-radius:7px;background:none;color:var(--ink);font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer}
+.tb{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:0;border-radius:var(--r);background:none;color:var(--ink);font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer}
 .tb:hover{background:var(--bg)}
 .tb[aria-expanded="true"]{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line-strong)}
 .tb svg{width:16px;height:16px;flex:none}
@@ -105,18 +109,18 @@ h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-
 .hello .btn{flex:none;background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .hello .x{flex:none;position:static;background:none}
 .tbtools .tb svg{width:18px;height:18px}
-.tb[data-msg]::after{content:attr(data-msg);position:absolute;top:38px;right:0;background:var(--ink);color:var(--surface);font-size:12.5px;padding:3px 8px;border-radius:6px;white-space:nowrap;z-index:60}
+.tb[data-msg]::after{content:attr(data-msg);position:absolute;top:38px;right:0;background:var(--ink);color:var(--surface);font-size:12.5px;padding:3px 8px;border-radius:var(--r);white-space:nowrap;z-index:60}
 .tdd{display:flex;gap:2px;align-items:center;padding-left:6px;margin-left:2px;border-left:1px solid var(--line)}
 .pop.dd{right:auto;width:300px;max-height:calc(100vh - 70px);overflow:auto;padding:12px 10px 12px 8px}
 .search{position:relative;flex:1;max-width:460px;min-width:110px;margin-left:6px}
-.search input{width:100%;height:38px;border:1px solid var(--line-strong);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 30px 0 32px;font:inherit;font-size:14px}
+.search input{width:100%;height:38px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--bg);color:var(--ink);padding:0 30px 0 32px;font:inherit;font-size:14px}
 .search input::placeholder{color:var(--muted)}
 .search>svg{position:absolute;left:10px;top:11px;width:16px;height:16px;color:var(--muted);pointer-events:none}
-.search kbd{position:absolute;right:8px;top:10px;font:12px/16px var(--label);color:var(--muted);border:1px solid var(--line-strong);border-radius:4px;padding:0 5px;pointer-events:none}
+.search kbd{position:absolute;right:8px;top:10px;font:12px/16px var(--label);color:var(--muted);border:1px solid var(--line-strong);border-radius:var(--r);padding:0 5px;pointer-events:none}
 .search input:focus+kbd{display:none}
-.qres{position:absolute;left:0;right:0;top:43px;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.18);max-height:min(440px,70vh);overflow:auto;display:none;padding:4px;z-index:50;min-width:280px}
+.qres{position:absolute;left:0;right:0;top:43px;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);max-height:min(440px,70vh);overflow:auto;display:none;padding:4px;z-index:50;min-width:280px}
 .qres.open{display:block}
-.qr{display:flex;gap:9px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;padding:6px 8px;border-radius:6px;cursor:pointer}
+.qr{display:flex;gap:9px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;padding:6px 8px;border-radius:var(--r);cursor:pointer}
 .qr[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
 .qr>i{flex:none;width:9px;height:9px;border-radius:2px;margin-top:5px;background:var(--c,var(--muted))}
 .qr .ico{margin-top:1px}
@@ -127,36 +131,67 @@ h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-
 .qr.qstub b{font-weight:500;color:var(--muted)}
 .tbtools{display:flex;gap:0;align-items:center;margin-left:auto}
 .moreb{display:none;margin-left:auto}
-.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden}
 .seg button{border:0;background:transparent;padding:5px 9px;font-size:13px;cursor:pointer}
 .seg button+button{border-left:1px solid var(--line-strong)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
 /* key popover */
-.pop{position:fixed;top:58px;right:14px;z-index:40;background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:12px 14px 14px;width:min(380px,calc(100vw - 28px));display:none}
+.pop{position:fixed;top:58px;right:14px;z-index:40;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 14px 14px;width:min(380px,calc(100vw - 28px));display:none}
 .pop.open{display:block}
 .spint{margin:0 0 10px;font-size:13.5px;color:var(--muted);line-height:1.4}
 .sbook{font-size:12.5px;font-weight:600;color:var(--muted);margin:10px 0 4px}
-.lib{border-top:1px solid var(--line-strong)}
-.lib summary{display:flex;align-items:baseline;gap:8px;padding:9px 2px;cursor:pointer;list-style:none;font-family:var(--display);font-size:15.5px}
-.lib summary::-webkit-details-marker{display:none}
-.lib summary::before{content:"";flex:none;align-self:center;width:6px;height:6px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(-45deg);transition:transform .12s}
-.lib[open] summary::before{transform:rotate(45deg)}
-.lib summary span{font-family:var(--label);font-size:12.5px;color:var(--muted)}
-.lib .spint{margin:0 0 4px}
-.lib .sitem:last-child{border-bottom:0}
+/* the Library: a panel down the right side, under the top bar. Its sections are listed on the left and one shows at a time; a phone gets the whole screen, with the sections in a row */
+.libp{position:fixed;top:52px;right:0;bottom:0;z-index:40;width:min(600px,100vw);display:none;flex-direction:column;background:var(--surface);border-left:1px solid var(--rule);box-shadow:-3px 0 0 var(--shade)}
+.libp.open{display:flex;animation:libin .18s ease-out}
+@keyframes libin{from{transform:translateX(26px);opacity:0}}
+.libp [hidden]{display:none!important}
+.libhead{flex:none;display:flex;align-items:center;gap:10px;height:50px;padding:0 12px 0 16px;border-bottom:1px solid var(--line)}
+.libhead h2{font-family:'Pixelta',var(--display);font-weight:400;font-size:25px;line-height:1;margin:0 auto 0 0}
+.libfind{flex:0 1 210px;min-width:0;height:30px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--bg);color:var(--ink);padding:0 9px;font:inherit;font-size:13.5px}
+.libbody{flex:1;min-height:0;display:grid;grid-template-columns:172px minmax(0,1fr)}
+.libnav{display:flex;flex-direction:column;gap:2px;padding:10px 8px;background:var(--bg);border-right:1px solid var(--line);overflow:auto}
+.libtab{flex:none;display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;font:inherit;font-size:14.5px;color:var(--ink);background:none;border:0;border-radius:var(--r);padding:7px 9px;cursor:pointer}
+.libtab i{margin-left:auto;font-style:normal;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.libtab:hover{background:var(--surface)}
+.libtab[aria-selected="true"]{background:var(--ink);color:var(--surface);font-weight:600}
+.libtab[aria-selected="true"] i{color:inherit;opacity:.72}
+#storyList{min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px 16px 22px}
+.libh{font-family:var(--display);font-weight:400;font-size:19px;line-height:1.2;margin:0 0 5px}
+.lib .spint{margin:0 0 8px}
+.lib .sbook{position:sticky;top:0;z-index:1;margin:8px -16px 0;padding:7px 16px 5px;background:var(--surface);border-bottom:1px solid var(--line)}
+.lib .sitem{margin:0 -8px;width:calc(100% + 16px);padding:9px 8px}
+.lib .sitem span{display:block;line-height:1.35;margin-top:1px}
+.librow{display:flex;align-items:center;gap:2px;border-bottom:1px solid var(--line)}
+.librow .sitem{flex:1;min-width:0;border-bottom:0}
+.libun{flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:var(--r);background:none;color:#e0262b;cursor:pointer}
+.libun path{fill:currentColor}
+.libun:hover{background:var(--bg)}
+.libnone{margin:8px 0;font-size:13.5px;color:var(--muted);line-height:1.4}
+@media (max-width:759px){
+  .libp{top:0!important;width:100vw;border-left:0;box-shadow:none}
+  .libbody{display:flex;flex-direction:column}
+  .libnav{flex:none;flex-direction:row;gap:6px;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+  .libnav::-webkit-scrollbar{display:none}
+  .libtab{width:auto;white-space:nowrap;gap:6px;padding:5px 11px;border:1px solid var(--line-strong);background:var(--surface)}
+  .libtab i{margin-left:0}
+  .libtab[aria-selected="true"]{border-color:var(--ink)}
+  #storyList{flex:1;padding:12px 14px 22px}
+  .lib .sbook{margin:8px -14px 0;padding:7px 14px 5px}
+  .libfind{flex:1 1 0}
+}
 .sitem{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--line);padding:8px 2px;cursor:pointer}
 .sitem:hover{background:var(--bg)}
 .sitem b{display:block;font-weight:600;font-size:14.5px}
 .sitem span{font-size:13px;color:var(--muted)}
 /* Ask the map, at the top of the Stories list */
-.ask{border:1px solid var(--line-strong);border-radius:8px;padding:10px 10px 8px;margin:6px 0 4px;display:flex;flex-direction:column;gap:7px}
+.ask{border:1px solid var(--line-strong);border-radius:var(--r);padding:10px 10px 8px;margin:6px 0 4px;display:flex;flex-direction:column;gap:7px}
 .ask h3{margin:0;font-size:14.5px}
 .askhint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.35}
-.ask textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:6px;padding:7px 8px;resize:vertical;min-height:44px}
+.ask textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r);padding:7px 8px;resize:vertical;min-height:44px}
 .askrow{display:flex;align-items:center;gap:10px}
 .asklink{border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0}
 .askkey{display:flex;flex-wrap:wrap;gap:6px}
-.askkey input{flex:1;min-width:0;font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:6px;padding:0 8px;height:34px}
+.askkey input{flex:1;min-width:0;font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r);padding:0 8px;height:34px}
 .askkey[hidden]{display:none}
 .askkey input.bad,.chkey input.bad{border-color:#e0262b}
 .keymsg{flex-basis:100%;color:#e0262b!important}
@@ -192,15 +227,15 @@ h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-
 .askrun:hover .think,.askrun:focus-within .think{opacity:0}
 .askrun:not([hidden]) + .moreb + .tbtools{margin-left:8px}
 .askrun:not([hidden]) + .moreb{margin-left:8px}
-#storyPop,#askPop{max-height:calc(100vh - 80px);overflow:auto}
+#askPop{max-height:calc(100vh - 80px);overflow:auto}
 #askPop .ask{border:0;padding:0;margin:0}
 .askhd{display:flex;align-items:center;justify-content:space-between}
 .sown{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
 .sown .btn{height:28px;font-size:12.5px;padding:0 9px}
 .qask b{color:var(--accent)}
-.scard{position:absolute;left:var(--sleft,16px);top:var(--stop,70px);z-index:25;width:min(340px,calc(100% - 32px));box-sizing:border-box;background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:12px 14px 14px;display:flex;flex-direction:column;gap:7px}
+.scard{position:absolute;left:var(--sleft,16px);top:var(--stop,70px);z-index:25;width:min(340px,calc(100% - 32px));box-sizing:border-box;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 14px 14px;display:flex;flex-direction:column;gap:7px}
 .scard[hidden]{display:none}
-.svid{position:fixed;right:14px;top:66px;z-index:35;width:min(372px,calc(100vw - 28px));background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);overflow:hidden}
+.svid{position:fixed;right:14px;top:66px;z-index:35;width:min(372px,calc(100vw - 28px));background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
 .svid[hidden]{display:none}
 .svid .vhd{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;font-size:12.5px;color:var(--muted)}
 .svid .vhd span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -265,7 +300,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .ghead.sub{margin-top:8px}
 .lk{border:0;background:none;padding:0;font:inherit;font-size:12.5px;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 .lk:disabled{color:var(--muted);text-decoration:none;cursor:default}
-.crow{display:flex;align-items:center;gap:4px;min-height:34px;border-radius:6px;padding:0 2px 0 4px;font-size:14.5px}
+.crow{display:flex;align-items:center;gap:4px;min-height:34px;border-radius:var(--r);padding:0 2px 0 4px;font-size:14.5px}
 .crow:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .crow label{display:flex;align-items:center;gap:7px;flex:1;min-width:0;cursor:pointer;line-height:1.2;padding:4px 0}
 .crow input{margin:0;width:18px;height:18px;accent-color:var(--ink);flex:none;cursor:pointer}
@@ -275,10 +310,10 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .crow .mk .key{width:16px}
 .crow.dis{color:var(--muted)}
 .crow.dis label{cursor:default}
-.only{flex:none;opacity:0;border:1px solid var(--line-strong);background:var(--surface);border-radius:5px;font-size:11.5px;line-height:1.3;padding:1px 6px;cursor:pointer}
+.only{flex:none;opacity:0;border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r);font-size:11.5px;line-height:1.3;padding:1px 6px;cursor:pointer}
 .crow:hover .only,.only:focus-visible{opacity:1}
 @media (hover:none){ .only{opacity:1} }
-.caret{flex:none;width:24px;height:24px;border:0;background:none;padding:0;border-radius:4px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.caret{flex:none;width:24px;height:24px;border:0;background:none;padding:0;border-radius:var(--r);cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
 .caret svg{width:12px;height:12px;transition:transform .15s}
 .caret[aria-expanded="true"] svg{transform:rotate(90deg)}
 .caret:hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
@@ -288,7 +323,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .vrow>span{font-size:12.5px;color:var(--muted)}
 .vrow .seg{display:flex}
 .vrow .seg button{flex:1;padding:5px 4px}
-.gbsel{width:100%;height:30px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);padding:0 6px;font:inherit;font-size:13px}
+.gbsel{width:100%;height:30px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink);padding:0 6px;font:inherit;font-size:13px}
 .gbsel:disabled{color:var(--muted)}
 .gblab{display:block;font-size:12.5px;color:var(--muted);margin:10px 4px 4px}
 
@@ -317,7 +352,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .band{position:absolute;z-index:3;pointer-events:none;
   background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 16%,transparent) 0 5px,transparent 5px 10px)}
 .band.long{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--accent) 8%,transparent) 0 5px,transparent 5px 10px)}
-.bandlab{position:absolute;z-index:3;transform:translateY(-100%);background:var(--surface);border:1px solid var(--accent);border-bottom:0;border-radius:4px 4px 0 0;
+.bandlab{position:absolute;z-index:3;transform:translateY(-100%);background:var(--surface);border:1px solid var(--accent);border-bottom:0;border-radius:var(--r) var(--r) 0 0;
   font-family:var(--label);font-weight:600;font-size:11.5px;line-height:1;padding:3px 6px 2px;cursor:pointer;white-space:nowrap;color:var(--accent)}
 .bandlab.sel{background:var(--accent);color:var(--surface)}
 .ev{position:absolute;z-index:2;display:flex;gap:6px;align-items:flex-start;background:none;border:0;padding:3px;margin:-3px;cursor:pointer;text-align:left}
@@ -371,7 +406,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .ev.vid i{outline:1.5px solid var(--ink);outline-offset:2px}
 .legend .vidk{outline:1.5px solid var(--line-strong);outline-offset:2px;margin:0 3px}
 .ivid{margin:10px 0 12px}
-.ivid iframe,.ivid video{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:8px;background:#000}
+.ivid iframe,.ivid video{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:var(--r);background:#000}
 .ivid figcaption{margin-top:4px;font-size:12px;color:var(--muted)}
 .life{position:absolute;z-index:1;height:2px;border-radius:1px;background:var(--lc);opacity:.4;pointer-events:none}
 .life.v{height:auto;width:2px}
@@ -386,13 +421,13 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .sheet.horiz .bar span{writing-mode:horizontal-tb;top:auto;left:calc(var(--headw,136px) + 4px);line-height:1}
 .sheet.horiz .ev span{white-space:nowrap}
 .evrule.v{height:auto;width:0;border-top:0;border-left:1px dotted var(--line-strong)}
-.bandlab.h{transform:none;border:1px solid var(--accent);border-left:0;border-radius:0 4px 4px 0}
+.bandlab.h{transform:none;border:1px solid var(--accent);border-left:0;border-radius:0 var(--r) var(--r) 0}
 .wiki{display:inline-block;margin-top:7px;font-size:13.5px;font-weight:500;color:var(--accent);text-underline-offset:2px}
 
 /* ---------- time bar, under the chart ---------- */
-.timebar{flex:none;position:relative;z-index:25;user-select:none;-webkit-user-select:none;background:var(--surface);border-top:1px solid var(--line-strong);padding:6px 12px 6px;display:flex;flex-direction:column;gap:3px}
+.timebar{flex:none;position:relative;z-index:25;user-select:none;-webkit-user-select:none;background:var(--surface);border-top:2px solid var(--rule);padding:6px 12px 6px;display:flex;flex-direction:column;gap:3px}
 /* the time line: one track, edge to edge. Red is the year; the dark part is the time already passed */
-.slider{position:relative;flex:none;height:31px;cursor:pointer;touch-action:none;border-radius:4px}
+.slider{position:relative;flex:none;height:31px;cursor:pointer;touch-action:none;border-radius:var(--r)}
 .slider .track{position:absolute;left:10px;right:10px;top:8px;height:6px;border-radius:3px;background:var(--line-strong)}
 .tfill{position:absolute;left:10px;top:8px;height:6px;border-radius:3px 0 0 3px;background:color-mix(in srgb,var(--ink) 55%,var(--line-strong));pointer-events:none}
 .tsel{position:absolute;top:5px;height:12px;border-radius:3px;background:color-mix(in srgb,var(--accent) 45%,transparent);border:1px solid var(--accent);box-sizing:border-box;pointer-events:none;display:none}
@@ -401,25 +436,25 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .tdots i{position:absolute;top:6px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);box-sizing:border-box;pointer-events:none}
 .tdots i.on{background:var(--accent)}
 .tdots i.cur{transform:scale(1.35);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
-.thumb{position:absolute;top:0;width:12px;height:22px;margin-left:-6px;border-radius:6px;background:#e0262b;border:2px solid var(--surface);box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,.3);pointer-events:none;transition:transform .12s}
+.thumb{position:absolute;top:0;width:12px;height:22px;margin-left:-6px;border-radius:var(--r);background:#e0262b;border:2px solid var(--surface);box-sizing:border-box;box-shadow:0 1px 0 var(--shade);pointer-events:none;transition:transform .12s}
 .slider:hover .thumb{transform:scale(1.12)}
 .slider.drag .thumb,.slider:focus-visible .thumb{transform:scale(1.2)}
 .slider.drag{cursor:grabbing}
 .slider.pick,.slider.shift{cursor:col-resize}
 /* the lens: the years shown on the map, as one object on the track. Its body moves through time, a dark end changes where it
    starts or stops, and the marker inside it becomes a needle for the year the borders are drawn for */
-.tlens{position:absolute;top:1px;height:20px;box-sizing:border-box;border-radius:7px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1.5px solid var(--ink);box-shadow:0 1px 5px rgba(0,0,0,.2);cursor:grab;touch-action:none;display:none}
+.tlens{position:absolute;top:1px;height:20px;box-sizing:border-box;border-radius:var(--r);background:color-mix(in srgb,var(--surface) 70%,transparent);border:1.5px solid var(--ink);box-shadow:0 1px 0 var(--shade);cursor:grab;touch-action:none;display:none}
 .slider.drag .tlens{cursor:grabbing}
 .twh{position:absolute;top:-1.5px;bottom:-1.5px;width:10px;background:var(--ink);cursor:ew-resize;display:grid;place-items:center;transition:background .12s}
 .twh::before{content:"";width:3px;height:8px;border-left:1px solid var(--surface);border-right:1px solid var(--surface);opacity:.85}
 .twh::after{content:"";position:absolute;top:-6px;bottom:-6px}
-#tWa{left:-1.5px;border-radius:7px 0 0 7px}
-#tWb{right:-1.5px;border-radius:0 7px 7px 0}
+#tWa{left:-1.5px;border-radius:var(--r) 0 0 var(--r)}
+#tWb{right:-1.5px;border-radius:0 var(--r) var(--r) 0}
 #tWa::after{left:-7px;right:0}
 #tWb::after{left:0;right:-7px}
 .twh:hover,.twh.on{background:var(--accent)}
 .slider.haslens .thumb{top:-5px;width:2px;height:30px;margin-left:-1px;border:0;border-radius:1px;box-shadow:none;transform:none!important}
-.slider.haslens .thumb::before{content:"";position:absolute;left:-5px;top:-2px;width:12px;height:12px;box-sizing:border-box;border-radius:50%;background:#e0262b;border:2px solid var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .12s}
+.slider.haslens .thumb::before{content:"";position:absolute;left:-5px;top:-2px;width:12px;height:12px;box-sizing:border-box;border-radius:50%;background:#e0262b;border:2px solid var(--surface);box-shadow:0 1px 0 var(--shade);transition:transform .12s}
 .slider.haslens:hover .thumb::before{transform:scale(1.15)}
 .slider.haslens.drag .thumb::before{transform:scale(1.3)}
 /* the red line can be held on its own: it grows under the pointer, and has room round it to catch */
@@ -429,7 +464,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .slider.haslens .thumb:hover::before,.slider.needle .thumb::before{transform:scale(1.6)}
 @media (pointer:coarse){ .slider.haslens .thumb::after{left:-12px;right:-12px;top:-10px;bottom:-6px} }
 /* the year at each end of the lens, shown while the pointer is on it or it is being dragged */
-.ttag{position:absolute;bottom:calc(100% + 6px);transform:translateX(-50%);background:var(--ink);color:var(--surface);font:600 12px/1.25 var(--label);font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s}
+.ttag{position:absolute;bottom:calc(100% + 6px);transform:translateX(-50%);background:var(--ink);color:var(--surface);font:600 12px/1.25 var(--label);font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:var(--r);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s}
 .slider.lenson .ttag.show{opacity:1}
 .slider.lenson .ttip{opacity:0}
 .twsel{max-width:150px}
@@ -439,7 +474,7 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 @media (pointer:coarse){ .twh::after{top:-11px;bottom:-11px} #tWa::after{left:-14px;right:0} #tWb::after{left:0;right:-14px} }
 @media (max-width:1099px){ .tshow{display:none} }
 @media (max-width:759px){ .twsel{display:none} }
-.ttip{position:absolute;bottom:calc(100% + 1px);transform:translateX(-50%);background:var(--ink);color:var(--surface);font:600 12px/1.25 var(--label);font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:5px;white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;transition:opacity .1s}
+.ttip{position:absolute;bottom:calc(100% + 1px);transform:translateX(-50%);background:var(--ink);color:var(--surface);font:600 12px/1.25 var(--label);font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:var(--r);white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;transition:opacity .1s}
 .slider.tipon .ttip{opacity:1}
 .sticks .tk{position:absolute;top:19px;transform:translateX(-50%);font-family:var(--label);font-size:11px;line-height:12px;color:var(--muted);white-space:nowrap;pointer-events:none}
 .sticks .tk::before{content:"";position:absolute;left:50%;top:-5px;height:4px;border-left:1px solid var(--muted)}
@@ -449,15 +484,15 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .sticks .tk.r::before{left:100%}
 /* the controls under it: the year, play, speed, then the years the line covers and the chart's zoom */
 .trow{display:flex;align-items:center;gap:8px;min-width:0}
-.tyear{flex:none;min-width:124px;height:34px;display:flex;align-items:center;border:1px solid transparent;border-radius:6px;background:none;color:var(--ink);padding:0 6px;margin-left:-6px;cursor:text;font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;white-space:nowrap}
+.tyear{flex:none;min-width:124px;height:34px;display:flex;align-items:center;border:1px solid transparent;border-radius:var(--r);background:none;color:var(--ink);padding:0 6px;margin-left:-6px;cursor:text;font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;white-space:nowrap}
 .tyear:hover{border-color:var(--line-strong)}
-.tyin{flex:none;width:118px;height:34px;margin-left:-6px;border:1px solid var(--ink);border-radius:6px;background:var(--surface);color:var(--ink);padding:0 6px;font-family:var(--display);font-weight:700;font-size:17px;user-select:text;-webkit-user-select:text}
+.tyin{flex:none;width:118px;height:34px;margin-left:-6px;border:1px solid var(--ink);border-radius:var(--r);background:var(--surface);color:var(--ink);padding:0 6px;font-family:var(--display);font-weight:700;font-size:17px;user-select:text;-webkit-user-select:text}
 .tyin.bad{border-color:#e0262b;animation:tyshake .25s}
 @keyframes tyshake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .tyin[hidden],.tyear[hidden]{display:none}
-.speed{flex:none;height:36px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);font:600 12.5px var(--label);padding:0 6px;cursor:pointer;font-variant-numeric:tabular-nums}
+.speed{flex:none;height:36px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink);font:600 12.5px var(--label);padding:0 6px;cursor:pointer;font-variant-numeric:tabular-nums}
 .speed:hover{border-color:var(--ink)}
-.ib{flex:none;width:36px;height:36px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
+.ib{flex:none;width:36px;height:36px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
 .ib svg{width:16px;height:16px}
 .ib:hover{border-color:var(--ink)}
 .ib[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
@@ -465,10 +500,82 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .tgrp{flex:none;display:flex}
 .tgrp .ib{border-radius:0;margin-left:-1px;position:relative}
 .tgrp .ib:hover{z-index:1}
-.tgrp .ib:first-child{border-radius:6px 0 0 6px;margin-left:0}
-.tgrp .ib:last-child{border-radius:0 6px 6px 0}
+.tgrp .ib:first-child{border-radius:var(--r) 0 0 var(--r);margin-left:0}
+.tgrp .ib:last-child{border-radius:0 var(--r) var(--r) 0}
 .tgrp #playBtn{width:44px;background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .trow .speed{height:34px}
+.lucky img{display:block;flex:none;width:22px;height:22px;image-rendering:pixelated}
+.tbtools #luckyBtn{padding:0 7px}
+/* ---------- Guess the year (daily.js): its button sits by the Library and turns grey once today's map is done; the game is a screen of its own over the app ---------- */
+#dailyBtn img{display:block;flex:none;width:22px;height:22px;image-rendering:pixelated}
+.tbtools #dailyBtn{padding:0 8px}
+#dailyBtn.done{opacity:.45}
+#dailyBtn.done img{filter:grayscale(1)}
+@media (min-width:1200px){ .tbtools #dailyBtn .tbt{display:inline} }
+.dg{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:var(--bg);color:var(--ink)}
+.dg.open{display:flex}
+body.dgon{overflow:hidden}
+.dghead{flex:none;display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.dghead h2{font-family:'Pixelta',var(--display);font-weight:400;font-size:25px;line-height:1;margin:0}
+.dgstep{font:500 14.5px var(--label);color:var(--muted)}
+.dghead .x{margin-left:auto}
+.dgmap{flex:1;min-height:0;position:relative;margin:10px 10px 0;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;background:var(--sea)}
+.dgmap[hidden]{display:none}
+.dgmap canvas{display:block;touch-action:none;cursor:grab}
+.dgmap canvas:active{cursor:grabbing}
+.dgtag{position:absolute;left:8px;top:8px;background:var(--surface);border-radius:var(--r);padding:3px 9px;font:500 13.5px var(--label)}
+.dgtag:empty{display:none}
+.dghint{position:absolute;left:8px;bottom:8px;background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:var(--r);padding:2px 8px;font:500 12.5px var(--label);color:var(--muted);pointer-events:none}
+.dghint[hidden]{display:none}
+.dgzoom{position:absolute;right:8px;top:8px;display:flex;gap:4px}
+.dgzoom .mb{height:30px;min-width:30px;padding:0 9px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink);font-size:14px;cursor:pointer}
+.dgfoot{flex:none;padding:10px 14px 12px}
+.dgrow{display:flex;align-items:center;gap:10px}
+.dgyear{flex:none;min-width:168px;height:38px;display:flex;align-items:center;border:1px solid transparent;border-radius:var(--r);background:none;color:var(--ink);padding:0 6px;margin-left:-6px;font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;white-space:nowrap}
+button.dgyear{cursor:text}
+button.dgyear:hover{border-color:var(--line-strong)}
+.dgyear[hidden],.dgyin[hidden]{display:none}
+.dgyin{flex:none;width:162px;height:38px;border:1px solid var(--ink);border-radius:var(--r);background:var(--surface);color:var(--ink);padding:0 8px;font-size:16px}
+.dgsay{flex:1;min-width:0;color:var(--muted);font-size:14px}
+.dg .dggo{flex:none;margin-left:auto;background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.dgsl{position:relative;margin-top:8px;padding-bottom:20px}
+.dgsl input{display:block;width:100%;margin:0;accent-color:var(--ink)}
+.dgticks{position:absolute;left:8px;right:8px;top:21px;height:18px;pointer-events:none}
+.dgticks i{position:absolute;top:0;transform:translateX(-50%);padding-top:7px;font:500 12px var(--label);font-style:normal;color:var(--muted);white-space:nowrap}
+.dgticks i::before{content:"";position:absolute;left:50%;top:0;width:1px;height:5px;background:var(--line-strong)}
+.dgticks i:first-child{transform:none} .dgticks i:first-child::before{left:0}
+.dgticks i:last-child{transform:translateX(-100%)} .dgticks i:last-child::before{left:100%}
+.dgans{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:14px;line-height:1.3}
+.dgans span{color:var(--muted)}
+.dgpts{flex:none;font-family:'Pixelta',var(--display);font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.dgpts small{font:500 13.5px var(--label);color:var(--muted)}
+.dgevh{margin:10px 0 5px;font:500 12.5px var(--label);color:var(--muted)}
+.dgevs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dgev{display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:9px;align-items:center;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;cursor:pointer}
+.dgev:hover{border-color:var(--line-strong)}
+.dgev i{grid-row:1/3;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--surface);font:600 12.5px/22px var(--label);font-style:normal;text-align:center}
+.dgev b{font-weight:600;font-size:14.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dgev span{font-size:13px;line-height:1.25;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dgend{display:flex;align-items:center;gap:8px;margin-top:10px}
+.dgmeta{flex:1;min-width:0;margin:0;font-size:13.5px;color:var(--muted)}
+.dgend .dggo{margin-left:0}
+@media (max-width:759px){
+  .dghead{padding:6px 10px;gap:8px} .dghead h2{font-size:21px}
+  .dgmap{margin:8px 8px 0}
+  .dgfoot{padding:8px 10px 10px}
+  .dgyear{min-width:0;font-size:27px}
+  .dgsay{visibility:hidden}
+  .dgfoot.ans .dgrow{flex-wrap:wrap}
+  .dgfoot.ans .dgans{order:5;flex-basis:100%}
+  .dgfoot.ans .dgpts{margin-left:auto}
+  .dgevs{grid-template-columns:1fr;gap:5px} .dgevh{margin-top:8px}
+  .dgend{flex-wrap:wrap} .dgmeta{flex-basis:100%}
+}
+/* the die sits on the time bar, left of the Years button. The row sheds what it can do without when it has no room (trowFit):
+   the Showing text, the zoom's label, the window menu and last the die, which then moves in with the tools at the top */
+.trow.fit1 #tShow,.trow.fit2 .zread,.trow.fit3 #winSel,.trow.fit4 #luckyBar{display:none}
+.cmain:has(#storyCard:not([hidden])) #luckyBar{display:none}   /* a story has the time bar to itself */
+body:not(.nodie) .tbtools #luckyBtn{display:none}
 .tmid{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
 .tnow{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted)}
 .tnow b{color:var(--ink);font-weight:600}
@@ -483,27 +590,27 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .overview.inwin{cursor:grab}
 .ovthumb{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#e0262b;pointer-events:none}
 .rwrap{flex:none;position:relative;display:flex;align-items:center}
-.rchip{height:34px;display:flex;align-items:center;gap:6px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);padding:0 10px;font:600 12.5px var(--label);font-variant-numeric:tabular-nums;white-space:nowrap;cursor:pointer}
+.rchip{height:34px;display:flex;align-items:center;gap:6px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink);padding:0 10px;font:600 12.5px var(--label);font-variant-numeric:tabular-nums;white-space:nowrap;cursor:pointer}
 .rchip svg{width:15px;height:15px;flex:none}
 .rchip:hover,.rchip[aria-expanded="true"]{border-color:var(--ink)}
-.rwrap.on .rchip{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));border-radius:6px 0 0 6px}
-.rx{height:34px;width:28px;margin-left:-1px;border:1px solid var(--accent);border-radius:0 6px 6px 0;background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:var(--ink);font-size:17px;line-height:1;cursor:pointer;padding:0}
+.rwrap.on .rchip{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));border-radius:var(--r) 0 0 var(--r)}
+.rx{height:34px;width:28px;margin-left:-1px;border:1px solid var(--accent);border-radius:0 var(--r) var(--r) 0;background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:var(--ink);font-size:17px;line-height:1;cursor:pointer;padding:0}
 .rx:hover{background:var(--accent);color:var(--surface)}
 .rx[hidden],.rpop[hidden]{display:none}
-.rpop{position:absolute;right:0;bottom:calc(100% + 8px);width:270px;max-width:calc(100vw - 16px);z-index:45;background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:10px}
+.rpop{position:absolute;right:0;bottom:calc(100% + 8px);width:270px;max-width:calc(100vw - 16px);z-index:45;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);padding:10px}
 .rpop h3{margin:0 0 6px 4px;font-size:13.5px}
-.rpop .ri{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;border:0;background:none;color:var(--ink);border-radius:6px;padding:6px 8px;font:inherit;font-size:13.5px;text-align:left;cursor:pointer}
+.rpop .ri{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;border:0;background:none;color:var(--ink);border-radius:var(--r);padding:6px 8px;font:inherit;font-size:13.5px;text-align:left;cursor:pointer}
 .rpop .ri:hover,.rpop .ri:focus-visible{background:var(--line)}
 .rpop .ri span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .rpop .ri b{font-weight:600}
 .rpop .ri[aria-current="true"] b{color:var(--accent)}
 .rcust{display:flex;align-items:center;gap:6px;margin-top:8px;padding:9px 4px 0;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
-.rcust input{flex:1;min-width:0;height:30px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);padding:0 7px;font:inherit;font-size:13px;user-select:text;-webkit-user-select:text}
+.rcust input{flex:1;min-width:0;height:30px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink);padding:0 7px;font:inherit;font-size:13px;user-select:text;-webkit-user-select:text}
 .rcust input.bad{border-color:#e0262b}
 .rcust .btn{height:30px;padding:0 10px}
 .rhint{margin:8px 4px 0;font-size:11.5px;line-height:1.35;color:var(--muted)}
 @media (hover:none){ .rhint{display:none} }
-.zoomgrp{flex:none;display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:6px}
+.zoomgrp{flex:none;display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:var(--r)}
 .zoomgrp .ib{border:0;background:none;width:32px;height:32px}
 .zoomgrp .ib:hover{background:var(--line)}
 .zoomgrp .ib:disabled{opacity:.35;cursor:default}
@@ -514,14 +621,14 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .yflag.v{left:3px;right:3px;text-align:center;transform:translateY(-50%);padding:3px 2px}
 
 /* ---------- right column: map, then The world in YEAR or the detail card ---------- */
-.side{background:var(--surface);border-left:1px solid var(--line-strong);display:flex;flex-direction:column;min-height:0;min-width:0;position:relative}
+.side{background:var(--surface);border-left:1px solid var(--rule);display:flex;flex-direction:column;min-height:0;min-width:0;position:relative}
 /* drag the side panel's left edge to set its width; a double click goes back to the default */
 body.sized .app{grid-template-columns:minmax(0,1fr) var(--sidew) var(--pinw,0px)}
 .sgrip{position:absolute;left:0;top:0;bottom:0;width:7px;margin-left:-1px;cursor:col-resize;z-index:30;touch-action:none}
 .sgrip::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .15s}
 .sgrip:hover::after,.sgrip.on::after{opacity:1}
 /* the right panel folds to a rail. The button shows on The world in YEAR; a card that opens unfolds the panel until it is closed */
-.sfoldb{position:absolute;top:9px;right:8px;z-index:31;width:30px;height:30px;border:1px solid transparent;border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0}
+.sfoldb{position:absolute;top:9px;right:8px;z-index:31;width:30px;height:30px;border:1px solid transparent;border-radius:var(--r);background:var(--surface);color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0}
 .sfoldb:hover{border-color:var(--line-strong);color:var(--ink)}
 .sfoldb svg{transform:rotate(180deg)}
 body.hascard .sfoldb{display:none}
@@ -541,44 +648,44 @@ body.sfold #side{cursor:pointer}
 }
 body.resizing,body.resizing *{cursor:col-resize!important;user-select:none!important}
 /* the map: off, full (in place of the chart) or a floating window over the chart */
-.mappane{display:none;flex-direction:column;gap:4px;padding:7px 10px 6px;min-height:0;background:var(--surface)}
+.mappane{display:none;flex-direction:column;gap:0;padding:0;min-height:0;background:var(--surface)}
 body.mapfull .scroller{display:none}
 body.mapfull .mappane{display:flex;flex:1}
-body.mapfloat .mappane{display:flex;position:absolute;right:14px;bottom:96px;width:400px;height:300px;z-index:20;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);resize:both;overflow:hidden;min-width:240px;min-height:180px;max-width:calc(100% - 16px);max-height:calc(100% - 110px)}
+body.mapfloat .mappane{display:flex;position:absolute;right:14px;bottom:96px;width:400px;height:300px;z-index:20;border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);resize:both;overflow:hidden;min-width:240px;min-height:180px;max-width:calc(100% - 16px);max-height:calc(100% - 110px)}
 body.mapfloat .mhead{cursor:move;touch-action:none}
 body.mapfloat .msrc{display:none}
-.mfocus{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:8px;padding:4px 6px 4px 10px;font-size:13px;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.mfocus{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:var(--r);padding:4px 6px 4px 10px;font-size:13px;color:var(--ink);box-shadow:2px 2px 0 var(--shade)}
 .mfocus[hidden]{display:none}
 .mfocus.low{top:auto;bottom:8px}   /* in a story the line sits at the foot of the map, clear of the story's card */
 .mfocus span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mfocus button{flex:none;font:inherit;font-size:12.5px;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.mfocus button{flex:none;font:inherit;font-size:12.5px;padding:3px 9px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .mfocus button:hover{border-color:var(--ink)}
-.mwin{position:absolute;left:6px;top:6px;z-index:1;pointer-events:none;background:color-mix(in srgb,var(--surface) 88%,transparent);border-radius:4px;padding:1px 6px;font-size:12px;color:var(--ink)}
+.mwin{position:absolute;left:6px;top:6px;z-index:1;pointer-events:none;background:color-mix(in srgb,var(--surface) 88%,transparent);border-radius:var(--r);padding:1px 6px;font-size:12px;color:var(--ink)}
 .mwin:empty{display:none}
 body.mapfull .zoomgrp{display:none}
-.vsw{display:inline-flex;flex:none;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;height:38px}
+.vsw{display:inline-flex;flex:none;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;height:38px}
 .vsw button{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--surface);color:var(--ink);padding:0 13px;font:inherit;font-size:14.5px;font-weight:600;cursor:pointer}
 .vsw button+button{border-left:1px solid var(--line-strong)}
 .vsw button svg{width:16px;height:16px}
 .vsw button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
-.mhead{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex:none;min-height:24px}
+.mhead{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex:none;min-height:36px;padding:4px 10px;background:var(--bar);border-bottom:1px solid var(--rule)}   /* a title strip; the map under it runs edge to edge */
 .mhead b{font-family:var(--display);font-size:15px;color:var(--ink)}
-.asof{position:absolute;left:6px;bottom:6px;z-index:1;pointer-events:none;background:color-mix(in srgb,var(--surface) 88%,transparent);border-radius:4px;padding:1px 6px;font-size:11.5px;color:var(--ink)}
+.asof{position:absolute;left:6px;bottom:6px;z-index:1;pointer-events:none;background:color-mix(in srgb,var(--surface) 88%,transparent);border-radius:var(--r);padding:1px 6px;font-size:11.5px;color:var(--ink)}
 .mtools{margin-left:auto;display:flex;gap:4px;align-items:center;flex:none}
-.mb{background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:3px 9px;font-size:13px;line-height:1.35;cursor:pointer;white-space:nowrap}
+.mb{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:3px 9px;font-size:13px;line-height:1.35;cursor:pointer;white-space:nowrap}
 .mb:hover{border-color:var(--ink)}
 .mb[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .mapt{opacity:.0;transition:opacity .12s}
 .mappane:hover .mapt,.mapt:focus-visible,.mapt[aria-pressed="true"]{opacity:1}
 @media (hover:none){ .mapt{opacity:1} }
 body.mapfull .mapt{opacity:1}                    /* on the full map the tools always show */
-.mapwrap{position:relative;flex:1;min-height:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:grab;touch-action:none}
+.mapwrap{position:relative;flex:1;min-height:0;overflow:hidden;cursor:grab;touch-action:none}
 .mapwrap.panning{cursor:grabbing}
 .mapwrap.boxing{cursor:crosshair}
 .mapwrap canvas{display:block;width:100%;height:100%}
-.mtip{position:absolute;display:none;pointer-events:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:4px;padding:2px 7px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.mtip{position:absolute;display:none;pointer-events:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:2px 7px;font-size:12px;white-space:nowrap;box-shadow:2px 2px 0 var(--shade)}
 .boxsel{position:absolute;display:none;pointer-events:none;border:1.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
-.msrc{margin:0;flex:none;font-size:10.5px;color:var(--muted);line-height:1.3}
+.msrc{margin:0;flex:none;font-size:10.5px;color:var(--muted);line-height:1.3;padding:3px 10px;background:var(--bar);border-top:1px solid var(--line-strong)}
 .msrc a{color:inherit}
 
 .detail{flex:1;min-height:0;overflow:auto;padding:12px 14px 18px;overscroll-behavior:contain}
@@ -594,7 +701,7 @@ body.mapfull .mapt{opacity:1}                    /* on the full map the tools al
 .detail .warn{margin-top:6px;font-size:12.5px;color:var(--muted)}
 .hint{color:var(--muted);font-size:13.5px}
 .detail .txt{min-width:0}
-.pic{display:block;width:100%;height:190px;border-radius:6px;overflow:hidden;background:var(--line);border:1px solid var(--line)}
+.pic{display:block;width:100%;height:190px;border-radius:var(--r);overflow:hidden;background:var(--line);border:1px solid var(--line)}
 .pic img{display:block;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .2s}
 /* the whole picture, never a crop: a blurred copy of it fills the space beside a tall or wide one */
 .pic .ph{display:block;position:relative;flex:1;min-width:0;width:100%;height:100%;overflow:hidden}
@@ -610,7 +717,12 @@ body.mapfull .mapt{opacity:1}                    /* on the full map the tools al
 .pic.duo .spr img{opacity:1;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .pic.duo > img{flex:1;min-width:0}
 body.wide .pic{height:220px}
-.x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:6px;width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
+.ownpic{margin:0}
+.ownpic .pic{height:240px}
+body.wide .ownpic .pic{height:280px}
+.piccap{margin-top:6px;font-size:13px;line-height:1.4;color:var(--ink)}
+.piccap span{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+.x{flex:none;border:1px solid var(--line-strong);background:transparent;border-radius:var(--r);width:30px;height:30px;font-size:16px;line-height:1;cursor:pointer}
 .facets{margin:10px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px;font-size:12.5px;color:var(--muted)}
 .facets b{font-weight:600;color:var(--ink)}
 .kbt p{margin:0 0 10px}
@@ -633,7 +745,7 @@ body.wide .pic{height:220px}
 .sronly{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media (max-height:520px){ .scard{top:8px!important;max-height:calc(100dvh - 16px);overflow:auto} }   /* a phone on its side */
 .kbai{margin:6px 0 10px!important;font-size:12px!important;line-height:1.35;color:var(--muted)}
-.skip{position:absolute;left:8px;top:-60px;z-index:200;background:var(--ink);color:var(--surface);padding:8px 12px;border-radius:6px;font-size:14px;text-decoration:none}
+.skip{position:absolute;left:8px;top:-60px;z-index:200;background:var(--ink);color:var(--surface);padding:8px 12px;border-radius:var(--r);font-size:14px;text-decoration:none}
 .skip:focus{top:8px}
 .loadmsg{padding:28px 16px;color:var(--muted);font-size:14px}
 .keymsg.ok{color:var(--muted)!important}
@@ -643,7 +755,7 @@ body.wide .pic{height:220px}
 .kbx .kbrel{font-size:14px;color:var(--muted);margin:0 0 4px}
 .kbx .kbrel b{font-weight:600;color:var(--ink)}
 .kbp i{background:var(--muted);border-radius:50%}
-.kbtip{position:fixed;z-index:80;max-width:300px;padding:8px 10px;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13.5px;line-height:1.4;display:none;pointer-events:none}
+.kbtip{position:fixed;z-index:80;max-width:300px;padding:8px 10px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);font-size:13.5px;line-height:1.4;display:none;pointer-events:none}
 .kbtip.on{display:flex;flex-direction:column;gap:2px}
 .kbtip small{color:var(--muted);font-size:12.5px}
 .kbx h3,.kbback h3,.ctx h3,.moment h3{font-family:'Pixelta',var(--display);font-size:20px;font-weight:400;margin:18px 0 8px;color:var(--ink)}
@@ -671,11 +783,11 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
   body.pinned.pinhide .pintab{display:flex;flex:none;align-items:center;justify-content:center;gap:6px;width:100%;border:0;border-bottom:1px solid var(--line-strong);background:var(--bg);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;padding:7px 10px;cursor:pointer}
   body.pinned.pinhide .pintab:hover{background:var(--line)}
 }
-.pin{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px 10px;flex:none}
+.pin{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:8px 10px 10px;flex:none}
 .pin.shut{padding-bottom:8px}
 .pinhd{display:flex;align-items:center;gap:6px}
 .pinhd .x{width:30px;height:30px;font-size:15px;margin-left:auto}
-.pintg{flex:none;width:28px;height:28px;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:3px;border-radius:4px}
+.pintg{flex:none;width:28px;height:28px;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:3px;border-radius:var(--r)}
 .pintg:hover{color:var(--ink);background:var(--line)}
 .pintg svg{width:100%;height:100%;transition:transform .15s}
 .pintg[aria-expanded="true"] svg{transform:rotate(90deg)}
@@ -691,7 +803,7 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .pill i{flex:none;width:8px;height:8px;border-radius:2px;background:var(--c)}
 .inside{display:flex;flex-direction:column;gap:3px;margin-bottom:6px}
 .inside h3{margin-top:18px}
-.insb{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:1px solid transparent;border-radius:8px;background:none;text-align:left;cursor:pointer;font-size:14.5px;line-height:1.25;color:var(--ink)}
+.insb{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:1px solid transparent;border-radius:var(--r);background:none;text-align:left;cursor:pointer;font-size:14.5px;line-height:1.25;color:var(--ink)}
 .insb:hover,.insb:focus-visible{background:var(--surface);border-color:var(--line-strong)}
 .insb>span:not(.ico){flex:1;min-width:0}
 .insb .ico{width:17px;height:17px}
@@ -705,9 +817,9 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .insw{flex:none;width:12px;height:12px;margin:0 2px;border-radius:3px;background:var(--c)}
 .insmore{color:var(--muted);font-size:13px;margin:2px 8px}
 .nav2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.navb{display:flex;align-items:center;gap:10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:7px 10px;text-align:left;cursor:pointer;font-size:14px;line-height:1.25;min-width:0}
+.navb{display:flex;align-items:center;gap:10px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);padding:7px 10px;text-align:left;cursor:pointer;font-size:14px;line-height:1.25;min-width:0}
 .navb .nt{display:block;min-width:0;flex:1}
-.nthumb{flex:none;width:40px;height:40px;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--muted) 14%,var(--surface))}
+.nthumb{flex:none;width:40px;height:40px;border-radius:var(--r);overflow:hidden;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--muted) 14%,var(--surface))}
 .nthumb.o{border-radius:50%}
 .nthumb.sw{background:color-mix(in srgb,var(--c) 55%,var(--surface))}
 .nthumb .ph{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
@@ -723,7 +835,7 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 @media (min-width:760px){ .acts{position:sticky;top:-12px} }
 .detail{container-type:inline-size}
 @container (max-width:400px){ .acts svg,.acts .wmark{display:none} .acts .btn{padding:0 10px} }
-.acts.stuck{border-bottom-color:var(--line-strong);box-shadow:0 4px 8px -6px rgba(0,0,0,.25)}
+.acts.stuck{border-bottom-color:var(--line-strong);box-shadow:0 1px 0 var(--line-strong)}
 .actb{height:32px;font-size:13.5px;text-decoration:none;color:var(--ink)}
 .wmark{font-family:Georgia,"Times New Roman",serif;font-size:15px;font-weight:700;line-height:1}
 /* short first: the rest of a long page waits behind Read more */
@@ -731,14 +843,14 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .morebt[hidden]{display:none}
 .morebt{display:block;margin:0 0 8px;font-size:14.5px;font-weight:600;text-underline-offset:2px}
 /* a voice from the time: a line of its words, then whose they are */
-.vq{display:block;width:100%;margin:0 0 8px;padding:6px 10px 7px 12px;border:0;border-left:3px solid #2f6fd0;border-radius:0 8px 8px 0;background:color-mix(in srgb,#2f6fd0 7%,var(--surface));text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.vq{display:block;width:100%;margin:0 0 8px;padding:6px 10px 7px 12px;border:0;border-left:3px solid #2f6fd0;border-radius:0 var(--r) var(--r) 0;background:color-mix(in srgb,#2f6fd0 7%,var(--surface));text-align:left;font:inherit;color:var(--ink);cursor:pointer}
 .vq:hover{background:color-mix(in srgb,#2f6fd0 13%,var(--surface))}
 .vq .vqq{display:block;font-size:16px;line-height:1.5;margin-bottom:5px}
 .vq .vqq:empty{display:none}
 .vq b{display:block;font-size:13.5px;font-weight:600}
 .vq .vqby{display:block;font-size:12.5px;color:var(--muted)}
 /* Explore: the foot of a card */
-.xpl{margin-top:18px;padding:12px 14px 14px;border-radius:10px;background:var(--bg)}
+.xpl{margin-top:18px;padding:12px 14px 14px;border-radius:var(--r);background:var(--bg)}
 .xpl:not(:has(.xl)){display:none}
 .ctx .xpl h3{margin:0 0 2px}
 .xl h4{margin:12px 0 6px;font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -753,26 +865,35 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .detail .xchat{right:36px;display:flex;align-items:center;justify-content:center;padding:0}
 .detail .xchat svg{width:16px;height:16px}
 .detail:has(.xchat) h2{padding-right:74px}
+.detail .bmk{right:36px;display:flex;align-items:center;justify-content:center;padding:0;color:var(--muted)}
+.detail .bmk[aria-pressed="true"]{color:#e0262b}
+.detail .bmk[aria-pressed="true"] path{fill:currentColor}
+@media (hover:hover){ .detail .bmk:hover{color:#e0262b} }
+.detail:has(.xchat) .bmk{right:72px}
+.detail .row:has(.bmk)>.txt:first-child h2{padding-right:74px}   /* no picture above: the title makes room for both buttons */
 .scite a{color:var(--accent);text-decoration-color:color-mix(in srgb,var(--accent) 35%,transparent);text-underline-offset:2px}
 .chatb{height:32px;font-size:13.5px}
+.watchb{height:32px;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.watchb:hover{filter:brightness(1.07)}
+@container (max-width:400px){ .acts .watchb svg{display:inline} }
 .mpart{margin:2px 0 8px;font-size:12.5px;color:var(--muted)}
 .cback{display:inline-flex;align-items:center;gap:4px;max-width:100%;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;padding:0 0 7px;cursor:pointer}
 .cback span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cback:hover{color:var(--ink)}
 .pinb{height:32px;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
-.ichat{margin:16px 0 4px;padding:12px;border:1px solid var(--line-strong);border-radius:10px;background:color-mix(in srgb,var(--accent) 4%,var(--surface))}
+.ichat{margin:16px 0 4px;padding:12px;border:1px solid var(--line-strong);border-radius:var(--r);background:color-mix(in srgb,var(--accent) 4%,var(--surface))}
 .ichat h3{font-family:var(--display);font-size:15px;font-weight:700;margin:0 0 8px}
 .chlog{display:flex;flex-direction:column;gap:10px}
 .chlog:empty{display:none}
-.chq{align-self:flex-end;max-width:85%;background:var(--line);border-radius:10px 10px 2px 10px;padding:6px 10px;font-size:14.5px;line-height:1.4;white-space:pre-wrap}
+.chq{align-self:flex-end;max-width:85%;background:var(--line);border-radius:var(--r) var(--r) var(--r) var(--r);padding:6px 10px;font-size:14.5px;line-height:1.4;white-space:pre-wrap}
 .cha p{margin:0 0 9px;font-size:15.5px;line-height:1.55}
 .cha p:last-child{margin-bottom:0}
 .cha .chst{color:var(--muted);font-size:13px;font-style:italic}
 .chin{display:flex;gap:6px;align-items:flex-end;margin-top:10px}
-.chin textarea{flex:1;min-width:0;resize:none;font:inherit;font-size:14.5px;line-height:1.4;padding:7px 9px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--ink);max-height:160px}
+.chin textarea{flex:1;min-width:0;resize:none;font:inherit;font-size:14.5px;line-height:1.4;padding:7px 9px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink);max-height:160px}
 .chin .btn{height:34px}
 .chkey{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chkey input{flex:1;min-width:0;font:inherit;font-size:14px;padding:6px 9px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--ink)}
+.chkey input{flex:1;min-width:0;font:inherit;font-size:14px;padding:6px 9px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);color:var(--ink)}
 .chkey .askhint{flex-basis:100%;margin:0}
 .chkey[hidden],.ichat[hidden]{display:none}
 .chfoot{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
@@ -787,14 +908,14 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .mband{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
 .ico.head{background-repeat:no-repeat;image-rendering:pixelated;border-radius:50%}
 .alive{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
-.who{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;background:var(--surface);cursor:pointer;font-size:13.5px;font-weight:500;line-height:1.2;text-align:center;min-width:0}
+.who{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);border-radius:var(--r);padding:10px 4px 8px;background:var(--surface);cursor:pointer;font-size:13.5px;font-weight:500;line-height:1.2;text-align:center;min-width:0}
 .who:hover{border-color:var(--ink)}
 .who .face{width:56px;height:56px;border-radius:50%;background-color:color-mix(in srgb,#8e5bd6 16%,var(--surface));box-shadow:0 0 0 1.5px var(--line-strong);display:flex;align-items:center;justify-content:center}
 .who .face .ico{width:58%;height:58%;margin:0}
 .who .face .ph{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 20%}
 .who small{font-weight:400;color:var(--muted);font-size:12.5px}
 .more{border:0;background:none;color:var(--accent);font:inherit;font-size:14px;font-weight:600;padding:6px 0 0;cursor:pointer}
-.dyk{display:block;width:100%;text-align:left;border-radius:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);cursor:pointer;font:inherit;color:inherit}   /* a plain card, like the rows under it: the only colour is its icon */
+.dyk{display:block;width:100%;text-align:left;border-radius:var(--r);padding:12px 14px;background:var(--surface);border:1px solid var(--line);cursor:pointer;font:inherit;color:inherit}   /* a plain card, like the rows under it: the only colour is its icon */
 .dyk:hover{border-color:var(--ink)}
 .dyk b{display:flex;gap:8px;align-items:center;font-size:16px;line-height:1.25;margin-bottom:4px}
 .dyk b .ico{width:24px;height:24px;flex:none}
@@ -806,12 +927,12 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 .mname{border:0;background:none;padding:0;font:inherit;color:var(--ink);cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
 .mname:hover{text-decoration-color:var(--ink)}
 .ups{display:flex;flex-direction:column;gap:6px}
-.up{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 10px;cursor:pointer;text-align:left;font:inherit;font-size:15px;line-height:1.3;color:inherit}
+.up{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:8px 10px;cursor:pointer;text-align:left;font:inherit;font-size:15px;line-height:1.3;color:inherit}
 .up:hover{border-color:var(--ink)}
 .up .ico,.up>i{width:22px;height:22px;flex:none}
 .up .ico.pix img{image-rendering:pixelated}
 .up .ico.art{width:24px;height:24px;margin:-1px;background-repeat:no-repeat}
-.up>i{border-radius:4px;background:var(--c)}
+.up>i{border-radius:var(--r);background:var(--c)}
 .up span{flex:1;min-width:0}
 .up[hidden]{display:none}
 .up.chgr>i{width:10px;height:10px;border-radius:3px;margin:0 6px}   /* What is changing: the region's small square, as in the filters column */
@@ -874,7 +995,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 /* ---------- about overlay ---------- */
 .overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(2px);z-index:60;display:none;align-items:flex-end;justify-content:center;padding:16px}
 .overlay.open{display:flex}
-.card{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;max-width:620px;width:100%;max-height:100%;overflow:auto;padding:16px 18px 18px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);max-width:620px;width:100%;max-height:100%;overflow:auto;padding:16px 18px 18px;box-shadow:var(--shadow)}
 .card h2{font-family:var(--display);font-size:19px;margin:0 0 2px}
 .card h3{font-family:var(--display);font-size:15px;color:var(--muted);margin:14px 0 4px}
 .card ul{margin:0;padding-left:18px}
@@ -893,7 +1014,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .moreb{display:inline-flex}
   .tbtools .tb{justify-content:flex-start}
   .tbtools .tbt{display:inline}
-  .tbtools{display:none;position:absolute;right:8px;top:48px;flex-direction:column;align-items:stretch;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:45}
+  .tbtools{display:none;position:absolute;right:8px;top:48px;flex-direction:column;align-items:stretch;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:6px;box-shadow:var(--shadow);z-index:45}
   .tbtools.open{display:flex}
   .zread{min-width:0}
 }
@@ -915,10 +1036,10 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .search kbd{display:none}
   .moreb{display:inline-flex}
   .tbtools .tb{justify-content:flex-start}
-  .tbtools{display:none;position:absolute;right:8px;top:48px;flex-direction:column;align-items:stretch;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:45}
+  .tbtools{display:none;position:absolute;right:8px;top:48px;flex-direction:column;align-items:stretch;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:6px;box-shadow:var(--shadow);z-index:45}
   .tbtools.open{display:flex}
   .app,body.wide .app{display:flex;flex-direction:column}
-  body.pinned .pins{position:fixed;left:0;right:0;bottom:0;height:55vh;z-index:46;border-left:0;border-top:1px solid var(--line-strong);box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+  body.pinned .pins{position:fixed;left:0;right:0;bottom:0;height:55vh;z-index:46;border-left:0;border-top:2px solid var(--rule);box-shadow:none}
   .tdd{border-left:0;padding-left:0;margin-left:0}
   .tbn{display:none}
   .tb{padding:0 8px}
@@ -927,8 +1048,8 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   /* a phone gives the map the room: the panel under it starts as a bar and opens for a card */
   body.sfold .sfoldt{display:flex}
   #mapHead>b,#mapMin,#mapOut,#mapIn,.msrc{display:none}   /* two fingers zoom the map; the credit for the borders is in About */
-  body.mapfull .mappane{position:relative;padding:6px 8px}
-  body.mapfull .mhead{position:absolute;right:14px;top:12px;z-index:3;min-height:0}   /* its two buttons sit on the map */
+  body.mapfull .mappane{position:relative}
+  body.mapfull .mhead{position:absolute;right:8px;top:8px;z-index:3;min-height:0;padding:0;background:none;border:0}   /* its two buttons sit on the map */
   .mfocus{top:44px;left:8px;right:8px;transform:none;max-width:none;font-size:12.5px;gap:6px;padding:4px 6px 4px 8px}
   .mfocus span{flex:1}
   .mfocus.low{bottom:32px}
@@ -947,12 +1068,13 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .tmid .overview{display:none}
   .rchip{padding:0 9px}
   .rchip span{display:none}
-  .rwrap.on .rchip{border-radius:6px}
+  .rwrap.on .rchip{border-radius:var(--r)}
   .rwrap.on .rx{display:none}
   .trow .speed{padding:0 2px}
   .rpop{bottom:auto;top:calc(100% + 8px);max-height:36vh;overflow-y:auto}
   .rpop .ri{padding:5px 8px}
   .pic{height:140px}
+  .ownpic .pic{height:170px}
   .rbar{padding:6px 8px 3px}
   .lenses{padding:3px 8px 6px}
   .rlab{display:none}
@@ -966,15 +1088,15 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 .fhead{display:none}
 @media (min-width:760px){
   .center{flex-direction:row}
-  .fside{flex:none;width:214px;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line-strong);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;padding-bottom:6px}
-  .fhead{flex:none;display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 6px 0 12px}
+  .fside{flex:none;width:214px;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--rule);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;padding-bottom:6px}
+  .fhead{flex:none;display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 6px 0 12px;background:var(--bar);border-bottom:1px solid var(--rule)}
   .fhead b{font-family:var(--display);font-weight:700;font-size:15px}
-  .fbtn{width:30px;height:30px;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+  .fbtn{width:30px;height:30px;border:1px solid transparent;border-radius:var(--r);background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center}
   .fbtn:hover{border-color:var(--line-strong);color:var(--ink)}
   .fside .rbar,.fside .lenses{flex:none;flex-direction:column;align-items:stretch;gap:2px;padding:0 8px;overflow:visible;border-bottom:0}
   .fside .lenses{margin-top:4px}
   .fside .rlab,.fside .rlab2{width:auto;margin:3px 4px 2px;font-size:12.5px}
-  .fside .lens{height:25px;border-radius:7px;justify-content:flex-start;padding:0 8px 0 6px;gap:7px;font-size:13.5px;min-width:0}
+  .fside .lens{height:25px;border-radius:var(--r);justify-content:flex-start;padding:0 8px 0 6px;gap:7px;font-size:13.5px;min-width:0}
   .fside .lens .lt{overflow:hidden;text-overflow:ellipsis}
   .fside .lens .n{margin-left:auto}
   .fside .rsw{width:12px;height:12px;margin:0 5px}
@@ -985,7 +1107,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .fside .thead .rlab,.fside .thead .rlab2{margin:0}
   /* a calm column: plain rows, no boxes and no tints. The colour sits only in the square or the icon. A row that is on has dark text on a soft grey ground; one that is off is plain and muted, its square hollow and its icon faded. Every row shows its count, so you can see what it would add; a zero is faint */
   .fside .lens,.fside .lens[aria-pressed="false"]:not(:disabled){border-width:1px;border-color:transparent;background:none;box-shadow:none}
-  .fside .lens[aria-pressed="true"]{background:color-mix(in srgb,var(--ink) 6%,var(--surface));border-color:transparent;box-shadow:none}
+  .fside .lens[aria-pressed="true"]{background:color-mix(in srgb,var(--ink) 9%,var(--surface));border-color:transparent;box-shadow:none}
   .fside .lens:not(:disabled):hover{border-color:transparent;background:color-mix(in srgb,var(--ink) 11%,var(--surface))}
   .fside .rchip[aria-pressed="false"] .rsw{opacity:1;background:none;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--lc) 70%,var(--surface))}
   .fside .lens[aria-pressed="false"] .ico.pix img{opacity:.55;filter:saturate(.25)}
@@ -1002,6 +1124,16 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   body.fsmall .fside .rbar,body.fsmall .fside .lenses{padding:0 6px}
   body.fsmall .fside .lens{justify-content:center;padding:0;gap:0}
   body.fsmall .fside .lsep{margin:6px 2px}
+  /* the column reads Regions, Topics, then what is on the chart or the map (Events, Shared, Links); a phone's row keeps those three first */
+  .fside .lenses>.lg1{order:1} .fside .lenses>.lsep{order:2} .fside .lenses>.lg3{order:3}
+  /* each section's name sits on a rule, so the rule between sections is not needed; the narrow column has no names and keeps it */
+  .fside .rbar{padding-top:4px}
+  .fside .rlab,.fside .thead{border-bottom:1px solid var(--line);padding-bottom:3px;margin-bottom:4px;color:var(--ink)}
+  .fside .thead .rlab,.fside .thead .rlab2{border:0;padding:0;color:var(--ink)}
+  .fside .rlab2{color:var(--ink)}
+  .fside .lsep{display:none}
+  body.fsmall .fside .lsep{display:block}
+  body.fsmall .fside .thead{display:none}
 }
 @media (min-width:760px) and (min-height:1000px){   /* a tall window has room for taller rows */
   .fside .lens{height:30px}
@@ -1009,6 +1141,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   .fside .thead,.fside .rlab{margin-top:8px}
 }
 </style>
+<link rel="stylesheet" href="super.css?v=1122r">
 </head>
 <body>
 <a class="skip" href="#scroller">Skip to the chart</a><a class="skip" href="#slider">Skip to the time line</a><a class="skip" href="#detail">Skip to the card</a>
@@ -1033,8 +1166,10 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
   <button class="btn moreb" id="moreBtn" type="button" aria-expanded="false" aria-controls="tbtools">Menu</button>
   <div class="tbtools" id="tbtools">
+    <button class="tb lucky" id="luckyBtn" type="button" aria-label="Surprise me" title="Surprise me: open something at random"><img src="pix/dice.png" alt="" width="22" height="22" draggable="false"><span class="tbt">Surprise me</span></button>
     <button class="tb" id="askBtn" type="button" aria-expanded="false" aria-controls="askPop" aria-label="Ask the map" title="Ask the map: ask a question and Claude makes a story to play"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 2.8h9.6a1 1 0 0 1 1 1v6.4a1 1 0 0 1-1 1H8.4l-3 2.4v-2.4H3.2a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1z"/><path d="M6.6 5.6a1.5 1.5 0 1 1 2 1.4c-.4.2-.6.5-.6.9v.2"/><path d="M8 9.6v.01"/></svg><span class="tbt">Ask the map</span></button>
     <button class="tb" id="storyBtn" type="button" aria-expanded="false" aria-controls="storyPop" aria-label="Library" title="Library: stories, voices and videos. Key S"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4.6C6.6 3.5 4.6 3.1 2.5 3.3v9c2.1-.2 4.1.2 5.5 1.3 1.4-1.1 3.4-1.5 5.5-1.3v-9c-2.1-.2-4.1.2-5.5 1.3zM8 4.6v9"/></svg><span class="tbt">Library</span></button>
+    <button class="tb" id="dailyBtn" type="button" aria-label="Guess the year"><img src="pix/hourglass.png" alt="" width="22" height="22" draggable="false"><span class="tbt">Guess the year</span></button>
     <button class="tb" id="shareBtn" type="button" aria-label="Share view" title="Copy a link to this view: year, regions, layers and detail"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 9.4l2.8-2.8M7.2 4.9l1.1-1.1a2.6 2.6 0 0 1 3.7 3.7l-1.1 1.1M8.8 11.1l-1.1 1.1a2.6 2.6 0 0 1-3.7-3.7l1.1-1.1"/></svg><span class="tbt">Share view</span></button>
     <button class="tb" id="keyBtn" type="button" aria-expanded="false" aria-controls="keyPop" aria-label="Key" title="Key: what the marks mean"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3" width="3" height="3" rx=".7"/><rect x="2.5" y="10" width="3" height="3" rx=".7"/><path d="M8 4.5h5.5M8 11.5h5.5"/></svg><span class="tbt">Key</span></button>
     <button class="tb" id="themeBtn" type="button" aria-label="Theme" title="Theme: Auto. Switch between light, dark and your system's setting"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor"/></svg><span class="tbt">Theme: Auto</span></button>
@@ -1043,9 +1178,9 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
 </header>
 
 <div class="pop" id="askPop" role="dialog" aria-label="Ask the map"></div>
-<div class="pop" id="storyPop" role="dialog" aria-labelledby="storyTitle">
-  <div class="row"><h2 id="storyTitle">Library</h2><button class="x" id="storyClose" type="button" aria-label="Close the library">×</button></div>
-  <div id="storyList"></div>
+<div class="libp" id="storyPop" role="dialog" aria-labelledby="storyTitle">
+  <div class="libhead"><h2 id="storyTitle">Library</h2><input class="libfind" id="libFind" type="search" placeholder="Find in this list" aria-label="Find in this list" autocomplete="off" spellcheck="false" hidden><button class="x" id="storyClose" type="button" aria-label="Close the library" title="Close (Escape)">×</button></div>
+  <div class="libbody"><div class="libnav" id="libNav" role="tablist" aria-label="Sections of the library" aria-orientation="vertical"></div><div id="storyList"></div></div>
 </div>
 <div class="pop" id="keyPop" role="dialog" aria-labelledby="keyTitle">
   <div class="row"><h2 id="keyTitle">Key</h2><button class="x" id="keyClose" type="button" aria-label="Close the key">×</button></div>
@@ -1126,6 +1261,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
           <span class="tnow" id="tNow"></span>
           <div class="overview" id="overview" hidden title="Where these years sit in all of time. Drag the window to move it, its edges to change it, or drag elsewhere to pick new years."><div class="ovwin" id="ovWin"></div><div class="ovthumb" id="ovThumb"></div></div>
         </div>
+        <button class="ib lucky" id="luckyBar" type="button" aria-label="Surprise me" title="Surprise me: open something at random. Key R"><img src="pix/dice.png" alt="" width="22" height="22" draggable="false"></button>
         <div class="rwrap" id="rangeWrap">
           <button class="rchip" id="rangeBtn" type="button" aria-haspopup="dialog" aria-expanded="false" title="The years the time line covers"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5v9M13 3.5v9M5.6 8h4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="rangeLab">Years: all time</span></button>
           <button class="rx" id="rangeAll" type="button" aria-label="Back to all time" title="Back to all time" hidden>×</button>
@@ -1197,20 +1333,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=ad256dc6ae"></script>
-<script src="books.js?v=ad256dc6ae"></script>
-<script src="videos.js?v=ad256dc6ae"></script>
-<script src="stories.js?v=ad256dc6ae"></script>
-<script src="deep.js?v=ad256dc6ae"></script>
-<script src="famous.js?v=ad256dc6ae"></script>
-<script src="kb.js?v=ad256dc6ae"></script>
-<script src="people/portraits.js?v=ad256dc6ae"></script>
-<script src="ovpics.js?v=ad256dc6ae"></script>
-<script src="kinds.js?v=ad256dc6ae"></script>
-<script src="events.js?v=ad256dc6ae"></script>
+<script src="hier.js?v=36d5882c91"></script>
+<script src="books.js?v=36d5882c91"></script>
+<script src="videos.js?v=36d5882c91"></script>
+<script src="stories.js?v=36d5882c91"></script>
+<script src="deep.js?v=36d5882c91"></script>
+<script src="famous.js?v=36d5882c91"></script>
+<script src="kb.js?v=36d5882c91"></script>
+<script src="people/portraits.js?v=36d5882c91"></script>
+<script src="ovpics.js?v=36d5882c91"></script>
+<script src="kinds.js?v=36d5882c91"></script>
+<script src="events.js?v=36d5882c91"></script>
 <script>
 "use strict";
-const VER = "?v=ad256dc6ae";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=36d5882c91";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -1824,7 +1960,20 @@ function wikiPic(title){
 function hoverLoad(node,obj){ node.addEventListener("pointerenter",()=>wikiPic(wikiTitle(obj)),{once:true}); }
 /* easter eggs: a person whose card shows a moving portrait (a strip of n frames, people/), in place of the still one. The map keeps the still one */
 const SPIN = {"Rumi":{f:"rumi-spin.png", n:48, title:"Rumi whirls, as the Mevlevi dervishes still do"}};
+/* a page's own picture (kbpics/, named in the page): the real thing the page is about, with what it shows and whose it is under it */
+function ownPic(obj, id){
+  const box=el("figure","ownpic"), fig=el("a","pic"), ph=el("span","ph"), bg=el("img","fill"), img=el("img"), src="kbpics/"+id+".jpg"+VER;
+  fig.target="_blank"; fig.rel="noopener"; fig.title="Open the picture on Wikimedia Commons";
+  bg.alt=""; bg.src=src; img.alt=obj.name||""; img.src=src; img.decoding="async";
+  img.addEventListener("load",()=>fig.classList.add("ready")); img.addEventListener("error",()=>box.remove());
+  ph.append(bg, img); fig.append(ph); box.append(fig);
+  kbText(id).then(tx=>{ const p=tx && tx.pic; if (!p) return;
+    fig.href=p.page; img.alt=p.cap;
+    const c=el("figcaption","piccap"); c.append(p.cap+" ", el("span",null,"Picture: "+p.by)); box.append(c); });
+  return box;
+}
 function picFigure(obj){
+  { const k = obj.kb || KBOF.get(obj); if (k && KBX[k] && KBX[k].pic) return ownPic(obj, k); }   /* a page on the chart is found through its item */
   const fig = el("a","pic"), P=portraitOf(obj), S = P ? "people/"+P.f : ovPicOf(obj);
   if (S){ fig.classList.add("duo"); const sp=el("span","spr"), sv=P && SPIN[obj.name];
     if (sv){ const i=el("i","spin"); i.style.backgroundImage=`url(people/${sv.f})`; i.style.setProperty("--n",sv.n); i.title=sv.title; sp.append(i); }
@@ -2793,6 +2942,17 @@ function context(obj){
   return c;
 }
 const CHATSVG='<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 2.8h9.6a1 1 0 0 1 1 1v6.4a1 1 0 0 1-1 1H8.4l-3 2.4v-2.4H3.2a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1z"/><path d="M5.2 6.1h5.6M5.2 8.3h3.6"/></svg>';
+/* ---------- bookmarks: the mark at the top of a card keeps the item in the Library, under Your bookmarked items. Kept in this browser (wh8-marks), newest first ---------- */
+const BMSVG='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4.2 2.5h7.6v11l-3.8-2.8-3.8 2.8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+const marks = () => { try{ const L=JSON.parse(LS("wh8-marks")||"[]"); return Array.isArray(L) ? L.filter(m=>m && typeof m.k==="string") : []; }catch(e){ return []; } };
+/* what a bookmark is kept by: a page's id, else the name the link in the address bar uses. A territory with no page has neither, so it has no mark */
+function markKey(o){ if (!o) return ""; if (o.kb) return "kb:"+o.kb; if (o.terr){ const k=kbOfTerr(o.name,o.reg); return k ? "kb:"+k : ""; } return itemKey(o); }
+const markObj = k => k.startsWith("kb:") ? kbTarget(k.slice(3)) : itemByKey(k);
+function markLine(o,k){ if (k.startsWith("kb:")){ const p=KBX[k.slice(3)]; return p ? [p.name, [p.kind ? p.kind[0].toUpperCase()+p.kind.slice(1) : KBTYPE[p.t], kbWhen(p)].filter(Boolean).join(", ")] : [o.name,""]; }
+  const x=INDEX.find(x=>x.obj===o); return [o.n||o.name, x ? [x.k,x.when].filter(Boolean).join(", ") : ""]; }
+function toggleMark(o){ const k=markKey(o); if (!k) return false; const L=marks(), i=L.findIndex(m=>m.k===k);
+  if (i>=0) L.splice(i,1); else { const [t,w]=markLine(o,k); L.unshift({k,t,w}); }
+  saveLS("wh8-marks",JSON.stringify(L.slice(0,500))); return i<0; }
 function select(obj){
   if (obj && typeof helloGone==="function") helloGone();
   if (obj && window.pinsHide) pinsHide();        /* on a narrow laptop the kept pages cover the card: a card that opens comes to the front */
@@ -2890,6 +3050,10 @@ function select(obj){
   if (window.itemChat){ chat=itemChat(obj, kid||null);
     const cb=el("button","btn chatb"); cb.type="button"; cb.innerHTML=CHATSVG+"<span>Ask about this</span>"; cb.addEventListener("click",()=>openItemChat()); acts.prepend(cb);
     cb.title="Ask Claude a follow-up question about this"; }
+  /* Watch story: this page is part of a super-story, a film on the map (super.js); the button opens it where this page comes in */
+  { const sf = kid && typeof ssStoryFor==="function" ? ssStoryFor(kid) : null;
+    if (sf){ const sb=el("button","btn watchb"); sb.type="button"; sb.innerHTML='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4.5 2.8v10.4L13 8z" fill="currentColor"/></svg><span>Watch story</span>';
+      sb.title="Watch "+sf.s.title+", a film on the map"+(sf.ch || sf.li ? ", from "+sf.s.chapters[sf.ch].t : ""); sb.addEventListener("click",()=>ssOpen(sf.s,false,sf)); acts.prepend(sb); } }
   if (typeof pinOfObj==="function" && (obj.kb || KBOF.get(obj))){   /* the visible way into the sidebar; Shift and click on a link is the quick one */
     const pb=el("button","btn pinb"); pb.type="button"; pb.title="Keep this page open in the sidebar while you read on. Shift and click on any link does the same.";
     pb.innerHTML='<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2.5 3.5h11v9h-11zM10 3.5v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><span>Keep open</span>';
@@ -2899,7 +3063,12 @@ function select(obj){
   left.append(...(chat?[chat]:[]), context(obj));
   left.className="txt";
   if (chat && chat.classList.contains("carry") && (acts.parentNode || meta.parentNode)) (acts.parentNode ? acts : meta).after(chat);   /* a conversation that came along from another card sits at the top */
-  row.append(...(obj.terr || (obj.kb && !KBX[obj.kb].wiki) ? [] : [picFigure(obj)]), left, x, ...(xc?[xc]:[])); detail.append(row); if (window.fitWatch) fitWatch(row);   /* a territory gets no photo: Wikipedia's is often of today */
+  let bm=null;                                   /* the bookmark, beside the close button: red under the pointer, and red for as long as the item is kept */
+  if (markKey(obj)){ const k=markKey(obj); bm=el("button","x bmk"); bm.type="button"; bm.innerHTML=BMSVG;
+    const set=on=>{ bm.setAttribute("aria-pressed",on); bm.setAttribute("aria-label", on ? "Remove the bookmark" : "Bookmark this");
+      bm.title = on ? "Bookmarked: it is in the Library, under Your bookmarked items. Click to remove it" : "Bookmark this: keep it in the Library"; };
+    bm.sync=()=>set(marks().some(m=>m.k===k)); bm.sync(); bm.addEventListener("click",()=>set(toggleMark(obj))); }
+  row.append(...(obj.terr || (obj.kb && !KBX[obj.kb].wiki && !KBX[obj.kb].pic) ? [] : [picFigure(obj)]), left, x, ...(bm?[bm]:[]), ...(xc?[xc]:[])); detail.append(row); if (window.fitWatch) fitWatch(row);   /* a territory gets no photo: Wikipedia's is often of today */
   detail.scrollTop=0;
 }
 /* a long page shows as many paragraphs as leave the whole card in view, down to the end of Explore, with no scrolling; never fewer than two.
@@ -3313,6 +3482,7 @@ function drawLenses(){
     bar.append(lensChip({key:L.id, on:state.layers.has(L.id), label:SHORT[L.id][0], ico:L.icon, c:L.c, title:`${L.name}: ${SHORT[L.id][1]}`, onclick:()=>{
       setLayers(state.layers.has(L.id) ? [...state.layers].filter(id=>id!==L.id) : [...state.layers, L.id]); }}));
   }
+  { let g="lg3"; for (const k of bar.children){ if (k.classList.contains("lsep")) g="lg1"; else k.classList.add(g); } }   /* the two halves: the filters column shows the topics (lg1) first and these three rows (lg3) under them */
   lensCounts(); requestAnimationFrame(fitRows);
 }
 /* how many of each are in the years on screen */
@@ -3520,6 +3690,32 @@ speedSel.addEventListener("change",()=>{ try { localStorage.setItem("history.spe
 $("playBtn").innerHTML=PLAYSVG;
 $("playBtn").addEventListener("click",()=> story ? filmToggle() : setPlay(!playT));
 
+/* ---------- Surprise me: the die on the time bar opens something well known at random.
+   Every region has the same chance, so the finely detailed ones do not crowd out the rest. Nothing comes up twice until its region has run out. ---------- */
+let luckyBy=null;
+const luckyId = o => o.name+"~"+o.reg;
+function lucky(){
+  if (story) return;
+  if (!luckyBy){ luckyBy=new Map(); const got=new Set();
+    for (const x of INDEX){ const o=x.obj; if (!o || x.lv>2 || !o.reg || !o.name || o.terr || o.lk || o.kb || got.has(o) || !KBOF.has(o)) continue;
+      got.add(o); (luckyBy.get(o.reg) || luckyBy.set(o.reg,[]).get(o.reg)).push(o); } }
+  const regs=[...luckyBy.keys()]; if (!regs.length) return;
+  let seen=[]; try{ seen=JSON.parse(LS("wh8-lucky")||"[]"); }catch(e){} if (!Array.isArray(seen)) seen=[];
+  const pool=luckyBy.get(regs[Math.floor(Math.random()*regs.length)]), had=new Set(seen);
+  let left=pool.filter(o=>!had.has(luckyId(o)) && o!==state.sel);
+  if (!left.length){ const mine=new Set(pool.map(luckyId)); seen=seen.filter(k=>!mine.has(k)); left=pool.filter(o=>o!==state.sel); }
+  const o=left[Math.floor(Math.random()*left.length)]; if (!o) return;
+  seen.push(luckyId(o)); saveLS("wh8-lucky",JSON.stringify(seen));
+  setPlay(false); goTo(o); if (typeof focusOn==="function") focusOn(o);
+}
+$("luckyBtn").addEventListener("click",lucky); $("luckyBar").addEventListener("click",lucky);
+/* the time bar's row gives up one thing at a time until it fits. It runs when the row or anything in it changes size: a new window, a folded panel, the chart's zoom buttons, a longer year */
+{ const row=$("luckyBar").parentNode, steps=["fit1","fit2","fit3","fit4"];
+  const trowFit=()=>{ if (!row.clientWidth) return; row.classList.remove(...steps);
+    for (const c of steps){ if (row.scrollWidth<=row.clientWidth+1) break; row.classList.add(c); }
+    document.body.classList.toggle("nodie",row.classList.contains("fit4")); };
+  const ro=new ResizeObserver(trowFit); ro.observe(row); for (const k of row.children) if (!k.classList.contains("tmid")) ro.observe(k); }
+
 /* ---------- top bar: panel, key, theme, share, about ---------- */
 const narrow = () => innerWidth<1100;
 /* the View dropdown opens under its button */
@@ -3570,7 +3766,7 @@ document.addEventListener("keydown",e=>{
   if (e.key==="Escape"){
     if (about.classList.contains("open")){ about.classList.remove("open"); return; }
     if (keyPop.classList.contains("open")){ setKey(false); return; }
-    if (storyPop.classList.contains("open")){ setStories(false); return; }
+    if (storyPop.classList.contains("open")){ if (t===$("libFind") && t.value){ t.value=""; libFilter(); return; } setStories(false); $("storyBtn").focus(); return; }
     { const o=ddOpen(); if (o){ setDD(null); $(o[0]).focus(); return; } }
     if (story && !typing){ endStory(); return; }
     if (!typing) select(null); return;
@@ -3587,6 +3783,7 @@ document.addEventListener("keydown",e=>{
   }
   if (e.key==="0" || e.key==="1" || e.key==="2" || e.key==="3") setDetail(+e.key);
   if (e.key==="s" || e.key==="S"){ e.preventDefault(); setStories(!storyPop.classList.contains("open")); }
+  if (e.key==="r" || e.key==="R"){ e.preventDefault(); lucky(); }
 });
 
 /* ---------- stories: guided paths through the chart (first ones from Braudel's three volumes) ---------- */
@@ -3602,15 +3799,43 @@ const findItem = name => (INDEX.find(x=>x.t===name)||{}).obj;
 const storyOf = obj => obj && obj.name ? STORYS.find(s=>s.stops.some(x=>x.item===obj.name)) : null;
 /* how long a story plays for: the words at reading pace, plus the journeys between steps */
 function storyMins(s){ const w=s.stops.reduce((n,st)=>n+String(st.text||"").replace(/\[\[[^|\]]*\|?/g,"").split(/\s+/).length,0); return Math.max(1,Math.round((w*340+s.stops.length*3300)/60000)); }
+/* the Library's sections: one shows at a time, picked from the list beside it; the last one opened is remembered */
+function libShow(key){ const root=$("storyList"); let on=null;
+  for (const d of root.children){ const hit=d.dataset.k===key; d.hidden=!hit; if (hit) on=d; }
+  for (const t of $("libNav").children){ const hit=t.dataset.k===key; t.setAttribute("aria-selected",hit); t.tabIndex=hit?0:-1; }
+  if (!on) return; saveLS("history.lib.tab",key); root.scrollTop=0;
+  { const nav=$("libNav"), t=nav.querySelector('[aria-selected="true"]'); if (t && nav.scrollWidth>nav.clientWidth) nav.scrollLeft=Math.max(0, t.offsetLeft-(nav.clientWidth-t.offsetWidth)/2); }   /* a phone's row of sections: the one in use stays in sight */
+  const f=$("libFind"); f.value=""; f.hidden=on.querySelectorAll(".sitem").length<8; libFilter(); }
+/* the box at the top narrows a long list to the rows that hold the words typed */
+function libFilter(){ const q=$("libFind").value.trim().toLowerCase(), on=[...$("storyList").children].find(d=>!d.hidden); if (!on) return; let any=false;
+  for (const b of on.querySelectorAll(".sitem")){ const hit=!q || b.textContent.toLowerCase().includes(q); (b.closest(".librow")||b).hidden=!hit; any=any||hit; }
+  for (const h of on.querySelectorAll(".sbook")){ let n=h.nextElementSibling, live=false; while (n && !n.classList.contains("sbook")){ if (n.matches(".sitem,.librow") && !n.hidden) live=true; n=n.nextElementSibling; } h.hidden=!!q && !live; }
+  const miss=on.querySelector(".libmiss"); if (q && !any){ if (!miss) on.append(el("p","libnone libmiss","Nothing in this list matches.")); } else if (miss) miss.remove(); }
+$("libFind").addEventListener("input",libFilter);
+$("libNav").addEventListener("keydown",e=>{ const d = e.key==="ArrowDown" || e.key==="ArrowRight" ? 1 : e.key==="ArrowUp" || e.key==="ArrowLeft" ? -1 : 0; if (!d) return;
+  const T=[...$("libNav").children], i=T.findIndex(t=>t.getAttribute("aria-selected")==="true"), t=T[(i+d+T.length)%T.length]; e.preventDefault(); e.stopPropagation(); libShow(t.dataset.k); t.focus(); });
 function setStories(open){
+  const was=storyPop.classList.contains("open");
   storyPop.classList.toggle("open",open); $("storyBtn").setAttribute("aria-expanded",open);
   if (!open) return;
-  const root=$("storyList"); root.innerHTML="";
-  /* the library's sections fold; each remembers whether it was left open */
-  const sec=(key,name,n)=>{ const d=document.createElement("details"); d.className="lib"; d.open=LS("history.lib."+key)!=="0";
-    const h=document.createElement("summary"); h.append(el("b",null,name), el("span",null,String(n))); d.append(h);
-    d.addEventListener("toggle",()=>saveLS("history.lib."+key, d.open ? "1" : "0")); root.append(d); return d; };
+  storyPop.style.top=Math.round(document.querySelector("header.top").getBoundingClientRect().bottom)+"px";   /* under the top bar, whatever its height; a phone takes the whole screen */
+  const root=$("storyList"), nav=$("libNav"); root.innerHTML=""; nav.innerHTML="";
+  /* a section and its line in the list: sec(key, heading, how many, short name for the list) */
+  const sec=(key,name,n,tab)=>{ const d=el("section","lib"); d.dataset.k=key; d.id="lib-"+key; d.setAttribute("role","tabpanel"); d.setAttribute("aria-label",name); d.hidden=true; d.append(el("h3","libh",name)); root.append(d);
+    const t=el("button","libtab"); t.type="button"; t.dataset.k=key; t.setAttribute("role","tab"); t.setAttribute("aria-controls",d.id); t.append(el("span",null,tab||name), el("i",null,n ? String(n) : ""));
+    t.addEventListener("click",()=>libShow(key)); nav.append(t); return d; };
+  /* the reader's own bookmarks come first. One whose item is no longer in the data is left out */
+  { const L=marks().map(m=>[m,markObj(m.k)]).filter(([,o])=>o), BM=sec("marks","Your bookmarked items",L.length,"Bookmarks");
+    BM.append(el("p","spint","Kept with the mark at the top of a card. They stay in this browser."));
+    const none=el("p","libnone","Nothing kept yet."); none.hidden=!!L.length; BM.append(none);
+    for (const [m,o] of L){ const row=el("div","librow"), b=el("button","sitem"), un=el("button","libun"); b.type=un.type="button"; b.append(el("b",null,m.t||o.n||o.name), el("span",null,m.w||""));
+      b.addEventListener("click",()=>{ setStories(false); if (m.k.startsWith("kb:")) kbGo(m.k.slice(3)); else { goTo(o); if (typeof focusOn==="function") focusOn(o); } });
+      un.innerHTML=BMSVG; un.title="Remove the bookmark"; un.setAttribute("aria-label","Remove the bookmark from "+(m.t||o.name));
+      un.addEventListener("click",()=>{ if (marks().some(x=>x.k===m.k)) toggleMark(o); row.remove(); const left=BM.querySelectorAll(".librow").length;
+        nav.querySelector('[data-k="marks"] i').textContent = left ? String(left) : ""; none.hidden=!!left; const bm=$("detail").querySelector(".bmk"); if (bm && bm.sync) bm.sync(); });
+      row.append(b,un); BM.append(row); } }
   const vids=Object.values(typeof VIDEOS!=="undefined" ? VIDEOS : {}).filter(V=>V.item && kbTarget(V.item));
+  if (typeof ssLibrary==="function") ssLibrary(sec);   /* super-stories (super.js): first, the films on the map */
   if (typeof cxLibrary==="function") cxLibrary(sec);   /* Connections (cx.js): first, since the one on offer changes each time */
   const SV=sec("stories","Stories",STORYS.length);
   SV.append(el("p","spint","A story plays like a short film. Each step sets the year, the regions and the map, and opens one item. Leave any time to explore."));
@@ -3648,9 +3873,12 @@ function setStories(open){
       b.addEventListener("click",()=>{ setStories(false); kbGo(V.item); }); VV.append(b);
     }
   }
+  const keys=[...root.children].map(d=>d.dataset.k), want=LS("history.lib.tab");
+  libShow(keys.includes(want) ? want : keys.includes("super") ? "super" : keys[1]||keys[0]);
+  if (!was){ const t=nav.querySelector('[aria-selected="true"]'); if (t) t.focus({preventScroll:true}); }
 }
 $("storyBtn").addEventListener("click",e=>{ e.stopPropagation(); setStories(!storyPop.classList.contains("open")); });
-$("storyClose").addEventListener("click",()=>setStories(false));
+$("storyClose").addEventListener("click",()=>{ setStories(false); $("storyBtn").focus(); });
 document.addEventListener("click",e=>{ if (storyPop.classList.contains("open") && !storyPop.contains(e.target) && e.target!==$("storyBtn")) setStories(false); });
 function startStory(s,i,auto=true){
   if (typeof helloGone==="function") helloGone();
@@ -3883,6 +4111,7 @@ function writeURL(){
   if (MAP.lo>START || MAP.hi<NOW) p.set("t",MAP.lo+","+MAP.hi);
   if (MAP.win) p.set("w",MAP.win[0]+","+MAP.win[1]);
   if (story) p.set("st",story.s.id+"."+(story.i+1));
+  if (typeof SS!=="undefined" && SS.s) p.set("ss",SS.s.id);
   if (!state.detailAuto) p.set("d",state.detail);
   if (state.open.size) p.set("u",[...state.open].join(","));
   if (state.active.size===1 && state.lens!=="geo") p.set("g",state.lens);
@@ -3915,9 +4144,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=ad256dc6ae"></script>
-<script src="routes.js?v=ad256dc6ae"></script>
-<script src="map.js?v=ad256dc6ae"></script>
+<script src="geo.js?v=36d5882c91"></script>
+<script src="routes.js?v=36d5882c91"></script>
+<script src="map.js?v=36d5882c91"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -3964,10 +4193,14 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=ad256dc6ae"></script>
-<script src="sidebar.js?v=ad256dc6ae"></script>
-<script src="connections.js?v=ad256dc6ae"></script>
-<script src="cx.js?v=ad256dc6ae"></script>
+<script src="ask.js?v=36d5882c91"></script>
+<script src="sidebar.js?v=36d5882c91"></script>
+<script src="connections.js?v=36d5882c91"></script>
+<script src="cx.js?v=36d5882c91"></script>
+<script src="super/mongols.js?v=1122p"></script>
+<script src="super/mongols.voice.js?v=1122p"></script>
+<script src="super.js?v=1122q"></script>
+<script src="daily.js?v=36d5882c91"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
