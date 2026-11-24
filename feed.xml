@@ -7,6 +7,13 @@
   <updated>2026-11-23T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
   <entry>
+    <title>Ideas on Querying Dense Knowledge Bases</title>
+    <link href="https://hmeyy.com/essays/querying-dense-knowledge-bases.html"/>
+    <id>https://hmeyy.com/essays/querying-dense-knowledge-bases.html</id>
+    <updated>2026-11-23T00:00:00Z</updated>
+    <summary>A dense graph of hand-made notes breaks a plain retrieval agent three ways: priority, links and noise. One agent with three tools (lookup, sensemaking, discovery), lenses written as steps, and why a lens has to sit in the instructions, not the data.</summary>
+  </entry>
+  <entry>
     <title>Compounding in the Real World</title>
     <link href="https://hmeyy.com/essays/compounding-real-world.html"/>
     <id>https://hmeyy.com/essays/compounding-real-world.html</id>

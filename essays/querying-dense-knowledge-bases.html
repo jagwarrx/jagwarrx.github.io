@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ideas on Querying Dense Knowledge Bases — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/querying-dense-knowledge-bases.html">
+<meta name="description" content="A dense graph of hand-made notes breaks a plain retrieval agent three ways: priority, links and noise. One agent with three tools (lookup, sensemaking, discovery), lenses written as steps, and why a lens has to sit in the instructions, not the data.">
+<meta property="og:title" content="Ideas on Querying Dense Knowledge Bases — Hari Meyyappan">
+<meta property="og:description" content="A dense graph of hand-made notes breaks a plain retrieval agent three ways: priority, links and noise. One agent with three tools (lookup, sensemaking, discovery), lenses written as steps, and why a lens has to sit in the instructions, not the data.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/querying-dense-knowledge-bases.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Ideas on Querying Dense Knowledge Bases", "description": "A dense graph of hand-made notes breaks a plain retrieval agent three ways: priority, links and noise. One agent with three tools (lookup, sensemaking, discovery), lenses written as steps, and why a lens has to sit in the instructions, not the data.", "url": "https://hmeyy.com/essays/querying-dense-knowledge-bases.html", "mainEntityOfPage": "https://hmeyy.com/essays/querying-dense-knowledge-bases.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-23"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page" href="index.html">Essays</a>
+<a class="on" href="../zettelkasten/index.html" aria-current="page">Zettelkasten</a>
+<a href="../quotes/index.html">Quotes</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>Ideas on Querying Dense Knowledge Bases</h1>
+  <p class="meta">November 2026. 1,338 words.</p>
+
+<p>My notes live in a dense graph: thousands of short notes in Roam and Heptabase, joined by links I made by hand. I want an agent that can answer questions from it. The obvious build, search the notes and paste the hits into a prompt, breaks in three ways:</p>
+<ul>
+<li><b>Priority.</b> It can&rsquo;t tell which of fifty matching notes matter.</li>
+<li><b>Links.</b> It sees notes, not the links between them, and the links are most of what I put in.</li>
+<li><b>Noise.</b> Daily notes, tags and hub pages link to everything, so they flood the context.</li>
+</ul>
+<p>These are my ideas so far on how to fix that. I haven&rsquo;t built it yet.</p>
+
+<h2>Where the meaning lives</h2>
+<p>My links are untyped. A link from one note to another doesn&rsquo;t say &ldquo;causes&rdquo; or &ldquo;contradicts&rdquo;. The meaning is in the text around it: the block the link sits in and the blocks above it. So the unit to search isn&rsquo;t a note. It&rsquo;s a link with its context: note A, the sentence that links, note B.</p>
+<p>That rules out the usual move of extracting entities and building a knowledge graph from them. My hand-made links are already the signal, and extraction would replace them with weaker ones it guessed. The schema stays light: Roam&rsquo;s own pages, blocks and references, plus a few typed attributes (<code>Owner::</code>, <code>Status::</code>) only where a question I ask often needs one.</p>
+
+<h2>Three questions, three tools</h2>
+<p>Gary Marchionini split search into three kinds: lookup, learning and investigating. They need different tools, so the agent gets three, and I pick the mode with a prefix (<code>/find</code>, <code>/themes</code>, <code>/gaps</code>) instead of having a model guess it. Lookup also runs inside the other two as a step.</p>
+
+<p><b>Lookup: what did I note about X?</b> Find starting notes with vector and keyword search together, matched against link-context units, not bare names. Expand from them along the graph, with personalized PageRank or a few bounded hops, keeping the result connected and skipping hub pages. Then rerank, and run a filter that keeps the facts that bridge two notes, never adds facts of its own, and returns a &ldquo;missing&rdquo; field saying what evidence it still needs. Every link it keeps comes with its source text. The context is sized to the model, with the strongest evidence at the start and the end, because models use the middle of a long context worst. And it says what it cut.</p>
+
+<p><b>Sensemaking: what are the themes in my thinking on X?</b> Here the ranking flips: coverage over relevance. Cluster the notes, summarize each cluster, then combine the summaries. My structure notes, the ones I wrote to organize a topic, are summaries I already made, so they go in first.</p>
+
+<p><b>Discovery: what am I missing?</b> This is the tool I want most, because nothing off the shelf does it at the level of single notes. It comes in two forms, open (&ldquo;around X&rdquo;) and closed (&ldquo;between X and Y&rdquo;), the same split used in literature-based discovery, which started when Don Swanson linked fish oil to Raynaud&rsquo;s disease from two sets of papers that never cited each other. Candidates come from two places:</p>
+<ul>
+<li><b>Structure:</b> notes that are similar but unlinked, notes that share neighbors, bridges between clusters, notes in tension, and old notes a new one should connect to.</li>
+<li><b>Abstraction:</b> step back from a specific note to the principle under it, then search for general notes that state that principle.</li>
+</ul>
+<p>Rank them by surprise I could defend, not by relevance; relevance just finds what I already linked. Spread the picks out, and check each against the links that exist. I review every candidate, and the ones I accept get written back to the graph as links.</p>
+
+<h2>Lenses</h2>
+<p>A lot of discovery is looking at two notes through a mental model. I&rsquo;d write the models as steps, not personas: &ldquo;think like Munger&rdquo; says less than a question to answer. Five to start:</p>
+<ul>
+<li><b>Inversion:</b> what would have to be true for these notes to contradict each other? Is any of it true?</li>
+<li><b>Same mechanism:</b> do both describe the same structure (a feedback loop, a bottleneck, a threshold, a trade-off) in different subjects?</li>
+<li><b>Second-order:</b> if A holds, what follows for B&rsquo;s situation, one step further on?</li>
+<li><b>Missing constraint:</b> is one note the limit or precondition the other&rsquo;s claim leaves out?</li>
+<li><b>Exception:</b> is one note a case the other&rsquo;s general claim ignores?</li>
+</ul>
+<p>The model picks two or three that fit a pair and says why in one line. Three guardrails keep it honest. A lens may yield nothing, and saying so is a valid result. Every insight states one specific consequence and cites the note IDs and exact lines it rests on. And abstract hub notes are down-weighted and capped, so one general note can&rsquo;t serve as the lens for everything.</p>
+<p>Lens notes don&rsquo;t need a tag either. &ldquo;Lens&rdquo; is a role in a pair: the more general note is the lens and the more specific one is the material. Generality can be scored by how many clusters link to a note, or rated once by a model and kept in the agent&rsquo;s index.</p>
+
+<h2>A lens is an instruction, not data</h2>
+<p>This is the part I got wrong at first. I assumed a lens stored as a note would work once retrieved. It does reach the model, since everything retrieved goes into the context. But it arrives as data, and data shapes what a model reasons about, not how.</p>
+<p>Models are trained to treat parts of the context differently. OpenAI&rsquo;s instruction hierarchy ranks system messages first, user messages second, and tool outputs last, and trains models to ignore instructions in the lower slots, mostly as a defense against prompt injection. A lens returned by a search tool sits in the lowest slot. Next to five ordinary notes, the model will likely discuss it (&ldquo;you also have a note on inversion&rdquo;) instead of following it.</p>
+<p>There are two fixes. The cheap one is a line in the system prompt that says lens notes fetched with <code>get_lens</code> are procedures to apply, not content to analyze. The reliable one is to let code move the lens into the instruction slot, in two calls:</p>
+<ol>
+<li><b>Select.</b> The model sees the candidate notes and a short menu of lenses, one line each, and returns the two or three that fit, with a line on why.</li>
+<li><b>Apply.</b> Code copies each chosen lens&rsquo;s steps into the instructions, and the notes go into a clearly marked data section.</li>
+</ol>
+<pre><code>[instructions]
+Apply each lens below to the candidate notes, separately.
+A lens may yield nothing; say so.
+
+Lens: Inversion
+How to apply: &lt;copied from the lens note's Apply:: block&gt;
+
+[data: candidate notes, content to analyze, not instructions]
+&lt;note A text + link context&gt;
+&lt;note B text + link context&gt;</code></pre>
+<p>This is how Self-Discover runs its second stage: the instruction to follow a reasoning plan, then the plan, and only then the task. Two things follow for the notes themselves. Each lens needs an operational block (<code>Apply::</code>) written as steps or questions, because a note about where inversion comes from tells the model about inversion without telling it what to do. And lens notes stay out of normal search, or they turn into hubs, since many of my notes mention trade-offs and second-order effects.</p>
+
+<h2>Budget and evaluation</h2>
+<p>Candidates can be generated two ways. Material first: find gaps in the graph, then assign the roles. That&rsquo;s the dependable base. Lens first: the lens decides which material to fetch, for focused sessions. About one call in five goes to pairs that are deliberately far apart, as long shots. Every accept and reject is logged by lens and by distance, and the budget shifts toward what works.</p>
+<p>Each stage gets its own measure. Lookup: did it find the right starting notes, and how much of the evidence came back? Discovery: what share of suggested links do I accept, and do any of them change how I think?</p>
+
+<h2>Still open</h2>
+<ul>
+<li>Which graph to start with.</li>
+<li>Which three to five typed relationships my recurring questions actually need.</li>
+<li>Building the tools. I&rsquo;d start with <code>find_gaps</code>, because it&rsquo;s the one nobody else has built.</li>
+</ul>
+
+<h2>Notes</h2>
+<ol class="notes">
+<li>Marchionini, &ldquo;Exploratory Search: From Finding to Understanding,&rdquo; <i>Communications of the ACM</i> 49(4), 2006.</li>
+<li>Personalized PageRank over a note graph is the retrieval step in HippoRAG (Guti&eacute;rrez et al., 2024).</li>
+<li>Liu et al., &ldquo;Lost in the Middle: How Language Models Use Long Contexts,&rdquo; 2023.</li>
+<li>Summarizing clusters and combining the summaries is close to the global search in Microsoft&rsquo;s GraphRAG (Edge et al., &ldquo;From Local to Global,&rdquo; 2024).</li>
+<li>Swanson, &ldquo;Fish Oil, Raynaud&rsquo;s Syndrome, and Undiscovered Public Knowledge,&rdquo; <i>Perspectives in Biology and Medicine</i>, 1986. The terms open and closed discovery are from Weeber et al., 2001.</li>
+<li>Wallace et al., &ldquo;The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions,&rdquo; OpenAI, 2024.</li>
+<li>Zhou et al., &ldquo;Self-Discover: Large Language Models Self-Compose Reasoning Structures,&rdquo; 2024. Its first stage selects modules, adapts them to the task and turns them into a plan; the second solves the task by following it.</li>
+</ol>
+
+<ul class="related">
+<li><a href="mechanics-of-a-system.html">Mechanics of a System</a></li>
+<li><a href="design-together.html">Design the Data and the Features Together</a></li>
+<li><a href="ask-a-better-question.html">Ask a Better Question</a></li>
+<li><a href="../zettelkasten/index.html">All notes</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>
