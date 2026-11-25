@@ -4,8 +4,15 @@
   <link href="https://hmeyy.com/"/>
   <link rel="self" href="https://hmeyy.com/feed.xml"/>
   <id>https://hmeyy.com/</id>
-  <updated>2026-11-23T00:00:00Z</updated>
+  <updated>2026-11-25T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
+  <entry>
+    <title>Think in Trees, Do in Lists</title>
+    <link href="https://hmeyy.com/essays/trees-and-lists.html"/>
+    <id>https://hmeyy.com/essays/trees-and-lists.html</id>
+    <updated>2026-11-25T00:00:00Z</updated>
+    <summary>My ADHD brain thinks like a mind map, in trees, not in a line like a list. That's good for thinking and bad for doing. So I split them: think in mind maps, then force the doing into a list, one item after another.</summary>
+  </entry>
   <entry>
     <title>Ideas on Querying Dense Knowledge Bases</title>
     <link href="https://hmeyy.com/essays/querying-dense-knowledge-bases.html"/>

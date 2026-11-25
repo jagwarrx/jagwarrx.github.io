@@ -1,0 +1,31 @@
+/* Tellurae, Material UI version: layout for the MUI controls (see mui-chrome.mjs) */
+#muiHold{display:none!important}
+#viewPop{display:none!important}
+#about{display:none!important}
+
+/* the top bar: the MUI AppBar fills the header */
+body.mui-on header.top{height:auto;padding:0;border:0;background:none;display:block}
+body.mui-on header.top .brand{width:auto}
+body.mui-on header.top .brand h1{padding-left:0}
+body.mui-on header.top .search{margin-left:0;max-width:none;width:100%}
+body.mui-on header.top .search input{height:40px;border-radius:20px;border-color:transparent;background:var(--bg);padding-left:38px;font-family:Roboto,"Helvetica Neue",Arial,sans-serif}
+body.mui-on header.top .search input:focus{outline:2px solid #b42318;outline-offset:-2px;background:var(--surface)}
+body.mui-on header.top .search>svg{left:13px;top:12px}
+body.mui-on header.top .search kbd{top:11px;right:12px;border-radius:4px}
+body.mui-on .qres{border-radius:8px;box-shadow:0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12)}
+
+/* the panels the engine still draws get the Material paper look */
+body.mui-on .pop{top:62px;border-radius:8px;border-color:transparent;box-shadow:0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12)}
+body.mui-on .libp{box-shadow:0 8px 10px -5px rgba(0,0,0,.2),0 16px 24px 2px rgba(0,0,0,.14),0 6px 30px 5px rgba(0,0,0,.12);border-left:0}
+
+/* the time bar: the MUI controls sit where the originals were */
+.mui-gone{display:none!important}
+.mui-slot{display:contents}
+body.mui-on .timebar{border-top:0;box-shadow:0 -2px 4px -1px rgba(0,0,0,.12)}
+
+/* About: the original text inside the MUI dialog */
+.mui-about{font-family:Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5}
+.mui-about p{margin:0 0 8px}
+.mui-about h3{font-size:15px;font-weight:500;color:var(--muted);margin:16px 0 4px}
+.mui-about ul{margin:0;padding-left:20px}
+.mui-about li{margin:4px 0}

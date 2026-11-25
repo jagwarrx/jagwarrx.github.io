@@ -10,7 +10,8 @@
   <url><loc>https://hmeyy.com/apps/hackathon/_test2.html</loc><lastmod>2026-11-18</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/apps/hackathon/</loc><lastmod>2026-11-23</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/apps/history/_timeline-mock.html</loc><lastmod>2026-11-21</lastmod><priority>0.5</priority></url>
-  <url><loc>https://hmeyy.com/apps/history/app.html</loc><lastmod>2026-11-22</lastmod><priority>0.5</priority></url>
+  <url><loc>https://hmeyy.com/apps/history/app-mui.html</loc><lastmod>2026-11-24</lastmod><priority>0.5</priority></url>
+  <url><loc>https://hmeyy.com/apps/history/app.html</loc><lastmod>2026-11-24</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/apps/history/</loc><lastmod>2026-11-23</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/apps/liftoff/app.html</loc><lastmod>2026-11-16</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/apps/liftoff/</loc><lastmod>2026-11-23</lastmod><priority>0.5</priority></url>
@@ -68,7 +69,7 @@
   <url><loc>https://hmeyy.com/essays/let-the-rest-play-out.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/levers-on-response.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/life-quarter-week-day.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
-  <url><loc>https://hmeyy.com/essays/list-of-lists.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
+  <url><loc>https://hmeyy.com/essays/list-of-lists.html</loc><lastmod>2026-11-25</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/lists-of-book-lists.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/manage-commitments.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/market-for-the-need.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
@@ -86,7 +87,7 @@
   <url><loc>https://hmeyy.com/essays/not-tools-but-automation.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/observation-is-a-tool.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/ode-to-systems-thinking.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
-  <url><loc>https://hmeyy.com/essays/one-thing-at-a-time.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
+  <url><loc>https://hmeyy.com/essays/one-thing-at-a-time.html</loc><lastmod>2026-11-25</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/pain-times-resistance.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/power-as-defense.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/power-is-a-means.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
@@ -106,14 +107,15 @@
   <url><loc>https://hmeyy.com/essays/the-chupacabra.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/the-need-is-built-in.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/the-same-list.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
-  <url><loc>https://hmeyy.com/essays/todo-lists-adhd.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
+  <url><loc>https://hmeyy.com/essays/todo-lists-adhd.html</loc><lastmod>2026-11-25</lastmod><priority>0.8</priority></url>
+  <url><loc>https://hmeyy.com/essays/trees-and-lists.html</loc><lastmod>2026-11-25</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/what-each-religion-sells.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/what-is-enlightenment.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/why-an-edge-feels-like-survival.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/why-behind-the-need.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
   <url><loc>https://hmeyy.com/essays/why-belief-systems-survive.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
-  <url><loc>https://hmeyy.com/essays/work-not-organize.html</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
-  <url><loc>https://hmeyy.com/</loc><lastmod>2026-11-23</lastmod><priority>1.0</priority></url>
+  <url><loc>https://hmeyy.com/essays/work-not-organize.html</loc><lastmod>2026-11-25</lastmod><priority>0.8</priority></url>
+  <url><loc>https://hmeyy.com/</loc><lastmod>2026-11-25</lastmod><priority>1.0</priority></url>
   <url><loc>https://hmeyy.com/llm/</loc><lastmod>2026-11-17</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/llm/slides/</loc><lastmod>2026-11-18</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/llm/v1.html</loc><lastmod>2026-11-16</lastmod><priority>0.5</priority></url>
@@ -140,5 +142,5 @@
   <url><loc>https://hmeyy.com/projects/task-manager.html</loc><lastmod>2026-11-23</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/quotes/</loc><lastmod>2026-11-23</lastmod><priority>0.5</priority></url>
   <url><loc>https://hmeyy.com/recommended/</loc><lastmod>2026-11-23</lastmod><priority>0.5</priority></url>
-  <url><loc>https://hmeyy.com/zettelkasten/</loc><lastmod>2026-11-23</lastmod><priority>0.8</priority></url>
+  <url><loc>https://hmeyy.com/zettelkasten/</loc><lastmod>2026-11-25</lastmod><priority>0.8</priority></url>
 </urlset>

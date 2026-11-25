@@ -88,6 +88,11 @@ button,select{font:inherit;color:inherit}
 .brand h1{padding-left:12px;display:flex;align-items:center;gap:6px}
 /* the mark: a head and eight arms of dots, the eight regions with their events, near to far; the name is Optima Bold, drawn as outlines, to match the weight of the mark */
 .brand h1 .mk{width:30px;height:30px;flex:none} .brand h1 .nm{height:20px;width:auto;flex:none}
+/* while time or a story plays, the mark turns, one turn in 24 s. Pausing holds it where it is, so it never snaps back */
+@keyframes mkturn{to{transform:rotate(360deg)}}
+.brand h1 .mk{animation:mkturn 24s linear infinite paused;transform-origin:50% 50%}
+body.playing .brand h1 .mk{animation-play-state:running}
+@media (prefers-reduced-motion:reduce){ .brand h1 .mk{animation:none} }
 h1{font-family:'Pixelta',var(--display);font-weight:400;font-size:33.333px;line-height:1;margin:0;letter-spacing:0;white-space:nowrap}   /* 33.333px: one font pixel per screen pixel */
 .sub{font-size:12px;color:var(--muted);margin:1px 0 0;white-space:nowrap}
 .btn{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);padding:0 12px;height:36px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
@@ -443,13 +448,13 @@ body.wide .app{grid-template-columns:minmax(0,1fr) 560px var(--pinw,0px)}
 .slider.pick,.slider.shift{cursor:col-resize}
 /* the lens: the years shown on the map, as one object on the track. Its body moves through time, a dark end changes where it
    starts or stops, and the marker inside it becomes a needle for the year the borders are drawn for */
-.tlens{position:absolute;top:1px;height:20px;box-sizing:border-box;border-radius:var(--r);background:color-mix(in srgb,var(--surface) 70%,transparent);border:1.5px solid var(--ink);box-shadow:0 1px 0 var(--shade);cursor:grab;touch-action:none;display:none}
+.tlens{position:absolute;top:1px;height:20px;box-sizing:border-box;border-radius:0;background:var(--surface);border:1.5px solid var(--ink);box-shadow:0 1px 0 var(--shade);cursor:grab;touch-action:none;display:none}
 .slider.drag .tlens{cursor:grabbing}
 .twh{position:absolute;top:-1.5px;bottom:-1.5px;width:10px;background:var(--ink);cursor:ew-resize;display:grid;place-items:center;transition:background .12s}
 .twh::before{content:"";width:3px;height:8px;border-left:1px solid var(--surface);border-right:1px solid var(--surface);opacity:.85}
 .twh::after{content:"";position:absolute;top:-6px;bottom:-6px}
-#tWa{left:-1.5px;border-radius:var(--r) 0 0 var(--r)}
-#tWb{right:-1.5px;border-radius:0 var(--r) var(--r) 0}
+#tWa{left:-11.5px;border-radius:var(--r) 0 0 var(--r)}   /* the grips hang outside the box, so its edges are the window's years */
+#tWb{right:-11.5px;border-radius:0 var(--r) var(--r) 0}
 #tWa::after{left:-7px;right:0}
 #tWb::after{left:0;right:-7px}
 .twh:hover,.twh.on{background:var(--accent)}
@@ -1333,20 +1338,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=36d5882c91"></script>
-<script src="books.js?v=36d5882c91"></script>
-<script src="videos.js?v=36d5882c91"></script>
-<script src="stories.js?v=36d5882c91"></script>
-<script src="deep.js?v=36d5882c91"></script>
-<script src="famous.js?v=36d5882c91"></script>
-<script src="kb.js?v=36d5882c91"></script>
-<script src="people/portraits.js?v=36d5882c91"></script>
-<script src="ovpics.js?v=36d5882c91"></script>
-<script src="kinds.js?v=36d5882c91"></script>
-<script src="events.js?v=36d5882c91"></script>
+<script src="hier.js?v=fa52de02a6"></script>
+<script src="books.js?v=fa52de02a6"></script>
+<script src="videos.js?v=fa52de02a6"></script>
+<script src="stories.js?v=fa52de02a6"></script>
+<script src="deep.js?v=fa52de02a6"></script>
+<script src="famous.js?v=fa52de02a6"></script>
+<script src="kb.js?v=fa52de02a6"></script>
+<script src="people/portraits.js?v=fa52de02a6"></script>
+<script src="ovpics.js?v=fa52de02a6"></script>
+<script src="kinds.js?v=fa52de02a6"></script>
+<script src="events.js?v=fa52de02a6"></script>
 <script>
 "use strict";
-const VER = "?v=36d5882c91";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=fa52de02a6";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -1941,7 +1946,7 @@ const BANDWIKI = {"4.2 kiloyear drought":"4.2-kiloyear event","Silk Road opens":
  "Columbian Exchange":"Columbian exchange","Industrialisation begins":"Industrial Revolution","World wars":"World war","Decolonisation":"Decolonization"};
 function wikiTitle(obj){ if (obj.kb) return KBX[obj.kb].wiki||obj.name; return obj.n ? (BANDWIKI[obj.n]||obj.n) : obj.pt ? obj.w : (WIKI[obj.name]||obj.name); }
 const PICS = new Map();
-function wikiPic(title){
+function wikiPic(title, preload=true){   /* preload: fetch the picture now, so a card opens with it; the small faces skip it */
   if (PICS.has(title)) return PICS.get(title);
   const job = (async()=>{
     try{
@@ -1954,7 +1959,7 @@ function wikiPic(title){
       if (pg && pg.thumbnail) return {src:pg.thumbnail.source, page:pg.fullurl};
     }catch(e){}
     return null;
-  })().then(pic=>{ if (pic){ const im=new Image(); im.src=pic.src; } else PICS.delete(title); return pic; });
+  })().then(pic=>{ if (pic){ if (preload){ const im=new Image(); im.src=pic.src; } } else PICS.delete(title); return pic; });
   PICS.set(title, job); return job;
 }
 function hoverLoad(node,obj){ node.addEventListener("pointerenter",()=>wikiPic(wikiTitle(obj)),{once:true}); }
@@ -2694,6 +2699,8 @@ const inYrs = n => { const r=roundYrs(n); return n<1 ? "this year" : `in ${r.toL
 /* a person's face: the pixel portrait where one was drawn, else their picture from Wikipedia, else the plain figure.
    The panel is drawn again with every year, so a picture found once is put in at once the next time, and none is asked for while the years run past */
 const FACEPIC = new Map();
+/* a face is 56 px: Wikipedia's 330 px picture is cut to its 120 px size, about a seventh of the bytes */
+const faceSrc = src => src.replace(/\/(\d+)px-([^/]+)$/, (m,w,n) => +w>120 ? "/120px-"+n : m);
 function faceOf(p){
   const P=portraitOf(p), f=el("span","face");
   if (P){ const h=headIcon(P); h.classList.add("face"); return h; }
@@ -2701,7 +2708,7 @@ function faceOf(p){
   if (FACEPIC.get(t)) put(FACEPIC.get(t));
   else { f.append(icon("person"));
     if (!FACEPIC.has(t) && t) setTimeout(()=>{ if (!f.isConnected) return;
-      wikiPic(t).then(pic=>{ FACEPIC.set(t, pic ? pic.src : null); if (pic && f.isConnected) put(pic.src); }); }, 350); }
+      wikiPic(t,false).then(pic=>{ const s=pic && faceSrc(pic.src); FACEPIC.set(t, s || null); if (s && f.isConnected) put(s); }); }, 350); }
   return f;
 }
 function drawMoment(){
@@ -3647,12 +3654,14 @@ function stepEvent(dir){
 }
 $("prevEv").addEventListener("click",()=> story ? gotoStop(story.i-1) : stepEvent(-1));
 $("nextEv").addEventListener("click",()=> story ? gotoStop(story.i+1) : stepEvent(1));
-let playT=null;
+let playT=null, playFroze=false;   /* playFroze: Play fixed an auto window in place, and gives it back to auto when it stops */
 function setPlay(on){
   if (on===!!playT) return;
   $("mapYear").setAttribute("aria-live", on ? "off" : "polite");   /* a screen reader is not read every year while time plays */
   const b=$("playBtn");
   if (on){
+    /* an auto window follows the red line, so while time plays it would slide on to today. It holds still instead: the line plays to its end and stops */
+    if (!MAP.win && typeof lensOn==="function" && lensOn()){ const W=winYears(MAP.year); playFroze=true; setWin([W,W]); }
     /* in a window the reader has set, time plays inside it: the red line runs to the window's end and stops there, and the window stays. From the end, Play starts again at the window's start */
     const inWin = () => typeof ownWin==="function" && ownWin(), winEnd = () => MAP.win[1]<=0 || MAP.year>=MAP.hi;
     if (inWin()){ if (winEnd()) needleTo(MAP.year-MAP.win[0]); }
@@ -3668,13 +3677,13 @@ function setPlay(on){
         if (inWin()) needleTo(st[Math.min(st.length-1,i+n)]); else setYear(st[Math.min(st.length-1,i+n)],{scroll:true}); }
       playT=requestAnimationFrame(tick); };
     playT=requestAnimationFrame(tick);
-  } else { cancelAnimationFrame(playT); playT=null; }
+  } else { cancelAnimationFrame(playT); playT=null; if (playFroze){ playFroze=false; if (MAP.win) setWin(null); } }
   syncTransport();
 }
 /* the play buttons and the line beside them: they play time, or the story when one is open */
 function syncTransport(){
   const b=$("playBtn"), on = story ? film.on : !!playT;
-  b.innerHTML = on ? PAUSESVG : PLAYSVG; b.setAttribute("aria-pressed",on);
+  b.innerHTML = on ? PAUSESVG : PLAYSVG; b.setAttribute("aria-pressed",on); document.body.classList.toggle("playing",on);
   const lab = story ? (on ? "Pause the story" : film.done ? "Play the story again" : "Play the story") : on ? "Pause" : "Play through time";
   b.setAttribute("aria-label",lab); b.title = lab+" (Space)";
   for (const [id,a,c] of [["prevEv","Previous step","Previous event"],["nextEv","Next step","Next event"]]){ const t = story ? a : c; $(id).title=t; $(id).setAttribute("aria-label",t); }
@@ -4144,9 +4153,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=36d5882c91"></script>
-<script src="routes.js?v=36d5882c91"></script>
-<script src="map.js?v=36d5882c91"></script>
+<script src="geo.js?v=fa52de02a6"></script>
+<script src="routes.js?v=fa52de02a6"></script>
+<script src="map.js?v=fa52de02a6"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -4193,14 +4202,14 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=36d5882c91"></script>
-<script src="sidebar.js?v=36d5882c91"></script>
-<script src="connections.js?v=36d5882c91"></script>
-<script src="cx.js?v=36d5882c91"></script>
+<script src="ask.js?v=fa52de02a6"></script>
+<script src="sidebar.js?v=fa52de02a6"></script>
+<script src="connections.js?v=fa52de02a6"></script>
+<script src="cx.js?v=fa52de02a6"></script>
 <script src="super/mongols.js?v=1122p"></script>
 <script src="super/mongols.voice.js?v=1122p"></script>
 <script src="super.js?v=1122q"></script>
-<script src="daily.js?v=36d5882c91"></script>
+<script src="daily.js?v=fa52de02a6"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

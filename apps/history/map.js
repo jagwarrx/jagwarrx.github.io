@@ -953,9 +953,9 @@ function placeViewWin(){
   w.style.display="block"; w.style.left=x0+"px"; w.style.width=Math.max(4,x1-x0)+"px";
 }
 /* the lens on the track: the window of years, never narrower than its two ends and the needle need */
-const WGAP=16, WSIZES=[50,100,250,500,1000];
-function winX(){ const [a,b]=winAB(MAP.year), x=yearX(MAP.year);
-  return [Math.min(yearX(Math.max(MAP.lo,a)), x-WGAP), Math.max(yearX(Math.min(MAP.hi,b)), x+WGAP)]; }
+const WSIZES=[50,100,250,500,1000];
+/* the box's edges sit on its first and last years, so the red line meets the end when it gets there. Its grips hang outside the box */
+function winX(){ const [a,b]=winAB(MAP.year); return [yearX(Math.max(MAP.lo,a)), yearX(Math.min(MAP.hi,b))]; }
 const lensOn = () => MAP.on && MAP.mode!=="off" && typeof state!=="undefined" && (state.events || state.layers.size>0) && sliderEl.clientWidth>0;
 let winKey="";
 function placeWin(){
@@ -1064,15 +1064,21 @@ sliderEl.addEventListener("pointerdown",e=>{
   const r=sliderEl.getBoundingClientRect(), x0=e.clientX-r.left;
   const hold=(mv,up)=>{ const done=ev=>{ sliderEl.removeEventListener("pointermove",mv); sliderEl.removeEventListener("pointerup",done); sliderEl.removeEventListener("pointercancel",done); up(ev); };
     sliderEl.addEventListener("pointermove",mv); sliderEl.addEventListener("pointerup",done); sliderEl.addEventListener("pointercancel",done); };
-  const wh = e.target.closest ? e.target.closest(".twh") : null;
+  let wh = e.target.closest ? e.target.closest(".twh") : null;
+  /* the red line at an end of the box covers part of that end's grip: a press outside the box is the grip's */
+  if (!wh && e.target===thumbEl && lensOn()){ const X=winX(); if (x0<X[0]) wh=$("tWa"); else if (x0>X[1]) wh=$("tWb"); }
   if (wh){                                        /* an end of the lens: the years shown on the map start or stop where it is let go */
     const lo=wh.id==="tWa", W=winYears(MAP.year), w = MAP.win ? MAP.win.slice() : [W,W]; let moved=false;
     /* time stands still while an end is held, or the lens would slide out from under the pointer */
     const playing = typeof playT!=="undefined" && !!playT; if (playing) setPlay(false);
     sliderEl.classList.add("lenson"); wh.classList.add("on");
+    let A=MAP.year-w[0], B=MAP.year+w[1];         /* the window's first and last years while an end is dragged */
     hold(ev=>{ const x=ev.clientX-r.left; if (Math.abs(x-x0)>3) moved=true; if (!moved) return;
-        const y=MAP.year, yy=yearAtFrac(MAP.stops,sliderFrac(x)); if (lo) w[0]=Math.max(0,y-yy); else w[1]=Math.max(0,yy-y);
-        MAP.win=w.slice(); MAP.upto=false; placeWin(); drawMap(); if (typeof lensCounts==="function") lensCounts(); },
+        const yy=yearAtFrac(MAP.stops,sliderFrac(x)); if (lo) A=Math.min(yy,B); else B=Math.max(yy,A);
+        /* an end dragged past the red line pushes the line along with it */
+        const y=Math.max(A,Math.min(B,MAP.year)); MAP.win=[y-A,B-y]; MAP.upto=false;
+        if (y!==MAP.year) setYear(y,{scroll:true}); else { placeWin(); drawMap(); }
+        if (typeof lensCounts==="function") lensCounts(); },
       ev=>{ wh.classList.remove("on"); if (!ev || ev.pointerType!=="mouse") sliderEl.classList.remove("lenson");
         if (moved && typeof saveURL==="function") saveURL(); if (playing) setPlay(true); });
     return;
@@ -1111,7 +1117,7 @@ sliderEl.addEventListener("pointermove",e=>{ if (e.buttons || e.pointerType!=="m
   if (!inLens) tipAt(e.clientX); });
 /* a double click on an end of the lens gives the window back to the app (the press is held by the track, so the end is told by where it was) */
 sliderEl.addEventListener("dblclick",e=>{ if (!MAP.win || !lensOn()) return;
-  const x=e.clientX-sliderEl.getBoundingClientRect().left, X=winX(); if (!(x>=X[0]-7 && x<=X[0]+10) && !(x>=X[1]-10 && x<=X[1]+7)) return;
+  const x=e.clientX-sliderEl.getBoundingClientRect().left, X=winX(); if (!(x>=X[0]-12 && x<=X[0]+3) && !(x>=X[1]-3 && x<=X[1]+12)) return;
   setWin(null); });
 sliderEl.addEventListener("pointerleave",()=>{ if (!sliderEl.classList.contains("drag")) sliderEl.classList.remove("tipon","lenson"); });
 sliderEl.addEventListener("keydown",e=>{
