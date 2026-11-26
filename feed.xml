@@ -4,8 +4,22 @@
   <link href="https://hmeyy.com/"/>
   <link rel="self" href="https://hmeyy.com/feed.xml"/>
   <id>https://hmeyy.com/</id>
-  <updated>2026-11-25T00:00:00Z</updated>
+  <updated>2026-11-26T00:00:00Z</updated>
   <author><name>Hari Meyyappan</name></author>
+  <entry>
+    <title>See Everything Together in One Place</title>
+    <link href="https://hmeyy.com/essays/one-board.html"/>
+    <id>https://hmeyy.com/essays/one-board.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>To make a decision, I need to see everything together on one master board. Out of sight is out of existence, so with things spread out, every choice comes with doubt about what I'm missing. One board closes the set. Decide on the board, work from the short list.</summary>
+  </entry>
+  <entry>
+    <title>The Unusual Effectiveness of Visual Language for ADHD</title>
+    <link href="https://hmeyy.com/essays/visual-language.html"/>
+    <id>https://hmeyy.com/essays/visual-language.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Bullet journals, bullets, checkboxes, mind maps, kanban boards and canvases. For an ADHD brain, marks and shapes do organizing work that words do badly, and short words beat sentences. So build a language for organization: a few signs, one meaning each, the same everywhere.</summary>
+  </entry>
   <entry>
     <title>When It’s Not Working, Start</title>
     <link href="https://hmeyy.com/essays/start-when-stuck.html"/>
