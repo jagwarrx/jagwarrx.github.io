@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 640" font-family="-apple-system,Helvetica,Arial,sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#888"/></marker></defs>
+<rect width="760" height="640" fill="#fbfaf7"/>
+<g stroke="#888" stroke-width="1.6" fill="none" marker-end="url(#a)">
+<path d="M330 128V170"/><path d="M330 318V360"/>
+<path d="M560 245H475"/>
+<path d="M185 445H140"/><path d="M185 490L140 525"/>
+<path d="M185 490L140 525"/>
+</g>
+<path d="M475 460H700V60H500" stroke="#888" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#a)"/>
+<text x="708" y="270" font-size="13" fill="#555" transform="rotate(90 708 270)" text-anchor="middle">Weekly review</text>
+<g font-size="15" text-anchor="middle">
+<rect x="185" y="30" width="290" height="98" rx="12" fill="#f1efe9" stroke="#999"/>
+<text x="330" y="66" font-size="20" font-weight="700" fill="#333">Planning</text>
+<text x="330" y="90" fill="#555">Heptabase or Obsidian</text>
+<text x="330" y="112" font-size="13" fill="#777">projects, blocks per project</text>
+<rect x="185" y="170" width="290" height="148" rx="12" fill="#e2f4ec" stroke="#3c9a73"/>
+<text x="330" y="206" font-size="20" font-weight="700" fill="#145a3e">Operations</text>
+<text x="330" y="230" fill="#1f7350">Things 3</text>
+<text x="330" y="258" font-size="13" fill="#1f7350">Inbox: capture</text>
+<text x="330" y="278" font-size="13" fill="#1f7350">Today: a menu to choose from</text>
+<text x="330" y="298" font-size="13" fill="#1f7350">Logbook: tasks done</text>
+<rect x="185" y="360" width="290" height="148" rx="12" fill="#fff3b8" stroke="#c9a92a"/>
+<text x="330" y="396" font-size="20" font-weight="700" fill="#5a4a08">Execution</text>
+<text x="330" y="424" fill="#6b5a10">Sticky note + timer: start</text>
+<text x="330" y="448" fill="#6b5a10">Blocks app: log when done</text>
+<text x="330" y="472" font-size="13" fill="#7a6a20">blocks per project, per day; habits</text>
+<rect x="560" y="210" width="130" height="70" rx="12" fill="#f1efe9" stroke="#999"/>
+<text x="625" y="240" font-weight="700" fill="#333">Calendar</text>
+<text x="625" y="262" font-size="13" fill="#666">appointments only</text>
+<rect x="20" y="415" width="120" height="60" rx="12" fill="#f1efe9" stroke="#999"/>
+<text x="80" y="440" font-weight="700" fill="#333">Notes</text>
+<text x="80" y="461" font-size="13" fill="#666">Antinote</text>
+<rect x="20" y="500" width="120" height="60" rx="12" fill="#f1efe9" stroke="#999"/>
+<text x="80" y="525" font-weight="700" fill="#333">Artifacts</text>
+<text x="80" y="546" font-size="13" fill="#666">Dropbox</text>
+<rect x="20" y="120" width="120" height="70" rx="12" fill="#ece8f6" stroke="#8a7cc0"/>
+<text x="80" y="148" font-weight="700" fill="#463a7a">Claude</text>
+<text x="80" y="170" font-size="13" fill="#5a4e8e">reviews</text>
+</g>
+<g stroke="#8a7cc0" stroke-width="1.4" stroke-dasharray="3 3" fill="none" marker-end="url(#a)"><path d="M140 140L183 100"/><path d="M140 175L183 220"/></g>
+<g font-size="13" fill="#555"><rect x="190" y="590" width="14" height="14" rx="3" fill="#f1efe9" stroke="#999"/><text x="210" y="602">Planning</text>
+<rect x="290" y="590" width="14" height="14" rx="3" fill="#e2f4ec" stroke="#3c9a73"/><text x="310" y="602">Things 3</text>
+<rect x="390" y="590" width="14" height="14" rx="3" fill="#fff3b8" stroke="#c9a92a"/><text x="410" y="602">Execution</text></g>
+</svg>
