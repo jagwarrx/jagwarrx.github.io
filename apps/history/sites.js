@@ -6,8 +6,11 @@
      scans             Sketchfab models made from photos (photogrammetry). Drag to turn, scroll to zoom, double-click a spot to go there.
    SITES: page id -> {name (when the page's own is an event, e.g. Taj Mahal begun), g: its group in the Library, out: [lat, lon, heading],
      in: [lat, lon, heading], scans: [{u: Sketchfab id, t: tab name}], tours: [{url, t, by: the credit}], note}.
+     sv: more Street View points, [{t: tab name, p: [lat, lon, heading]}].
    TOURS: Columbia's Media Center for Art History panorama tours, [folder, name, group, lat, lon]; TK ties a tour to its page.
      A tour with a page joins that page's site; one without a page is a site of its own ("t:" + folder), on the map and in the Library.
+   MORE: other hosts, [kind:id, site name, group, lat, lon, page id or "", tab name, photographer]. Rows with one site name make one site
+     ("t:" + name when there is no page). Kinds in KIND below: walkable tours, single 360 photos (after Street View) and Sketchfab scans.
    Each point, scan and tour was checked by eye (26 and 27 Nov 2026). */
 (() => {
 const MCID = "https://mcid.mcah.columbia.edu/media/panos/pano-tours/", CU = "Photos: Media Center for Art History, Columbia University";
@@ -16,16 +19,27 @@ const GIZA = "Photos: the Giza Project at Harvard with Mused, about 2020 to 2022
 const SITES = {
   "hagia-sophia":          { g: "Istanbul", out: [41.00740, 28.97895, 60], in: [41.00788, 28.97960, 60], scans: [{ u: "7e7d826a49d248a7a81d4129ce976420", t: "3D inside" }], year: 2021 },
   "colosseum":             { g: "Rome", out: [41.89127, 12.49145, 90], scans: [{ u: "544c64b6445e4899a17350c949b7766a", t: "3D" }],
-                             tours: [{ url: "https://www.airpano.com/embed.php?3D=italy-rome-colosseum", t: "Tour", by: AIR }] },
+                             tours: [{ url: "https://www.airpano.com/embed.php?3D=italy-rome-colosseum", t: "From the air", by: AIR }] },
   "taj-mahal-begun":       { name: "Taj Mahal", g: "India", out: [27.17330, 78.04210, 0],
-                             tours: [{ url: "https://www.airpano.com/embed.php?3D=taj-mahal-india-2", t: "Tour", by: AIR }] },
+                             tours: [{ url: "https://www.airpano.com/embed.php?3D=taj-mahal-india-2", t: "From the air", by: AIR }] },
   "angkor-wat-built":      { name: "Angkor Wat", out: [13.41090, 103.86400, 90], scans: [{ u: "86a97678ae6d4f41a14c13d77990f223", t: "3D" }], year: 2013 },
   "great-pyramid-of-giza": { g: "Egypt", out: [29.97730, 31.13250, 40], scans: [{ u: "4a251113722f4d969b6cf2ca5f35c502", t: "3D" }, { u: "aa5a8d05e15d4bc4becb6fcd88c5a35d", t: "Tomb of Idu" }],
                              tours: [{ url: "https://app.spacery.dev/s/0b7dabf2e410/great-pyramid-of-giza", t: "Walk inside", by: GIZA },
                                      { url: "https://app.spacery.dev/s/48a9f8d4fddb/the-tomb-of-queen-meresankh-iii-giza", t: "Tomb of Meresankh", by: GIZA },
                                      { url: "https://app.spacery.dev/s/5b073eb82f3f/the-great-sphinx-of-giza", t: "Sphinx", by: GIZA }] },
   "machu-picchu":          { g: "Peru", out: [-13.16310, -72.54500, 0], scans: [{ u: "eb2e2c36ba8a4d8197dc30dd947984d2", t: "3D" }],
-                             tours: [{ url: "https://www.airpano.com/embed.php?3D=machu-picchu-peru", t: "Tour", by: AIR }] },
+                             tours: [{ url: "https://www.airpano.com/embed.php?3D=machu-picchu-peru", t: "From the air", by: AIR }] },
+  "brihadisvara-temple":   { g: "South India", out: [10.78280, 79.13170, 270] },
+  "charminar":             { g: "South India", in: [17.36160, 78.47470, 0] },
+  "hampi":                 { sv: [{ t: "Virupaksha", p: [15.33520, 76.45870, 90] }, { t: "Vittala", p: [15.34230, 76.47510, 90] }] },
+  "shore-temple":          { out: [12.61660, 80.19930, 90] },
+  "t:Gangaikonda Cholapuram":   { name: "Gangaikonda Cholapuram", g: "South India", out: [11.20640, 79.44830, 90] },
+  "t:Airavatesvara Temple":     { name: "Airavatesvara Temple, Darasuram", g: "South India", out: [10.94830, 79.35660, 90] },
+  "t:Ramappa Temple":           { name: "Ramappa Temple", g: "South India", out: [18.25920, 79.94330, 270] },
+  "t:Gol Gumbaz":               { name: "Gol Gumbaz", g: "South India", in: [16.83020, 75.73600, 0] },
+  "t:Pattadakal":               { name: "Pattadakal", g: "South India", out: [15.95140, 75.81470, 20] },
+  "t:Belur":                    { name: "Chennakeshava Temple, Belur", g: "South India", out: [13.16250, 75.86060, 90] },
+  "t:Badami":                   { out: [15.91830, 75.68420, 90] },
   "notre-dame-de-paris":   { out: [48.85300, 2.34900, 90], in: [48.85296, 2.35010, 90], scans: [{ u: "461a9a51ba1b40bc942b5dfa04c1100f", t: "3D" }],
                              note: "The walk and the 3D scan were made before the 2019 fire." },
 };
@@ -134,10 +148,10 @@ const TOURS = [
   ["Jordan/Qasr-Amra", "Qusayr Amra", "Jordan", 31.8017, 36.5873],
   ["Jordan/Qasr-Kharana", "Qasr Kharana", "Jordan", 31.7289, 36.4628],
   ["Jordan/Qasr-Mshatta", "Mshatta Palace", "Jordan", 31.7375, 36.0103],
-  ["Qutb/Fatima-Sultana", "Tomb of Fatima Sultana", "India", 17.395, 78.396],
-  ["Qutb/Hyath-Bakshi-Begum", "Tomb of Hayat Bakshi Begum", "India", 17.395, 78.396],
-  ["Qutb/Mohammed-Quli-Qutb-Shah", "Tomb of Muhammad Quli Qutb Shah", "India", 17.395, 78.396],
-  ["Qutb/Mohammed-Qutb-Shah", "Tomb of Muhammad Qutb Shah", "India", 17.395, 78.396],
+  ["Qutb/Fatima-Sultana", "Tomb of Fatima Sultana", "South India", 17.395, 78.396],
+  ["Qutb/Hyath-Bakshi-Begum", "Tomb of Hayat Bakshi Begum", "South India", 17.395, 78.396],
+  ["Qutb/Mohammed-Quli-Qutb-Shah", "Tomb of Muhammad Quli Qutb Shah", "South India", 17.395, 78.396],
+  ["Qutb/Mohammed-Qutb-Shah", "Tomb of Muhammad Qutb Shah", "South India", 17.395, 78.396],
   ["Japan/Byodo-in", "Byōdō-in", "Japan", 34.8894, 135.8078],
   ["Japan/Ginkakuji", "Ginkaku-ji", "Japan", 35.0267, 135.7983],
   ["Japan/Himeji-Castle", "Himeji Castle", "Japan", 34.8394, 134.6939],
@@ -240,6 +254,152 @@ const TK = {
   "Southwest/Mesa-Verde": "cliff-palace-mesa-verde", "Southwest/Chaco-Canyon": "chaco-canyon", "Southwest/Bandelier": "bandelier-national-monument",
 };
 /* every tour joins its page's site, or stands as a site of its own */
+const MORE = [
+  ["S:9540f3ac06a5/walking-the-giza-plateau-egypt", "Great Pyramid of Giza", "Egypt", 29.97611, 31.13278, "great-pyramid-of-giza", "Giza plateau"],
+  ["S:711262153bb3/the-great-sphinx-giza", "Great Sphinx", "Egypt", 29.97526, 31.13758, "great-sphinx-of-giza", "Walk through"],
+  ["S:4e4ce023e3eb/the-tomb-of-khufukhaf-i-giza", "Tombs at Giza", "Egypt", 29.9776, 31.1361, "", "Khufukhaf I"],
+  ["S:2e5bb8fb3b84/tomb-of-neferbauptah-giza", "Tombs at Giza", "Egypt", 29.9776, 31.1361, "", "Neferbauptah"],
+  ["S:da459a32687f/tomb-of-iasen-giza", "Tombs at Giza", "Egypt", 29.9776, 31.1361, "", "Iasen"],
+  ["S:e824d12857b6/the-pyramid-of-unas-saqqara", "Pyramid of Unas", "Egypt", 29.86833, 31.21472, "", "Walk through"],
+  ["S:3d80fdf4022f/the-step-pyramid-of-djoser-saqqara", "Step Pyramid of Djoser", "Egypt", 29.8711, 31.2167, "", "Walk through"],
+  ["S:6b4ed2f64b75/inside-and-around-the-step-pyramid-of-djoser-saqqara", "Step Pyramid of Djoser", "Egypt", 29.8711, 31.2167, "", "Inside and around"],
+  ["M:xmDbt2rfa82", "Tombs at Saqqara", "Egypt", 29.8697, 31.2155, "", "Mehu"],
+  ["M:PKxweZaPG3P", "Tombs at Saqqara", "Egypt", 29.8697, 31.2155, "", "Niankhkhnum and Khnumhotep"],
+  ["M:BsXpwTSYSyN", "Tombs at Saqqara", "Egypt", 29.8697, 31.2155, "", "Wahtye"],
+  ["S:4ac7c19df36c/the-mosque-of-muhammad-ali-cairo-citadel", "Mosque of Muhammad Ali", "Egypt", 30.02861, 31.25972, "", "Walk through"],
+  ["M:CqL3QB3dh7N", "Mosque of Muhammad Ali", "Egypt", 30.02861, 31.25972, "", "3D walk"],
+  ["S:7af83603df37/bab-zuwayla-cairo", "Bab Zuwayla", "Egypt", 30.04283, 31.2578, "", "Walk through"],
+  ["M:qhjXLPRDvRw", "Al-Fath Mosque", "Egypt", 30.05985, 31.24606, "", "3D walk"],
+  ["M:LCyv1zFUxiq", "Gayer-Anderson House", "Egypt", 30.0284, 31.2507, "", "3D walk"],
+  ["M:PfNu1RDRbZf", "Abu Serga Church", "Egypt", 30.0059, 31.2304, "", "3D walk"],
+  ["S:405effeb1519/the-villa-of-the-birds-alexandria", "Villa of the Birds, Alexandria", "Egypt", 31.19669, 29.90564, "", "Walk through"],
+  ["S:72da2138035b/qaitbay-citadel-alexandria", "Citadel of Qaitbay", "Egypt", 31.213, 29.8852, "", "Walk through"],
+  ["S:86acf94c40cf/saint-catherine-s-monastery-sinai", "Saint Catherine's Monastery", "Egypt", 28.55556, 33.97611, "", "Monastery"],
+  ["S:ddb9c80334cf/the-museum-saint-catherine-s-monastery-sinai", "Saint Catherine's Monastery", "Egypt", 28.55556, 33.97611, "", "Museum"],
+  ["S:0f65715f71e9/mount-sinai-holy-summit", "Saint Catherine's Monastery", "Egypt", 28.55556, 33.97611, "", "Summit of Mount Sinai"],
+  ["S:05d77725997a/chapel-at-saint-anthony-s-monastery", "Monastery of Saint Anthony", "Egypt", 28.9244, 32.3486, "", "Walk through"],
+  ["S:d5648deebaee/osireion-temple-of-seti-i-abydos", "Abydos", "Egypt", 26.185, 31.91889, "", "Seti I and the Osireion"],
+  ["S:bb9fcbb0574f/the-temple-of-ramesses-ii-abydos", "Abydos", "Egypt", 26.185, 31.91889, "", "Ramesses II"],
+  ["S:8d79d291ddc7/karnak-temple-complex-egypt", "Karnak", "Egypt", 25.7183, 32.6583, "karnak", "Walk through"],
+  ["S:33a0cb970e79/luxor-temple", "Luxor Temple", "Egypt", 25.7, 32.63917, "", "By day"],
+  ["S:b0eb64790078/luxor-temple-night", "Luxor Temple", "Egypt", 25.7, 32.63917, "", "By night"],
+  ["S:79975b05067d/mortuary-temple-of-hatshepsut", "Temple of Hatshepsut", "Egypt", 25.73828, 32.60658, "", "Walk through"],
+  ["S:280428e56ee0/medinet-habu-temple", "Medinet Habu", "Egypt", 25.71972, 32.60083, "", "Walk through"],
+  ["S:4ee9faeb51a8/the-tomb-of-menna-valley-of-the-nobles", "Tomb of Menna", "Egypt", 25.7333, 32.6, "", "Walk through"],
+  ["S:fbb9de0b7dc6/the-valley-of-the-kings-luxor-egypt", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "The valley"],
+  ["S:d12c56b4e0b8/the-tomb-of-tutankhamun-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Tutankhamun"],
+  ["S:a301b2fdabb1/tomb-of-seti-i-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Seti I"],
+  ["S:56658c81e687/the-tomb-of-ramesses-ii-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Ramesses II"],
+  ["S:6c75f88e5f48/the-tomb-of-ramesses-i", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Ramesses I"],
+  ["S:326a0d2a3bda/the-tomb-of-ramesses-iii-kv-11-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Ramesses III"],
+  ["S:30a3256af0a2/tomb-of-ramesses-v-and-vi-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Ramesses V and VI"],
+  ["S:12c9a4d57a54/the-tomb-of-merenptah-kv-8-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Merenptah"],
+  ["S:2a6ee4078eba/the-tomb-of-tausert-and-setnakht-kv-14-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Tausert and Setnakht"],
+  ["S:8a70fb43e144/the-tomb-of-thutmose-iii-kv-34-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Thutmose III"],
+  ["S:274613b6fd28/tomb-of-thutmose-iv-valley-of-the-kings", "Valley of the Kings", "Egypt", 25.74083, 32.60222, "", "Thutmose IV"],
+  ["S:d0967aa95a9f/the-valley-of-the-queens-luxor-egypt", "Valley of the Queens", "Egypt", 25.7275, 32.59306, "", "The valley"],
+  ["S:0d604467f270/the-tomb-of-nefertari-valley-of-the-queens", "Valley of the Queens", "Egypt", 25.7275, 32.59306, "", "Nefertari"],
+  ["S:139e3d0ba41c/the-tomb-of-amenherkhepeshef-qv-55-valley-of-the-queens", "Valley of the Queens", "Egypt", 25.7275, 32.59306, "", "Amenherkhepeshef"],
+  ["S:1ea7c62986ad/the-temple-of-ramesses-ii-at-abu-simbel", "Abu Simbel", "Egypt", 22.33694, 31.62556, "abu-simbel-temples", "Walk through"],
+  ["M:sgMWWDvdKsV", "Abu Simbel", "Egypt", 22.33694, 31.62556, "abu-simbel-temples", "3D walk"],
+  ["S:2994e22162b6/the-colosseum-flavian-amphitheater-rome", "Colosseum", "Rome", 41.8903, 12.4922, "colosseum", "Walk through"],
+  ["S:09b885402cb4/the-palazzo-nuovo-courtyard-capitoline-museums-rome", "Capitoline Museums", "Rome", 41.8931, 12.4828, "", "Walk through"],
+  ["S:d3d7f47a1c2c/the-basilica-of-santa-croce-florence-italy", "Santa Croce", "Florence", 43.76842, 11.26272, "", "Church"],
+  ["S:d61626e27014/rinuccini-chapel-basilica-of-santa-croce", "Santa Croce", "Florence", 43.76842, 11.26272, "", "Rinuccini Chapel"],
+  ["S:a551a6cb8505/piazza-di-santa-croce-florence-italy", "Santa Croce", "Florence", 43.76842, 11.26272, "", "Piazza"],
+  ["S:8c2f3c0c5442/the-boboli-gardens-florence-italy", "Boboli Gardens", "Florence", 43.7625, 11.24833, "", "Walk through"],
+  ["S:bace39eb3d31/prato-cathedral-duomo-di-santo-stefano-italy", "Prato Cathedral", "Florence", 43.88194, 11.09778, "", "Cathedral"],
+  ["S:63ff0d8d78b8/chapel-of-the-holy-belt-st-stephen-s-cathedral-prato-italy", "Prato Cathedral", "Florence", 43.88194, 11.09778, "", "Chapel of the Holy Belt"],
+  ["S:406dc316e81a/scrovegni-chapel-or-arena-chapel-padova", "Scrovegni Chapel", "Padua and Bolzano", 45.41184, 11.87952, "", "Walk through"],
+  ["S:0458cab3c12d/chiesa-dei-domenicani-bolzano", "Dominican Church, Bolzano", "Padua and Bolzano", 46.4975, 11.35167, "", "Walk through"],
+  ["S:ef49185cc195/the-acropolis-athens-greece", "Parthenon", "Greece", 37.97167, 23.72611, "parthenon", "Acropolis"],
+  ["S:f3c5e728e189/the-parthenon-and-the-acropolis-athens-greece", "Parthenon", "Greece", 37.97167, 23.72611, "parthenon", "Parthenon"],
+  ["S:af929a00d4d8/the-ancient-agora-of-athens-greece", "Ancient Agora of Athens", "Greece", 37.975, 23.7225, "", "Walk through"],
+  ["S:317060d9891b/the-areopagus-athens-greece", "Areopagus", "Greece", 37.97222, 23.72361, "", "Walk through"],
+  ["S:4596f9af0e2d/the-sanctuary-of-apollo-at-delphi-greece", "Delphi", "Greece", 38.4823, 22.5013, "oracle-of-delphi", "Sanctuary"],
+  ["S:28b3a3cd2896/the-sacred-way-and-temple-of-apollo-delphi-greece", "Delphi", "Greece", 38.4823, 22.5013, "oracle-of-delphi", "Sacred Way"],
+  ["S:cbe002e40b39/the-theatre-at-delphi-greece", "Delphi", "Greece", 38.4823, 22.5013, "oracle-of-delphi", "Theatre"],
+  ["S:52c299365d13/the-castalian-spring-delphi-greece", "Delphi", "Greece", 38.4823, 22.5013, "oracle-of-delphi", "Castalian Spring"],
+  ["S:3491ef8ef179/the-temple-of-apollo-sounion-greece", "Temple of Poseidon, Sounion", "Greece", 37.6502, 24.02455, "temple-of-poseidon-sounion", "Walk through"],
+  ["S:102a48821d49/the-temple-of-zeus-olympia-greece", "Temple of Zeus, Olympia", "Greece", 37.63778, 21.63, "temple-of-zeus-olympia", "Walk through"],
+  ["S:cda3514d5a5b/mycenae-greece", "Mycenae", "Greece", 37.73028, 22.7575, "", "Walk through"],
+  ["S:fda2bbf8b936/the-library-of-celsus-ephesus-turkey", "Ephesus", "Turkey", 37.94111, 27.34194, "", "Library of Celsus"],
+  ["S:9efbdffb8a06/the-terrace-houses-ephesus-turkey", "Ephesus", "Turkey", 37.94111, 27.34194, "", "Terrace Houses"],
+  ["S:d62132ddd88a/the-theatre-entrance-and-southeast-path-ephesus-turkey", "Ephesus", "Turkey", 37.94111, 27.34194, "", "Theatre"],
+  ["S:1fc490150ecf/the-synagogue-and-bath-gymnasium-complex-sardis", "Sardis", "Turkey", 38.48833, 28.04028, "", "Synagogue and gymnasium"],
+  ["S:0def100774de/the-temple-of-artemis-sardis", "Sardis", "Turkey", 38.48833, 28.04028, "", "Temple of Artemis"],
+  ["S:097b8b07b9a7/jerusalem-walking-in-ancient-footsteps", "Jerusalem", "Jerusalem", 31.77667, 35.23417, "jerusalem", "Walk through"],
+  ["S:ea0da1d24316/the-citadel-of-david-jerusalem", "Tower of David", "Jerusalem", 31.77611, 35.22778, "", "Walk through"],
+  ["S:0d0fcf84efa1/via-dolorosa-old-city-jerusalem", "Via Dolorosa", "Jerusalem", 31.7794, 35.23207, "", "Walk through"],
+  ["Z:Petra_oa_hr/Petra_oa_hr.html", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Whole site"],
+  ["S:22b149144d4c/khazneh-el-far-oun-the-treasury-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Treasury"],
+  ["S:54db5259d0b5/the-siq-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Siq"],
+  ["S:afc249b7305f/the-royal-tombs-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Royal Tombs"],
+  ["S:972a30e68407/the-theatre-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Theatre"],
+  ["S:83d1df3e1381/the-great-temple-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Great Temple"],
+  ["S:f8e50bb3b5ec/the-monastery-ad-deir-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Monastery"],
+  ["S:3fc7e3b65580/the-hieroglpyhic-stairway-and-temples-20-and-22-copan-ruinas", "Copán", "Central America", 14.8375, -89.1425, "copan", "Hieroglyphic Stairway"],
+  ["S:a861c4972c08/the-acropolis-copan-ruinas-honduras", "Copán", "Central America", 14.8375, -89.1425, "copan", "Acropolis"],
+  ["S:e905b68b48e0/the-rosalila-temple-and-altar-q-copan-ruinas", "Copán", "Central America", 14.8375, -89.1425, "copan", "Rosalila and Altar Q"],
+  ["Z:Lalibela/TourWeaver_Panorama_Lalibela_Final.html", "Lalibela", "East Africa", 12.0317, 39.0411, "rock-hewn-churches-of-lalibela", "Walk through"],
+  ["Z:Gondar/index.htm", "Fasil Ghebbi, Gondar", "East Africa", 12.6075, 37.47, "", "Walk through"],
+  ["Z:Meroe/Meroe_North.html", "Pyramids of Meroë", "East Africa", 16.93833, 33.74917, "", "Walk through"],
+  ["Z:Kilwa/TourWeaver_Kilwa.html", "Kilwa Kisiwani", "East Africa", -8.96, 39.5128, "", "Walk through"],
+  ["Z:SongoMnara/TourWeaver_SongoMnara.html", "Songo Mnara", "East Africa", -9.04944, 39.56722, "", "Walk through"],
+  ["Z:Kua/index.htm", "Kua ruins", "East Africa", -8.0024, 39.7807, "", "Walk through"],
+  ["Z:Gede/Gede.htm", "Gede", "East Africa", -3.3094, 40.0175, "ruins-of-gedi", "Walk through"],
+  ["Z:Zanzibar_pm/index.htm", "Palace Museum, Stone Town", "East Africa", -6.1611, 39.1886, "", "Walk through"],
+  ["Z:Mozambique/Mozambique_Panotour.htm", "Island of Mozambique", "East Africa", -15.03667, 40.73278, "island-of-mozambique", "Walk through"],
+  ["Z:Elmina/TourWeaver_Elmina_Panotour.html", "Elmina Castle", "West Africa", 5.0826, -1.3481, "elmina-castle", "Walk through"],
+  ["Z:Jago/Jago_Panotour.html", "Fort Coenraadsburg, Elmina", "West Africa", 5.0846, -1.3497, "", "Walk through"],
+  ["Z:Cape_Coast/Cape_Coast_Panotour.htm", "Cape Coast Castle", "West Africa", 5.10361, -1.24111, "cape-coast-castle", "Walk through"],
+  ["Z:Axim/Axim_Panotour.htm", "Fort St. Anthony, Axim", "West Africa", 4.8686, -2.2408, "", "Walk through"],
+  ["Z:Shama/Shama_Panotour.html", "Fort San Sebastian, Shama", "West Africa", 5.0099, -1.6334, "", "Walk through"],
+  ["Z:Besease/TourWeaver_Panorama_Besease.html", "Besease shrine", "West Africa", 6.7036, -1.4983, "", "Walk through"],
+  ["Z:Bunce_Island_Fort/index.htm", "Bunce Island", "West Africa", 8.56991, -13.04022, "bunce-island", "Walk through"],
+  ["Z:Djemila/Tourweaver_DjemilaTour.html", "Djémila", "North Africa", 36.31667, 5.73333, "", "Walk through"],
+  ["Z:castle_of_good_hope/index.htm", "Castle of Good Hope", "Southern Africa", -33.9259, 18.4278, "", "Walk through"],
+  ["Z:Bagan/1192_Naga_yon-hpaya/index.htm", "Bagan", "Myanmar", 21.1725, 94.86, "temples-of-bagan", "Naga-yon"],
+  ["Z:Bagan/154_Kyauk_ku_umin/index.htm", "Bagan", "Myanmar", 21.1725, 94.86, "temples-of-bagan", "Kyauk-ku-umin"],
+  ["T:Golconda_Tour/Golconda_Tour.html", "Golconda Fort", "South India", 17.38306, 78.40111, "", "Walk through"],
+  ["C:golconda-fort-1", "Golconda Fort", "South India", 17.38306, 78.40111, "", "360 photo", "Hemant Kumar"],
+  ["T:nagarjuna-konda/Nagarjunakonda.html", "Nagarjunakonda", "South India", 16.52189, 79.24285, "", "Walk through"],
+  ["T:Kailasanathar_Temple/Kailasanathar_Temple.html", "Kailasanathar Temple, Kanchipuram", "South India", 12.84231, 79.68967, "", "Walk through"],
+  ["T:Kamakshiamman_Temple/Kamakshiamman_Temple.html", "Kamakshi Amman Temple, Kanchipuram", "South India", 12.84068, 79.70324, "", "Walk through"],
+  ["T:Chandragiri_Fort_Tour/Chandragiri_Fort_Tour.html", "Chandragiri Fort", "South India", 13.5866, 79.3168, "", "Walk through"],
+  ["T:alampur-jogulamba-temple/Alampur_Jogulamba_Tour.html", "Alampur temples", "South India", 15.8784, 78.1338, "", "Walk through"],
+  ["C:virupaksha-temple-hampi", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Virupaksha courtyard", "Hemant Kumar"],
+  ["C:vittala-temple-hampi", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Stone chariot", "Hemant Kumar"],
+  ["F:dfaf413f0ce845a3b798b0bb4079962a", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Chariot 3D"],
+  ["F:9f2a30594cfc4141b8bd8ec94f6c85f5", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Mahanavami Dibba 3D"],
+  ["F:5ca97c7c70e1408bbd241c9466a040d8", "Hampi", "South India", 15.33444, 76.46222, "hampi", "From above 3D"],
+  ["C:bidar-fort", "Bidar", "South India", 17.92444, 77.52667, "", "360 photo", "Hemant Kumar"],
+  ["F:f1822a22fa584fdabcf1105ad863f29f", "Bidar", "South India", 17.92444, 77.52667, "", "Humayun Shah's tomb 3D"],
+  ["F:295c9496db134eb2a7e4d60f0ce8a73c", "Aihole", "South India", 16.01991, 75.88124, "", "3D"],
+  ["C:upper-shivalaya-area", "Badami", "South India", 15.91833, 75.68417, "", "360 photo", "Hemant Kumar"],
+  ["C:mysore-palace", "Mysore Palace", "South India", 12.30389, 76.65444, "", "360 photo", "KVS Setty"],
+  ["K:7lhk1", "Lepakshi", "South India", 13.81, 77.6, "", "360 photo", "uday029"],
+  ["F:510ad47a389c4c8780a1468719e4b339", "Mahabalipuram", "South India", 12.61639, 80.19861, "shore-temple", "Arjuna's Penance 3D"],
+  ["F:78ba4f358235443cb5ca216fee7ad561", "Mahabalipuram", "South India", 12.61639, 80.19861, "shore-temple", "Tiger Cave 3D"],
+];
+const KIND = {
+  S: { u: "https://app.spacery.dev/s/", by: "Photos: Mused." },
+  Z: { u: "https://www.zamaniproject.org/tl_files/data/panotours/", by: "Photos: the Zamani Project, University of Cape Town." },
+  M: { u: "https://my.matterport.com/show/?play=1&m=", by: "3D walk made for Egypt's Ministry of Tourism and Antiquities, 2020 and 2021." },
+  T: { u: "https://tours.touritvirtually.com/", by: "Photos: TouritVirtually." },
+  C: { u: "https://www.360cities.net/embed_iframe/", by: ", on 360Cities.", pic: 1 },
+  K: { u: "https://kuula.co/share/", end: "?fs=1&vr=0&thumbs=1&info=1", by: ", on Kuula.", pic: 1 },
+  F: { scan: 1 },
+};
+for (const [ref, name, g, lat, lon, page, t, who] of MORE){
+  const kind = KIND[ref[0]], ref1 = ref.slice(2), own = page && KBX[page], key = own ? page : "t:" + name;
+  const S = SITES[key] || (SITES[key] = {});
+  if (!S.name) S.name = name;
+  if (!S.g) S.g = g;
+  if (!S.ll) S.ll = [lat, lon];
+  if (kind.scan) (S.scans || (S.scans = [])).push({ u: ref1, t });
+  else (kind.pic ? (S.pics || (S.pics = [])) : (S.tours || (S.tours = []))).push({ url: kind.u + ref1 + (kind.end || ""), t, by: who ? "Photo: " + who + kind.by : kind.by });
+}
 for (const [path, name, g, lat, lon] of TOURS){
   const id = TK[path], own = id && KBX[id], key = own ? id : "t:" + path;
   const S = SITES[key] || (SITES[key] = { name, g, ll: [lat, lon] });
@@ -248,6 +408,7 @@ for (const [path, name, g, lat, lon] of TOURS){
   if (own && !S.name && / (built|rebuilt|begun|founded)$/i.test(KBX[id].name)) S.name = name;
   (S.tours || (S.tours = [])).unshift({ url: MCID + path + "/", t: "Walk through", by: CU + (S.year ? ", " + S.year + "." : ".") });
 }
+for (const S of Object.values(SITES)) if (S.tours) S.tours.sort((a, b) => (a.by === AIR) - (b.by === AIR));   /* walks before views from the air */
 const tourOnly = id => id.startsWith("t:");
 const live = id => SITES[id] && (tourOnly(id) || KBX[id]);
 const nameOf = id => SITES[id].name || KBX[id].name;
@@ -257,9 +418,10 @@ const css = document.createElement("style");
 css.textContent = `
 .siteview{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line-strong)}
 .siteview[hidden]{display:none}
-.svbar{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line-strong)}
-.svbar h2{flex:1 1 auto;min-width:0;margin:0 8px 0 2px;font-family:var(--display);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.svtabs{display:flex;flex-wrap:wrap;gap:6px}
+.svbar{flex:none;display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line-strong)}
+.svbar h2{flex:1 1 auto;min-width:5em;margin:0 8px 0 2px;font-family:var(--display);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svtabs{flex:0 1 auto;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+.svtabs .btn{flex:none}
 .svtabs[hidden]{display:none}
 .sitepop{position:absolute;z-index:6;min-width:190px;max-width:260px;max-height:260px;overflow:auto;padding:4px 10px;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);box-shadow:2px 2px 0 var(--shade)}
 .sitepop .sitem{padding:6px 2px;font-size:13.5px}
@@ -269,7 +431,7 @@ css.textContent = `
 .svnote:empty{display:none}
 .svframe{flex:1;min-height:0;position:relative;background:#000}
 .svframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-@media (max-width:760px){ .siteview{position:fixed;z-index:90} }`;
+@media (max-width:760px){ .siteview{position:fixed;z-index:90} .svbar{flex-wrap:wrap} .svtabs{order:3;flex-basis:100%} }`;
 document.head.append(css);
 
 const box = el("section", "siteview"); box.hidden = true; box.setAttribute("aria-label", "The site today");
@@ -280,7 +442,7 @@ bar.append(h, tabs, x); box.append(bar, note, frame);
 document.querySelector(".center").append(box);
 
 let cur = null;                                         /* the site on view */
-const views = S => [...(S.tours || []), ...(S.out ? [{ t: "Outside", p: S.out }] : []), ...(S.in ? [{ t: "Inside", p: S.in }] : []), ...(S.scans || [])];
+const views = S => [...(S.tours || []), ...(S.out ? [{ t: "Outside", p: S.out }] : []), ...(S.in ? [{ t: "Inside", p: S.in }] : []), ...(S.sv || []), ...(S.pics || []), ...(S.scans || [])];
 function show(id, i){
   const S = SITES[id], V = views(S);
   for (const [j, b] of [...tabs.children].entries()) b.setAttribute("aria-pressed", j === i);
@@ -331,7 +493,7 @@ window.sitesLibrary = sec => {
   const ids = Object.keys(SITES).filter(live);
   if (!ids.length) return;
   const D = sec("sites", "Sites today", ids.length, "Sites");
-  D.append(el("p", "spint", "The place as it stands now: photo tours you can walk through, Street View outside and in, and 3D scans made from visitors' photos. The pins on the map are the same places."));
+  D.append(el("p", "spint", "The place as it stands now: photo tours you can walk through, single 360 photos, Street View outside and in, and 3D scans made from visitors' photos. The pins on the map are the same places."));
   const G = new Map();
   for (const id of ids){ const g = SITES[id].g || "Elsewhere"; if (!G.has(g)) G.set(g, []); G.get(g).push(id); }
   for (const g of [...G.keys()].sort((a, b) => a.localeCompare(b))){

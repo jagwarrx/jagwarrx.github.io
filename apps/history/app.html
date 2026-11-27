@@ -1329,7 +1329,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
       <li><b>A map of borders.</b> The map shows the territories of the selected regions in the red line's year. Map, at the top, makes it fill the chart's space; Minimize turns it into a small window over the chart that you can drag and resize. Events and overlay items sit where Wikipedia or Wikidata places them (people at their birthplace, from age 20 to their death); the rest show when the red line is within some years of them, and the map says which years. Opening something moves the map to it: a state to its territory, outlined in red. Drag the map to pan, scroll or pinch to zoom, or use Zoom to area. Borders come from historical-basemaps, about 50 snapshots from 3000 BCE to 2010, with the borders of today from Natural Earth; the map shows the nearest snapshot at or before the year.</li>
       <li><b>Search and share.</b> Search finds states, events, people and years; press / to start. The address bar keeps the year, regions, layers, detail and what is open, so Share view copies a link that opens the same view. Keys: Left and Right step the year, Space plays and pauses, 1, 2 and 3 set the detail, S opens the library, Escape closes.</li>
       <li><b>Pages.</b> About 5,900 short pages sit behind the chart, on states, peoples, events, people, works and places. Open one from a card, a link or the search. Links in the text go to other pages; a link with no page yet says so. Hold Shift and click a link to keep that page open in a sidebar while you read on.</li>
-      <li><b>Library.</b> The Library button lists the stories, the voices, the videos and the sites. A site opens as it stands today: photo tours you can walk through, Street View outside and in, and 3D scans made from visitors' photos. View the site on its card does the same, and so does its pin on the map, shown once the map is zoomed in to about a country; the Sites button above the map hides the pins. A voice is a passage in the words of someone who was there, copied from a named source. A story plays like a short film: the chart and the map travel from step to step while the text is read out. Pause at any time, look around, and press play to carry on. The voice is your browser's and can be switched off.</li>
+      <li><b>Library.</b> The Library button lists the stories, the voices, the videos and the sites. A site opens as it stands today: photo tours you can walk through, single 360 photos, Street View outside and in, and 3D scans made from visitors' photos. View the site on its card does the same, and so does its pin on the map, shown once the map is zoomed in to about a country; the Sites button above the map hides the pins. A voice is a passage in the words of someone who was there, copied from a named source. A story plays like a short film: the chart and the map travel from step to step while the text is read out. Pause at any time, look around, and press play to carry on. The voice is your browser's and can be switched off.</li>
       <li><b>Ask the map.</b> Ask a question and Claude builds a story from the chart to answer it; Ask about this, on a card, answers questions about one item. Both need your own Anthropic API key, which stays in your browser, and each question costs you a few cents.</li>
       <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
       <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
@@ -1354,20 +1354,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=cdaa8674e0"></script>
-<script src="books.js?v=cdaa8674e0"></script>
-<script src="videos.js?v=cdaa8674e0"></script>
-<script src="stories.js?v=cdaa8674e0"></script>
-<script src="deep.js?v=cdaa8674e0"></script>
-<script src="famous.js?v=cdaa8674e0"></script>
-<script src="kb.js?v=cdaa8674e0"></script>
-<script src="people/portraits.js?v=cdaa8674e0"></script>
-<script src="ovpics.js?v=cdaa8674e0"></script>
-<script src="kinds.js?v=cdaa8674e0"></script>
-<script src="events.js?v=cdaa8674e0"></script>
+<script src="hier.js?v=d1c57cf6bd"></script>
+<script src="books.js?v=d1c57cf6bd"></script>
+<script src="videos.js?v=d1c57cf6bd"></script>
+<script src="stories.js?v=d1c57cf6bd"></script>
+<script src="deep.js?v=d1c57cf6bd"></script>
+<script src="famous.js?v=d1c57cf6bd"></script>
+<script src="kb.js?v=d1c57cf6bd"></script>
+<script src="people/portraits.js?v=d1c57cf6bd"></script>
+<script src="ovpics.js?v=d1c57cf6bd"></script>
+<script src="kinds.js?v=d1c57cf6bd"></script>
+<script src="events.js?v=d1c57cf6bd"></script>
 <script>
 "use strict";
-const VER = "?v=cdaa8674e0";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=d1c57cf6bd";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -4199,9 +4199,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=cdaa8674e0"></script>
-<script src="routes.js?v=cdaa8674e0"></script>
-<script src="map.js?v=cdaa8674e0"></script>
+<script src="geo.js?v=d1c57cf6bd"></script>
+<script src="routes.js?v=d1c57cf6bd"></script>
+<script src="map.js?v=d1c57cf6bd"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -4248,15 +4248,15 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=cdaa8674e0"></script>
-<script src="sidebar.js?v=cdaa8674e0"></script>
-<script src="connections.js?v=cdaa8674e0"></script>
-<script src="cx.js?v=cdaa8674e0"></script>
+<script src="ask.js?v=d1c57cf6bd"></script>
+<script src="sidebar.js?v=d1c57cf6bd"></script>
+<script src="connections.js?v=d1c57cf6bd"></script>
+<script src="cx.js?v=d1c57cf6bd"></script>
 <script src="super/mongols.js?v=1122p"></script>
 <script src="super/mongols.voice.js?v=1122p"></script>
 <script src="super.js?v=1122q"></script>
-<script src="daily.js?v=cdaa8674e0"></script>
-<script src="sites.js?v=cdaa8674e0"></script>
+<script src="daily.js?v=d1c57cf6bd"></script>
+<script src="sites.js?v=d1c57cf6bd"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
