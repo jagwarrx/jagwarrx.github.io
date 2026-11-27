@@ -14,6 +14,7 @@
 ## Writing
 
 - [Active Learning Is the Only Learning](https://hmeyy.com/essays/active-learning.html): Reading is not learning. Reading is familiarizing. Thinking, reasoning and recalling are learning.
+- [Modelling ADHD Attention as a Stack](https://hmeyy.com/essays/adhd-attention-stack.html): ADHD attention works like a stack: the last thing in is the first thing out, and only the top is top of mind. Importance doesn’t move an item up; only being new does. So build the priority queue outside, and let the head be a stack.
 - [What Difference Does ADHD Medication Make?](https://hmeyy.com/essays/adhd-medication.html): It turns the noise down. It doesn't choose what to focus on, and it doesn't pick itself up from the pharmacy. A practical answer, not medical advice.
 - [The ADHD Monkey Wrench: Diffused Attention](https://hmeyy.com/essays/adhd-monkey-wrench.html): Diffused attention affects sustained attention. I can focus only when something is novel or high stakes, so important things wait until they seem dangerous and new things get done at once. The fix is to borrow the stakes early, on purpose.
 - [The ADHD Version of the Need](https://hmeyy.com/essays/adhd-version-of-the-need.html): The need for meaning under uncertainty is the same in ADHD, but its time horizon isn't: the far future pulls less and the next ten minutes pull more. How that works, why the traits survive, and what follows.
