@@ -1354,20 +1354,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=d1c57cf6bd"></script>
-<script src="books.js?v=d1c57cf6bd"></script>
-<script src="videos.js?v=d1c57cf6bd"></script>
-<script src="stories.js?v=d1c57cf6bd"></script>
-<script src="deep.js?v=d1c57cf6bd"></script>
-<script src="famous.js?v=d1c57cf6bd"></script>
-<script src="kb.js?v=d1c57cf6bd"></script>
-<script src="people/portraits.js?v=d1c57cf6bd"></script>
-<script src="ovpics.js?v=d1c57cf6bd"></script>
-<script src="kinds.js?v=d1c57cf6bd"></script>
-<script src="events.js?v=d1c57cf6bd"></script>
+<script src="hier.js?v=e4ffa2e881"></script>
+<script src="books.js?v=e4ffa2e881"></script>
+<script src="videos.js?v=e4ffa2e881"></script>
+<script src="stories.js?v=e4ffa2e881"></script>
+<script src="deep.js?v=e4ffa2e881"></script>
+<script src="famous.js?v=e4ffa2e881"></script>
+<script src="kb.js?v=e4ffa2e881"></script>
+<script src="people/portraits.js?v=e4ffa2e881"></script>
+<script src="ovpics.js?v=e4ffa2e881"></script>
+<script src="kinds.js?v=e4ffa2e881"></script>
+<script src="events.js?v=e4ffa2e881"></script>
 <script>
 "use strict";
-const VER = "?v=d1c57cf6bd";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=e4ffa2e881";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -4199,9 +4199,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=d1c57cf6bd"></script>
-<script src="routes.js?v=d1c57cf6bd"></script>
-<script src="map.js?v=d1c57cf6bd"></script>
+<script src="geo.js?v=e4ffa2e881"></script>
+<script src="routes.js?v=e4ffa2e881"></script>
+<script src="map.js?v=e4ffa2e881"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -4248,15 +4248,15 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=d1c57cf6bd"></script>
-<script src="sidebar.js?v=d1c57cf6bd"></script>
-<script src="connections.js?v=d1c57cf6bd"></script>
-<script src="cx.js?v=d1c57cf6bd"></script>
+<script src="ask.js?v=e4ffa2e881"></script>
+<script src="sidebar.js?v=e4ffa2e881"></script>
+<script src="connections.js?v=e4ffa2e881"></script>
+<script src="cx.js?v=e4ffa2e881"></script>
 <script src="super/mongols.js?v=1122p"></script>
 <script src="super/mongols.voice.js?v=1122p"></script>
 <script src="super.js?v=1122q"></script>
-<script src="daily.js?v=d1c57cf6bd"></script>
-<script src="sites.js?v=d1c57cf6bd"></script>
+<script src="daily.js?v=e4ffa2e881"></script>
+<script src="sites.js?v=e4ffa2e881"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }

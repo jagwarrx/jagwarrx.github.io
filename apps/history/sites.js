@@ -10,7 +10,9 @@
    TOURS: Columbia's Media Center for Art History panorama tours, [folder, name, group, lat, lon]; TK ties a tour to its page.
      A tour with a page joins that page's site; one without a page is a site of its own ("t:" + folder), on the map and in the Library.
    MORE: other hosts, [kind:id, site name, group, lat, lon, page id or "", tab name, photographer]. Rows with one site name make one site
-     ("t:" + name when there is no page). Kinds in KIND below: walkable tours, single 360 photos (after Street View) and Sketchfab scans.
+     ("t:" + name when there is no page). Kinds in KIND below: walkable tours, CyArk's narrated 3D tours (their terms: free to embed with
+     "Explore X on Tapestry by CyArk" shown), single 360 photos (after Street View) and Sketchfab scans. 360Cities was dropped: it refuses
+     embeds on hmeyy.com. Test a new host from a page on hmeyy.com, not from localhost.
    Each point, scan and tour was checked by eye (26 and 27 Nov 2026). */
 (() => {
 const MCID = "https://mcid.mcah.columbia.edu/media/panos/pano-tours/", CU = "Photos: Media Center for Art History, Columbia University";
@@ -39,7 +41,7 @@ const SITES = {
   "t:Gol Gumbaz":               { name: "Gol Gumbaz", g: "South India", in: [16.83020, 75.73600, 0] },
   "t:Pattadakal":               { name: "Pattadakal", g: "South India", out: [15.95140, 75.81470, 20] },
   "t:Belur":                    { name: "Chennakeshava Temple, Belur", g: "South India", out: [13.16250, 75.86060, 90] },
-  "t:Badami":                   { out: [15.91830, 75.68420, 90] },
+  "t:Badami":                   { name: "Badami", g: "South India", out: [15.91830, 75.68420, 90] },
   "notre-dame-de-paris":   { out: [48.85300, 2.34900, 90], in: [48.85296, 2.35010, 90], scans: [{ u: "461a9a51ba1b40bc942b5dfa04c1100f", t: "3D" }],
                              note: "The walk and the 3D scan were made before the 2019 fire." },
 };
@@ -338,9 +340,9 @@ const MORE = [
   ["S:972a30e68407/the-theatre-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Theatre"],
   ["S:83d1df3e1381/the-great-temple-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Great Temple"],
   ["S:f8e50bb3b5ec/the-monastery-ad-deir-petra-jordan", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Monastery"],
-  ["S:3fc7e3b65580/the-hieroglpyhic-stairway-and-temples-20-and-22-copan-ruinas", "Copán", "Central America", 14.8375, -89.1425, "copan", "Hieroglyphic Stairway"],
-  ["S:a861c4972c08/the-acropolis-copan-ruinas-honduras", "Copán", "Central America", 14.8375, -89.1425, "copan", "Acropolis"],
-  ["S:e905b68b48e0/the-rosalila-temple-and-altar-q-copan-ruinas", "Copán", "Central America", 14.8375, -89.1425, "copan", "Rosalila and Altar Q"],
+  ["S:3fc7e3b65580/the-hieroglpyhic-stairway-and-temples-20-and-22-copan-ruinas", "Copán", "Mexico and Central America", 14.8375, -89.1425, "copan", "Hieroglyphic Stairway"],
+  ["S:a861c4972c08/the-acropolis-copan-ruinas-honduras", "Copán", "Mexico and Central America", 14.8375, -89.1425, "copan", "Acropolis"],
+  ["S:e905b68b48e0/the-rosalila-temple-and-altar-q-copan-ruinas", "Copán", "Mexico and Central America", 14.8375, -89.1425, "copan", "Rosalila and Altar Q"],
   ["Z:Lalibela/TourWeaver_Panorama_Lalibela_Final.html", "Lalibela", "East Africa", 12.0317, 39.0411, "rock-hewn-churches-of-lalibela", "Walk through"],
   ["Z:Gondar/index.htm", "Fasil Ghebbi, Gondar", "East Africa", 12.6075, 37.47, "", "Walk through"],
   ["Z:Meroe/Meroe_North.html", "Pyramids of Meroë", "East Africa", 16.93833, 33.74917, "", "Walk through"],
@@ -362,33 +364,77 @@ const MORE = [
   ["Z:Bagan/1192_Naga_yon-hpaya/index.htm", "Bagan", "Myanmar", 21.1725, 94.86, "temples-of-bagan", "Naga-yon"],
   ["Z:Bagan/154_Kyauk_ku_umin/index.htm", "Bagan", "Myanmar", 21.1725, 94.86, "temples-of-bagan", "Kyauk-ku-umin"],
   ["T:Golconda_Tour/Golconda_Tour.html", "Golconda Fort", "South India", 17.38306, 78.40111, "", "Walk through"],
-  ["C:golconda-fort-1", "Golconda Fort", "South India", 17.38306, 78.40111, "", "360 photo", "Hemant Kumar"],
   ["T:nagarjuna-konda/Nagarjunakonda.html", "Nagarjunakonda", "South India", 16.52189, 79.24285, "", "Walk through"],
   ["T:Kailasanathar_Temple/Kailasanathar_Temple.html", "Kailasanathar Temple, Kanchipuram", "South India", 12.84231, 79.68967, "", "Walk through"],
   ["T:Kamakshiamman_Temple/Kamakshiamman_Temple.html", "Kamakshi Amman Temple, Kanchipuram", "South India", 12.84068, 79.70324, "", "Walk through"],
   ["T:Chandragiri_Fort_Tour/Chandragiri_Fort_Tour.html", "Chandragiri Fort", "South India", 13.5866, 79.3168, "", "Walk through"],
   ["T:alampur-jogulamba-temple/Alampur_Jogulamba_Tour.html", "Alampur temples", "South India", 15.8784, 78.1338, "", "Walk through"],
-  ["C:virupaksha-temple-hampi", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Virupaksha courtyard", "Hemant Kumar"],
-  ["C:vittala-temple-hampi", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Stone chariot", "Hemant Kumar"],
   ["F:dfaf413f0ce845a3b798b0bb4079962a", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Chariot 3D"],
   ["F:9f2a30594cfc4141b8bd8ec94f6c85f5", "Hampi", "South India", 15.33444, 76.46222, "hampi", "Mahanavami Dibba 3D"],
   ["F:5ca97c7c70e1408bbd241c9466a040d8", "Hampi", "South India", 15.33444, 76.46222, "hampi", "From above 3D"],
-  ["C:bidar-fort", "Bidar", "South India", 17.92444, 77.52667, "", "360 photo", "Hemant Kumar"],
   ["F:f1822a22fa584fdabcf1105ad863f29f", "Bidar", "South India", 17.92444, 77.52667, "", "Humayun Shah's tomb 3D"],
   ["F:295c9496db134eb2a7e4d60f0ce8a73c", "Aihole", "South India", 16.01991, 75.88124, "", "3D"],
-  ["C:upper-shivalaya-area", "Badami", "South India", 15.91833, 75.68417, "", "360 photo", "Hemant Kumar"],
-  ["C:mysore-palace", "Mysore Palace", "South India", 12.30389, 76.65444, "", "360 photo", "KVS Setty"],
   ["K:7lhk1", "Lepakshi", "South India", 13.81, 77.6, "", "360 photo", "uday029"],
   ["F:510ad47a389c4c8780a1468719e4b339", "Mahabalipuram", "South India", 12.61639, 80.19861, "shore-temple", "Arjuna's Penance 3D"],
   ["F:78ba4f358235443cb5ca216fee7ad561", "Mahabalipuram", "South India", 12.61639, 80.19861, "shore-temple", "Tiger Cave 3D"],
+  ["Y:amarbayasgalant", "Amarbayasgalant Monastery", "Mongolia", 49.48, 105.085, "", "3D tour", "Amarbayasgalant Monastery"],
+  ["Y:choijin-lama", "Choijin Lama Temple", "Mongolia", 47.91477, 106.91907, "", "3D tour", "Choijin Lama Temple"],
+  ["Y:areni-cave", "Areni-1 cave", "Armenia", 39.73132, 45.20312, "", "3D tour", "Areni-1 Cave"],
+  ["Y:bagerhat", "Sixty Dome Mosque", "Bangladesh and Nepal", 22.67445, 89.74182, "sixty-dome-mosque", "3D tour", "the Sixty Dome Mosque"],
+  ["Y:patan", "Patan Durbar Square", "Bangladesh and Nepal", 27.6727, 85.32512, "", "3D tour", "Patan Durbar Square"],
+  ["Y:elephanta", "Elephanta Caves", "India", 18.96304, 72.93174, "", "3D tour", "the Elephanta Caves"],
+  ["Y:gateway-of-india", "Gateway of India", "India", 18.922, 72.8347, "", "3D tour", "the Gateway of India"],
+  ["Y:jaigarh-fort", "Jaigarh Fort", "India", 26.98307, 75.8443, "", "3D tour", "Jaigarh Fort"],
+  ["Y:preah-vihear", "Preah Vihear", "Southeast Asia", 14.3903, 104.68021, "", "3D tour", "Preah Vihear"],
+  ["Y:watarun", "Wat Arun", "Southeast Asia", 13.74361, 100.48889, "", "3D tour", "Wat Arun"],
+  ["Y:san-sebastian-basilica", "San Sebastian Basilica, Manila", "Southeast Asia", 14.59968, 120.98906, "", "3D tour", "San Sebastian Basilica"],
+  ["Y:jabal-banat", "Hegra", "Arabia", 26.78861, 37.95999, "hegra-madain-salih", "3D tour", "Jabal AlBanat at Hegra"],
+  ["Y:fujairah", "Fujairah Fort", "Arabia", 25.13861, 56.33712, "", "3D tour", "Fujairah Fort"],
+  ["Y:madaba", "Madaba Map", "Jordan", 31.716, 35.7939, "madaba-map", "3D tour", "St George's Church and the Madaba Map"],
+  ["Y:petra", "Petra", "Jordan", 30.3285, 35.4444, "petra", "Ad Deir 3D", "Ad Deir at Petra"],
+  ["Y:el-jem", "Amphitheatre of El Jem", "North Africa", 35.29643, 10.70671, "amphitheatre-of-el-jem", "3D tour", "El Jem"],
+  ["Y:kurru", "El-Kurru", "East Africa", 18.40925, 31.77046, "", "3D tour", "El Kurru"],
+  ["Y:kilwa-kisiwani", "Kilwa Kisiwani", "East Africa", -8.95921, 39.49819, "", "Great Mosque 3D", "the Great Mosque of Kilwa Kisiwani"],
+  ["Y:djenne", "Great Mosque of Djenné", "West Africa", 13.90516, -4.55548, "great-mosque-of-djenne", "3D tour", "the Great Mosque of Djenné"],
+  ["Y:busanyin-shrine", "Osun-Osogbo grove", "West Africa", 7.75873, 4.55626, "", "3D tour", "the Busanyin Shrine at Osun-Osogbo"],
+  ["Y:great-zimbabwe", "Great Zimbabwe", "Southern Africa", -20.27279, 30.93425, "great-enclosure", "3D tour", "Great Zimbabwe"],
+  ["Y:pompeii-forum", "Pompeii", "Campania", 40.746, 14.4989, "vesuvius-buries-pompeii", "3D tour", "the Forum of Pompeii"],
+  ["Y:civita", "Civita di Bagnoregio", "Around Rome", 42.62776, 12.11374, "", "3D tour", "Civita di Bagnoregio"],
+  ["Y:temple-of-apollo", "Portara, Naxos", "Greece", 37.1105, 25.3727, "", "3D tour", "the Temple of Apollo at Naxos"],
+  ["Y:qassiarsuk", "Brattahlíð", "Greenland", 61.1496, -45.5148, "", "3D tour", "Qassiarsuk"],
+  ["Y:rapanui", "Rapa Nui", "Rapa Nui", -27.07447, -109.32241, "moai-of-rapa-nui", "Anakena", "the moai at Anakena"],
+  ["Y:orongo", "Rapa Nui", "Rapa Nui", -27.18978, -109.44316, "moai-of-rapa-nui", "Orongo", "Orongo"],
+  ["Y:chan-chan", "Chan Chan", "Peru", -8.10583, -79.07444, "chan-chan", "3D tour", "Chan Chan"],
+  ["Y:ouro-preto", "Ouro Preto gold mine", "Brazil", -20.37638, -43.5161, "", "3D tour", "the Ouro Preto gold mine"],
+  ["Y:lamanai", "Lamanai", "Mexico and Central America", 17.765, -88.65301, "lamanai", "3D tour", "Lamanai"],
+  ["Y:bartolome", "San Bartolomé, Chihuahua", "Mexico and Central America", 26.93935, -105.39376, "", "3D tour", "San Bartolomé Church"],
+  ["Y:cliff-palace", "Cliff Palace, Mesa Verde", "American Southwest", 37.16686, -108.47336, "cliff-palace-mesa-verde", "3D tour", "Cliff Palace"],
+  ["Y:balcony-house", "Balcony House, Mesa Verde", "American Southwest", 37.16153, -108.4647, "", "Balcony House", "Balcony House"],
+  ["Y:resonant-balcony-house", "Balcony House, Mesa Verde", "American Southwest", 37.24275, -108.63027, "", "A Hopi lens", "Balcony House through a Hopi lens"],
+  ["Y:resonant-wupatki-pueblo", "Wupatki Pueblo", "American Southwest", 35.52119, -111.37546, "", "3D tour", "Wupatki Pueblo"],
+  ["Y:butler-wash", "Bears Ears ruins", "American Southwest", 37.52445, -109.89578, "", "Butler Wash", "Butler Wash"],
+  ["Y:house-on-fire", "Bears Ears ruins", "American Southwest", 37.54421, -109.74411, "", "House on Fire", "House on Fire"],
+  ["Y:mule-canyon-village", "Bears Ears ruins", "American Southwest", 37.53941, -109.7416, "", "Mule Canyon", "Mule Canyon Village"],
+  ["Y:river-house", "Bears Ears ruins", "American Southwest", 37.29789, -109.54533, "", "River House", "River House"],
+  ["Y:monarch", "Bears Ears ruins", "American Southwest", 37.35737, -109.6637, "", "Monarch Cave", "Monarch Cave"],
+  ["Y:dinetah", "Dinétah petroglyphs", "American Southwest", 36.54756, -107.62939, "", "3D tour", "Dinétah"],
+  ["Y:chumash", "Chumash Painted Cave", "United States", 34.50418, -119.78761, "", "3D tour", "Chumash Painted Cave"],
+  ["Y:sue-meg", "Sumêg Yurok village", "United States", 41.13716, -124.15665, "", "3D tour", "Sumêg Village"],
+  ["Y:totem-bight", "Totem Bight", "United States", 55.42012, -131.77511, "", "3D tour", "Totem Bight"],
+  ["Y:weaverville-joss-house", "Weaverville Joss House", "United States", 40.73182, -122.9431, "", "3D tour", "the Weaverville Joss House"],
+  ["Y:george-wythe-house", "George Wythe House, Williamsburg", "United States", 37.1617, -76.42, "", "3D tour", "the George Wythe House"],
+  ["Y:lincoln-memorial", "Lincoln Memorial", "United States", 38.88926, -77.05019, "", "3D tour", "the Lincoln Memorial"],
+  ["Y:mount-rushmore", "Mount Rushmore", "United States", 43.8792, -103.4583, "", "3D tour", "Mount Rushmore"],
+  ["Y:stonewall", "Stonewall Inn", "United States", 40.73357, -74.00235, "stonewall-riots", "3D tour", "the Stonewall Inn"],
+  ["Y:uss-utah", "USS Utah, Pearl Harbor", "United States", 21.365, -157.95, "attack-on-pearl-harbor", "3D tour", "the USS Utah Memorial"],
 ];
 const KIND = {
   S: { u: "https://app.spacery.dev/s/", by: "Photos: Mused." },
   Z: { u: "https://www.zamaniproject.org/tl_files/data/panotours/", by: "Photos: the Zamani Project, University of Cape Town." },
   M: { u: "https://my.matterport.com/show/?play=1&m=", by: "3D walk made for Egypt's Ministry of Tourism and Antiquities, 2020 and 2021." },
   T: { u: "https://tours.touritvirtually.com/", by: "Photos: TouritVirtually." },
-  C: { u: "https://www.360cities.net/embed_iframe/", by: ", on 360Cities.", pic: 1 },
   K: { u: "https://kuula.co/share/", end: "?fs=1&vr=0&thumbs=1&info=1", by: ", on Kuula.", pic: 1 },
+  Y: { u: "https://tapestry.cyark.org/content/", cy: 1 },
   F: { scan: 1 },
 };
 for (const [ref, name, g, lat, lon, page, t, who] of MORE){
@@ -398,7 +444,7 @@ for (const [ref, name, g, lat, lon, page, t, who] of MORE){
   if (!S.g) S.g = g;
   if (!S.ll) S.ll = [lat, lon];
   if (kind.scan) (S.scans || (S.scans = [])).push({ u: ref1, t });
-  else (kind.pic ? (S.pics || (S.pics = [])) : (S.tours || (S.tours = []))).push({ url: kind.u + ref1 + (kind.end || ""), t, by: who ? "Photo: " + who + kind.by : kind.by });
+  else (kind.pic ? (S.pics || (S.pics = [])) : (S.tours || (S.tours = []))).push({ url: kind.u + ref1 + (kind.end || ""), t, by: kind.cy ? "Explore " + who + " on Tapestry by CyArk." : who ? "Photo: " + who + kind.by : kind.by });
 }
 for (const [path, name, g, lat, lon] of TOURS){
   const id = TK[path], own = id && KBX[id], key = own ? id : "t:" + path;
@@ -451,7 +497,7 @@ function show(id, i){
   f.allowFullscreen = true; f.title = h.textContent + ": " + v.t;
   note.textContent = [S.note, v.by].filter(Boolean).join(" ");
   if (v.p){ const [lat, lon, hd] = v.p; f.src = `https://maps.google.com/maps?layer=c&cbll=${lat},${lon}&cbp=11,${hd},0,0,0&output=svembed`; }
-  else if (v.url){ f.src = v.url; f.allow = "fullscreen; xr-spatial-tracking; gyroscope; accelerometer"; }
+  else if (v.url){ f.src = v.url; f.allow = "fullscreen; autoplay; xr-spatial-tracking; gyroscope; accelerometer"; }
   else { f.src = `https://sketchfab.com/models/${v.u}/embed?autostart=1&ui_theme=dark&dnt=1`; f.allow = "autoplay; fullscreen; xr-spatial-tracking"; }
   frame.append(f);
 }
