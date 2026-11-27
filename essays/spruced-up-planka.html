@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spruced Up Planka — Hari Meyyappan</title>
+<link rel="canonical" href="https://hmeyy.com/essays/spruced-up-planka.html">
+<meta name="description" content="Planka is a free, open kanban board. Its calendar and timeline are paid. I kept its look and built what I needed on top: time on a calendar, swimlanes by date, focus blocks with targets, templates and typed fields. The full list of changes to the Community edition.">
+<meta property="og:title" content="Spruced Up Planka — Hari Meyyappan">
+<meta property="og:description" content="Planka is a free, open kanban board. Its calendar and timeline are paid. I kept its look and built what I needed on top: time on a calendar, swimlanes by date, focus blocks with targets, templates and typed fields. The full list of changes to the Community edition.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hmeyy.com/essays/spruced-up-planka.html">
+<meta property="og:image" content="https://hmeyy.com/img/portrait-ink-2.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="alternate" type="application/atom+xml" title="Essays feed" href="../feed.xml">
+<script>
+if (self !== top) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('DOMContentLoaded', () => document.querySelectorAll('a[href]').forEach(a => a.target = '_top'));
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Spruced Up Planka", "description": "Planka is a free, open kanban board. Its calendar and timeline are paid. I kept its look and built what I needed on top: time on a calendar, swimlanes by date, focus blocks with targets, templates and typed fields. The full list of changes to the Community edition.", "url": "https://hmeyy.com/essays/spruced-up-planka.html", "mainEntityOfPage": "https://hmeyy.com/essays/spruced-up-planka.html", "author": {"@type": "Person", "name": "Hari Meyyappan", "url": "https://hmeyy.com/"}, "datePublished": "2026-11-27"}</script>
+</head>
+<body class="doc">
+<div class="layout">
+<aside class="side">
+<a class="brand" href="../index.html">Hari Meyyappan</a>
+<nav aria-label="Contents">
+<div class="label">Contents</div>
+<div class="toc">
+<a href="../index.html#about">About</a>
+<a href="../index.html#work">Work</a>
+<a href="../index.html#tools">Tools</a>
+<a class="page" href="index.html">Essays</a>
+<a class="on" href="../zettelkasten/index.html" aria-current="page">Zettelkasten</a>
+<a href="../quotes/index.html">Quotes</a>
+<a href="../concepts/index.html">Concepts</a>
+<a href="../archive.html">Archive</a>
+</div>
+</nav>
+<nav aria-label="Contact" class="contact">
+<div class="label">Contact</div>
+<a href="mailto:hari.m.subbiah@gmail.com">Email</a>
+<a href="https://www.linkedin.com/in/harimeyy/">LinkedIn</a>
+<a href="https://github.com/jagwarrx">GitHub</a>
+</nav>
+</aside>
+<div class="wrap">
+
+<main class="essay">
+  <h1>Spruced Up Planka</h1>
+  <p class="meta">November 2026. 599 words.</p>
+
+<p>Planka is an open-source kanban board that looks like Trello and runs on my own machine. The free Community edition is good. The calendar, the timeline and the rest of what I wanted are in the paid Pro edition.</p>
+<p>So I made my own copy of Community 2.3.1. Its licence allows that for personal use. I kept the look exactly and wrote every new feature from scratch, without Pro&rsquo;s code. It has one user: me. This is the list of what changed.</p>
+
+<h2>Time</h2>
+<ul>
+<li><b>Calendar view</b> across all my projects or just one: month, week, three days and a single day. Drag a card to another day.</li>
+<li><b>Timeline view</b>: a bar from each card&rsquo;s start to its due date. Drag to move it, drag an end to resize.</li>
+<li><b>Day calendar beside the board</b>: drag a card or a task onto a time slot, as many times as it needs. A <i>To schedule</i> list shows what has no time yet.</li>
+<li><b>Start dates</b> on cards and <b>due dates</b> on tasks.</li>
+<li><b>Repeating cards</b>: closing one makes the next.</li>
+</ul>
+
+<h2>Boards</h2>
+<ul>
+<li>Every board starts with the same four lists: <b>Backlog, Next, Doing, Done</b>.</li>
+<li><b>Swimlanes</b>: Today, This week and Later, worked out from due dates and sessions. Dropping a card in a lane sets its date. Backlog and Done don&rsquo;t split.</li>
+<li>Lists can be added and renamed in the swimlanes view too.</li>
+<li>Plain Trello-style background colours for boards.</li>
+</ul>
+
+<h2>Home</h2>
+<ul>
+<li>My own <b>headings</b> instead of the fixed groups; drag projects between them.</li>
+<li><b>View all</b>: one kanban for a whole heading, with lists of the same name merged.</li>
+<li>A project opens the board I used last. Edit mode stays on.</li>
+<li><b>Cmd+K</b> searches projects, boards and cards.</li>
+</ul>
+
+<h2>Cards</h2>
+<ul>
+<li><b>Estimates</b>: tasks pick 1, 2, 3, 5 or 8; a card takes any number or adds up its tasks.</li>
+<li><b>Typed custom fields</b>: text, number, date, checkbox, dropdown and link.</li>
+<li><b>Templates</b>: mark a card as a template, then start new cards from it on any board.</li>
+<li>A card can <b>link a project</b>, so a card on one board opens another project.</li>
+<li>A done button on each card, and video attachments that play.</li>
+</ul>
+
+<h2>Focus blocks</h2>
+<p>Blocks follow <a href="block-method.html">the Block Method</a>.</p>
+<ul>
+<li><b>Start block</b> asks one question first: how will I start? Then a 25-minute countdown shows on the card and in the top bar.</li>
+<li>At the end, a short log: what I did, with an editable start time. Blocks live in their own section on the card.</li>
+<li><b>Log block</b> records a block I ran on paper, without the timer, for when I <a href="log-the-block.html">log the block instead of starting it</a>.</li>
+<li>The top bar shows <b>blocks done today against the day&rsquo;s target</b>.</li>
+<li>A <b>weekly report</b>: blocks per board per day, targets for each day and each board, what is left this week, and a copy button for a spreadsheet.</li>
+<li>Each board can have a total and a due date. The report shows the current rate, the rate needed, and when I&rsquo;ll finish at this pace.</li>
+</ul>
+
+<h2>One user</h2>
+<ul>
+<li>Logs in by itself on my machine.</li>
+<li>Hides members, joining, subscribing and the other team features.</li>
+</ul>
+
+<h2>Next</h2>
+<p>A dark theme, selecting several cards at once, quick capture by pasting, and a dashboard page to start the day.</p>
+
+<h2>Why bother</h2>
+<p>Stock Planka is a good surface. What I needed was time: which card, when, for how long, and whether I&rsquo;m on pace. Building on an app I already liked kept the parts that worked and let me add only those. It is <a href="the-same-list.html">the same list</a> with a better surface.</p>
+
+<ul class="related">
+<li><a href="the-same-list.html">Own the list, rent the app</a></li>
+<li><a href="block-method.html">The Block Method</a></li>
+<li><a href="log-the-block.html">Log the Block, Don&rsquo;t Start It</a></li>
+<li><a href="adhd-system-language.html">The Language of an ADHD System</a></li>
+<li><a href="removing-bullshit.html">Removing Bullshit</a></li>
+<li><a href="../zettelkasten/index.html">All notes</a></li>
+</ul>
+
+  <footer>Plain HTML. No tracking. Last updated November 2026. <a href="../feed.xml">RSS</a></footer>
+</main>
+
+</div>
+<script src="../js/toc.js" defer></script>
+</div>
+<script src="../js/stack.js" defer></script>
+</body>
+</html>
