@@ -849,6 +849,20 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 /* short first: the rest of a long page waits behind Read more */
 .kbt.clip>:not([hidden]):has(+[hidden]){margin-bottom:4px}
 .morebt[hidden]{display:none}
+.ltabs{display:flex;gap:16px;margin:2px 0 10px;border-bottom:1px solid var(--line)}
+.ltab{border:0;background:none;padding:4px 0 6px;margin-bottom:-1px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.ltab[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.lifel{display:none;list-style:none;margin:0 0 10px;padding:0}
+.lifeon .lifel{display:block}
+.lifeon .kbt,.lifeon .morebt,.lifeon .kbai,.lifeon .kbx{display:none!important}
+.lifel li{display:grid;grid-template-columns:92px 1fr;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.4}
+.lifel li:first-child{border-top:0}
+.lifel .ly{border:0;background:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--muted);text-align:left;cursor:pointer;font-variant-numeric:tabular-nums;display:flex;gap:4px;align-items:flex-start}
+.lifel .ly .ico.pix{width:14px;height:14px;flex:none;margin-top:1px}
+.lifel .ly .ico.pix img{width:14px;height:14px;image-rendering:pixelated}
+.lifel li.lmap .ly{color:var(--accent)}
+.lifel .ly:hover{text-decoration:underline}
+.lifel li.now{background:color-mix(in srgb,var(--accent) 8%,transparent)}
 .morebt{display:block;margin:0 0 8px;font-size:14.5px;font-weight:600;text-underline-offset:2px}
 /* a voice from the time: a line of its words, then whose they are */
 .vq{display:block;width:100%;margin:0 0 8px;padding:6px 10px 7px 12px;border:0;border-left:3px solid #2f6fd0;border-radius:0 var(--r) var(--r) 0;background:color-mix(in srgb,#2f6fd0 7%,var(--surface));text-align:left;font:inherit;color:var(--ink);cursor:pointer}
@@ -3170,8 +3184,36 @@ function kbFill(left, id, obj){
       mb.addEventListener("click",()=>{ const open=box.dataset.fit!=="open"; box.dataset.fit = open ? "open" : "fit"; mb.textContent = open ? "Show less" : "Read more"; mb.setAttribute("aria-expanded",String(open)); fitText(); if (!open) detail.scrollTop=0; });
       box.after(mb);
     }
+    if (P.t==="person" && tx.life && tx.life.length) lifeTab(left, box, tx.life);
     fitText();
   });
+}
+/* a person's life as a timeline, a second tab on their card. Its rows come from the page (kb_life.py, at most 20).
+   The year puts the red line there and takes the map to the item it names; the item's own link opens its card */
+let lifeShown=false;
+function lifeTab(left, box, rows){
+  const tabs=el("div","ltabs"), list=el("ol","lifel");
+  const tab=(name,on)=>{ const b=el("button","ltab",name); b.type="button"; b.setAttribute("aria-pressed",String(on)); return b; };
+  const ab=tab("About",!lifeShown), lb=tab("Life",lifeShown);
+  tabs.append(ab,lb);
+  for (const r of rows){
+    const li=el("li"), yb=el("button","ly"), span = r.e!=null && r.e!==r.y;
+    const Y=y=>y<0 ? (-y)+" BCE" : String(y);   /* CE goes without saying in a life list */
+    yb.type="button"; yb.textContent=(r.c?"c. ":"")+(span && r.y<0 && r.e<0 ? (-r.y)+" to "+Y(r.e) : Y(r.y)+(span ? " to "+Y(r.e) : ""));
+    const tx=el("span","lt"); tx.innerHTML=r.h; tx.querySelectorAll("a.kbl").forEach(kbDress);
+    li.append(yb,tx);
+    const o = r.k && kbTarget(r.k);
+    if (o){ li.classList.add("lmap"); yb.title="Show on the map"; yb.prepend(pixIcon("globe")); }
+    yb.addEventListener("click",()=>{
+      list.querySelectorAll("li.now").forEach(x=>x.classList.remove("now")); li.classList.add("now");
+      if (r.y>=START && r.y<=NOW) setYear(r.y,{scroll:true});
+      if (o && typeof followSel==="function"){ MAP.noFollow=0; followSel(o); }
+    });
+    list.append(li);
+  }
+  const show=life=>{ lifeShown=life; left.classList.toggle("lifeon",life); ab.setAttribute("aria-pressed",String(!life)); lb.setAttribute("aria-pressed",String(life)); fitText(); };
+  ab.addEventListener("click",()=>show(false)); lb.addEventListener("click",()=>show(true));
+  box.before(tabs); box.after(list); show(lifeShown);
 }
 /* voices: whose words a voice page holds, the voices that mention a page, and reading one aloud */
 const VOICEKIND = {"own words":"In their own words", witness:"A witness's account", traveller:"A traveller's account", reconstructed:"Reconstructed"};

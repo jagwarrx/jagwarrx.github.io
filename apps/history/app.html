@@ -577,8 +577,9 @@ button.dgyear:hover{border-color:var(--line-strong)}
   .dgend{flex-wrap:wrap} .dgmeta{flex-basis:100%}
 }
 /* the die sits on the time bar, left of the Years button. The row sheds what it can do without when it has no room (trowFit):
-   the Showing text, the zoom's label, the window menu and last the die, which then moves in with the tools at the top */
+   the Showing text, the zoom's label, the window menu and the die, which then moves in with the tools at the top; last its gaps narrow */
 .trow.fit1 #tShow,.trow.fit2 .zread,.trow.fit3 #winSel,.trow.fit4 #luckyBar{display:none}
+.trow.fit5{gap:3px}   /* last, on the narrowest phones with the chart's zoom buttons: closer together */
 .cmain:has(#storyCard:not([hidden])) #luckyBar{display:none}   /* a story has the time bar to itself */
 body:not(.nodie) .tbtools #luckyBtn{display:none}
 .tmid{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
@@ -846,6 +847,20 @@ body.pinned .pins{display:flex;flex-direction:column;gap:10px;min-height:0;overf
 /* short first: the rest of a long page waits behind Read more */
 .kbt.clip>:not([hidden]):has(+[hidden]){margin-bottom:4px}
 .morebt[hidden]{display:none}
+.ltabs{display:flex;gap:16px;margin:2px 0 10px;border-bottom:1px solid var(--line)}
+.ltab{border:0;background:none;padding:4px 0 6px;margin-bottom:-1px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.ltab[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.lifel{display:none;list-style:none;margin:0 0 10px;padding:0}
+.lifeon .lifel{display:block}
+.lifeon .kbt,.lifeon .morebt,.lifeon .kbai,.lifeon .kbx{display:none!important}
+.lifel li{display:grid;grid-template-columns:92px 1fr;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.4}
+.lifel li:first-child{border-top:0}
+.lifel .ly{border:0;background:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--muted);text-align:left;cursor:pointer;font-variant-numeric:tabular-nums;display:flex;gap:4px;align-items:flex-start}
+.lifel .ly .ico.pix{width:14px;height:14px;flex:none;margin-top:1px}
+.lifel .ly .ico.pix img{width:14px;height:14px;image-rendering:pixelated}
+.lifel li.lmap .ly{color:var(--accent)}
+.lifel .ly:hover{text-decoration:underline}
+.lifel li.now{background:color-mix(in srgb,var(--accent) 8%,transparent)}
 .morebt{display:block;margin:0 0 8px;font-size:14.5px;font-weight:600;text-underline-offset:2px}
 /* a voice from the time: a line of its words, then whose they are */
 .vq{display:block;width:100%;margin:0 0 8px;padding:6px 10px 7px 12px;border:0;border-left:3px solid #2f6fd0;border-radius:0 var(--r) var(--r) 0;background:color-mix(in srgb,#2f6fd0 7%,var(--surface));text-align:left;font:inherit;color:var(--ink);cursor:pointer}
@@ -1173,7 +1188,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   <div class="tbtools" id="tbtools">
     <button class="tb lucky" id="luckyBtn" type="button" aria-label="Surprise me" title="Surprise me: open something at random"><img src="pix/dice.png" alt="" width="22" height="22" draggable="false"><span class="tbt">Surprise me</span></button>
     <button class="tb" id="askBtn" type="button" aria-expanded="false" aria-controls="askPop" aria-label="Ask the map" title="Ask the map: ask a question and Claude makes a story to play"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 2.8h9.6a1 1 0 0 1 1 1v6.4a1 1 0 0 1-1 1H8.4l-3 2.4v-2.4H3.2a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1z"/><path d="M6.6 5.6a1.5 1.5 0 1 1 2 1.4c-.4.2-.6.5-.6.9v.2"/><path d="M8 9.6v.01"/></svg><span class="tbt">Ask the map</span></button>
-    <button class="tb" id="storyBtn" type="button" aria-expanded="false" aria-controls="storyPop" aria-label="Library" title="Library: stories, voices and videos. Key S"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4.6C6.6 3.5 4.6 3.1 2.5 3.3v9c2.1-.2 4.1.2 5.5 1.3 1.4-1.1 3.4-1.5 5.5-1.3v-9c-2.1-.2-4.1.2-5.5 1.3zM8 4.6v9"/></svg><span class="tbt">Library</span></button>
+    <button class="tb" id="storyBtn" type="button" aria-expanded="false" aria-controls="storyPop" aria-label="Library" title="Library: stories, voices, videos and sites. Key S"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4.6C6.6 3.5 4.6 3.1 2.5 3.3v9c2.1-.2 4.1.2 5.5 1.3 1.4-1.1 3.4-1.5 5.5-1.3v-9c-2.1-.2-4.1.2-5.5 1.3zM8 4.6v9"/></svg><span class="tbt">Library</span></button>
     <button class="tb" id="dailyBtn" type="button" aria-label="Guess the year"><img src="pix/hourglass.png" alt="" width="22" height="22" draggable="false"><span class="tbt">Guess the year</span></button>
     <button class="tb" id="shareBtn" type="button" aria-label="Share view" title="Copy a link to this view: year, regions, layers and detail"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 9.4l2.8-2.8M7.2 4.9l1.1-1.1a2.6 2.6 0 0 1 3.7 3.7l-1.1 1.1M8.8 11.1l-1.1 1.1a2.6 2.6 0 0 1-3.7-3.7l1.1-1.1"/></svg><span class="tbt">Share view</span></button>
     <button class="tb" id="keyBtn" type="button" aria-expanded="false" aria-controls="keyPop" aria-label="Key" title="Key: what the marks mean"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3" width="3" height="3" rx=".7"/><rect x="2.5" y="10" width="3" height="3" rx=".7"/><path d="M8 4.5h5.5M8 11.5h5.5"/></svg><span class="tbt">Key</span></button>
@@ -1314,7 +1329,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
       <li><b>A map of borders.</b> The map shows the territories of the selected regions in the red line's year. Map, at the top, makes it fill the chart's space; Minimize turns it into a small window over the chart that you can drag and resize. Events and overlay items sit where Wikipedia or Wikidata places them (people at their birthplace, from age 20 to their death); the rest show when the red line is within some years of them, and the map says which years. Opening something moves the map to it: a state to its territory, outlined in red. Drag the map to pan, scroll or pinch to zoom, or use Zoom to area. Borders come from historical-basemaps, about 50 snapshots from 3000 BCE to 2010, with the borders of today from Natural Earth; the map shows the nearest snapshot at or before the year.</li>
       <li><b>Search and share.</b> Search finds states, events, people and years; press / to start. The address bar keeps the year, regions, layers, detail and what is open, so Share view copies a link that opens the same view. Keys: Left and Right step the year, Space plays and pauses, 1, 2 and 3 set the detail, S opens the library, Escape closes.</li>
       <li><b>Pages.</b> About 5,900 short pages sit behind the chart, on states, peoples, events, people, works and places. Open one from a card, a link or the search. Links in the text go to other pages; a link with no page yet says so. Hold Shift and click a link to keep that page open in a sidebar while you read on.</li>
-      <li><b>Library.</b> The Library button lists the stories, the voices and the videos. A voice is a passage in the words of someone who was there, copied from a named source. A story plays like a short film: the chart and the map travel from step to step while the text is read out. Pause at any time, look around, and press play to carry on. The voice is your browser's and can be switched off.</li>
+      <li><b>Library.</b> The Library button lists the stories, the voices, the videos and the sites. A site opens as it stands today: photo tours you can walk through, Street View outside and in, and 3D scans made from visitors' photos. View the site on its card does the same, and so does its pin on the map, shown once the map is zoomed in to about a country; the Sites button above the map hides the pins. A voice is a passage in the words of someone who was there, copied from a named source. A story plays like a short film: the chart and the map travel from step to step while the text is read out. Pause at any time, look around, and press play to carry on. The voice is your browser's and can be switched off.</li>
       <li><b>Ask the map.</b> Ask a question and Claude builds a story from the chart to answer it; Ask about this, on a card, answers questions about one item. Both need your own Anthropic API key, which stays in your browser, and each question costs you a few cents.</li>
       <li><b>Two time scales.</b> An even scale is honest about duration. Stretch recent gives the crowded last five centuries three times the room.</li>
       <li><b>The Roman Empire does not end in 476.</b> The eastern empire is labelled as the Roman state continuing.</li>
@@ -1323,6 +1338,7 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
     <ul>
       <li>No cookies, no tracking, no account. Your settings, the pages you keep open and the stories you save stay in this browser.</li>
       <li>Opening an item, or resting the pointer on a link, asks Wikipedia for its picture and summary. Wikipedia sees the item's title.</li>
+      <li>View the site loads Google Street View, a Sketchfab model or a photo tour in the page. Google, Sketchfab or the tour's host sees which place you opened.</li>
       <li>The Claude features send your question and the text of the card to Anthropic, with your own API key. The key is kept in this browser only; Forget key removes it.</li>
       <li>The map of borders before 2010 comes from historical-basemaps (GPL-3.0). The fonts are Barlow (OFL), the small pictures Noto Emoji (Apache 2.0).</li>
     </ul>
@@ -1338,20 +1354,20 @@ details.more2 summary{cursor:pointer;color:var(--muted);font-weight:500}
   </div>
 </div>
 
-<script src="hier.js?v=fa52de02a6"></script>
-<script src="books.js?v=fa52de02a6"></script>
-<script src="videos.js?v=fa52de02a6"></script>
-<script src="stories.js?v=fa52de02a6"></script>
-<script src="deep.js?v=fa52de02a6"></script>
-<script src="famous.js?v=fa52de02a6"></script>
-<script src="kb.js?v=fa52de02a6"></script>
-<script src="people/portraits.js?v=fa52de02a6"></script>
-<script src="ovpics.js?v=fa52de02a6"></script>
-<script src="kinds.js?v=fa52de02a6"></script>
-<script src="events.js?v=fa52de02a6"></script>
+<script src="hier.js?v=cdaa8674e0"></script>
+<script src="books.js?v=cdaa8674e0"></script>
+<script src="videos.js?v=cdaa8674e0"></script>
+<script src="stories.js?v=cdaa8674e0"></script>
+<script src="deep.js?v=cdaa8674e0"></script>
+<script src="famous.js?v=cdaa8674e0"></script>
+<script src="kb.js?v=cdaa8674e0"></script>
+<script src="people/portraits.js?v=cdaa8674e0"></script>
+<script src="ovpics.js?v=cdaa8674e0"></script>
+<script src="kinds.js?v=cdaa8674e0"></script>
+<script src="events.js?v=cdaa8674e0"></script>
 <script>
 "use strict";
-const VER = "?v=fa52de02a6";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
+const VER = "?v=cdaa8674e0";     /* deploy.sh sets this in the published copy (?v=stamp), so a reader never gets new code with old data */
 const NOW = 2026, START = -3300;
 const REG = [
   {id:"ca", name:"Central & Inner Asia"},
@@ -3065,6 +3081,7 @@ function select(obj){
     const pb=el("button","btn pinb"); pb.type="button"; pb.title="Keep this page open in the sidebar while you read on. Shift and click on any link does the same.";
     pb.innerHTML='<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2.5 3.5h11v9h-11zM10 3.5v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><span>Keep open</span>';
     pb.addEventListener("click",()=>pinOfObj(obj)); acts.insertBefore(pb, acts.querySelector("a")); }
+  if (typeof siteButton==="function" && kid) siteButton(acts, kid);   /* View the site: the place as it is today (sites.js) */
   /* the actions come first, under the title, and stay in view while the card scrolls */
   if (acts.firstChild && meta.parentNode) meta.after(acts);
   left.append(...(chat?[chat]:[]), context(obj));
@@ -3166,8 +3183,36 @@ function kbFill(left, id, obj){
       mb.addEventListener("click",()=>{ const open=box.dataset.fit!=="open"; box.dataset.fit = open ? "open" : "fit"; mb.textContent = open ? "Show less" : "Read more"; mb.setAttribute("aria-expanded",String(open)); fitText(); if (!open) detail.scrollTop=0; });
       box.after(mb);
     }
+    if (P.t==="person" && tx.life && tx.life.length) lifeTab(left, box, tx.life);
     fitText();
   });
+}
+/* a person's life as a timeline, a second tab on their card. Its rows come from the page (kb_life.py, at most 20).
+   The year puts the red line there and takes the map to the item it names; the item's own link opens its card */
+let lifeShown=false;
+function lifeTab(left, box, rows){
+  const tabs=el("div","ltabs"), list=el("ol","lifel");
+  const tab=(name,on)=>{ const b=el("button","ltab",name); b.type="button"; b.setAttribute("aria-pressed",String(on)); return b; };
+  const ab=tab("About",!lifeShown), lb=tab("Life",lifeShown);
+  tabs.append(ab,lb);
+  for (const r of rows){
+    const li=el("li"), yb=el("button","ly"), span = r.e!=null && r.e!==r.y;
+    const Y=y=>y<0 ? (-y)+" BCE" : String(y);   /* CE goes without saying in a life list */
+    yb.type="button"; yb.textContent=(r.c?"c. ":"")+(span && r.y<0 && r.e<0 ? (-r.y)+" to "+Y(r.e) : Y(r.y)+(span ? " to "+Y(r.e) : ""));
+    const tx=el("span","lt"); tx.innerHTML=r.h; tx.querySelectorAll("a.kbl").forEach(kbDress);
+    li.append(yb,tx);
+    const o = r.k && kbTarget(r.k);
+    if (o){ li.classList.add("lmap"); yb.title="Show on the map"; yb.prepend(pixIcon("globe")); }
+    yb.addEventListener("click",()=>{
+      list.querySelectorAll("li.now").forEach(x=>x.classList.remove("now")); li.classList.add("now");
+      if (r.y>=START && r.y<=NOW) setYear(r.y,{scroll:true});
+      if (o && typeof followSel==="function"){ MAP.noFollow=0; followSel(o); }
+    });
+    list.append(li);
+  }
+  const show=life=>{ lifeShown=life; left.classList.toggle("lifeon",life); ab.setAttribute("aria-pressed",String(!life)); lb.setAttribute("aria-pressed",String(life)); fitText(); };
+  ab.addEventListener("click",()=>show(false)); lb.addEventListener("click",()=>show(true));
+  box.before(tabs); box.after(list); show(lifeShown);
 }
 /* voices: whose words a voice page holds, the voices that mention a page, and reading one aloud */
 const VOICEKIND = {"own words":"In their own words", witness:"A witness's account", traveller:"A traveller's account", reconstructed:"Reconstructed"};
@@ -3719,7 +3764,7 @@ function lucky(){
 }
 $("luckyBtn").addEventListener("click",lucky); $("luckyBar").addEventListener("click",lucky);
 /* the time bar's row gives up one thing at a time until it fits. It runs when the row or anything in it changes size: a new window, a folded panel, the chart's zoom buttons, a longer year */
-{ const row=$("luckyBar").parentNode, steps=["fit1","fit2","fit3","fit4"];
+{ const row=$("luckyBar").parentNode, steps=["fit1","fit2","fit3","fit4","fit5"];
   const trowFit=()=>{ if (!row.clientWidth) return; row.classList.remove(...steps);
     for (const c of steps){ if (row.scrollWidth<=row.clientWidth+1) break; row.classList.add(c); }
     document.body.classList.toggle("nodie",row.classList.contains("fit4")); };
@@ -3882,6 +3927,7 @@ function setStories(open){
       b.addEventListener("click",()=>{ setStories(false); kbGo(V.item); }); VV.append(b);
     }
   }
+  if (typeof sitesLibrary==="function") sitesLibrary(sec);   /* Sites today (sites.js): places as they stand now */
   const keys=[...root.children].map(d=>d.dataset.k), want=LS("history.lib.tab");
   libShow(keys.includes(want) ? want : keys.includes("super") ? "super" : keys[1]||keys[0]);
   if (!was){ const t=nav.querySelector('[aria-selected="true"]'); if (t) t.focus({preventScroll:true}); }
@@ -4153,9 +4199,9 @@ if (!LS("wh8-seen") && !LS("wh8-keyseen") && !FROM_URL && window.self===window.t
 saveLS("wh8-seen","1");
 function helloGone(){ const h=$("hello"); if (h) h.remove(); }
 </script>
-<script src="geo.js?v=fa52de02a6"></script>
-<script src="routes.js?v=fa52de02a6"></script>
-<script src="map.js?v=fa52de02a6"></script>
+<script src="geo.js?v=cdaa8674e0"></script>
+<script src="routes.js?v=cdaa8674e0"></script>
+<script src="map.js?v=cdaa8674e0"></script>
 <script>
 /* a link to a story step. Runs here, and again once ask.js has added the stories saved in this browser */
 function openStoryLink(){ const m=(Q.get("st")||"").match(/^([\w-]+)\.(\d+)$/), s=m && !story && STORYS.find(x=>x.id===m[1]); if (s){ startStory(s,+m[2]-1,false);
@@ -4202,14 +4248,15 @@ openStoryLink();
   addEventListener("resize",()=>{ if (document.body.classList.contains("sized")) setW(parseInt(document.body.style.getPropertyValue("--sidew"))); });
 }
 </script>
-<script src="ask.js?v=fa52de02a6"></script>
-<script src="sidebar.js?v=fa52de02a6"></script>
-<script src="connections.js?v=fa52de02a6"></script>
-<script src="cx.js?v=fa52de02a6"></script>
+<script src="ask.js?v=cdaa8674e0"></script>
+<script src="sidebar.js?v=cdaa8674e0"></script>
+<script src="connections.js?v=cdaa8674e0"></script>
+<script src="cx.js?v=cdaa8674e0"></script>
 <script src="super/mongols.js?v=1122p"></script>
 <script src="super/mongols.voice.js?v=1122p"></script>
 <script src="super.js?v=1122q"></script>
-<script src="daily.js?v=fa52de02a6"></script>
+<script src="daily.js?v=cdaa8674e0"></script>
+<script src="sites.js?v=cdaa8674e0"></script>
 <script>
 /* a card opened from the link was drawn before ask.js and sidebar.js loaded: draw it again so it gets their buttons */
 if (state.sel){ MAP.keepYear=true; select(state.sel); MAP.keepYear=false; }
