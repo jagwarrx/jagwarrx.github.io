@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 520" font-family="-apple-system,Helvetica,Arial,sans-serif">
+<defs><marker id="m0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#8a7cc0"/></marker><marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#3c9a73"/></marker><marker id="m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#c9a92a"/></marker><marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#999"/></marker></defs>
+<rect width="910" height="520" fill="#fbfaf7"/>
+<path d="M285.0 40H495.0L521.7 102H258.3Z" fill="#ece8f6" stroke="#8a7cc0" stroke-width="1.3"/>
+<text x="390" y="67" text-anchor="middle" font-size="17" font-weight="700" fill="#463a7a"><tspan fill="#5a4e8e" font-weight="400">7</tspan>  Ends</text>
+<text x="390" y="87" text-anchor="middle" font-size="13" fill="#5a4e8e">What&#8217;s it all for?</text>
+<path d="M256.1 107H523.9L550.6 169H229.4Z" fill="#ece8f6" stroke="#8a7cc0" stroke-width="1.3"/>
+<text x="390" y="134" text-anchor="middle" font-size="17" font-weight="700" fill="#463a7a"><tspan fill="#5a4e8e" font-weight="400">6</tspan>  Strategy</text>
+<text x="390" y="154" text-anchor="middle" font-size="13" fill="#5a4e8e">How will I get there?</text>
+<path d="M227.2 174H552.8L579.5 236H200.5Z" fill="#ece8f6" stroke="#8a7cc0" stroke-width="1.3"/>
+<text x="390" y="201" text-anchor="middle" font-size="17" font-weight="700" fill="#463a7a"><tspan fill="#5a4e8e" font-weight="400">5</tspan>  Outputs</text>
+<text x="390" y="221" text-anchor="middle" font-size="13" fill="#5a4e8e">What will exist in the world?</text>
+<path d="M198.4 241H581.6L608.4 303H171.6Z" fill="#e2f4ec" stroke="#3c9a73" stroke-width="1.3"/>
+<text x="390" y="268" text-anchor="middle" font-size="17" font-weight="700" fill="#145a3e"><tspan fill="#1f7350" font-weight="400">4</tspan>  Plans and objectives</text>
+<text x="390" y="288" text-anchor="middle" font-size="13" fill="#1f7350">What am I doing this week?</text>
+<path d="M169.5 308H610.5L637.2 370H142.8Z" fill="#e2f4ec" stroke="#3c9a73" stroke-width="1.3"/>
+<text x="390" y="335" text-anchor="middle" font-size="17" font-weight="700" fill="#145a3e"><tspan fill="#1f7350" font-weight="400">3</tspan>  Focused work</text>
+<text x="390" y="355" text-anchor="middle" font-size="13" fill="#1f7350">Am I actually doing it?</text>
+<path d="M140.6 375H639.4L666.1 437H113.9Z" fill="#fff3b8" stroke="#c9a92a" stroke-width="1.3"/>
+<text x="390" y="402" text-anchor="middle" font-size="17" font-weight="700" fill="#5a4a08"><tspan fill="#6b5a10" font-weight="400">2</tspan>  Others&#8217; help</text>
+<text x="390" y="422" text-anchor="middle" font-size="13" fill="#6b5a10">Who multiplies my capacity?</text>
+<path d="M111.7 442H668.3L695.0 504H85.0Z" fill="#fff3b8" stroke="#c9a92a" stroke-width="1.3"/>
+<text x="390" y="469" text-anchor="middle" font-size="17" font-weight="700" fill="#5a4a08"><tspan fill="#6b5a10" font-weight="400">1</tspan>  Energy and sustenance</text>
+<text x="390" y="489" text-anchor="middle" font-size="13" fill="#6b5a10">Do I have the fuel?</text>
+<path d="M743.0 46V230" stroke="#8a7cc0" stroke-width="2.4" fill="none" marker-end="url(#m0)" />
+<text x="759.0" y="135.0" font-size="16" font-weight="700" fill="#463a7a">Direction</text>
+<text x="759.0" y="154.0" font-size="12.5" fill="#5a4e8e">what deserves time</text>
+<path d="M743.0 247V364" stroke="#3c9a73" stroke-width="2.4" fill="none" marker-start="url(#m1)" marker-end="url(#m1)" />
+<text x="759.0" y="302.5" font-size="16" font-weight="700" fill="#145a3e">Time</text>
+<text x="759.0" y="321.5" font-size="12.5" fill="#1f7350">where the hours go</text>
+<path d="M743.0 381V498" stroke="#c9a92a" stroke-width="2.4" fill="none" marker-start="url(#m2)" />
+<text x="759.0" y="436.5" font-size="16" font-weight="700" fill="#5a4a08">Energy</text>
+<text x="759.0" y="455.5" font-size="12.5" fill="#6b5a10">what powers it all</text>
+<path d="M34 498V46" stroke="#999" stroke-width="1.6" fill="none" marker-end="url(#mg)"/>
+<path d="M60 46V498" stroke="#999" stroke-width="1.6" fill="none" marker-end="url(#mg)"/>
+<text x="28" y="272.0" font-size="13" fill="#666" text-anchor="middle" transform="rotate(-90 28 272.0)">why?</text>
+<text x="76" y="272.0" font-size="13" fill="#666" text-anchor="middle" transform="rotate(90 76 272.0)">how?</text>
+</svg>
